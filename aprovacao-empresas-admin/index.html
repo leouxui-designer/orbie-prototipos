@@ -1,0 +1,899 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Empresas — SCTEC Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Montserrat:wght@800&display=swap" rel="stylesheet" />
+
+  <!--
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ARQUITETURA — fluxo unificado de aprovação                     │
+  │                                                                 │
+  │  Regra de negócio: cada empresa tem exatamente 1 responsável.   │
+  │  Toda decisão passa pelo mesmo side-sheet, independente         │
+  │  de quantas solicitações existam.                               │
+  │                                                                 │
+  │  Back-end: POST /companies/:id/access-decision                  │
+  │    body: { approved_candidate_id: string | null }               │
+  │    — string  → aprova esse candidato, recusa os demais          │
+  │    — null    → recusa todos                                     │
+  │                                                                 │
+  │  E-mail automático: itera sobre os recusados (pode ser lista    │
+  │  vazia quando só há 1 candidato e ele é aprovado).              │
+  │                                                                 │
+  │  UI: sheet sempre abre. Com 1 candidato, o radio é ocultado     │
+  │  e os botões do rodapé viram "Aprovar" / "Recusar" diretos.     │
+  │  Com N candidatos, radio de seleção + "Recusar todos".          │
+  └─────────────────────────────────────────────────────────────────┘
+  -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #7ab934;
+      --primary-dark: #2ca942;
+      --primary-container: rgba(122,185,52,0.18);
+      --sidebar-bg: #22292b;
+      --sidebar-text: #d4d4d4;
+      --sidebar-active-text: #7ab934;
+      --bg: #f8f9fb;
+      --white: #ffffff;
+      --border: #d4d4d4;
+      --text-main: #171717;
+      --text-sub: #737373;
+      --text-dark: #22292b;
+      --success-bg: #ecfdf3;
+      --success-text: #027a48;
+      --warning-bg: #fffaeb;
+      --warning-text: #b54708;
+      --danger-bg: #fef2f2;
+      --danger-text: #c0392b;
+      --neutral-bg: #f0f1f7;
+      --neutral-text: #374151;
+      --amber: #f59e0b;
+      --shadow-card: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+      --r-lg: 12px; --r-md: 10px; --r-sm: 8px; --r-badge: 20px;
+    }
+
+    body { font-family:'Roboto',sans-serif; background:var(--bg); color:var(--text-main); min-height:100vh; overflow-x:hidden; }
+
+    /* NAVBAR */
+    .navbar { position:fixed; top:0; left:0; right:0; height:80px; background:rgba(255,255,255,.75); backdrop-filter:blur(12px); border-bottom:2px solid rgba(255,255,255,.5); box-shadow:0 1.2px 15px rgba(69,42,124,.10); display:flex; align-items:center; justify-content:space-between; padding:0 24px; z-index:100; }
+    .brand-name { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; color:var(--text-main); line-height:1; }
+    .brand-sub  { font-size:14px; font-weight:600; color:var(--text-main); }
+    .navbar-right { display:flex; align-items:center; gap:12px; }
+    .user-role  { font-size:14px; font-weight:500; color:var(--text-main); text-align:right; }
+    .user-team  { font-size:13px; color:var(--text-sub); text-align:right; }
+    .avatar     { width:48px; height:48px; border-radius:50%; background:var(--primary-container); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--primary-dark); }
+
+    /* SIDEBAR */
+    .sidebar { position:fixed; top:80px; left:0; width:256px; height:calc(100vh - 80px); background:var(--sidebar-bg); display:flex; flex-direction:column; z-index:90; }
+    .sidebar-header { padding:16px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .sidebar-header .s-name { font-size:16px; font-weight:700; color:#fff; }
+    .sidebar-header .s-team { font-size:12px; color:rgba(255,255,255,.5); }
+    .sidebar-menu { flex:1; padding:16px 8px; display:flex; flex-direction:column; gap:4px; }
+    .s-item { display:flex; align-items:center; gap:8px; padding:10px 8px; border-radius:6px; text-decoration:none; color:var(--sidebar-text); font-size:14px; font-weight:700; opacity:.8; transition:background .15s; }
+    .s-item:hover { background:rgba(255,255,255,.06); }
+    .s-item.active { background:rgba(122,185,52,.18); color:var(--sidebar-active-text); opacity:1; }
+    .sidebar-footer { padding:8px 8px 24px; border-top:1px solid rgba(255,255,255,.08); }
+
+    /* MAIN */
+    .main { margin-left:256px; padding-top:80px; }
+    .main-content { padding:32px 40px; display:flex; flex-direction:column; gap:24px; }
+
+    /* TITLE */
+    .title-header { display:flex; align-items:flex-start; justify-content:space-between; }
+    .title-group h1 { font-size:30px; font-weight:700; color:var(--text-dark); letter-spacing:-.75px; }
+    .title-group p  { font-size:16px; color:var(--text-sub); margin-top:4px; }
+
+    /* BUTTONS */
+    .btn-primary    { display:flex; align-items:center; gap:6px; background:linear-gradient(128deg,#2ca942 15%,#55b13a 54%,#52b934 86%); color:#fff; border:none; cursor:pointer; padding:0 14px; height:36px; border-radius:var(--r-md); font-size:14px; font-weight:500; font-family:'Roboto',sans-serif; white-space:nowrap; transition:opacity .15s; }
+    .btn-primary:hover { opacity:.9; }
+    .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
+    .btn-outline    { display:flex; align-items:center; gap:6px; background:#fff; color:var(--text-main); border:1px solid var(--border); cursor:pointer; padding:0 14px; height:36px; border-radius:var(--r-md); font-size:14px; font-weight:500; font-family:'Roboto',sans-serif; white-space:nowrap; transition:background .12s; }
+    .btn-outline:hover { background:#f3f4f6; }
+    .btn-danger     { display:flex; align-items:center; gap:6px; background:#fff; color:var(--danger-text); border:1px solid #fca5a5; cursor:pointer; padding:0 14px; height:36px; border-radius:var(--r-md); font-size:14px; font-weight:500; font-family:'Roboto',sans-serif; white-space:nowrap; transition:background .12s; }
+    .btn-danger:hover { background:var(--danger-bg); }
+
+    /* FILTER */
+    .filter-bar { background:var(--white); border-radius:22px; box-shadow:var(--shadow-card); padding:20px; display:flex; gap:16px; }
+    .filter-input { flex:1; display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:var(--r-md); padding:0 12px; height:42px; background:#fff; }
+    .filter-input input { flex:1; border:none; outline:none; font-size:14px; color:var(--text-sub); font-family:'Roboto',sans-serif; background:transparent; }
+    .filter-select { display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--border); border-radius:var(--r-md); padding:0 12px; height:42px; background:#fff; cursor:pointer; font-size:14px; color:var(--text-sub); min-width:190px; }
+
+    /* TABLE */
+    .table-meta { font-size:14px; color:#6b7280; }
+    .table-meta strong { font-weight:700; color:var(--text-main); }
+    .table-card { border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:#fff; }
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:var(--bg); }
+    thead th { padding:0 16px; height:42px; text-align:left; font-size:12px; font-weight:600; color:#6b7280; letter-spacing:.4px; border-bottom:1px solid rgba(0,0,0,.06); white-space:nowrap; }
+    thead th:first-child { padding-left:20px; }
+    tbody tr { border-bottom:1px solid rgba(0,0,0,.05); transition:background .12s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:nth-child(odd)  { background:#fff; }
+    tbody tr:nth-child(even) { background:#fafcff; }
+    tbody tr:hover { background:#f4fae9 !important; }
+    tbody tr.row-warn { background:rgba(255,250,245,.6) !important; }
+    tbody tr.row-warn:hover { background:#fff5e6 !important; }
+    td { padding:0 16px; height:74px; vertical-align:middle; font-size:13px; color:#454545; }
+    td:first-child { padding-left:20px; }
+    .co-name { font-size:13px; font-weight:600; color:#111; margin-bottom:2px; }
+    .co-seg  { font-size:12px; color:#6b7280; }
+    .co-tag  { display:inline-flex; align-items:center; gap:4px; background:#fff3cd; color:#92400e; border:1px solid var(--amber); border-radius:20px; font-size:11px; font-weight:600; padding:2px 8px; margin-top:4px; }
+    .resp-name  { font-size:13px; font-weight:500; color:#111; margin-bottom:2px; }
+    .resp-email { font-size:12px; color:#6b7280; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:var(--r-badge); font-size:13px; font-weight:500; white-space:nowrap; }
+    .badge-success  { background:var(--success-bg); color:var(--success-text); }
+    .badge-warning  { background:var(--warning-bg); color:var(--warning-text); }
+    .badge-neutral  { background:var(--neutral-bg); color:var(--neutral-text); }
+    /* badge clicável — mesmo estilo para 1 ou N solicitações */
+    .badge-pending  { display:inline-flex; align-items:center; gap:5px; background:var(--warning-bg); color:var(--warning-text); border:1.5px solid var(--amber); border-radius:var(--r-badge); font-size:13px; font-weight:600; padding:3px 10px; cursor:pointer; transition:background .15s; }
+    .badge-pending:hover { background:#fef3c7; }
+    .actions-cell { display:flex; align-items:center; gap:6px; }
+    /* ícones para linhas ativas/inativas */
+    .btn-icon { width:32px; height:32px; border:none; cursor:pointer; border-radius:8px; display:flex; align-items:center; justify-content:center; background:transparent; transition:background .12s; flex-shrink:0; }
+    .btn-icon.edit    { color:#6b7280; } .btn-icon.edit:hover    { background:#f3f4f6; }
+    .switch-track { width:40px; height:22px; border-radius:100px; position:relative; transition:background .2s; }
+    .switch-track.on  { background:var(--primary); }
+    .switch-track.off { background:#e0e0e0; }
+    .switch-knob { position:absolute; top:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(39,39,39,.1); transition:left .2s; }
+    .switch-track.on  .switch-knob { left:20px; }
+    .switch-track.off .switch-knob { left:2px; }
+    /* botões com label para linhas pendentes */
+    .btn-action {
+      display:inline-flex; align-items:center; gap:6px;
+      height:34px; padding:0 12px; border-radius:var(--r-md);
+      font-size:13px; font-weight:500; font-family:'Roboto',sans-serif;
+      cursor:pointer; white-space:nowrap; border:1px solid var(--border);
+      background:#fff; color:var(--text-main);
+      transition:background .12s, border-color .12s;
+    }
+    .btn-action:hover { background:#f3f4f6; border-color:#a3a3a3; }
+
+    /* PAGINATION */
+    .pagination { display:flex; align-items:center; gap:4px; }
+    .page-btn { width:36px; height:36px; border:1px solid #e5e7eb; border-radius:var(--r-sm); background:#fff; cursor:pointer; font-size:14px; color:#6b7280; display:flex; align-items:center; justify-content:center; transition:background .12s; }
+    .page-btn:hover  { background:#f3f4f6; }
+    .page-btn.active { background:var(--primary-dark); border-color:var(--primary-dark); color:#fff; font-weight:600; }
+    .page-meta { font-size:14px; color:#6b7280; margin:0 4px; }
+
+    /* OVERLAY */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.38); z-index:200; display:none; }
+    .overlay.on { display:block; }
+
+    /* ══════════════════════════════════════════
+       SIDE-SHEET — componente único de decisão
+       Mesmo componente para 1 ou N candidatos.
+       A diferença visual é controlada via JS:
+       - isSingle=true  → oculta radio, muda footer
+       - isSingle=false → exibe radio, exibe "Recusar todos"
+    ══════════════════════════════════════════ */
+    .sheet { position:fixed; top:0; right:-580px; width:580px; height:100vh; background:#fff; z-index:300; box-shadow:-4px 0 32px rgba(0,0,0,.16); transition:right .3s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; overflow:hidden; }
+    .sheet.open { right:0; }
+
+    .sheet-head { padding:22px 24px 18px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-shrink:0; }
+    .sheet-head-info h3 { font-size:18px; font-weight:700; color:var(--text-dark); }
+    .sheet-head-meta { font-size:13px; color:var(--text-sub); margin-top:4px; display:flex; align-items:center; gap:10px; }
+    .btn-close { background:none; border:none; cursor:pointer; color:#9ca3af; padding:4px; border-radius:6px; transition:background .12s,color .12s; flex-shrink:0; }
+    .btn-close:hover { background:#f3f4f6; color:#374151; }
+
+    .sheet-body { flex:1; overflow-y:auto; padding:20px 24px 8px; display:flex; flex-direction:column; gap:14px; }
+
+    /* contexto — texto corrido, sem caixa */
+    .sheet-context { font-size:14px; color:var(--text-sub); line-height:1.65; }
+    .sheet-context strong { color:var(--text-dark); }
+
+    .section-label { font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.6px; display:flex; align-items:center; gap:6px; }
+    .section-label .pill { background:var(--warning-bg); color:var(--warning-text); border-radius:20px; font-size:11px; font-weight:700; padding:1px 8px; }
+
+    /* ── card de candidato ── */
+    .sol-card { border:1.5px solid var(--border); border-radius:var(--r-md); overflow:hidden; cursor:pointer; transition:border-color .15s; }
+    .sol-card:hover { border-color:#a3a3a3; }
+    /* selecionado */
+    .sol-card.selected { border-color:var(--primary-dark); box-shadow:0 0 0 3px rgba(44,169,66,.12); cursor:default; }
+    .sol-card-top { padding:12px 16px; background:#f9fafb; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .sol-card.selected .sol-card-top { background:#f0fdf4; border-bottom-color:rgba(44,169,66,.2); }
+    .sol-radio-row { display:flex; align-items:center; gap:10px; flex:1; }
+    /* radio — só visível quando isSingle=false */
+    .sol-radio { width:18px; height:18px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:border-color .15s,background .15s; }
+    .sol-radio.checked { border-color:var(--primary-dark); background:var(--primary-dark); }
+    .sol-radio.checked::after { content:''; width:6px; height:6px; border-radius:50%; background:#fff; }
+    .sol-name  { font-size:14px; font-weight:600; color:#111; }
+    .sol-email-pill { display:inline-flex; align-items:center; gap:4px; background:#eef2ff; color:#6366f1; border-radius:20px; font-size:12px; font-weight:500; padding:2px 8px; margin-top:3px; }
+    .sol-since { font-size:12px; color:#9ca3af; margin-top:3px; }
+    .chip-approved { display:inline-flex; align-items:center; gap:4px; background:var(--success-bg); color:var(--success-text); border-radius:20px; font-size:12px; font-weight:600; padding:3px 10px; flex-shrink:0; }
+    .sol-card-body { padding:12px 16px; display:flex; flex-direction:column; gap:7px; }
+    .sol-field { display:flex; align-items:center; }
+    .sol-label { font-size:12px; color:#9ca3af; min-width:90px; flex-shrink:0; }
+    .sol-value { font-size:13px; color:var(--text-dark); font-weight:500; display:flex; align-items:center; gap:6px; }
+    .copy-btn { background:none; border:none; cursor:pointer; color:#9ca3af; padding:2px; border-radius:4px; transition:color .12s; }
+    .copy-btn:hover { color:var(--primary-dark); }
+    .sol-msg { font-size:12px; color:#6b7280; font-style:italic; line-height:1.5; }
+
+    /* ── rodapé do sheet ── */
+    .sheet-footer { flex-shrink:0; border-top:1px solid var(--border); padding:14px 24px 20px; background:#fff; }
+    .sheet-hint { font-size:14px; color:var(--text-sub); line-height:1.6; margin-bottom:12px; }
+    .sheet-hint strong { color:var(--text-dark); }
+    .sheet-actions { display:flex; gap:8px; align-items:center; }
+
+    /* ══════════════════════════════════════════
+       MODAL — confirmação de decisão
+       Mesmo componente para todos os casos.
+       Varia apenas o texto e o ícone.
+    ══════════════════════════════════════════ */
+    .modal-wrap { position:fixed; inset:0; z-index:400; display:none; align-items:center; justify-content:center; }
+    .modal-wrap.open { display:flex; }
+    .modal-back { position:absolute; inset:0; background:rgba(0,0,0,.45); }
+    .modal { position:relative; z-index:1; background:#fff; border-radius:16px; width:520px; max-height:88vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,.18); animation:slideUp .25s ease; }
+    @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .modal-header { padding:24px 24px 0; display:flex; justify-content:space-between; align-items:flex-start; }
+    .modal-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+    .modal-icon.approve { background:var(--success-bg); color:var(--success-text); }
+    .modal-icon.reject  { background:var(--danger-bg); color:var(--danger-text); }
+    .modal-title { font-size:18px; font-weight:700; color:var(--text-dark); }
+    .modal-sub   { font-size:14px; color:var(--text-sub); margin-top:3px; }
+    .modal-body  { padding:16px 24px 8px; display:flex; flex-direction:column; gap:12px; }
+
+    /* bloco "quem aprova" */
+    .approved-block { background:var(--success-bg); border:1px solid rgba(44,169,66,.3); border-radius:var(--r-md); padding:14px 16px; }
+    .approved-block .ab-label { font-size:11px; font-weight:700; color:var(--success-text); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+    .approved-block .ab-name  { font-size:15px; font-weight:700; color:#111; }
+    .approved-block .ab-meta  { font-size:13px; color:var(--text-sub); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
+    /* e-mail preview */
+    .email-preview { border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
+    .email-preview-head { background:#f3f4f6; padding:10px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .ep-label { font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:6px; }
+    .ep-auto  { font-size:11px; font-weight:600; background:#e0f2fe; color:#0369a1; border-radius:20px; padding:2px 8px; }
+    .email-preview-body { padding:14px 16px; background:#fff; display:flex; flex-direction:column; gap:5px; }
+    .ep-to   { font-size:12px; color:#6b7280; }
+    .ep-to strong { color:#374151; font-weight:600; }
+    .ep-subj { font-size:12px; color:#374151; font-weight:500; }
+    .ep-divider { border:none; border-top:1px solid #f3f4f6; margin:4px 0; }
+    .ep-body { font-size:13px; color:#374151; line-height:1.65; }
+    .ep-body strong { color:#111; }
+
+    .modal-footer { padding:12px 24px 24px; display:flex; justify-content:flex-end; gap:10px; }
+    .btn-confirm { padding:0 18px; height:38px; border:none; border-radius:var(--r-md); cursor:pointer; font-size:14px; font-weight:600; color:#fff; font-family:'Roboto',sans-serif; transition:opacity .15s; }
+    .btn-confirm.approve { background:linear-gradient(128deg,#2ca942,#52b934); }
+    .btn-confirm.approve:hover { opacity:.9; }
+    .btn-confirm.reject  { background:#e53e3e; }
+    .btn-confirm.reject:hover  { opacity:.9; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:32px; right:32px; padding:14px 20px; border-radius:12px; font-size:14px; font-weight:500; box-shadow:0 4px 20px rgba(0,0,0,.18); display:flex; align-items:center; gap:10px; z-index:500; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .25s,transform .25s; color:#fff; }
+    .toast.show { opacity:1; pointer-events:auto; transform:translateY(0); }
+    .toast.success { background:#027a48; }
+    .toast.danger  { background:#c0392b; }
+
+    [data-tip] { position:relative; }
+    [data-tip]:hover::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#303030; color:#fff; font-size:12px; font-weight:500; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; z-index:600; }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:10px; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div>
+    <div class="brand-name">SCTEC</div>
+    <div class="brand-sub">Portal de Talentos</div>
+  </div>
+  <div class="navbar-right">
+    <div><div class="user-role">ADMINISTRADOR</div><div class="user-team">Equipe SCTEC</div></div>
+    <div class="avatar">CN</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="s-name">Administrador</div>
+    <div class="s-team">Equipe SCTEC</div>
+  </div>
+  <div class="sidebar-menu">
+    <a href="#" class="s-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Banco de Talentos
+    </a>
+    <a href="#" class="s-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Gestão de Empresas
+    </a>
+    <a href="#" class="s-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Usuários
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <a href="#" class="s-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="main-content">
+
+    <div class="title-header">
+      <div class="title-group">
+        <h1>Gestão de Empresas</h1>
+        <p>Gerencie empresas parceiras, aprove cadastros e cadastre novas empresas</p>
+      </div>
+      <button class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Cadastrar Empresa
+      </button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-input" style="flex:1">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar por nome, CNPJ ou responsável…" />
+      </div>
+      <div class="filter-select">
+        Todos os status
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="filter-select">
+        Todos os segmentos
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <p class="table-meta">Exibindo <strong>1.247</strong> empresas — <strong style="color:#b54708">3 aguardando decisão</strong></p>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:250px">EMPRESA</th>
+            <th style="width:175px">CNPJ</th>
+            <th style="width:215px">RESPONSÁVEL</th>
+            <th style="width:70px;text-align:center">VAGAS</th>
+            <th style="width:210px">STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Ativas -->
+          <tr>
+            <td><div class="co-name">InovaTech SC</div><div class="co-seg">Tecnologia / IoT</div></td>
+            <td>44.555.666/0001-33</td>
+            <td><div class="resp-name">André Luiz Pereira</div><div class="resp-email">andre@inovatech.sc</div></td>
+            <td style="text-align:center">—</td>
+            <td><span class="badge badge-success">Ativa</span></td>
+            <td><div class="actions-cell">
+              <button class="btn-icon edit" data-tip="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-icon edit" data-tip="Resetar senha"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+              <div class="switch-track on"><div class="switch-knob"></div></div>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="co-name">SC Digital Solutions</div><div class="co-seg">E-commerce</div></td>
+            <td>77.888.999/0001-55</td>
+            <td><div class="resp-name">Patrícia Mendes</div><div class="resp-email">patricia@scdigital.com.br</div></td>
+            <td style="text-align:center">—</td>
+            <td><span class="badge badge-success">Ativa</span></td>
+            <td><div class="actions-cell">
+              <button class="btn-icon edit" data-tip="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-icon edit" data-tip="Resetar senha"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+              <div class="switch-track on"><div class="switch-knob"></div></div>
+            </div></td>
+          </tr>
+          <tr>
+            <td><div class="co-name">TechCorp Soluções</div><div class="co-seg">Tecnologia / SaaS</div></td>
+            <td>12.345.678/0001-90</td>
+            <td><div class="resp-name">Carlos Eduardo</div><div class="resp-email">carlos@techcorp.com.br</div></td>
+            <td style="text-align:center">3</td>
+            <td><span class="badge badge-success">Ativa</span></td>
+            <td><div class="actions-cell">
+              <button class="btn-icon edit" data-tip="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-icon edit" data-tip="Resetar senha"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+              <div class="switch-track on"><div class="switch-knob"></div></div>
+            </div></td>
+          </tr>
+
+          <!-- Inativa -->
+          <tr>
+            <td><div class="co-name">FinanSC</div><div class="co-seg">Fintech</div></td>
+            <td>33.444.555/0001-22</td>
+            <td><div class="resp-name">Juliana Martins</div><div class="resp-email">juliana@finansc.com.br</div></td>
+            <td style="text-align:center">4</td>
+            <td><span class="badge badge-neutral">Inativa</span></td>
+            <td><div class="actions-cell">
+              <button class="btn-icon edit" style="opacity:.4" data-tip="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-icon edit" style="opacity:.4" data-tip="Resetar senha"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+              <div class="switch-track off"><div class="switch-knob"></div></div>
+            </div></td>
+          </tr>
+
+          <!--
+            ════════════════════════════════════════════
+            CENÁRIO A — 1 solicitação (CloudSC)
+            Badge: "Aguardando aprovação"
+            Sheet: sem radio, footer = Aprovar / Recusar
+            ════════════════════════════════════════════
+          -->
+          <tr class="row-warn">
+            <td><div class="co-name">CloudSC Tecnologia</div><div class="co-seg">Cloud / Infra</div></td>
+            <td>11.222.333/0001-44</td>
+            <td><div class="resp-name">Marcos Souza</div><div class="resp-email">marcos@cloudsc.com.br</div></td>
+            <td style="text-align:center">1</td>
+            <td>
+              <span class="badge badge-warning">Aguardando aprovação</span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" onclick="openSheet('cloudsc')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Ver solicitação
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!--
+            ════════════════════════════════════════════
+            CENÁRIO B — 2 candidatos (InovaPlus)
+            Badge: "2 candidatos · decidir"
+            Sheet: com radio, footer = Aprovar selecionado / Recusar todos
+            ════════════════════════════════════════════
+          -->
+          <tr class="row-warn">
+            <td>
+              <div class="co-name">InovaPlus Sistemas</div>
+              <div class="co-seg">ERP / Consultoria</div>
+              <div class="co-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                2 candidatos
+              </div>
+            </td>
+            <td>66.777.888/0001-11</td>
+            <td style="color:#b54708;font-size:13px;font-weight:600">2 solicitantes</td>
+            <td style="text-align:center">—</td>
+            <td>
+              <span class="badge badge-warning"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> 2 Solicitações</span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" onclick="openSheet('inovaplus')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Ver solicitações
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!--
+            ════════════════════════════════════════════
+            CENÁRIO B — 3 candidatos (OldTech)
+            ════════════════════════════════════════════
+          -->
+          <tr class="row-warn">
+            <td>
+              <div class="co-name">OldTech Sistemas</div>
+              <div class="co-seg">ERP / Consultoria</div>
+              <div class="co-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                3 candidatos
+              </div>
+            </td>
+            <td>55.666.777/0001-88</td>
+            <td style="color:#b54708;font-size:13px;font-weight:600">3 solicitantes</td>
+            <td style="text-align:center">—</td>
+            <td>
+              <span class="badge badge-warning"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> 3 Solicitações</span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-action" onclick="openSheet('oldtech')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Ver solicitações
+                </button>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn">←</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <span class="page-meta">de 5</span>
+      <button class="page-btn">→</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- ══════════════════════════════════════════════
+     SIDE-SHEET — componente único de decisão
+     Renders differently based on candidates.length
+══════════════════════════════════════════════ -->
+<aside class="sheet" id="sheet">
+  <div class="sheet-head">
+    <div class="sheet-head-info">
+      <h3 id="sheetTitle">—</h3>
+      <div class="sheet-head-meta">
+        <span id="sheetSeg">—</span>
+        <span style="color:#d4d4d4">·</span>
+        <span id="sheetCnpj" style="font-family:monospace">—</span>
+      </div>
+    </div>
+    <button class="btn-close" onclick="closeSheet()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+  <div class="sheet-footer">
+    <p class="sheet-hint" id="sheetHint"></p>
+    <div class="sheet-actions" id="sheetActions"></div>
+  </div>
+</aside>
+
+<!-- MODAL -->
+<div class="modal-wrap" id="modalWrap">
+  <div class="modal-back" onclick="closeModal()"></div>
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-icon" id="mIcon"></div>
+        <div class="modal-title" id="mTitle">—</div>
+        <div class="modal-sub"   id="mSub">—</div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" id="mConfirmBtn" onclick="execConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<!-- ══════════════════════════════════════════════
+     JS — lógica unificada
+══════════════════════════════════════════════ -->
+<script>
+/*
+ * POST /companies/:id/access-decision
+ * { approved_candidate_id: string | null }
+ *
+ * null  = recusar todos
+ * id    = aprovar esse, recusar os outros
+ *
+ * O back-end sempre itera sobre os candidatos recusados
+ * (lista vazia quando há 1 candidato aprovado) e dispara e-mails.
+ */
+
+const COMPANIES = {
+  cloudsc: {
+    name: 'CloudSC Tecnologia', cnpj: '11.222.333/0001-44', seg: 'Cloud / Infra',
+    candidates: [
+      { id:'cs1', name:'Marcos Souza', email:'marcos@cloudsc.com.br', phone:'(47) 99111-2233', role:'CEO', date:'08/09/2026',
+        msg:'Somos uma empresa de cloud computing baseada em Joinville e gostaríamos de contratar talentos pelo programa.' }
+    ]
+  },
+  inovaplus: {
+    name: 'InovaPlus Sistemas', cnpj: '66.777.888/0001-11', seg: 'ERP / Consultoria',
+    candidates: [
+      { id:'ip1', name:'Ana Paula Ramos',  email:'ana@inovaplus.com.br',   phone:'(47) 99876-1234', role:'Diretora Comercial', date:'05/09/2026',
+        msg:'Representamos a InovaPlus e queremos participar do programa para contratar talentos da região.' },
+      { id:'ip2', name:'Bruno Carvalho',   email:'bruno@inovaplus.com.br', phone:'(47) 99000-5678', role:'Gerente de TI',      date:'10/09/2026',
+        msg:'Já somos parceiros em outros programas e queremos expandir nosso banco de talentos.' }
+    ]
+  },
+  oldtech: {
+    name: 'OldTech Sistemas', cnpj: '55.666.777/0001-88', seg: 'ERP / Consultoria',
+    candidates: [
+      { id:'ot1', name:'Marcos Souza',    email:'marcos@oldtech.com.br',  phone:'(47) 98765-4321', role:'CEO',            date:'02/09/2026',
+        msg:'Queremos encontrar profissionais para nossa equipe de desenvolvimento.' },
+      { id:'ot2', name:'Ana Paula Ramos', email:'ana@oldtech.com.br',     phone:'(47) 99111-9999', role:'RH Sênior',      date:'05/09/2026',
+        msg:'A OldTech está crescendo e precisamos de talentos em tecnologia.' },
+      { id:'ot3', name:'Roberto Alves',   email:'roberto@oldtech.com.br', phone:'(47) 91234-5678', role:'Diretor de Ops', date:'12/09/2026',
+        msg:'Tentamos contato anteriormente. Seguimos interessados no programa.' }
+    ]
+  }
+};
+
+let activeKey = null;
+let selectedId = null;
+let modalCallback = null;
+
+/* ─── utils ─── */
+function copyText(txt) {
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  showToast('Copiado: ' + txt, 'success', 2000);
+}
+
+const ICON_COPY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const ICON_MAIL = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+
+/* ─── SHEET ─── */
+function openSheet(key) {
+  activeKey = key;
+  selectedId = null;
+  const co = COMPANIES[key];
+  const isSingle = co.candidates.length === 1;
+
+  document.getElementById('sheetTitle').textContent = co.name;
+  document.getElementById('sheetSeg').textContent   = co.seg;
+  document.getElementById('sheetCnpj').textContent  = co.cnpj;
+
+  renderSheetBody(co, isSingle);
+  renderSheetFooter(co, isSingle);
+
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function renderSheetBody(co, isSingle) {
+  const body = document.getElementById('sheetBody');
+  let html = '';
+
+  /* contexto — texto corrido */
+  html += '<div class="sheet-context">';
+  if (isSingle) {
+    html += '<p><strong>' + co.candidates[0].name + '</strong> solicitou acesso ao portal em nome da <strong>' + co.name + '</strong>. Revise os dados e decida se concede o acesso.</p>';
+  } else {
+    html += '<p><strong>' + co.candidates.length + ' candidatos</strong> da ' + co.name + ' aguardam aprovação. Selecione quem será o responsável — os demais serão recusados e notificados.</p>';
+  }
+  html += '</div>';
+
+  html += '<div class="section-label">' + (isSingle ? 'Solicitante' : 'Candidatos <span class="pill">' + co.candidates.length + '</span>') + '</div>';
+
+  co.candidates.forEach(function(c) {
+    const isSelected = selectedId === c.id;
+    html += '<div class="sol-card' + (isSelected ? ' selected' : '') + '" id="card-' + c.id + '"'
+      + (isSingle ? '' : ' onclick="selectCandidate(\'' + c.id + '\')"') + '>';
+
+    /* topo */
+    html += '<div class="sol-card-top"><div class="sol-radio-row">';
+    /* radio só no modo múltiplo */
+    if (!isSingle) {
+      html += '<div class="sol-radio' + (isSelected ? ' checked' : '') + '"></div>';
+    }
+    html += '<div>'
+      + '<div class="sol-name">' + c.name + '</div>'
+      + '<div class="sol-email-pill">' + ICON_MAIL + c.email
+      + '<button class="copy-btn" onclick="event.stopPropagation();copyText(\'' + c.email + '\')" data-tip="Copiar">' + ICON_COPY + '</button>'
+      + '</div>'
+      + '<div class="sol-since">' + c.role + ' · ' + c.date + '</div>'
+      + '</div></div>';
+    if (isSelected) {
+      html += '<span class="chip-approved"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Selecionado</span>';
+    }
+    html += '</div>';
+
+    /* corpo */
+    html += '<div class="sol-card-body">'
+      + '<div class="sol-field"><span class="sol-label">Telefone</span><span class="sol-value">' + c.phone
+      + '<button class="copy-btn" onclick="event.stopPropagation();copyText(\'' + c.phone + '\')" data-tip="Copiar">' + ICON_COPY + '</button>'
+      + '</span></div>'
+      + '<div class="sol-field"><span class="sol-label">Cargo</span><span class="sol-value">' + c.role + '</span></div>'
+      + '<div class="sol-field" style="align-items:flex-start"><span class="sol-label" style="padding-top:2px">Mensagem</span><span class="sol-msg">&ldquo;' + c.msg + '&rdquo;</span></div>'
+      + '</div></div>';
+  });
+
+  body.innerHTML = html;
+}
+
+function renderSheetFooter(co, isSingle) {
+  const hint    = document.getElementById('sheetHint');
+  const actions = document.getElementById('sheetActions');
+
+  if (isSingle) {
+    /* ── CENÁRIO A: 1 candidato ── */
+    hint.innerHTML = 'Decida se <strong>' + co.candidates[0].name + '</strong> receberá o acesso ao portal.';
+    actions.innerHTML =
+      '<button class="btn-outline" onclick="closeSheet()">Cancelar</button>'
+      + '<button class="btn-danger" onclick="openModal(null,\'' + co.candidates[0].id + '\',\'' + key + '\')">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      + 'Recusar</button>'
+      + '<button class="btn-primary" style="flex:1" onclick="openModal(\'' + co.candidates[0].id + '\',null,\'' + key + '\')">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+      + 'Aprovar</button>';
+  } else {
+    /* ── CENÁRIO B: múltiplos candidatos ── */
+    updateMultiFooter(co);
+  }
+}
+
+function updateMultiFooter(co) {
+  const hint    = document.getElementById('sheetHint');
+  const actions = document.getElementById('sheetActions');
+
+  if (!selectedId) {
+    hint.innerHTML = 'Selecione quem receberá o acesso. Os demais serão recusados e notificados por e-mail.';
+    actions.innerHTML =
+      '<button class="btn-outline" onclick="closeSheet()">Cancelar</button>'
+      + '<button class="btn-danger" onclick="openModal(null,null,\'' + activeKey + '\')">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      + 'Recusar todos</button>'
+      + '<button class="btn-primary" style="flex:1" disabled>'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+      + 'Aprovar selecionado</button>';
+  } else {
+    const chosen = co.candidates.find(c => c.id === selectedId);
+    hint.innerHTML = 'Aprovar <strong>' + chosen.name + '</strong> como responsável da empresa.';
+    actions.innerHTML =
+      '<button class="btn-outline" onclick="closeSheet()">Cancelar</button>'
+      + '<button class="btn-danger" onclick="openModal(null,null,\'' + activeKey + '\')">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      + 'Recusar todos</button>'
+      + '<button class="btn-primary" style="flex:1" onclick="openModal(\'' + selectedId + '\',null,\'' + activeKey + '\')">'
+      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+      + 'Aprovar ' + chosen.name.split(' ')[0] + '</button>';
+  }
+}
+
+function selectCandidate(id) {
+  selectedId = id;
+  const co = COMPANIES[activeKey];
+  renderSheetBody(co, false);
+  updateMultiFooter(co);
+}
+
+/* ─── MODAL ─────────────────────────────────────────────────────
+ * openModal(approvedId, rejectedId, companyKey)
+ *
+ * Casos:
+ *  (id,  null, key)  → aprovar `id`, recusar todos os outros
+ *  (null, id,  null) → recusar o `id` (cenário 1 candidato)
+ *  (null, null, key) → recusar todos
+ *
+ * Mapeia exatamente para POST /companies/:id/access-decision
+ *  { approved_candidate_id: id | null }
+ * ──────────────────────────────────────────────────────────────── */
+function openModal(approvedId, rejectedSingleId, companyKey) {
+  const key  = companyKey || activeKey;
+  const co   = COMPANIES[key];
+  /* fecha o sheet antes de abrir o modal */
+  closeSheet();
+  const icon = document.getElementById('mIcon');
+
+  let title, confirmLabel, confirmClass, bodyHtml, toastMsg;
+
+  if (approvedId) {
+    /* ── Aprovar um candidato ── */
+    const chosen = co.candidates.find(c => c.id === approvedId);
+    const others = co.candidates.filter(c => c.id !== approvedId);
+
+    icon.className = 'modal-icon approve';
+    icon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    title = 'Conceder acesso ao portal';
+    confirmLabel = 'Confirmar acesso';
+    confirmClass = 'approve';
+    toastMsg = '✓ Acesso concedido a ' + chosen.name + '.';
+
+    bodyHtml = '<div class="approved-block">'
+      + '<div class="ab-label">✓ Receberá acesso</div>'
+      + '<div class="ab-name">' + chosen.name + '</div>'
+      + '<div class="ab-meta">'
+      + '<span style="display:inline-flex;align-items:center;gap:4px;background:#d1fae5;color:#065f46;border-radius:20px;font-size:12px;padding:2px 8px">' + ICON_MAIL + chosen.email + '</span>'
+      + '<button class="copy-btn" onclick="copyText(\'' + chosen.email + '\')" data-tip="Copiar">' + ICON_COPY + '</button>'
+      + '<span style="color:#9ca3af">' + chosen.role + '</span>'
+      + '</div></div>';
+
+    if (others.length > 0) {
+      const toList  = others.map(o => o.email).join(', ');
+      const namesHtml = others.map(o =>
+        '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #f3f4f6">'
+        + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">' + o.name + '</div>'
+        + '<div style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:#6366f1;border-radius:20px;font-size:12px;padding:2px 8px;margin-top:2px">' + ICON_MAIL + o.email + '</div></div>'
+        + '<button class="copy-btn" onclick="copyText(\'' + o.email + '\')" data-tip="Copiar" style="color:#9ca3af">' + ICON_COPY + '</button>'
+        + '</div>'
+      ).join('');
+
+      bodyHtml += '<div class="email-preview">'
+        + '<div class="email-preview-head"><span class="ep-label">'
+        + '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>'
+        + 'E-mail para ' + others.length + ' recusado' + (others.length > 1 ? 's' : '') + '</span>'
+        + '<span class="ep-auto">Automático</span></div>'
+        + '<div class="email-preview-body">'
+        + '<div>' + namesHtml + '</div>'
+        + '<hr class="ep-divider" />'
+        + '<div class="ep-subj">Assunto: Sua solicitação de acesso — ' + co.name + '</div>'
+        + '<hr class="ep-divider" />'
+        + '<div class="ep-body">Olá, <strong>[nome]</strong>,<br><br>'
+        + 'Obrigado pelo interesse. Identificamos que outra solicitação da <strong>' + co.name + '</strong> foi aprovada e <strong>' + chosen.name + '</strong> será o responsável oficial da empresa no portal. Por isso, sua solicitação não poderá ser aceita no momento.<br><br>'
+        + 'Se isso for um engano, responda este e-mail.<br><br>'
+        + 'Equipe SCTEC</div></div></div>';
+
+      toastMsg = '✓ Acesso concedido a ' + chosen.name + '. ' + others.length + ' candidato(s) notificado(s).';
+    }
+
+  } else if (rejectedSingleId) {
+    /* ── Recusar candidato único ── */
+    const c = co.candidates.find(x => x.id === rejectedSingleId);
+    icon.className = 'modal-icon reject';
+    icon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    title = 'Recusar solicitação';
+    confirmLabel = 'Confirmar recusa';
+    confirmClass = 'reject';
+    toastMsg = 'Solicitação de ' + c.name + ' recusada.';
+
+    bodyHtml = '<div style="background:var(--danger-bg);border:1px solid #fca5a5;border-radius:var(--r-md);padding:14px 16px;margin-bottom:4px">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--danger-text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Será recusado(a)</div>'
+      + '<div style="font-size:15px;font-weight:700;color:#111">' + c.name + '</div>'
+      + '<div style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#9b1c1c;border-radius:20px;font-size:12px;padding:2px 8px;margin-top:4px">'
+      + ICON_MAIL + c.email
+      + '<button class="copy-btn" onclick="copyText(\'' + c.email + '\')" data-tip="Copiar" style="color:#9b1c1c">' + ICON_COPY + '</button>'
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--text-sub);margin-top:4px">' + c.role + '</div>'
+      + '</div>'
+      + '<p style="font-size:14px;color:var(--text-sub);line-height:1.65">'
+      + c.name + ' receberá um e-mail informando que a solicitação da <strong>' + co.name + '</strong> não foi aprovada no momento.'
+      + '</p>';
+
+  } else {
+    /* ── Recusar todos ── */
+    const all = co.candidates;
+    icon.className = 'modal-icon reject';
+    icon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    title = 'Recusar todos os candidatos';
+    confirmLabel = 'Confirmar recusa de todos';
+    confirmClass = 'reject';
+    toastMsg = 'Todos os candidatos de ' + co.name + ' foram recusados.';
+
+    const listHtml = all.map(c =>
+      '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #f3f4f6">'
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">' + c.name + '</div>'
+      + '<div style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:#6366f1;border-radius:20px;font-size:12px;padding:2px 8px;margin-top:2px">' + ICON_MAIL + c.email + '</div></div>'
+      + '<button class="copy-btn" onclick="copyText(\'' + c.email + '\')" data-tip="Copiar" style="color:#9ca3af">' + ICON_COPY + '</button>'
+      + '</div>'
+    ).join('');
+
+    bodyHtml = '<p style="font-size:14px;color:var(--text-sub);line-height:1.65;margin-bottom:12px">'
+      + 'Todos os <strong>' + all.length + ' candidatos</strong> da ' + co.name + ' serão recusados e notificados por e-mail.</p>'
+      + '<div style="background:#f9fafb;border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px">' + listHtml + '</div>';
+  }
+
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mSub').textContent   = co.name;
+  document.getElementById('mBody').innerHTML    = bodyHtml;
+  const btn = document.getElementById('mConfirmBtn');
+  btn.className = 'btn-confirm ' + confirmClass;
+  btn.textContent = confirmLabel;
+  modalCallback = () => showToast(toastMsg, confirmClass === 'approve' ? 'success' : 'danger');
+  document.getElementById('modalWrap').classList.add('open');
+}
+
+function execConfirm() {
+  closeModal();
+  if (modalCallback) { modalCallback(); modalCallback = null; }
+}
+function closeModal()  { document.getElementById('modalWrap').classList.remove('open'); }
+function closeSheet()  { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').classList.remove('on'); activeKey = null; selectedId = null; }
+function closeAll()    { closeSheet(); closeModal(); }
+
+function showToast(msg, type, dur) {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + (type || 'success');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur || 4000);
+}
+</script>
+</body>
+</html>

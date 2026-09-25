@@ -1,0 +1,1346 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Tags – SCTEC Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fb;
+      color: #171717;
+      min-height: 100vh;
+    }
+
+    /* ── Tokens ─────────────────────────────────────────────────── */
+    :root {
+      --green-primary: #2ca942;
+      --green-gradient: linear-gradient(128deg, #2ca942 15%, #55b13a 55%, #52b934 87%);
+      --green-container: #7ab934;
+      --sidebar-bg: #22292b;
+      --sidebar-text: rgba(255,255,255,0.8);
+      --sidebar-active-bg: rgba(122,185,52,0.18);
+      --sidebar-active-text: #7ab934;
+      --navbar-bg: rgba(255,255,255,0.70);
+      --bg-page: #f8f9fb;
+      --bg-card: #ffffff;
+      --border: #d4d4d4;
+      --text-primary: #171717;
+      --text-secondary: #737373;
+      --text-heading: #22292b;
+      --radius-card: 22px;
+      --radius-btn: 10px;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.10);
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 80px;
+      background: var(--navbar-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 1.2px 15px rgba(69,42,124,0.10);
+      display: flex; align-items: center;
+      padding: 0 24px;
+    }
+    .navbar-brand { display: flex; flex-direction: column; gap: 2px; width: 263px; }
+    .navbar-brand .brand-name {
+      font-family: 'Montserrat', sans-serif; font-weight: 800;
+      font-size: 31px; line-height: 1; color: #171717;
+    }
+    .navbar-brand .brand-sub {
+      font-size: 16px; font-weight: 600; color: #171717;
+    }
+    .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .navbar-user-info { text-align: right; }
+    .navbar-user-info .user-role { font-size: 14px; font-weight: 500; color: #171717; }
+    .navbar-user-info .user-team { font-size: 14px; color: var(--text-secondary); }
+    .avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--green-container);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #568328;
+    }
+
+    .sidebar {
+      position: fixed; top: 80px; left: 0; bottom: 0;
+      width: 256px; background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--border);
+    }
+    .sidebar-header {
+      padding: 16px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .sidebar-header-inner { padding: 0 8px; }
+    .sidebar-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 16px; color: #fff; }
+    .sidebar-subtitle { font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.12px; margin-top: 1px; }
+
+    .sidebar-content { flex: 1; padding: 16px 8px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 8px; border-radius: 6px;
+      color: var(--sidebar-text); font-size: 14px; font-weight: 700;
+      text-decoration: none; cursor: pointer;
+      transition: background 0.15s;
+      opacity: 0.8;
+    }
+    .sidebar-item:hover { background: rgba(255,255,255,0.07); opacity: 1; }
+    .sidebar-item.active {
+      background: var(--sidebar-active-bg);
+      color: var(--sidebar-active-text);
+      opacity: 1;
+    }
+    .sidebar-item svg { flex-shrink: 0; width: 20px; height: 20px; }
+
+    .sidebar-footer {
+      padding: 8px 8px 24px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .main {
+      margin-left: 256px;
+      margin-top: 80px;
+      padding: 32px 40px;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* ── Page Header ─────────────────────────────────────────────── */
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 30px; font-weight: 700; color: var(--text-heading); letter-spacing: -0.75px; line-height: 1; }
+    .page-desc { font-size: 16px; color: var(--text-secondary); margin-top: 4px; }
+
+    /* ── Tabs ─────────────────────────────────────────────────────── */
+    .tabs-bar {
+      display: flex; gap: 24px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0; border: none; background: transparent;
+      font-size: 14px; font-weight: 400; cursor: pointer;
+      color: var(--text-secondary);
+      transition: color 0.15s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .tab-btn.active {
+      color: var(--text-heading);
+      font-weight: 700;
+    }
+    .tab-btn:hover:not(.active) { color: var(--text-primary); }
+
+    /* ── Category Card ───────────────────────────────────────────── */
+    .category-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .category-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .category-card-title-group { display: flex; align-items: center; gap: 10px; }
+    .category-card-title { font-size: 16px; font-weight: 700; color: var(--text-heading); }
+    .category-card-count {
+      font-size: 12px; font-weight: 500; color: var(--text-secondary);
+      background: #f0f0f0; border-radius: 20px; padding: 2px 10px;
+    }
+    .category-card-actions { display: flex; gap: 8px; }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0 14px; height: 36px; border-radius: var(--radius-btn);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      border: none; text-decoration: none; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn-primary { background: var(--green-gradient); color: #fff; }
+    .btn-outline {
+      background: transparent; color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border: none; padding: 0 10px; }
+    .btn-danger-ghost { background: transparent; color: #ef4444; border: none; padding: 0 10px; }
+    .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Tag chips ───────────────────────────────────────────────── */
+    .tags-area {
+      padding: 16px 24px 20px;
+    }
+    .tags-area + .tags-area { border-top: 1px dashed #e8e8e8; }
+
+    .sub-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 10px;
+    }
+
+    .tags-flex { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid #d4d4d4;
+      background: #f8f9fb; color: #333;
+      white-space: nowrap;
+    }
+    .tag-chip .tag-del {
+      display: flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: transparent; border: none; cursor: pointer;
+      color: #999; font-size: 12px; line-height: 1;
+      transition: background 0.15s, color 0.15s;
+      padding: 0; flex-shrink: 0;
+    }
+    .tag-chip .tag-del:hover { background: #fee2e2; color: #ef4444; }
+
+    /* Sub-itens de interesse (especialidades) */
+    .tree-area { padding: 0 24px 16px; }
+    .tree-node { margin-bottom: 12px; }
+    .tree-node-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .tree-node-title {
+      font-size: 13px; font-weight: 700; color: #333;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tree-node-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px; height: 14px;
+      border-radius: 2px;
+      background: var(--green-primary);
+    }
+
+    /* ── Search in card ──────────────────────────────────────────── */
+    .card-filter {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 24px 0;
+    }
+    .card-search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 12px; height: 36px; background: #fff;
+      flex: 1; max-width: 320px;
+    }
+    .card-search input {
+      border: none; outline: none; font-size: 13px; color: #333;
+      background: transparent; flex: 1;
+    }
+    .card-search svg { color: #999; width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Empty state ─────────────────────────────────────────────── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 24px; color: var(--text-secondary); gap: 8px;
+      font-size: 14px;
+    }
+    .empty-state svg { width: 32px; height: 32px; opacity: 0.35; }
+
+    /* ── Modal overlay ───────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff; border-radius: 16px; width: 480px; max-width: 95vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      overflow: hidden; animation: modal-in 0.2s ease;
+    }
+    @keyframes modal-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--text-heading); }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px; border: none;
+      background: #f5f5f5; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #666; font-size: 16px; transition: background 0.15s;
+    }
+    .modal-close:hover { background: #ebebeb; }
+
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      display: flex; justify-content: flex-end; gap: 8px;
+      padding: 16px 24px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #333; margin-bottom: 6px;
+    }
+    .form-label span { color: #ef4444; margin-left: 2px; }
+    .form-input, .form-select {
+      width: 100%; height: 42px; border: 1px solid var(--border);
+      border-radius: 10px; padding: 0 12px; font-size: 14px;
+      font-family: 'Roboto', sans-serif; color: #171717;
+      outline: none; transition: border-color 0.15s;
+      appearance: none; background: #fff;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--green-primary); }
+    .form-hint { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    /* ── Confirm Delete Modal ────────────────────────────────────── */
+    .modal-danger .modal-header { border-bottom-color: #fee2e2; }
+    .modal-danger-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #fee2e2; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; color: #ef4444;
+    }
+    .modal-danger-icon svg { width: 22px; height: 22px; }
+    .modal-danger-text { text-align: center; }
+    .modal-danger-text h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .modal-danger-text p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-danger:hover { background: #dc2626; opacity: 1; }
+
+    /* ── Toast ───────────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 300;
+      background: #22292b; color: #fff; border-radius: 10px;
+      padding: 12px 20px; font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { color: var(--green-primary); }
+
+    /* ── Tree legend ─────────────────────────────────────────────── */
+    .tree-legend {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .legend-step b { color: var(--text-primary); }
+    .legend-arrow { color: #ccc; font-size: 14px; }
+
+    /* ── Area block ──────────────────────────────────────────────── */
+    .area-block {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .area-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .area-header-left { display: flex; align-items: center; gap: 10px; }
+    .area-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #aaa;
+      background: #f5f5f5; border-radius: 4px;
+      padding: 2px 7px;
+    }
+    .area-title { font-size: 16px; font-weight: 700; color: var(--text-heading); }
+
+    /* ── Especialidade block ─────────────────────────────────────── */
+    .especialidades-list { padding: 0 24px 8px; }
+    .espec-block {
+      padding: 14px 0 12px;
+      border-bottom: 1px dashed #ebebeb;
+    }
+    .espec-block:last-of-type { border-bottom: none; }
+    .espec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .espec-header-left { display: flex; align-items: center; gap: 8px; }
+    .espec-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #bbb;
+      background: #fafafa; border: 1px solid #eee;
+      border-radius: 4px; padding: 2px 7px;
+    }
+    .espec-title { font-size: 13px; font-weight: 600; color: #333; }
+    .espec-actions { display: flex; align-items: center; gap: 6px; }
+
+    /* Tecnologias row */
+    .tecnologias-row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding-left: 2px;
+      min-height: 28px;
+    }
+    .tecnologias-row .empty-row {
+      font-size: 12px; color: #ccc; font-style: italic; padding: 4px 0;
+    }
+
+    /* btn-sm */
+    .btn.btn-sm { height: 28px; font-size: 12px; padding: 0 10px; }
+
+    /* btn-icon-del */
+    .btn-icon-del {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: transparent; border: 1px solid #eee;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #ccc;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .btn-icon-del:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+
+    /* Modal especialidade */
+    .modal-espec-area {
+      font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      background: #f5f5f5; border-radius: 8px; padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+    .modal-espec-area span { color: var(--text-heading); }
+    /* ── Scrollbar ───────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="brand-name">SCTEC</span>
+    <span class="brand-sub">Portal de Talentos</span>
+  </div>
+  <div class="navbar-right">
+    <div class="navbar-user-info">
+      <div class="user-role">ADMINISTRADOR</div>
+      <div class="user-team">Equipe SCTEC</div>
+    </div>
+    <div class="avatar">CN</div>
+  </div>
+</nav>
+
+<!-- ── Sidebar ────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-header-inner">
+      <div class="sidebar-title">Administrador</div>
+      <div class="sidebar-subtitle">Equipe SCTEC</div>
+    </div>
+  </div>
+  <div class="sidebar-content">
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Banco de Talentos
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Gestão de Empresas
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Usuários
+    </a>
+    <a class="sidebar-item active" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Gestão de Tags
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </a>
+  </div>
+</aside>
+
+<!-- ── Main Content ───────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Gestão de Tags</h1>
+      <p class="page-desc">Gerencie as tags disponíveis para candidatos e empresas na plataforma</p>
+    </div>
+  </div>
+
+
+    <!-- Tabs -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('interesse', this)">
+      Interesse Profissional 
+    </button>
+    <button class="tab-btn" onclick="switchTab('hard', this)">
+      Hard Skills 
+    </button>
+    <button class="tab-btn" onclick="switchTab('soft', this)">
+      Soft Skills 
+    </button>
+  </div>
+
+  <!-- ─── TAB: INTERESSE PROFISSIONAL ─────────────────────────── -->
+  <div id="tab-interesse" class="tab-content">
+
+    <!-- instrução contextual -->
+    <div class="tree-legend">
+      <span class="legend-step">Nível 1: <b>Área</b></span>
+      <span class="legend-arrow">›</span>
+      <span class="legend-step">Nível 2: <b>Especialidade</b></span>
+      <span class="legend-arrow">›</span>
+      <span class="legend-step">Nível 3: <b>Tecnologia</b></span>
+    </div>
+
+    <!-- ── ÁREA 1: Desenvolvimento de Software ──────────────────── -->
+    <div class="area-block" id="area-dev">
+
+      <!-- Cabeçalho da área -->
+      <div class="area-header">
+        <div class="area-header-left">
+          <span class="area-label">Área</span>
+          <span class="area-title">Desenvolvimento de Software</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddEspecialidadeModal('dev')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova especialidade
+        </button>
+      </div>
+
+      <!-- Especialidades (nível 2) -->
+      <div class="especialidades-list" id="espec-dev">
+
+        <!-- Back-End -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Back-End</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Back-End','dev-backend')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Back-End','dev-backend')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-backend"></div>
+        </div>
+
+        <!-- Front-End -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Front-End</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Front-End','dev-frontend')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Front-End','dev-frontend')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-frontend"></div>
+        </div>
+
+        <!-- Full-Stack -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Full-Stack</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Full-Stack','dev-fullstack')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Full-Stack','dev-fullstack')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-fullstack"></div>
+        </div>
+
+        <!-- Mobile -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Mobile</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Mobile','dev-mobile')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Mobile','dev-mobile')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-mobile"></div>
+        </div>
+
+        <!-- DevOps -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">DevOps</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('DevOps','dev-devops')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','DevOps','dev-devops')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-devops"></div>
+        </div>
+
+        <!-- QA -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Qualidade e Testes (QA)</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Qualidade e Testes (QA)','dev-qa')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Qualidade e Testes (QA)','dev-qa')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-qa"></div>
+        </div>
+
+        <!-- Cibersegurança -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Cibersegurança</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Cibersegurança','dev-ciber')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','Cibersegurança','dev-ciber')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-ciber"></div>
+        </div>
+
+        <!-- UX/UI -->
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">UX/UI Design</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('UX/UI Design','dev-ux')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dev','UX/UI Design','dev-ux')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dev-ux"></div>
+        </div>
+
+        <!-- Placeholder para novas especialidades criadas dinamicamente -->
+        <div id="espec-dev-dynamic"></div>
+
+      </div><!-- /especialidades-list -->
+    </div><!-- /area-block dev -->
+
+    <!-- ── ÁREA 2: Análise de Dados ─────────────────────────────── -->
+    <div class="area-block" id="area-dados">
+      <div class="area-header">
+        <div class="area-header-left">
+          <span class="area-label">Área</span>
+          <span class="area-title">Análise de Dados</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddEspecialidadeModal('dados')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova especialidade
+        </button>
+      </div>
+      <div class="especialidades-list" id="espec-dados">
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Análise e Visualização</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Análise e Visualização','dados-analise')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('dados','Análise e Visualização','dados-analise')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-dados-analise"></div>
+        </div>
+        <div id="espec-dados-dynamic"></div>
+      </div>
+    </div>
+
+    <!-- ── ÁREA 3: Inteligência Artificial ──────────────────────── -->
+    <div class="area-block" id="area-ia">
+      <div class="area-header">
+        <div class="area-header-left">
+          <span class="area-label">Área</span>
+          <span class="area-title">Inteligência Artificial</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddEspecialidadeModal('ia')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova especialidade
+        </button>
+      </div>
+      <div class="especialidades-list" id="espec-ia">
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">Machine Learning</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('Machine Learning','ia-ml')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('ia','Machine Learning','ia-ml')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-ia-ml"></div>
+        </div>
+        <div class="espec-block">
+          <div class="espec-header">
+            <div class="espec-header-left">
+              <span class="espec-label">Especialidade</span>
+              <span class="espec-title">IA Generativa</span>
+            </div>
+            <div class="espec-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('IA Generativa','ia-gen')">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tecnologia
+              </button>
+              <button class="btn-icon-del" onclick="requestDeleteEspec('ia','IA Generativa','ia-gen')" title="Remover especialidade">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tecnologias-row" id="tags-ia-gen"></div>
+        </div>
+        <div id="espec-ia-dynamic"></div>
+      </div>
+    </div>
+
+  </div><!-- /tab-interesse -->
+  <!-- ─── TAB: HARD SKILLS ──────────────────────────────────────── -->
+  <div id="tab-hard" class="tab-content" style="display:none;">
+    <div class="category-card">
+      <div class="category-card-header">
+        <div class="category-card-title-group">
+          <div class="category-card-title">Competências Técnicas (Hard Skills)</div>
+          <span class="category-card-count" id="count-hard-display">61 tags</span>
+        </div>
+        <div class="category-card-actions">
+          <button class="btn btn-primary" onclick="openAddTagModal('Hard Skills','hard')">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Tag
+          </button>
+        </div>
+      </div>
+      <div class="card-filter">
+        <div class="card-search">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Buscar tag..." oninput="filterTags('hard', this.value)" />
+        </div>
+      </div>
+      <div class="tags-area">
+        <div class="tags-flex" id="tags-hard"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB: SOFT SKILLS ──────────────────────────────────────── -->
+  <div id="tab-soft" class="tab-content" style="display:none;">
+    <div class="category-card">
+      <div class="category-card-header">
+        <div class="category-card-title-group">
+          <div class="category-card-title">Competências Comportamentais (Soft Skills)</div>
+          <span class="category-card-count" id="count-soft-display">11 tags</span>
+        </div>
+        <div class="category-card-actions">
+          <button class="btn btn-primary" onclick="openAddTagModal('Soft Skills','soft')">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Tag
+          </button>
+        </div>
+      </div>
+      <div class="tags-area">
+        <div class="tags-flex" id="tags-soft"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Modal: Adicionar Tag ──────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-add-title">Adicionar Tag</span>
+      <button class="modal-close" onclick="closeModal('modal-add')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome da tag <span>*</span></label>
+        <input class="form-input" id="input-tag-name" type="text" placeholder="Ex: Next.js" />
+        <div class="form-hint">Use capitalização consistente com as outras tags desta categoria.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmAddTag()">Adicionar Tag</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Adicionar Interesse (especialidade + tecnologia) ──── -->
+<div class="modal-overlay" id="modal-add-interest">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-interest-title">Nova Especialidade ou Tecnologia</span>
+      <button class="modal-close" onclick="closeModal('modal-add-interest')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Tipo <span>*</span></label>
+        <select class="form-select" id="interest-type" onchange="toggleInterestFields()">
+          <option value="especialidade">Nova Especialidade (ex: Full-Stack, DevOps)</option>
+          <option value="tecnologia">Nova Tecnologia dentro de uma especialidade</option>
+        </select>
+      </div>
+      <div class="form-group" id="interest-parent-group" style="display:none;">
+        <label class="form-label">Especialidade pai <span>*</span></label>
+        <select class="form-select" id="interest-parent">
+          <option value="Back-End">Back-End</option>
+          <option value="Front-End">Front-End</option>
+          <option value="Mobile">Mobile</option>
+          <option value="Full-Stack">Full-Stack</option>
+          <option value="DevOps">DevOps</option>
+          <option value="Qualidade e Testes (QA)">Qualidade e Testes (QA)</option>
+          <option value="Computação em Nuvem">Computação em Nuvem</option>
+          <option value="Cibersegurança">Cibersegurança</option>
+          <option value="UX/UI Design">UX/UI Design</option>
+          <option value="Automação">Automação</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome <span>*</span></label>
+        <input class="form-input" id="input-interest-name" type="text" placeholder="Ex: TypeScript" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-interest')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmAddInterest()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Confirmar Exclusão ─────────────────────────────────── -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal modal-danger">
+    <div class="modal-header">
+      <span class="modal-title">Remover Tag</span>
+      <button class="modal-close" onclick="closeModal('modal-delete')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-danger-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="modal-danger-text">
+        <h3>Tem certeza que deseja remover?</h3>
+        <p>A tag <strong id="delete-tag-label">"..."</strong> será removida e deixará de aparecer como opção para candidatos e empresas. Esta ação não pode ser desfeita.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-delete')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Remover Tag</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────────── -->
+<div class="toast" id="toast">
+  <span class="toast-icon">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </span>
+  <span id="toast-msg">Tag adicionada com sucesso!</span>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────
+   STORE — estrutura Área › Especialidade › Tecnologias
+─────────────────────────────────────────────────────────────────── */
+const areas = {
+  dev:   'Desenvolvimento de Software',
+  dados: 'Análise de Dados',
+  ia:    'Inteligência Artificial'
+};
+
+// especialidades[areaKey] = [ { id, label } ]
+const especialidades = {
+  dev: [
+    { id:'dev-backend',  label:'Back-End' },
+    { id:'dev-frontend', label:'Front-End' },
+    { id:'dev-fullstack',label:'Full-Stack' },
+    { id:'dev-mobile',   label:'Mobile' },
+    { id:'dev-devops',   label:'DevOps' },
+    { id:'dev-qa',       label:'Qualidade e Testes (QA)' },
+    { id:'dev-ciber',    label:'Cibersegurança' },
+    { id:'dev-ux',       label:'UX/UI Design' }
+  ],
+  dados: [
+    { id:'dados-analise', label:'Análise e Visualização' }
+  ],
+  ia: [
+    { id:'ia-ml',  label:'Machine Learning' },
+    { id:'ia-gen', label:'IA Generativa' }
+  ]
+};
+
+// tecnologias[especId] = [string, ...]
+const tecnologias = {
+  'dev-backend':  ['Node.js', 'Spring Boot', '.Net'],
+  'dev-frontend': ['React', 'Angular', 'Vue.js', 'Next.js', 'TypeScript'],
+  'dev-fullstack': [],
+  'dev-mobile':   ['React Native', 'Flutter'],
+  'dev-devops':   ['Docker', 'Kubernetes', 'CI/CD'],
+  'dev-qa':       ['Cypress', 'Jest'],
+  'dev-ciber':    [],
+  'dev-ux':       ['Figma'],
+  'dados-analise': ['Python', 'Power BI', 'Tableau', 'SQL', 'Data/Looker Studio'],
+  'ia-ml':        ['Scikit-learn', 'TensorFlow', 'Machine Learning', 'Visão Computacional'],
+  'ia-gen':       ['LLMs', 'RAG', 'Prompt Engineering', 'IA Generativa']
+};
+
+// store legado (hard/soft) — mantido igual
+const store = {
+  'hard': [
+    'Agentes de IA','Angular','APIs REST','AWS','Azure','Bancos de Dados','C#',
+    'Cibersegurança','CI/CD','Cloud Computing','CSS','Cypress','Data/Looker Studio',
+    'DAX','Deep Learning','DevOps','Docker','ETL/ELT','Figma','Flutter','Git e GitHub',
+    'Google Cloud','HTML','IA Generativa','Java','JavaScript','Jest','Kotlin',
+    'Kubernetes','LLMs','Machine Learning','Modelagem de Dados','Next.js','Node.js',
+    '.Net','NumPy','OpenCV','Pandas','Power BI','Power Query','Prompt Engineering',
+    'Python','RAG','React','React Native','Scikit-learn','SQL','Tableau','Terraform',
+    'Testes (Automatizados, API, Integração, E2E, Unitários)','TypeScript',
+    'UX/UI Design','Visualização de Dados','Visão Computacional','Web Scraping',
+    'Swift','Rust','Go'
+  ],
+  'soft': [
+    'Comunicação','Colaboração','Criatividade','Resolução de problemas',
+    'Pensamento crítico','Adaptabilidade','Aprendizado contínuo',
+    'Organização','Proatividade','Inteligência emocional','Autonomia'
+  ]
+};
+
+/* ─────────────────────────────────────────────────────────────────
+   RENDER TECNOLOGIAS
+─────────────────────────────────────────────────────────────────── */
+function renderTecnologias(especId) {
+  const el = document.getElementById('tags-' + especId);
+  if (!el) return;
+  const items = tecnologias[especId] || [];
+  el.innerHTML = '';
+  if (items.length === 0) {
+    el.innerHTML = '<span class="empty-row">Nenhuma tecnologia cadastrada.</span>';
+    return;
+  }
+  items.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" title="Remover" onclick="requestDeleteTecnologia('${escapeJs(especId)}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+}
+
+/* RENDER tags legadas (hard/soft) */
+function renderTags(storeId) {
+  const el = document.getElementById('tags-' + storeId);
+  if (!el) return;
+  const items = store[storeId] || [];
+  el.innerHTML = '';
+  items.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" title="Remover" onclick="requestDelete('${storeId}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+  if (items.length === 0) {
+    el.innerHTML = '<span style="font-size:13px;color:#aaa;font-style:italic;">Nenhuma tag cadastrada.</span>';
+  }
+  updateCounts();
+}
+
+function renderAll() {
+  // interesse: todas as especialidades conhecidas
+  Object.keys(tecnologias).forEach(id => renderTecnologias(id));
+  // hard / soft
+  ['hard','soft'].forEach(id => renderTags(id));
+  updateCounts();
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeJs(str) {
+  return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   CONTADORES
+─────────────────────────────────────────────────────────────────── */
+function updateCounts() {
+  const nHard = store['hard']?.length || 0;
+  const nSoft = store['soft']?.length || 0;
+  safeSet('count-hard-display', nHard + ' tags');
+  safeSet('count-soft-display', nSoft + ' tags');
+}
+function safeSet(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   TABS
+─────────────────────────────────────────────────────────────────── */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).style.display = 'block';
+  btn.classList.add('active');
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL: ADICIONAR ESPECIALIDADE
+─────────────────────────────────────────────────────────────────── */
+let addEspecTarget = { areaKey: null };
+
+function openAddEspecialidadeModal(areaKey) {
+  addEspecTarget.areaKey = areaKey;
+  document.getElementById('modal-espec-area-name').textContent = areas[areaKey] || areaKey;
+  document.getElementById('input-espec-name').value = '';
+  openModal('modal-add-espec');
+  setTimeout(() => document.getElementById('input-espec-name').focus(), 60);
+}
+
+function confirmAddEspec() {
+  const name = document.getElementById('input-espec-name').value.trim();
+  if (!name) { document.getElementById('input-espec-name').focus(); return; }
+  const areaKey = addEspecTarget.areaKey;
+  const id = areaKey + '-' + name.toLowerCase().replace(/[^a-z0-9]/g,'-') + '-' + Date.now();
+
+  // Registrar
+  if (!especialidades[areaKey]) especialidades[areaKey] = [];
+  especialidades[areaKey].push({ id, label: name });
+  tecnologias[id] = [];
+
+  // Injetar no DOM
+  injectEspecBlock(areaKey, id, name);
+
+  closeModal('modal-add-espec');
+  showToast(`Especialidade "${name}" adicionada!`);
+}
+
+function injectEspecBlock(areaKey, especId, especLabel) {
+  const dynEl = document.getElementById('espec-' + areaKey + '-dynamic');
+  if (!dynEl) return;
+  const block = document.createElement('div');
+  block.className = 'espec-block';
+  block.id = 'espec-block-' + especId;
+  block.innerHTML = `
+    <div class="espec-header">
+      <div class="espec-header-left">
+        <span class="espec-label">Especialidade</span>
+        <span class="espec-title">${escapeHtml(especLabel)}</span>
+      </div>
+      <div class="espec-actions">
+        <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('${escapeJs(especLabel)}','${escapeJs(especId)}')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar tecnologia
+        </button>
+        <button class="btn-icon-del" onclick="requestDeleteEspec('${escapeJs(areaKey)}','${escapeJs(especLabel)}','${escapeJs(especId)}')" title="Remover especialidade">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tecnologias-row" id="tags-${escapeHtml(especId)}">
+      <span class="empty-row">Nenhuma tecnologia cadastrada.</span>
+    </div>`;
+  dynEl.before(block);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL: ADICIONAR TECNOLOGIA
+─────────────────────────────────────────────────────────────────── */
+let addTecTarget = { especId: null, especLabel: null };
+
+function openAddTecnologiaModal(especLabel, especId) {
+  addTecTarget = { especId, especLabel };
+  document.getElementById('modal-tec-espec-name').textContent = especLabel;
+  document.getElementById('input-tec-name').value = '';
+  openModal('modal-add-tec');
+  setTimeout(() => document.getElementById('input-tec-name').focus(), 60);
+}
+
+function confirmAddTecnologia() {
+  const name = document.getElementById('input-tec-name').value.trim();
+  if (!name) { document.getElementById('input-tec-name').focus(); return; }
+  const { especId } = addTecTarget;
+  if (!tecnologias[especId]) tecnologias[especId] = [];
+  if (!tecnologias[especId].includes(name)) {
+    tecnologias[especId].push(name);
+    renderTecnologias(especId);
+  }
+  closeModal('modal-add-tec');
+  showToast(`"${name}" adicionado à especialidade!`);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL: EXCLUIR TECNOLOGIA
+─────────────────────────────────────────────────────────────────── */
+let deleteTarget = { type: null, storeId: null, tagName: null, especId: null };
+
+function requestDeleteTecnologia(especId, tagName) {
+  deleteTarget = { type: 'tec', especId, tagName };
+  document.getElementById('delete-tag-label').textContent = '"' + tagName + '"';
+  openModal('modal-delete');
+}
+
+/* EXCLUIR TAG legada (hard/soft) */
+function requestDelete(storeId, tagName) {
+  deleteTarget = { type: 'legacy', storeId, tagName };
+  document.getElementById('delete-tag-label').textContent = '"' + tagName + '"';
+  openModal('modal-delete');
+}
+
+function confirmDelete() {
+  if (deleteTarget.type === 'tec') {
+    const { especId, tagName } = deleteTarget;
+    if (tecnologias[especId]) {
+      tecnologias[especId] = tecnologias[especId].filter(t => t !== tagName);
+      renderTecnologias(especId);
+    }
+  } else {
+    const { storeId, tagName } = deleteTarget;
+    if (store[storeId]) {
+      store[storeId] = store[storeId].filter(t => t !== tagName);
+      renderTags(storeId);
+    }
+  }
+  closeModal('modal-delete');
+  showToast(`Tag "${deleteTarget.tagName}" removida.`);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL: EXCLUIR ESPECIALIDADE
+─────────────────────────────────────────────────────────────────── */
+let deleteEspecTarget = { areaKey: null, label: null, especId: null };
+
+function requestDeleteEspec(areaKey, label, especId) {
+  deleteEspecTarget = { areaKey, label, especId };
+  document.getElementById('delete-tag-label').textContent = `a especialidade "${label}"`;
+  openModal('modal-delete');
+}
+
+/* override confirmDelete para também tratar especialidade */
+const _originalConfirmDelete = confirmDelete;
+// (já coberto no confirmDelete acima via type check — usamos tipo 'espec')
+function requestDeleteEspec(areaKey, label, especId) {
+  deleteTarget = { type: 'espec', areaKey, label, especId, tagName: label };
+  document.getElementById('delete-tag-label').textContent = `a especialidade "${label}"`;
+  openModal('modal-delete');
+}
+
+// Reescrever confirmDelete para cobrir os 3 tipos
+function confirmDelete() {
+  const { type } = deleteTarget;
+  if (type === 'tec') {
+    const { especId, tagName } = deleteTarget;
+    if (tecnologias[especId]) {
+      tecnologias[especId] = tecnologias[especId].filter(t => t !== tagName);
+      renderTecnologias(especId);
+    }
+    showToast(`Tecnologia "${tagName}" removida.`);
+  } else if (type === 'espec') {
+    const { areaKey, label, especId } = deleteTarget;
+    if (especialidades[areaKey]) {
+      especialidades[areaKey] = especialidades[areaKey].filter(e => e.id !== especId);
+    }
+    delete tecnologias[especId];
+    const blockEl = document.getElementById('espec-block-' + especId)
+                 || document.querySelector(`[id^="espec-block-"]`);
+    // buscar pelo DOM
+    document.querySelectorAll('.espec-block').forEach(el => {
+      if (el.querySelector('.espec-title')?.textContent === label) el.remove();
+    });
+    showToast(`Especialidade "${label}" removida.`);
+  } else {
+    const { storeId, tagName } = deleteTarget;
+    if (store[storeId]) {
+      store[storeId] = store[storeId].filter(t => t !== tagName);
+      renderTags(storeId);
+    }
+    showToast(`Tag "${tagName}" removida.`);
+  }
+  closeModal('modal-delete');
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL: ADICIONAR TAG genérica (hard/soft)
+─────────────────────────────────────────────────────────────────── */
+let addTarget = { containerId: null };
+
+function openAddTagModal(title, containerId) {
+  addTarget.containerId = containerId;
+  document.getElementById('modal-add-title').textContent = 'Adicionar Tag — ' + title;
+  document.getElementById('input-tag-name').value = '';
+  openModal('modal-add');
+  setTimeout(() => document.getElementById('input-tag-name').focus(), 60);
+}
+
+function confirmAddTag() {
+  const name = document.getElementById('input-tag-name').value.trim();
+  if (!name) { document.getElementById('input-tag-name').focus(); return; }
+  const cid = addTarget.containerId;
+  if (!store[cid]) store[cid] = [];
+  if (!store[cid].includes(name)) {
+    store[cid].push(name);
+    renderTags(cid);
+  }
+  closeModal('modal-add');
+  showToast(`Tag "${name}" adicionada com sucesso!`);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BUSCA (Hard Skills)
+─────────────────────────────────────────────────────────────────── */
+function filterTags(containerId, query) {
+  const el = document.getElementById('tags-' + containerId);
+  if (!el) return;
+  const q = query.toLowerCase().trim();
+  const items = store[containerId] || [];
+  el.innerHTML = '';
+  const filtered = q ? items.filter(t => t.toLowerCase().includes(q)) : items;
+  filtered.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" title="Remover" onclick="requestDelete('${containerId}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+  if (filtered.length === 0) {
+    el.innerHTML = '<span style="font-size:13px;color:#aaa;font-style:italic;">Nenhuma tag encontrada.</span>';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MODAL HELPERS
+─────────────────────────────────────────────────────────────────── */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+/* ─────────────────────────────────────────────────────────────────
+   TOAST
+─────────────────────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   INIT
+─────────────────────────────────────────────────────────────────── */
+// Conectar Enter nos inputs dos novos modais após DOM pronto
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('input-espec-name')?.addEventListener('keydown', e => { if(e.key==='Enter') confirmAddEspec(); });
+  document.getElementById('input-tec-name')?.addEventListener('keydown', e => { if(e.key==='Enter') confirmAddTecnologia(); });
+  document.getElementById('input-tag-name')?.addEventListener('keydown', e => { if(e.key==='Enter') confirmAddTag(); });
+});
+
+renderAll();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+

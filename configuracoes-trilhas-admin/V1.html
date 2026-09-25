@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Configurações — Trilhas Adaptativas | Orbie Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#F1F4F9;color:#344054;min-width:1440px;font-size:14px}
+
+/* layout */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#fff;border-right:1px solid #E1E8EF;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;display:flex;flex-direction:column}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* topbar */
+.topbar{height:64px;background:#fff;border-bottom:1px solid #E1E8EF;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:100}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:#52607A}
+.breadcrumb strong{color:#344054}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#52607A;cursor:pointer;transition:background .15s}
+.topbar-icon:hover{background:#F1F4F9}
+.avatar{width:36px;height:36px;border-radius:50%;background:#2177FF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+
+/* sidebar */
+.sidebar-logo{padding:18px 20px 14px;border-bottom:1px solid #E1E8EF}
+.nav-section-label{padding:8px 24px 4px;font-size:11px;font-weight:700;color:#8A95B2;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:8px;cursor:pointer;font-size:14px;color:#52607A;transition:background .15s}
+.nav-item:hover{background:#F8F9FC}
+.nav-item .pi{font-size:17px;width:20px;text-align:center}
+.nav-sub-item{display:block;padding:7px 12px;margin:1px 8px 1px 46px;border-radius:6px;cursor:pointer;font-size:13px;color:#52607A;transition:background .15s}
+.nav-sub-item:hover{background:#F8F9FC}
+.nav-sub-item.active{color:#2177FF;font-weight:600}
+
+/* page */
+.page-content{padding:28px 32px;flex:1;max-width:1000px}
+.page-title{font-size:22px;font-weight:700;color:#1D2939;margin-bottom:4px}
+.page-subtitle{font-size:14px;color:#52607A;margin-bottom:28px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:10px;font-size:13px;font-family:'Outfit',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:#2177FF;color:#fff}
+.btn-primary:hover{background:#0059E7}
+.btn-secondary{background:#fff;color:#344054;border:1px solid #E1E8EF}
+.btn-secondary:hover{background:#F8F9FC}
+.btn-danger-outline{background:#fff;color:#B42318;border:1px solid #FECDCA}
+.btn-danger-outline:hover{background:#FEF3F2}
+.btn-ghost{background:none;border:none;color:#52607A;font-size:13px;font-family:'Outfit',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;transition:background .15s}
+.btn-ghost:hover{background:#F1F4F9;color:#344054}
+
+/* card section */
+.section-card{background:#fff;border:1px solid #E1E8EF;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px;overflow:hidden}
+.section-head{padding:16px 20px;border-bottom:1px solid #E1E8EF;display:flex;align-items:center;gap:10px}
+.section-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.icon-motor-a{background:#EFF8FF;color:#1849A9}
+.icon-elegib{background:#ECFDF3;color:#027A48}
+.icon-motor-b{background:#FFFAEB;color:#B54708}
+.icon-ia{background:#F5F0FF;color:#6941C6}
+.icon-ciclo{background:#F1F4F9;color:#344054}
+.icon-revisao{background:#EFF8FF;color:#1849A9}
+.icon-reward{background:#FFF8E6;color:#92400E}
+.section-title{font-size:15px;font-weight:700;color:#1D2939}
+.section-body{padding:0}
+
+/* param row */
+.param-row{display:grid;grid-template-columns:1fr 180px 180px;gap:0;border-bottom:1px solid #F1F4F9;align-items:start}
+.param-row:last-child{border-bottom:none}
+.param-info{padding:14px 20px 14px 20px}
+.param-name{font-size:14px;font-weight:600;color:#1D2939;margin-bottom:2px}
+.param-desc{font-size:12px;color:#52607A;line-height:1.5;margin-bottom:3px}
+.param-impact{font-size:11px;color:#8A95B2;font-style:italic;line-height:1.4}
+.param-default{padding:14px 16px;border-left:1px solid #F1F4F9;display:flex;flex-direction:column;justify-content:center}
+.param-default-label{font-size:10px;font-weight:700;color:#8A95B2;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.param-default-val{font-size:13px;color:#52607A;font-family:monospace}
+.param-input-cell{padding:14px 16px;border-left:1px solid #F1F4F9;display:flex;flex-direction:column;justify-content:center;gap:4px}
+
+/* inputs */
+.inp{height:36px;border:1px solid #E1E8EF;border-radius:8px;padding:0 10px;font-size:13px;font-family:'Outfit',sans-serif;color:#344054;background:#fff;outline:none;width:100%;transition:border .15s}
+.inp:focus{border-color:#2177FF;box-shadow:0 0 0 3px rgba(33,119,255,.08)}
+.inp.error{border-color:#F04438;background:#FEF3F2}
+.inp-sm{height:32px;font-size:12px}
+.inp-hint{font-size:11px;color:#8A95B2;margin-top:2px}
+.inp-hint.err-hint{color:#B42318}
+select.inp{appearance:auto;cursor:pointer}
+
+/* pesos especiais */
+.pesos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px;border-bottom:1px solid #F1F4F9}
+.peso-item{display:flex;flex-direction:column;gap:4px}
+.peso-label{font-size:11px;font-weight:600;color:#52607A;display:flex;justify-content:space-between;align-items:center}
+.peso-code{font-size:10px;color:#8A95B2;font-family:monospace}
+.soma-row{padding:8px 20px 14px;display:flex;align-items:center;gap:12px}
+.soma-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.soma-ok{background:#ECFDF3;color:#027A48}
+.soma-err{background:#FEF3F2;color:#B42318}
+
+/* textarea */
+.ta{width:100%;border:1px solid #E1E8EF;border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Outfit',sans-serif;color:#344054;resize:vertical;outline:none;line-height:1.6;min-height:80px;transition:border .15s}
+.ta:focus{border-color:#2177FF;box-shadow:0 0 0 3px rgba(33,119,255,.08)}
+.prompt-cell{padding:14px 20px;border-bottom:1px solid #F1F4F9}
+.prompt-label{font-size:13px;font-weight:600;color:#1D2939;margin-bottom:2px}
+.prompt-desc{font-size:12px;color:#52607A;margin-bottom:8px;line-height:1.5}
+.version-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;background:#F1F4F9;color:#52607A;font-size:11px;margin-left:6px}
+
+/* toggle switch */
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#C5D0DE;border-radius:22px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:#2177FF}
+.toggle input:checked + .toggle-slider::before{transform:translateX(18px)}
+.toggle-label{font-size:13px;color:#344054}
+
+/* sticky footer */
+.sticky-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid #E1E8EF;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;z-index:50;margin-left:240px}
+.footer-left{display:flex;align-items:center;gap:8px}
+.footer-right{display:flex;align-items:center;gap:8px}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.15);width:480px;overflow:hidden}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid #E1E8EF;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:700;color:#1D2939}
+.modal-body{padding:20px 24px}
+.modal-body p{font-size:14px;color:#344054;line-height:1.6}
+.modal-footer{padding:16px 24px;border-top:1px solid #E1E8EF;display:flex;justify-content:flex-end;gap:8px}
+
+/* saved toast */
+.toast{position:fixed;bottom:80px;right:32px;background:#1D2939;color:#fff;border-radius:8px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:8px;z-index:600;opacity:0;transform:translateY(12px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* faixas row */
+.faixas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 20px;border-bottom:1px solid #F1F4F9}
+.faixa-item{display:flex;flex-direction:column;gap:4px}
+.faixa-label{font-size:11px;font-weight:600;color:#52607A;display:flex;align-items:center;gap:5px}
+.dot-critical{width:8px;height:8px;border-radius:50%;background:#F04438;display:inline-block}
+.dot-moderate{width:8px;height:8px;border-radius:50%;background:#F79009;display:inline-block}
+.dot-attention{width:8px;height:8px;border-radius:50%;background:#2177FF;display:inline-block}
+
+/* blocos min table */
+.blocos-min-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 20px;border-bottom:1px solid #F1F4F9}
+.bm-item{display:flex;flex-direction:column;gap:4px}
+.bm-label{font-size:11px;font-weight:600;color:#52607A}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="96" height="28" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clip-path="url(#cl)">
+        <path d="M41.763 56C56.537 56 67.751 45.014 67.751 30.467C67.751 15.919 56.539 4.936 41.763 4.936C26.987 4.936 15.778 15.922 15.778 30.467C15.778 45.012 26.916 56 41.766 56M41.766 52.136C29.416 52.136 20.097 42.893 20.097 30.467C20.097 18.041 29.416 8.798 41.766 8.798C54.115 8.798 63.434 18.041 63.434 30.467C63.434 42.893 54.115 52.136 41.766 52.136Z" fill="#1064AD"/>
+        <path d="M92.769 16.832C91.481 16.453 90.495 16.3 88.981 16.3C84.134 16.3 80.495 19.029 78.45 23.422V18.572C78.45 17.586 77.919 16.981 76.936 16.981H76.026C75.117 16.981 74.512 17.589 74.512 18.572V53.424C74.512 54.41 75.119 55.091 76.026 55.091H77.162C78.072 55.091 78.676 54.41 78.676 53.424V33.196C78.676 25.543 82.843 20.012 88.602 20.012C89.512 20.012 90.345 20.165 91.405 20.467C92.314 20.77 93.148 20.693 93.526 19.558L93.679 18.95C94.133 17.662 93.526 17.055 92.769 16.829" fill="#1064AD"/>
+        <path d="M116.487 16.3C110.046 16.3 104.82 19.103 101.408 23.574V2.586C101.408 1.451 100.954 0.767 99.666 1.146L98.756 1.372C97.694 1.674 97.315 2.205 97.315 3.039V53.421C97.315 54.407 97.846 55.088 98.83 55.088H99.892C100.877 55.088 101.406 54.407 101.406 53.421V48.498C104.663 53.043 109.891 56 116.484 56C127.699 56 135.577 47.21 135.577 36.148C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.21C107.696 52.21 101.18 46.3 101.027 36.148C100.875 25.996 107.77 20.086 116.106 20.086C125.272 20.086 131.334 27.284 131.334 36.148C131.334 45.012 125.272 52.21 116.106 52.21Z" fill="#1064AD"/>
+        <path d="M143.848 55.091H144.984C145.969 55.091 146.498 54.41 146.498 53.424V18.572C146.498 17.586 145.967 16.981 144.984 16.981H143.848C142.939 16.981 142.334 17.589 142.334 18.572V53.424C142.334 54.41 142.941 55.091 143.848 55.091Z" fill="#1064AD"/>
+        <path d="M157.566 37.438H188.478C189.766 37.438 190.523 36.605 190.523 35.393C190.523 30.619 188.856 25.998 185.749 22.512C182.642 18.648 177.944 16.3 172.111 16.3C161.125 16.3 153.244 24.862 153.244 36.227C153.244 48.653 162.64 56 172.944 56C178.097 56 184.385 53.955 188.704 49.407C189.235 48.8 189.613 47.893 188.78 47.06L188.325 46.681C187.644 46 186.811 45.848 185.825 46.681C181.961 50.545 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.757 157.566 37.438ZM172.113 20.089C176.963 20.089 180.752 22.058 183.099 25.393C184.842 27.591 185.901 30.393 186.28 33.653H157.566C158.399 25.546 164.083 20.091 172.113 20.091" fill="#1064AD"/>
+        <path d="M140.645 6.445C141.212 8.486 143.361 9.69 145.442 9.133C147.522 8.577 148.749 6.471 148.183 4.431C147.616 2.391 145.467 1.186 143.386 1.745C141.305 2.302 140.078 4.408 140.645 6.448" fill="#29B84C"/>
+        <path d="M79.976 3.577C79.851 2.269 78.863 1.321 78.147 0.846C77.547 0.447 76.203 0 74.681 0C70.802 0 64.316 1.941 56.628 5.386L52.908 7.241C53.777 7.627 54.618 8.056 55.426 8.529L57.842 7.264C65.53 3.811 71.688 1.969 75.431 1.969C76.178 1.969 76.965 2.071 77.306 2.203C77.649 2.335 78.03 2.513 78.045 3.229C78.088 5.356 75.431 9.255 70.634 14.029C64.369 20.264 55.068 27.4 44.443 34.12C25.36 46.191 10.653 51.595 4.545 51.595C1.021 51.595 2.027 49.461 1.966 49.946C2.274 47.489 5.472 42.647 13.991 35.218L15.947 33.498C15.846 32.566 15.787 31.618 15.78 30.65L12.65 33.394C4.449 40.492 0 46.264 0 49.682C0 50.126 0.193 52.286 2.779 53.2C3.46 53.442 4.301 53.564 5.297 53.564C12.927 53.564 28.823 46.628 45.797 35.891C56.384 29.197 65.685 22.088 71.988 15.881C75.962 11.966 80.288 6.888 79.976 3.577" fill="#F79850"/>
+      </g>
+      <defs><clipPath id="cl"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
+    </svg>
+  </div>
+  <nav style="flex:1;padding:8px 0 16px">
+    <div class="nav-section-label">Menu</div>
+    <div class="nav-item"><i class="pi pi-home"></i>Início</div>
+    <div class="nav-item"><i class="pi pi-users"></i>Turmas</div>
+    <div class="nav-item"><i class="pi pi-chart-line"></i>Acompanhamento</div>
+    <div class="nav-section-label">Sistema</div>
+    <div class="nav-item" style="color:#2177FF;background:#EFF8FF;font-weight:600"><i class="pi pi-cog"></i>Configurações</div>
+    <div class="nav-sub-item active">Trilhas Adaptativas</div>
+    <div class="nav-item"><i class="pi pi-question-circle"></i>Suporte</div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="breadcrumb">
+      Configurações <i class="pi pi-chevron-right" style="font-size:10px;color:#C5D0DE;margin:0 4px"></i>
+      <strong>Trilhas Adaptativas</strong>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-icon"><i class="pi pi-bell"></i></div>
+      <div class="topbar-icon"><i class="pi pi-question-circle"></i></div>
+      <div class="avatar">SA</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <h1 class="page-title">Configurações — Trilhas Adaptativas</h1>
+    <p class="page-subtitle">Parâmetros dos motores de diagnóstico e montagem. Alterações entram em vigor a partir do próximo ciclo de cada turma. Visível apenas para Super Administrador.</p>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 1 — MOTOR A
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-motor-a"><i class="pi pi-chart-bar"></i></div>
+        <div>
+          <div class="section-title">Motor A — Diagnóstico Adaptativo</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- PESOS G1–G7 -->
+        <div style="border-bottom:1px solid #F1F4F9">
+          <div style="padding:14px 20px 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div>
+              <div class="param-name">Pesos G1 a G7</div>
+              <div class="param-desc">Distribuição percentual dos sete componentes do índice IDH. A soma deve totalizar exatamente 100%.</div>
+              <div class="param-impact">Impacto: altera a prioridade relativa de cada fator no ranqueamento de lacunas.</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:10px;font-weight:700;color:#8A95B2;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Padrão</div>
+              <div style="font-size:12px;color:#52607A;font-family:monospace">40/15/10/10/10/5/10</div>
+            </div>
+          </div>
+          <div class="pesos-grid">
+            <div class="peso-item">
+              <div class="peso-label">G1 — Déficit de performance <span class="peso-code">G1</span></div>
+              <input type="number" class="inp inp-sm" id="g1" value="40" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G2 — Déficit relativo à turma <span class="peso-code">G2</span></div>
+              <input type="number" class="inp inp-sm" id="g2" value="15" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G3 — Erro em baixa dificuldade <span class="peso-code">G3</span></div>
+              <input type="number" class="inp inp-sm" id="g3" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G4 — Não recuperação em chance extra <span class="peso-code">G4</span></div>
+              <input type="number" class="inp inp-sm" id="g4" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G5 — Recorrência <span class="peso-code">G5</span></div>
+              <input type="number" class="inp inp-sm" id="g5" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G6 — Tendência negativa <span class="peso-code">G6</span></div>
+              <input type="number" class="inp inp-sm" id="g6" value="5" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <div class="peso-label">G7 — Peso avaliativo <span class="peso-code">G7</span></div>
+              <input type="number" class="inp inp-sm" id="g7" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+          </div>
+          <div class="soma-row">
+            <span id="soma-badge" class="soma-badge soma-ok"><i class="pi pi-check-circle"></i>Soma: <strong id="soma-val">100%</strong></span>
+            <span id="soma-err-txt" style="font-size:12px;color:#B42318;display:none"><i class="pi pi-exclamation-triangle"></i> A soma dos pesos deve ser exatamente 100% para salvar.</span>
+          </div>
+        </div>
+
+        <!-- LIMIAR DE ELEGIBILIDADE -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Limiar de elegibilidade (IDH mínimo)</div>
+            <div class="param-desc">Valor mínimo de IDH_final para que uma habilidade seja elegível como bloco principal na trilha.</div>
+            <div class="param-impact">Impacto: aumentar o limiar reduz o número de habilidades elegíveis (trilhas mais focadas); diminuir amplia a cobertura.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">50</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="limiar" value="50" min="0" max="100">
+            <div class="inp-hint">Intervalo: 0 a 100</div>
+          </div>
+        </div>
+
+        <!-- N_MIN -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">N_min — respostas para confiança plena</div>
+            <div class="param-desc">Número mínimo de respostas que uma habilidade precisa ter para receber índice de confiança (IC) igual a 1. Habilidades com menos respostas têm IDH_final penalizado.</div>
+            <div class="param-impact">Impacto: valores menores tornam o diagnóstico mais sensível a poucas respostas; valores maiores exigem mais evidências.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">4</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="nmin" value="4" min="1" max="20">
+            <div class="inp-hint">Intervalo: 1 a 20</div>
+          </div>
+        </div>
+
+        <!-- LIMITES DAS FAIXAS -->
+        <div style="border-bottom:1px solid #F1F4F9">
+          <div style="padding:14px 20px 8px">
+            <div class="param-name">Limites das faixas de IDH (Gap Crítico / Moderado / Atenção)</div>
+            <div class="param-desc" style="margin-top:2px">Define os limiares de corte entre as três faixas de gap. Os valores devem estar em ordem decrescente: Crítico &gt; Moderado &gt; Atenção.</div>
+            <div class="param-impact">Impacto: altera como os estudantes e habilidades são classificados e priorizados no painel do professor.</div>
+          </div>
+          <div class="faixas-grid">
+            <div class="faixa-item">
+              <div class="faixa-label"><span class="dot-critical"></span>Gap Crítico — IDH ≥</div>
+              <input type="number" class="inp inp-sm" id="faixa-critica" value="70" min="1" max="100" oninput="validFaixas()">
+              <div class="inp-hint" id="hint-critica">Padrão: 70</div>
+            </div>
+            <div class="faixa-item">
+              <div class="faixa-label"><span class="dot-moderate"></span>Gap Moderado — IDH ≥</div>
+              <input type="number" class="inp inp-sm" id="faixa-moderada" value="50" min="1" max="99" oninput="validFaixas()">
+              <div class="inp-hint" id="hint-moderada">Padrão: 50</div>
+            </div>
+            <div class="faixa-item">
+              <div class="faixa-label"><span class="dot-attention"></span>Atenção — IDH ≥</div>
+              <input type="number" class="inp inp-sm" id="faixa-atencao" value="30" min="1" max="98" oninput="validFaixas()">
+              <div class="inp-hint" id="hint-atencao">Padrão: 30</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- % MÁX BLOCOS MESMO COMPONENTE -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Percentual máximo de blocos do mesmo componente curricular</div>
+            <div class="param-desc">Limite máximo da proporção de blocos de um único componente em uma mesma trilha. Garante diversidade curricular quando há lacunas em múltiplos componentes.</div>
+            <div class="param-impact">Impacto: percentuais menores forçam mais diversidade; 100% remove a restrição.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">60%</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="pct-comp" value="60" min="20" max="100">
+            <div class="inp-hint">Intervalo: 20% a 100%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 2 — ELEGIBILIDADE
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-elegib"><i class="pi pi-users"></i></div>
+        <div><div class="section-title">Elegibilidade do Estudante</div></div>
+      </div>
+      <div class="section-body">
+
+        <!-- N_GATILHO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">N_gatilho — respostas para geração sob demanda</div>
+            <div class="param-desc">Número mínimo de respostas válidas que um estudante inativo deve acumular no ciclo corrente para acionar a geração antecipada ("entrada tardia").</div>
+            <div class="param-impact">Impacto: valores menores geram trilhas mais cedo com menos evidências; valores maiores aumentam a confiabilidade do diagnóstico sob demanda.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">8</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="ngatilho" value="8" min="1" max="50">
+            <div class="inp-hint">Intervalo: 1 a 50</div>
+          </div>
+        </div>
+
+        <!-- ANTECEDÊNCIA MÍNIMA VIGÊNCIA -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Antecedência mínima de vigência para geração sob demanda</div>
+            <div class="param-desc">Tempo mínimo restante de ciclo (em horas) para que o sistema publique uma trilha sob demanda. Se restar menos do que esse valor, a geração é adiada para o próximo ciclo.</div>
+            <div class="param-impact">Impacto: aumentar o valor evita trilhas com vigência muito curta; diminuir permite entregas mais tardias no ciclo.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">48h</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="antecedencia" value="48" min="12" max="120">
+            <div class="inp-hint">Intervalo: 12h a 120h</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 3 — MOTOR B
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-motor-b"><i class="pi pi-list"></i></div>
+        <div><div class="section-title">Motor B — Montagem de Trilhas</div></div>
+      </div>
+      <div class="section-body">
+
+        <!-- BLOCOS MÍNIMOS POR PERIODICIDADE -->
+        <div style="border-bottom:1px solid #F1F4F9">
+          <div style="padding:14px 20px 8px">
+            <div class="param-name">Blocos mínimos por periodicidade</div>
+            <div class="param-desc" style="margin-top:2px">Número mínimo de Blocos de Recomposição exigidos na trilha gerada, conforme a periodicidade configurada na turma. O limite superior é sempre mínimo + 1 bloco.</div>
+            <div class="param-impact">Impacto: aumentar os mínimos gera trilhas mais longas; reduzir produz revisões mais curtas e rápidas.</div>
+          </div>
+          <div class="blocos-min-grid">
+            <div class="bm-item">
+              <div class="bm-label">Semanal (7 dias)</div>
+              <input type="number" class="inp inp-sm" id="bm-sem" value="2" min="2" max="10">
+              <div class="inp-hint">Padrão: 2 · mín: 2</div>
+            </div>
+            <div class="bm-item">
+              <div class="bm-label">Quinzenal (15 dias)</div>
+              <input type="number" class="inp inp-sm" id="bm-qui" value="3" min="2" max="10">
+              <div class="inp-hint">Padrão: 3 · mín: 2</div>
+            </div>
+            <div class="bm-item">
+              <div class="bm-label">Mensal (30 dias)</div>
+              <input type="number" class="inp inp-sm" id="bm-men" value="5" min="2" max="10">
+              <div class="inp-hint">Padrão: 5 · mín: 2</div>
+            </div>
+            <div class="bm-item">
+              <div class="bm-label">Trimestral (90 dias)</div>
+              <input type="number" class="inp inp-sm" id="bm-tri" value="5" min="2" max="10">
+              <div class="inp-hint">Padrão: 5 · mín: 2</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRÁTICAS POR BLOCO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Práticas por bloco</div>
+            <div class="param-desc">Número máximo de questões práticas por Bloco de Recomposição (além da questão informativa obrigatória).</div>
+            <div class="param-impact">Impacto: mais práticas por bloco aumentam a carga de exercícios por habilidade.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">3</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="praticas" value="3" min="1" max="5">
+            <div class="inp-hint">Intervalo: 1 a 5</div>
+          </div>
+        </div>
+
+        <!-- PISO ABSOLUTO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Piso absoluto de blocos para publicação</div>
+            <div class="param-desc">Número mínimo de blocos (cada um com ao menos 1 informativa + 1 prática) necessário para que a trilha seja publicada. Se não atingido, a trilha não é publicada e o professor recebe alerta.</div>
+            <div class="param-impact">Impacto: aumentar o piso exige mais conteúdo disponível; diminuir permite publicar trilhas menores.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">2</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="piso" value="2" min="1" max="10">
+            <div class="inp-hint">Mínimo: 1</div>
+          </div>
+        </div>
+
+        <!-- ANTIRREPETIÇÃO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Antirrepetição — nº de trilhas anteriores consideradas</div>
+            <div class="param-desc">Número de trilhas adaptativas anteriores do estudante cujas questões são bloqueadas para reutilização na nova trilha.</div>
+            <div class="param-impact">Impacto: valores maiores garantem mais variedade mas podem esgotar o banco de questões mais rapidamente.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">2</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="antirepeat" value="2" min="0" max="5">
+            <div class="inp-hint">Intervalo: 0 a 5</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 4 — IA GENERATIVA
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-ia"><i class="pi pi-sparkles"></i></div>
+        <div><div class="section-title">IA Generativa</div></div>
+      </div>
+      <div class="section-body">
+
+        <!-- LIMITE CHAMADAS -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Limite de chamadas por ciclo por turma</div>
+            <div class="param-desc">Número máximo de chamadas à IA Generativa permitidas por ciclo para cada turma. Atingido o limite, os blocos são completados apenas com o conteúdo disponível no banco.</div>
+            <div class="param-impact">Impacto: limites menores reduzem custo mas podem aumentar blocos incompletos; valores maiores garantem mais conteúdo gerado.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">200</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="limite-chamadas" value="200" min="0">
+            <div class="inp-hint">Mínimo: 0</div>
+          </div>
+        </div>
+
+        <!-- JANELA CACHE -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Janela de cache de geração</div>
+            <div class="param-desc">Período (em horas) em que uma questão gerada para a mesma combinação de parâmetros (habilidade + objetivo + tipo + dificuldade + ano/série) é reutilizada entre estudantes da mesma turma, sem nova chamada à IA.</div>
+            <div class="param-impact">Impacto: janelas maiores reduzem custo e padronizam o conteúdo; janelas menores aumentam a variedade gerada.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">24h</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="cache" value="24" min="1" max="168">
+            <div class="inp-hint">Intervalo: 1h a 168h</div>
+          </div>
+        </div>
+
+        <!-- TIMEOUT -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Timeout por chamada</div>
+            <div class="param-desc">Tempo máximo (em segundos) aguardado por cada chamada à IA Generativa. Excedido, o sistema aplica a política de retry e depois segue para a próxima flexibilização.</div>
+            <div class="param-impact">Impacto: valores menores aumentam a velocidade do processamento mas podem descartar gerações lentas; valores maiores aceitam mais latência.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">30s</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="timeout" value="30" min="10" max="60">
+            <div class="inp-hint">Intervalo: 10s a 60s</div>
+          </div>
+        </div>
+
+        <!-- TENTATIVAS EM CASO DE REPROVAÇÃO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Tentativas em caso de reprovação na validação automática</div>
+            <div class="param-desc">Número de vezes que o sistema tenta regenerar uma questão reprovada pela validação automática (campos ausentes, estrutura inválida, etc.) antes de descartá-la.</div>
+            <div class="param-impact">Impacto: mais tentativas aumentam a chance de obter conteúdo válido mas aumentam o custo e o tempo de processamento.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">2</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="tentativas" value="2" min="0" max="3">
+            <div class="inp-hint">Intervalo: 0 a 3</div>
+          </div>
+        </div>
+
+        <!-- PROMPT RECOMPOSIÇÃO -->
+        <div class="prompt-cell">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+            <div class="prompt-label">Prompt padrão de recomposição <span class="version-badge"><i class="pi pi-history" style="font-size:11px"></i>v3</span></div>
+            <span style="font-size:11px;color:#8A95B2">Editável apenas pelo Super Administrador · alterações criam nova versão</span>
+          </div>
+          <div class="prompt-desc">Instrução enviada à IA Generativa para gerar questões práticas de recomposição. Variáveis disponíveis: <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px;font-size:11px">[ano/série]</code> <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px;font-size:11px">[código – descrição]</code> <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px;font-size:11px">[objetivo]</code></div>
+          <textarea class="ta" id="prompt-recomp" rows="4">Gere atividades de recomposição de aprendizagem para um estudante de [ano/série] que apresentou dificuldade na habilidade [código – descrição], especificamente no objetivo de aprendizagem [objetivo]. O conteúdo deve retomar o conceito de forma clara e progressiva, com linguagem adequada à faixa etária, contextualizada e sem pressupor domínio prévio do conceito em defasagem.</textarea>
+        </div>
+
+        <!-- PROMPT INFORMATIVA -->
+        <div class="prompt-cell" style="border-bottom:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+            <div class="prompt-label">Prompt padrão de questão informativa <span class="version-badge"><i class="pi pi-history" style="font-size:11px"></i>v2</span></div>
+            <span style="font-size:11px;color:#8A95B2">Editável apenas pelo Super Administrador · alterações criam nova versão</span>
+          </div>
+          <div class="prompt-desc">Instrução enviada à IA Generativa para gerar a questão informativa de abertura de cada bloco. Limite de 1.200 caracteres no texto gerado.</div>
+          <textarea class="ta" id="prompt-info" rows="4">Gere um texto de apoio pedagógico curto (máximo 1.200 caracteres) que explique o conceito central da habilidade [código – descrição] para um estudante de [ano/série], em linguagem acessível, com um exemplo prático. O conteúdo não deve conter pergunta nem campo de resposta.</textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 5 — CICLO
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-ciclo"><i class="pi pi-clock"></i></div>
+        <div><div class="section-title">Ciclo</div></div>
+      </div>
+      <div class="section-body">
+
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Horário do job de processamento de fim de ciclo</div>
+            <div class="param-desc">Horário agendado (fuso GMT-03:00 — Brasília) em que o sistema executa o diagnóstico e a montagem de trilhas para todas as turmas com ciclos encerrando naquele dia. Deve ser no horário de menor uso da plataforma.</div>
+            <div class="param-impact">Impacto: horários com maior uso simultâneo da plataforma podem aumentar a latência do processamento e afetar a experiência dos estudantes.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">02:00 GMT-03:00</div></div>
+          <div class="param-input-cell">
+            <input type="time" class="inp" id="horario-job" value="02:00">
+            <div class="inp-hint">Fuso: GMT-03:00 (Brasília)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 6 — REVISÃO
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-revisao"><i class="pi pi-eye"></i></div>
+        <div><div class="section-title">Revisão pelo Professor</div></div>
+      </div>
+      <div class="section-body">
+
+        <!-- SWITCH EXIGIR REVISÃO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Exigir revisão do professor antes de publicar a trilha</div>
+            <div class="param-desc">Quando ativo, todas as trilhas geradas ficam com status "Sugerida" e aguardam revisão e aprovação manual do professor (ou administrador com escopo) antes de serem publicadas ao estudante.</div>
+            <div class="param-impact">Impacto: ativar garante curadoria humana mas atrasa a entrega; desativar publica automaticamente após geração.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">Inativo</div></div>
+          <div class="param-input-cell">
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="toggle-revisao" onchange="updateToggleLabel(this,'label-revisao')">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label" id="label-revisao">Inativo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- JANELA REVISÃO -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Janela de revisão do professor</div>
+            <div class="param-desc">Tempo máximo (em horas) que o professor tem para revisar e aprovar uma trilha em status "Sugerida". Após esse prazo, a trilha é publicada automaticamente sem intervenção. Aplica-se apenas quando a opção de exigir revisão estiver ativa.</div>
+            <div class="param-impact">Impacto: janelas menores garantem publicação rápida; janelas maiores dão mais tempo ao professor mas podem atrasar a entrega ao estudante.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">72h</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="janela-revisao" value="72" min="24" max="168">
+            <div class="inp-hint">Intervalo: 24h a 168h</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         GRUPO 7 — RECOMPENSA
+    ═══════════════════════════════════════ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-icon icon-reward"><i class="pi pi-star"></i></div>
+        <div><div class="section-title">Recompensa</div></div>
+      </div>
+      <div class="section-body">
+
+        <!-- SIGCOINS -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">Sigcoins por trilha concluída</div>
+            <div class="param-desc">Quantidade de Sigcoins creditada ao estudante ao concluir todas as fases de uma trilha adaptativa. A recompensa é fixa, independente do percentual de acerto, e creditada uma única vez por trilha.</div>
+            <div class="param-impact">Impacto: valores maiores aumentam o incentivo à conclusão; o valor deve ser calibrado em relação às recompensas de outros conteúdos da plataforma.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">50</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="sigcoins" value="50" min="0">
+            <div class="inp-hint">Mínimo: 0</div>
+          </div>
+        </div>
+
+        <!-- XP -->
+        <div class="param-row">
+          <div class="param-info">
+            <div class="param-name">XP por trilha concluída</div>
+            <div class="param-desc">Quantidade de XP creditada ao concluir a trilha adaptativa. Aplicável quando o sistema de XP das Trilhas Auto-Guiadas estiver disponível. A escala deve ser compatível com a das trilhas auto-guiadas.</div>
+            <div class="param-impact">Impacto: compatível com o sistema de XP existente. Dependência: sistema de XP das Trilhas Auto-Guiadas.</div>
+          </div>
+          <div class="param-default"><div class="param-default-label">Padrão</div><div class="param-default-val">Conforme escala Trilhas Auto-Guiadas</div></div>
+          <div class="param-input-cell">
+            <input type="number" class="inp" id="xp" value="0" min="0">
+            <div class="inp-hint">Mínimo: 0</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- espaço para o footer fixo -->
+    <div style="height:24px"></div>
+  </div><!-- /page-content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- STICKY FOOTER -->
+<div class="sticky-footer">
+  <div class="footer-left">
+    <button class="btn btn-danger-outline" onclick="openModal()"><i class="pi pi-refresh"></i>Restaurar padrões</button>
+    <span style="font-size:12px;color:#8A95B2">Alterações entram em vigor no próximo ciclo de cada turma</span>
+  </div>
+  <div class="footer-right">
+    <button class="btn btn-secondary" onclick="window.location.reload()">Cancelar</button>
+    <button class="btn btn-primary" onclick="salvar()"><i class="pi pi-check"></i>Salvar configurações</button>
+  </div>
+</div>
+
+<!-- MODAL RESTAURAR PADRÕES -->
+<div class="modal-overlay" id="modal-restaurar">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Restaurar padrões</div>
+      <button class="btn-ghost" onclick="closeModal()"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Todos os parâmetros serão redefinidos para os valores padrão do sistema. Uma nova versão dos parâmetros será criada e a alteração será registrada em log de auditoria.</p>
+      <p style="margin-top:12px;color:#B42318;font-size:13px"><i class="pi pi-exclamation-triangle" style="margin-right:4px"></i>Esta ação não pode ser desfeita. Os parâmetros atuais serão substituídos. Os ciclos já processados não são afetados.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn" style="background:#B42318;color:#fff" onclick="restaurar()"><i class="pi pi-refresh"></i>Confirmar restauração</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── SOMA PESOS ── */
+function recalcSoma() {
+  var ids = ['g1','g2','g3','g4','g5','g6','g7'];
+  var soma = ids.reduce(function(acc,id){
+    return acc + (parseInt(document.getElementById(id).value) || 0);
+  }, 0);
+  document.getElementById('soma-val').textContent = soma + '%';
+  var badge = document.getElementById('soma-badge');
+  var errTxt = document.getElementById('soma-err-txt');
+  if(soma === 100) {
+    badge.className = 'soma-badge soma-ok';
+    badge.innerHTML = '<i class="pi pi-check-circle"></i>Soma: <strong id="soma-val">100%</strong>';
+    errTxt.style.display = 'none';
+    ids.forEach(function(id){ document.getElementById(id).classList.remove('error'); });
+  } else {
+    badge.className = 'soma-badge soma-err';
+    badge.innerHTML = '<i class="pi pi-exclamation-triangle"></i>Soma: <strong id="soma-val">'+soma+'%</strong>';
+    errTxt.style.display = 'inline-flex';
+  }
+}
+
+/* ── VALIDAÇÃO FAIXAS ── */
+function validFaixas() {
+  var c = parseInt(document.getElementById('faixa-critica').value) || 0;
+  var m = parseInt(document.getElementById('faixa-moderada').value) || 0;
+  var a = parseInt(document.getElementById('faixa-atencao').value) || 0;
+  var ok = c > m && m > a;
+  ['faixa-critica','faixa-moderada','faixa-atencao'].forEach(function(id){
+    document.getElementById(id).classList.toggle('error', !ok);
+  });
+  ['hint-critica','hint-moderada','hint-atencao'].forEach(function(id, i){
+    var el = document.getElementById(id);
+    if(!ok) {
+      el.className = 'inp-hint err-hint';
+      el.textContent = 'Os valores devem ser: Crítico > Moderado > Atenção';
+    } else {
+      el.className = 'inp-hint';
+      var defs = ['Padrão: 70','Padrão: 50','Padrão: 30'];
+      el.textContent = defs[i];
+    }
+  });
+}
+
+/* ── TOGGLE LABEL ── */
+function updateToggleLabel(el, labelId) {
+  document.getElementById(labelId).textContent = el.checked ? 'Ativo' : 'Inativo';
+}
+
+/* ── MODAL ── */
+function openModal() { document.getElementById('modal-restaurar').classList.add('open'); }
+function closeModal() { document.getElementById('modal-restaurar').classList.remove('open'); }
+
+/* ── RESTAURAR ── */
+function restaurar() {
+  closeModal();
+  var defaults = {g1:40,g2:15,g3:10,g4:10,g5:10,g6:5,g7:10,limiar:50,nmin:4,'faixa-critica':70,'faixa-moderada':50,'faixa-atencao':30,'pct-comp':60,ngatilho:8,antecedencia:48,'bm-sem':2,'bm-qui':3,'bm-men':5,'bm-tri':5,praticas:3,piso:2,antirepeat:2,'limite-chamadas':200,cache:24,timeout:30,tentativas:2,'janela-revisao':72,sigcoins:50,xp:0};
+  Object.keys(defaults).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value = defaults[id];
+  });
+  document.getElementById('horario-job').value = '02:00';
+  var tog = document.getElementById('toggle-revisao');
+  tog.checked = false;
+  document.getElementById('label-revisao').textContent = 'Inativo';
+  document.getElementById('prompt-recomp').value = 'Gere atividades de recomposição de aprendizagem para um estudante de [ano/série] que apresentou dificuldade na habilidade [código – descrição], especificamente no objetivo de aprendizagem [objetivo]. O conteúdo deve retomar o conceito de forma clara e progressiva, com linguagem adequada à faixa etária, contextualizada e sem pressupor domínio prévio do conceito em defasagem.';
+  document.getElementById('prompt-info').value = 'Gere um texto de apoio pedagógico curto (máximo 1.200 caracteres) que explique o conceito central da habilidade [código – descrição] para um estudante de [ano/série], em linguagem acessível, com um exemplo prático. O conteúdo não deve conter pergunta nem campo de resposta.';
+  recalcSoma();
+  validFaixas();
+  showToast('Padrões restaurados. Registro de auditoria gravado.', 'ok');
+}
+
+/* ── SALVAR ── */
+function salvar() {
+  var soma = ['g1','g2','g3','g4','g5','g6','g7'].reduce(function(acc,id){
+    return acc + (parseInt(document.getElementById(id).value) || 0);
+  }, 0);
+  if(soma !== 100) {
+    showToast('A soma dos pesos G1–G7 deve ser 100%. Corrija antes de salvar.', 'err');
+    document.getElementById('g1').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  var c = parseInt(document.getElementById('faixa-critica').value)||0;
+  var m = parseInt(document.getElementById('faixa-moderada').value)||0;
+  var a = parseInt(document.getElementById('faixa-atencao').value)||0;
+  if(!(c > m && m > a)) {
+    showToast('Os limites de faixas devem obedecer: Crítico > Moderado > Atenção.', 'err');
+    document.getElementById('faixa-critica').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  showToast('Configurações salvas. Nova versão de parâmetros criada. Auditoria registrada.', 'ok');
+}
+
+/* ── TOAST ── */
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.innerHTML = (type === 'ok' ? '<i class="pi pi-check-circle"></i>' : '<i class="pi pi-exclamation-triangle" style="color:#FECDCA"></i>') + msg;
+  t.style.background = type === 'ok' ? '#1D2939' : '#B42318';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+
+/* fechar modal clicando fora */
+document.getElementById('modal-restaurar').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
+</script>
+</body>
+</html>

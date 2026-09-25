@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dados Pessoais — Orbie App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:             #0D1A32;
+      --surface:        #142A51;
+      --surface-dark:   #10203D;
+      --border:         #224476;
+      --primary:        #0059E7;
+      --primary-hover:  #3F84F3;
+      --text:           #FFFFFF;
+      --text-sec:       #99C0FF;
+      --text-label:     #C0CADB;
+      --success:        #12B76A;
+      --success-bg:     rgba(18,183,106,0.12);
+      --error:          #F04438;
+      --warning:        #F79009;
+      --warning-bg:     rgba(247,144,9,0.12);
+      --whatsapp:       #25D366;
+      --whatsapp-hover: #1ebe5a;
+      --whatsapp-bg:    rgba(37,211,102,0.12);
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-full: 1000px;
+    }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+    .topbar-back { width: 36px; height: 36px; border-radius: var(--radius-full); border: none; background: transparent; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background .15s; }
+    .topbar-back:hover { background: rgba(255,255,255,.06); }
+    .topbar-title { font-size: 16px; font-weight: 700; }
+
+    /* ── PAGE ── */
+    .page { max-width: 720px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 24px; }
+    .section-title    { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .section-subtitle { font-size: 14px; color: var(--text-sec); line-height: 1.5; }
+
+    /* ── CARD ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-sec); margin-bottom: 4px; }
+
+    /* ── FORM ── */
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 500; color: var(--text-label); }
+    .form-input { height: 44px; background: var(--surface-dark); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text); width: 100%; transition: border-color .2s; outline: none; }
+    .form-input:focus { border-color: var(--primary); }
+    .form-input::placeholder { color: rgba(153,192,255,.4); }
+    .form-input:disabled { opacity: .5; cursor: not-allowed; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── GUARDIAN AUTHORIZATION BANNER ── */
+    .auth-banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .auth-banner-header { display: flex; align-items: flex-start; gap: 12px; }
+    .auth-banner-icon { width: 36px; height: 36px; border-radius: var(--radius-full); background: rgba(33,119,255,.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #99C0FF; font-size: 16px; }
+    .auth-banner-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .auth-banner-text  { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
+
+    /* estado: aguardando envio */
+    .auth-status { display: none; }
+    .auth-status.active { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); }
+    .auth-status.success { background: var(--success-bg); border: 1px solid rgba(18,183,106,.3); }
+    .auth-status.warning { background: var(--warning-bg); border: 1px solid rgba(247,144,9,.3); }
+    .auth-status-icon { font-size: 20px; flex-shrink: 0; }
+    .auth-status.success .auth-status-icon { color: var(--success); }
+    .auth-status.warning .auth-status-icon { color: var(--warning); }
+    .auth-status-body { flex: 1; }
+    .auth-status-label { font-size: 13px; font-weight: 600; }
+    .auth-status-dest  { font-size: 13px; color: var(--text-sec); margin-top: 2px; }
+    .auth-status-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-text-link { background: transparent; border: none; color: var(--primary); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline; white-space: nowrap; padding: 0; transition: color .2s; }
+    .btn-text-link:hover { color: var(--primary-hover); }
+    .btn-text-link.danger { color: var(--warning); }
+    .btn-text-link.danger:hover { color: #B54708; }
+
+    /* ── BOTÃO SOLICITAR AUTORIZAÇÃO ── */
+    .btn-request-auth { width: 100%; height: 48px; background: transparent; border: 1.5px solid var(--primary); border-radius: var(--radius-md); color: var(--primary); font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; }
+    .btn-request-auth:hover { background: rgba(0,89,231,.1); }
+
+    /* ══════════════════════════
+       MODAIS
+    ══════════════════════════ */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: #FFFFFF; border-radius: 20px; padding: 32px 24px 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; align-items: center; text-align: center; transform: translateY(12px) scale(.97); transition: transform .25s ease; }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-icon-wrap { width: 56px; height: 56px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 26px; }
+    .modal-icon-wrap.success { background: #ECFDF3; color: #12B76A; }
+    .modal-icon-wrap.info    { background: #EFF8FF; color: #2E90FA; }
+    .modal-icon-wrap.warn    { background: #FFF4E5; color: #F79009; }
+    .modal-icon-wrap.wpp     { background: var(--whatsapp-bg); color: var(--whatsapp); }
+    .modal-icon-wrap svg     { width: 28px; height: 28px; fill: currentColor; }
+
+    .modal-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 400; color: #1D2939; margin-bottom: 10px; line-height: 1.4; }
+    .modal-title strong { font-weight: 700; }
+    .modal-body { font-family: 'Outfit', sans-serif; font-size: 14px; color: #52607A; line-height: 1.6; margin-bottom: 24px; }
+    .modal-body .hl { color: #F04438; font-weight: 600; }
+    .modal-divider { width: calc(100% + 48px); height: 1px; background: #E1E8EF; margin: 0 -24px 20px; }
+
+    /* Tabs dentro do modal */
+    .modal-tabs { display: flex; gap: 8px; width: 100%; margin-bottom: 16px; }
+    .modal-tab { flex: 1; height: 40px; border-radius: var(--radius-sm); border: 1.5px solid #E1E8EF; background: transparent; color: #8A95B2; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .2s; }
+    .modal-tab i { font-size: 16px; }
+    .modal-tab.active { border-color: var(--primary); background: rgba(0,89,231,.07); color: #1D2939; }
+    .modal-tab.tab-wpp.active { border-color: var(--whatsapp); background: var(--whatsapp-bg); color: #1D2939; }
+    .modal-tab svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .modal-panel { display: none; width: 100%; text-align: left; }
+    .modal-panel.active { display: block; }
+
+    .modal-input-label { font-size: 13px; font-weight: 600; color: #344054; margin-bottom: 6px; display: block; }
+    .modal-input { width: 100%; height: 44px; background: #F1F4F9; border: 1px solid #E1E8EF; border-radius: var(--radius-sm); padding: 0 12px; font-family: 'Outfit', sans-serif; font-size: 14px; color: #344054; outline: none; transition: border-color .2s; }
+    .modal-input:focus { border-color: var(--primary); }
+    .modal-input::placeholder { color: #8A95B2; }
+    .modal-input.error { border-color: var(--error); }
+
+    .modal-phone-wrap { display: flex; align-items: center; background: #F1F4F9; border: 1px solid #E1E8EF; border-radius: var(--radius-sm); height: 44px; overflow: hidden; transition: border-color .2s; }
+    .modal-phone-wrap:focus-within { border-color: var(--whatsapp); }
+    .modal-phone-wrap.error { border-color: var(--error); }
+    .modal-phone-prefix { padding: 0 10px 0 12px; font-size: 14px; color: #52607A; border-right: 1px solid #E1E8EF; height: 100%; display: flex; align-items: center; user-select: none; }
+    .modal-phone-input { flex: 1; height: 100%; background: transparent; border: none; outline: none; padding: 0 12px; font-family: 'Outfit', sans-serif; font-size: 14px; color: #344054; }
+    .modal-phone-input::placeholder { color: #8A95B2; }
+    .modal-hint { font-size: 12px; color: #8A95B2; margin-top: 6px; }
+
+    /* Botões do modal */
+    .modal-actions { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .btn-modal-ghost { background: transparent; border: none; color: #F04438; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 4px; transition: opacity .15s; white-space: nowrap; }
+    .btn-modal-ghost:hover { opacity: .75; }
+    .btn-modal-primary { height: 44px; background: #F04438; color: white; border: none; border-radius: var(--radius-md); padding: 0 20px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .2s; flex: 1; justify-content: center; }
+    .btn-modal-primary:hover { background: #D92D20; }
+    .btn-modal-primary.green { background: var(--whatsapp); }
+    .btn-modal-primary.green:hover { background: var(--whatsapp-hover); }
+    .btn-modal-primary.blue { background: var(--primary); }
+    .btn-modal-primary.blue:hover { background: var(--primary-hover); }
+
+    /* ── SVG WPP ── */
+    .icon-wpp { width: 17px; height: 17px; fill: currentColor; flex-shrink: 0; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      .page { padding: 20px 16px 80px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .auth-status { flex-wrap: wrap; }
+      .auth-status-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="topbar-back"><i class="pi pi-arrow-left"></i></button>
+    <span class="topbar-title">Dados pessoais</span>
+  </div>
+
+  <div class="page">
+
+    <div>
+      <h1 class="section-title">Dados pessoais</h1>
+      <p class="section-subtitle">Gerencie suas informações cadastrais, dados de identificação e preferências vinculadas à sua conta Orbie.</p>
+    </div>
+
+    <!-- CARD IDENTIFICAÇÃO -->
+    <div class="card">
+      <p class="card-label">Identificação</p>
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" type="text" value="Ana Beatriz Ferreira" disabled />
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Data de nascimento</label>
+          <input class="form-input" type="text" value="12/04/2012" disabled />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matrícula</label>
+          <input class="form-input" type="text" value="2024001248" disabled />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" value="ana.ferreira@escola.senai.br" disabled />
+      </div>
+    </div>
+
+    <!-- CARD INSTITUIÇÃO -->
+    <div class="card">
+      <p class="card-label">Instituição</p>
+      <div class="form-group">
+        <label class="form-label">Unidade SENAI</label>
+        <input class="form-input" type="text" value="SENAI — Unidade Consolação" disabled />
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Turma</label>
+          <input class="form-input" type="text" value="Turma A — 7º Ano" disabled />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ano letivo</label>
+          <input class="form-input" type="text" value="2026" disabled />
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         GUARDIAN AUTHORIZATION BANNER
+    ══════════════════════════════════════════ -->
+    <div class="auth-banner">
+
+      <!-- Cabeçalho informativo -->
+      <div class="auth-banner-header">
+        <div class="auth-banner-icon"><i class="pi pi-info-circle"></i></div>
+        <div>
+          <p class="auth-banner-title">Solicite a autorização do seu responsável</p>
+          <p class="auth-banner-text">Você pode visualizar as informações da sua conta. Para editar dados e utilizar recursos restritos, envie uma solicitação de autorização ao seu responsável.</p>
+        </div>
+      </div>
+
+      <!-- Status pós-envio (oculto até enviar) -->
+      <div class="auth-status" id="auth-status">
+        <i class="pi auth-status-icon" id="status-icon"></i>
+        <div class="auth-status-body">
+          <p class="auth-status-label" id="status-label">—</p>
+          <p class="auth-status-dest"  id="status-dest">—</p>
+        </div>
+        <div class="auth-status-actions">
+          <button class="btn-text-link" id="btn-corrigir" onclick="abrirModalEdicao()">Corrigir</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTÃO DE SOLICITAÇÃO -->
+    <button class="btn-request-auth" id="btn-solicitar" onclick="openModal('envio')">
+      <i class="pi pi-send"></i>
+      Solicitar autorização
+    </button>
+
+  </div><!-- /page -->
+
+
+  <!-- ══════════════════════════════════════════
+       MODAL 1 — ENVIO (tabs + campos)
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-envio" onclick="handleOverlay(event,'modal-envio')">
+    <div class="modal">
+      <div class="modal-icon-wrap info"><i class="pi pi-send"></i></div>
+      <p class="modal-title">Autorização do <strong>responsável</strong></p>
+      <p class="modal-body">Escolha como enviar a solicitação. O responsável receberá um link para autorizar o acesso à sua conta.</p>
+
+      <!-- Tabs -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="mtab-email" onclick="switchModalTab('email')">
+          <i class="pi pi-envelope"></i> E-mail
+        </button>
+        <button class="modal-tab tab-wpp" id="mtab-wpp" onclick="switchModalTab('wpp')">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+
+      <!-- Painel e-mail -->
+      <div class="modal-panel active" id="mpanel-email">
+        <label class="modal-input-label">E-mail do responsável</label>
+        <input class="modal-input" type="email" id="input-email" placeholder="responsavel@email.com" />
+      </div>
+
+      <!-- Painel WhatsApp -->
+      <div class="modal-panel" id="mpanel-wpp">
+        <label class="modal-input-label">WhatsApp do responsável</label>
+        <div class="modal-phone-wrap" id="phone-wrap">
+          <span class="modal-phone-prefix">🇧🇷 +55</span>
+          <input class="modal-phone-input" type="tel" id="input-phone"
+            placeholder="(11) 99999-9999" oninput="formatPhone(this)" maxlength="15" />
+        </div>
+        <p class="modal-hint">Dica de protótipo: números terminados em 0 ou 1 simulam "sem WhatsApp".</p>
+      </div>
+
+      <div class="modal-divider" style="margin-top:16px;"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-envio')">Cancelar</button>
+        <button class="btn-modal-primary blue" id="btn-enviar" onclick="enviar()">
+          <i class="pi pi-send"></i> Enviar solicitação
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL 2 — SUCESSO E-MAIL
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-success-email" onclick="handleOverlay(event,'modal-success-email')">
+    <div class="modal">
+      <div class="modal-icon-wrap success"><i class="pi pi-check-circle"></i></div>
+      <p class="modal-title">Solicitação enviada <strong>ao responsável</strong></p>
+      <p class="modal-body">
+        Enviamos a solicitação para <span class="hl" id="dest-email">—</span>.
+        Você poderá editar seus dados e acessar os recursos restritos após a autorização do seu responsável.
+      </p>
+      <div class="modal-divider"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-success-email'); openModal('edit-email')">Corrigir e-mail</button>
+        <button class="btn-modal-primary" onclick="closeModal('modal-success-email'); confirmarEnvio()">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL 3 — SUCESSO WHATSAPP
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-success-wpp" onclick="handleOverlay(event,'modal-success-wpp')">
+    <div class="modal">
+      <div class="modal-icon-wrap success"><i class="pi pi-check-circle"></i></div>
+      <p class="modal-title">Solicitação enviada <strong>ao responsável</strong></p>
+      <p class="modal-body">
+        Enviamos a solicitação para o WhatsApp <span class="hl" id="dest-wpp">—</span>.
+        Você poderá editar seus dados e acessar os recursos restritos após a autorização do seu responsável.
+      </p>
+      <div class="modal-divider"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-success-wpp'); openModal('edit-wpp')">Corrigir telefone</button>
+        <button class="btn-modal-primary" onclick="closeModal('modal-success-wpp'); confirmarEnvio()">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL 4 — SEM WHATSAPP
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-nowpp" onclick="handleOverlay(event,'modal-nowpp')">
+    <div class="modal">
+      <div class="modal-icon-wrap warn"><i class="pi pi-info-circle"></i></div>
+      <p class="modal-title">Número <strong>sem WhatsApp</strong></p>
+      <p class="modal-body">
+        Não conseguimos entregar a solicitação via WhatsApp para <span class="hl" id="dest-nowpp">—</span>.
+        Verifique o número ou envie por e-mail.
+      </p>
+      <div class="modal-divider"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-nowpp'); openModal('edit-wpp')">Corrigir telefone</button>
+        <button class="btn-modal-primary" onclick="closeModal('modal-nowpp'); abrirEnvioPorEmail()">Enviar por e-mail</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL 5 — EDITAR E-MAIL
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-edit-email" onclick="handleOverlay(event,'modal-edit-email')">
+    <div class="modal">
+      <div class="modal-icon-wrap info"><i class="pi pi-envelope"></i></div>
+      <p class="modal-title">Corrigir <strong>e-mail</strong></p>
+      <p class="modal-body" style="margin-bottom:20px;">Informe o e-mail correto e reenviaremos a solicitação ao responsável.</p>
+      <div class="modal-panel active" style="width:100%;text-align:left;margin-bottom:16px;">
+        <label class="modal-input-label">E-mail do responsável</label>
+        <input class="modal-input" type="email" id="edit-input-email" placeholder="responsavel@email.com" />
+      </div>
+      <div class="modal-divider"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-edit-email')">Cancelar</button>
+        <button class="btn-modal-primary blue" onclick="reenviarEmail()">
+          <i class="pi pi-send"></i> Reenviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL 6 — EDITAR TELEFONE
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-edit-wpp" onclick="handleOverlay(event,'modal-edit-wpp')">
+    <div class="modal">
+      <div class="modal-icon-wrap wpp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </div>
+      <p class="modal-title">Corrigir <strong>telefone</strong></p>
+      <p class="modal-body" style="margin-bottom:20px;">Informe o número correto com WhatsApp e reenviaremos a solicitação ao responsável.</p>
+      <div class="modal-panel active" style="width:100%;text-align:left;margin-bottom:16px;">
+        <label class="modal-input-label">WhatsApp do responsável</label>
+        <div class="modal-phone-wrap" id="edit-phone-wrap">
+          <span class="modal-phone-prefix">🇧🇷 +55</span>
+          <input class="modal-phone-input" type="tel" id="edit-input-phone"
+            placeholder="(11) 99999-9999" oninput="formatPhone(this)" maxlength="15" />
+        </div>
+      </div>
+      <div class="modal-divider"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-ghost" onclick="closeModal('modal-edit-wpp')">Cancelar</button>
+        <button class="btn-modal-primary green" onclick="reenviarWpp()">
+          <svg class="icon-wpp" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Reenviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── ESTADO ── */
+    const S = { channel: 'email', sentTo: '' };
+
+    /* ── TABS DO MODAL DE ENVIO ── */
+    function switchModalTab(ch) {
+      S.channel = ch;
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.modal-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('mtab-' + ch).classList.add('active');
+      document.getElementById('mpanel-' + ch).classList.add('active');
+      // atualiza botão enviar
+      const btn = document.getElementById('btn-enviar');
+      if (ch === 'wpp') {
+        btn.className = 'btn-modal-primary green';
+        btn.innerHTML = '<svg class="icon-wpp" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Enviar via WhatsApp';
+      } else {
+        btn.className = 'btn-modal-primary blue';
+        btn.innerHTML = '<i class="pi pi-send"></i> Enviar solicitação';
+      }
+    }
+
+    /* ── ENVIAR (modal principal) ── */
+    function enviar() {
+      if (S.channel === 'email') {
+        const v = document.getElementById('input-email').value.trim();
+        if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { shake('input-email'); return; }
+        S.sentTo = v;
+        closeModal('modal-envio');
+        document.getElementById('dest-email').textContent = v;
+        openModal('success-email');
+        document.getElementById('input-email').value = '';
+      } else {
+        const raw = document.getElementById('input-phone').value.replace(/\D/g,'');
+        if (!raw || raw.length < 10) { shake('phone-wrap'); return; }
+        S.sentTo = document.getElementById('input-phone').value;
+        closeModal('modal-envio');
+        processarWpp(S.sentTo, raw);
+        document.getElementById('input-phone').value = '';
+      }
+    }
+
+    function processarWpp(formatted, raw) {
+      const semWpp = raw.endsWith('0') || raw.endsWith('1'); // simulação
+      if (semWpp) {
+        document.getElementById('dest-nowpp').textContent = formatted;
+        openModal('nowpp');
+      } else {
+        document.getElementById('dest-wpp').textContent = formatted;
+        openModal('success-wpp');
+      }
+    }
+
+    /* ── CONFIRMAR (Entendi) ── */
+    function confirmarEnvio() {
+      const isWpp = S.channel === 'wpp';
+      const status = document.getElementById('auth-status');
+      status.className = 'auth-status active success';
+      document.getElementById('status-icon').className = 'pi auth-status-icon pi-check-circle';
+      document.getElementById('status-label').textContent = 'Solicitação enviada';
+      document.getElementById('status-dest').textContent = isWpp ? 'WhatsApp · ' + S.sentTo : S.sentTo;
+      document.getElementById('btn-corrigir').textContent = isWpp ? 'Corrigir número' : 'Corrigir e-mail';
+    }
+
+    /* ── ABRIR EDIÇÃO (do banner) ── */
+    function abrirModalEdicao() {
+      openModal(S.channel === 'wpp' ? 'edit-wpp' : 'edit-email');
+    }
+
+    /* ── REENVIO E-MAIL (modal editar) ── */
+    function reenviarEmail() {
+      const v = document.getElementById('edit-input-email').value.trim();
+      if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { shake('edit-input-email'); return; }
+      S.sentTo = v; S.channel = 'email';
+      closeModal('modal-edit-email');
+      document.getElementById('dest-email').textContent = v;
+      openModal('success-email');
+      document.getElementById('edit-input-email').value = '';
+    }
+
+    /* ── REENVIO WPP (modal editar) ── */
+    function reenviarWpp() {
+      const raw = document.getElementById('edit-input-phone').value.replace(/\D/g,'');
+      if (!raw || raw.length < 10) { shake('edit-phone-wrap'); return; }
+      S.sentTo = document.getElementById('edit-input-phone').value;
+      S.channel = 'wpp';
+      closeModal('modal-edit-wpp');
+      processarWpp(S.sentTo, raw);
+      document.getElementById('edit-input-phone').value = '';
+    }
+
+    /* ── ABRIR ENVIO POR EMAIL (do modal sem-wpp) ── */
+    function abrirEnvioPorEmail() {
+      S.channel = 'email';
+      switchModalTab('email');
+      openModal('envio');
+    }
+
+    /* ── MODAL HELPERS ── */
+    function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function handleOverlay(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+    /* ── SHAKE (validação visual) ── */
+    function shake(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = '#F04438';
+      el.style.animation = 'none';
+      setTimeout(() => el.style.borderColor = '', 2000);
+    }
+
+    /* ── FORMATO TELEFONE ── */
+    function formatPhone(input) {
+      let v = input.value.replace(/\D/g,'');
+      if (v.length > 11) v = v.slice(0,11);
+      if (v.length >= 7) v = '('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+      else if (v.length >= 3) v = '('+v.slice(0,2)+') '+v.slice(2);
+      else if (v.length > 0) v = '('+v;
+      input.value = v;
+    }
+
+    /* ── ESC fecha modais ── */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape')
+        document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    });
+  </script>
+</body>
+</html>

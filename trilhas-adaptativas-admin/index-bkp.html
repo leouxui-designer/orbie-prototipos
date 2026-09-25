@@ -1,0 +1,1087 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Trilhas Adaptativas — Carlos de Oliveira</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: #F8F9FC; color: #344054; min-width: 1200px; }
+:root {
+  --primary: #2177FF; --primary-8: rgba(33,119,255,0.08); --primary-3: rgba(33,119,255,0.03);
+  --on-bg: #344054; --on-bg-mid: #525e76; --on-bg-light: #8a95b2;
+  --outline: #dde4eb; --surface: #fff; --bg: #F8F9FC;
+  --error: #b42318; --error-bg: rgba(217,55,43,0.05);
+  --success: #027A48; --success-bg: #ECFDF3;
+  --warning: #B54708; --warning-bg: #FFFAEB;
+  --tooltip-bg: #252529;
+  --r-xs:6px; --r-sm:8px; --r-md:10px; --r-lg:12px; --r-xl:16px; --r-full:1000px;
+}
+
+/* LAYOUT */
+.layout { display:flex; min-height:100vh; }
+.header {
+  position:fixed; top:0; left:0; right:0; height:64px; z-index:100;
+  background:var(--surface); border-bottom:1px solid var(--outline);
+  display:flex; align-items:center; justify-content:space-between; padding:0 16px;
+}
+.header-left, .header-right { display:flex; align-items:center; gap:8px; }
+.btn-icon-hd {
+  width:40px; height:40px; border-radius:var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; border:none; cursor:pointer; color:var(--on-bg);
+  font-size:18px; transition:background .15s;
+}
+.btn-icon-hd:hover { background:var(--primary-8); }
+.hd-select {
+  display:flex; align-items:center; gap:6px;
+  background:var(--surface); border:1px solid var(--outline);
+  border-radius:var(--r-lg); padding:6px 12px; cursor:pointer;
+  font-size:14px; color:var(--on-bg); min-height:36px; font-family:inherit;
+}
+.avatar {
+  width:40px; height:40px; border-radius:var(--r-full);
+  background:rgba(0,0,0,.03); display:flex; align-items:center;
+  justify-content:center; font-weight:500; font-size:16px; color:var(--on-bg);
+}
+.sidebar {
+  position:fixed; top:64px; left:0; bottom:0; width:240px;
+  background:var(--surface); border-right:1px solid var(--outline);
+  padding:16px 12px; overflow-y:auto; z-index:90;
+}
+.mi {
+  display:flex; align-items:center; gap:6px; padding:8px;
+  border-radius:var(--r-xs); cursor:pointer; font-size:14px; font-weight:500;
+  color:var(--on-bg); text-decoration:none; transition:background .15s;
+}
+.mi:hover { background:rgba(0,0,0,.03); }
+.mi.active { background:var(--primary-8); color:var(--primary); }
+.mi i { font-size:18px; width:24px; text-align:center; }
+.mi-exp { margin-left:auto; font-size:13px; }
+.msub { margin-left:30px; display:flex; flex-direction:column; gap:2px; }
+.msub-item {
+  padding:6px 12px; border-radius:var(--r-xs); cursor:pointer;
+  font-size:14px; color:var(--on-bg); transition:background .15s;
+}
+.msub-item:hover { background:rgba(0,0,0,.03); }
+.msub-item.active { color:var(--primary); font-weight:500; }
+.main { margin-top:64px; margin-left:240px; padding:8px 32px 48px; }
+
+/* BREADCRUMB / PAGE TITLE */
+.breadcrumb {
+  display:flex; align-items:center; gap:4px;
+  font-size:12px; color:var(--on-bg-mid); margin:16px 0 8px;
+}
+.breadcrumb a { color:var(--on-bg-mid); text-decoration:none; }
+.breadcrumb a:hover { color:var(--primary); }
+.breadcrumb .cur { color:var(--on-bg-light); }
+.page-title { font-size:28px; font-weight:700; color:var(--on-bg); line-height:33px; margin-bottom:16px; }
+
+/* TABS */
+.tabs { display:flex; border-bottom:2px solid var(--outline); margin-bottom:24px; }
+.tab {
+  padding:12px 16px; font-size:14px; font-weight:500; color:var(--on-bg);
+  cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:color .15s;
+}
+.tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+.tab:hover:not(.active) { color:var(--primary); }
+
+/* ── SCENARIO SWITCHER ── */
+.scenario-bar {
+  display:flex; align-items:center; gap:8px; margin-bottom:20px;
+  background:var(--surface); border:1px solid var(--outline);
+  border-radius:var(--r-lg); padding:10px 16px; flex-wrap:wrap;
+}
+.scenario-bar span { font-size:12px; font-weight:600; color:var(--on-bg-mid); margin-right:4px; }
+.sc-btn {
+  padding:4px 12px; border-radius:var(--r-full); font-size:12px; font-weight:500;
+  cursor:pointer; border:1px solid var(--outline); background:var(--surface);
+  color:var(--on-bg-mid); font-family:inherit; transition:all .15s;
+}
+.sc-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-8); }
+.sc-btn.active { border-color:var(--primary); color:var(--primary); background:var(--primary-8); font-weight:700; }
+
+/* CARD */
+.card {
+  background:var(--surface); border:1px solid var(--outline);
+  border-radius:var(--r-lg); padding:16px; display:flex; flex-direction:column; gap:16px;
+}
+.card-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.card-header-left { display:flex; flex-direction:column; gap:4px; }
+.card-title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.card-title { font-size:14px; font-weight:700; color:var(--on-bg); }
+.card-subtitle { font-size:12px; color:var(--on-bg-mid); }
+.card-actions { display:flex; align-items:center; gap:12px; }
+
+/* BADGES */
+.badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 8px; border-radius:var(--r-full);
+  font-size:12px; font-weight:500; line-height:16px;
+}
+.b-disponivel { background:rgba(0,0,0,.03); color:var(--on-bg-mid); }
+.b-andamento  { background:rgba(247,144,9,.1); color:var(--warning); }
+.b-concluida  { background:var(--success-bg); color:var(--success); }
+.b-cancelada  { background:var(--error-bg); color:var(--error); }
+.b-editada    { background:var(--primary-8); color:var(--primary); }
+.b-ia {
+  background:linear-gradient(90deg,#9747ff,#698afa);
+  color:#fff; padding:2px 8px; border-radius:var(--r-full);
+  font-size:12px; font-weight:500;
+}
+
+/* BUTTONS */
+.btn {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:6px 12px; border-radius:var(--r-md);
+  font-size:14px; font-weight:500; cursor:pointer; border:none;
+  min-height:36px; font-family:inherit; transition:background .15s;
+}
+.btn-link { background:transparent; color:var(--primary); }
+.btn-link:hover { background:var(--primary-8); }
+.btn-link:disabled { opacity:.4; cursor:not-allowed; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:#0059E7; }
+.btn-outline { background:var(--surface); color:var(--primary); border:1px solid var(--primary); }
+.btn-outline:hover { background:var(--primary-8); }
+.btn-ghost { background:transparent; color:var(--on-bg-mid); border:none; }
+.btn-ghost:hover { background:rgba(0,0,0,.04); }
+.btn-danger-fill { background:var(--error); color:#fff; }
+.btn-danger-fill:hover { background:#8b1a12; }
+.bi {
+  width:32px; height:32px; border-radius:var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; border:none; cursor:pointer;
+  color:var(--on-bg-mid); font-size:16px; transition:background .15s; position:relative;
+}
+.bi:hover { background:rgba(0,0,0,.06); color:var(--on-bg); }
+.bi.del:hover { background:var(--error-bg); color:var(--error); }
+.bi.pri { color:var(--primary); }
+.bi.pri:hover { background:var(--primary-8); }
+.bi:disabled { opacity:.3; cursor:not-allowed; }
+
+/* TOOLTIP */
+.tw { position:relative; display:inline-flex; }
+.tw .tt {
+  position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+  background:var(--tooltip-bg); color:#fff; font-size:11px; padding:5px 8px;
+  border-radius:var(--r-xs); white-space:nowrap; opacity:0; pointer-events:none;
+  transition:opacity .15s; z-index:200;
+}
+.tw:hover .tt { opacity:1; }
+
+/* AVISO */
+.aviso {
+  display:flex; align-items:flex-start; gap:8px;
+  border-radius:var(--r-sm); padding:10px 14px; font-size:12px; line-height:18px;
+}
+.aviso-warning { background:var(--warning-bg); border:1px solid rgba(181,71,8,.2); color:var(--warning); }
+.aviso-info { background:#EFF8FF; border:1px solid rgba(46,144,250,.2); color:#1849A9; }
+.aviso i { font-size:14px; margin-top:1px; flex-shrink:0; }
+
+/* BLOCO */
+.bloco {
+  border:1px solid var(--outline); border-radius:var(--r-xl);
+  display:flex; flex-direction:column;
+}
+.bloco-hd {
+  display:flex; align-items:flex-start; gap:16px;
+  padding:16px; border-bottom:1px solid var(--outline);
+}
+.bloco-hd.frozen { background:#f8f9fc; }
+.drag-h { color:var(--on-bg-light); cursor:grab; font-size:14px; margin-top:2px; }
+.bloco-body { flex:1; display:flex; flex-direction:column; gap:8px; }
+.bloco-tags { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.chip-hab {
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(0,0,0,.03); border-radius:var(--r-full);
+  padding:2px 8px 2px 12px; font-size:12px; color:var(--on-bg); cursor:pointer;
+}
+.chip-hab i { font-size:11px; color:var(--on-bg-mid); }
+.bloco-title { font-size:16px; font-weight:700; color:var(--on-bg); }
+.bloco-acts { display:flex; align-items:center; gap:2px; flex-shrink:0; }
+
+/* JUSTIFICATIVA */
+.justif {
+  margin:0 16px 0 48px; background:#F8F9FC;
+  border-radius:var(--r-sm); border:1px solid var(--outline);
+  padding:10px 14px; display:flex; align-items:flex-start; gap:10px;
+}
+.justif-icon { color:var(--primary); font-size:14px; margin-top:2px; flex-shrink:0; }
+.justif-text { font-size:12px; color:var(--on-bg-mid); line-height:18px; flex:1; }
+.justif-text strong { color:var(--on-bg); }
+.justif-text em { font-style:normal; color:var(--on-bg-mid); }
+.justif-lock { font-size:11px; color:var(--on-bg-light); flex-shrink:0; margin-top:2px; }
+.ev-link {
+  font-size:12px; color:var(--primary); cursor:pointer;
+  text-decoration:underline; white-space:nowrap; flex-shrink:0; margin-top:2px;
+}
+.ev-link:hover { color:#0059E7; }
+
+/* QUESTÕES */
+.q-list { display:flex; flex-direction:column; gap:10px; padding:16px; }
+.q-item {
+  background:var(--surface); border:1px solid var(--outline);
+  border-radius:var(--r-lg); padding:12px 16px;
+  display:flex; align-items:center; gap:14px;
+}
+.q-item.frozen { background:#f8f9fc; opacity:.6; }
+.q-info { flex:1; display:flex; flex-direction:column; gap:3px; }
+.q-label { font-size:12px; color:var(--on-bg-mid); }
+.q-tr { display:flex; align-items:center; gap:8px; }
+.q-title { font-size:15px; font-weight:700; color:var(--on-bg); }
+.q-acts { display:flex; align-items:center; gap:2px; }
+
+/* ADD BUTTONS */
+.add-q-btn {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  margin:0 16px 16px; padding:8px 16px; border-radius:var(--r-lg);
+  border:1px dashed var(--outline); background:transparent;
+  color:var(--on-bg-mid); font-size:12px; font-weight:500;
+  cursor:pointer; font-family:inherit; transition:all .15s;
+}
+.add-q-btn:hover { background:rgba(0,0,0,.03); color:var(--primary); border-color:var(--primary); }
+.add-b-btn {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 16px; border-radius:var(--r-lg);
+  border:1.5px dashed var(--outline); background:transparent;
+  color:var(--primary); font-size:14px; font-weight:500;
+  cursor:pointer; font-family:inherit; width:100%; transition:all .15s;
+}
+.add-b-btn:hover { background:var(--primary-8); border-color:var(--primary); }
+
+/* CARD FOOTER */
+.card-footer {
+  display:flex; align-items:center; justify-content:flex-end;
+  padding-top:12px; border-top:1px solid var(--outline); gap:12px; flex-wrap:wrap;
+}
+
+/* MODALS */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.4);
+  z-index:300; display:none; align-items:center; justify-content:center;
+}
+.overlay.open { display:flex; }
+.modal {
+  background:var(--surface); border-radius:var(--r-xl);
+  box-shadow:0 10px 30px rgba(0,0,0,.15); padding:24px;
+  width:560px; max-width:90vw; display:flex; flex-direction:column; gap:16px;
+}
+.modal-hd { display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:16px; font-weight:700; color:var(--on-bg); }
+.modal-sub { font-size:12px; color:var(--on-bg-mid); line-height:18px; }
+.mtable { width:100%; border-collapse:collapse; font-size:13px; }
+.mtable th {
+  text-align:left; font-weight:600; color:var(--on-bg-mid);
+  border-bottom:1px solid var(--outline); padding:8px 0; font-size:12px;
+}
+.mtable td { padding:10px 0; border-bottom:1px solid var(--outline); color:var(--on-bg); }
+.mtable tr:last-child td { border-bottom:none; }
+.t-ok { color:var(--success); font-weight:600; }
+.t-err { color:var(--error); font-weight:600; }
+
+/* SELECT HAB */
+.hab-list { display:flex; flex-direction:column; gap:6px; max-height:280px; overflow-y:auto; }
+.hab-opt {
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  border:1px solid var(--outline); border-radius:var(--r-sm);
+  cursor:pointer; transition:all .15s;
+}
+.hab-opt:hover { border-color:var(--primary); background:var(--primary-8); }
+.hab-opt.selected { border-color:var(--primary); background:var(--primary-8); }
+.hab-code { font-size:12px; font-weight:600; color:var(--primary); }
+.hab-desc { font-size:13px; color:var(--on-bg); }
+.hab-origin { font-size:11px; color:var(--on-bg-light); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:999;
+  border-radius:var(--r-md); padding:12px 16px; font-size:13px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12); display:flex; align-items:center;
+  gap:8px; max-width:380px; animation:slideIn .2s ease; font-family:inherit;
+}
+@keyframes slideIn { from { transform:translateY(16px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div style="width:90px;height:27px;overflow:hidden;">
+      <svg width="90" height="27" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#cl)">
+          <path d="M41.763 56C56.5366 56 67.7509 45.0144 67.7509 30.4669C67.7509 15.9194 56.5392 4.9364 41.763 4.9364C26.9868 4.9364 15.7776 15.922 15.7776 30.4669C15.7776 45.0119 26.9157 56 41.7655 56M41.7655 52.1357C29.4156 52.1357 20.0967 42.893 20.0967 30.4669C20.0967 18.0408 29.4156 8.79812 41.7655 8.79812C54.1154 8.79812 63.4344 18.0408 63.4344 30.4669C63.4344 42.893 54.1154 52.1357 41.7655 52.1357Z" fill="#1064AD"/>
+          <path d="M92.769 16.8315C91.481 16.453 90.4952 16.3005 88.981 16.3005C84.1335 16.3005 80.4954 19.0291 78.4502 23.4219V18.5718C78.4502 17.5861 77.9192 16.9814 76.936 16.9814H76.0264C75.1169 16.9814 74.5122 17.5886 74.5122 18.5718V53.4238C74.5122 54.4096 75.1194 55.0905 76.0264 55.0905H77.1621C78.0716 55.0905 78.6763 54.4096 78.6763 53.4238V33.1956C78.6763 25.5433 82.8429 20.0124 88.6024 20.0124C89.512 20.0124 90.3453 20.1648 91.4047 20.4671C92.3143 20.7695 93.1476 20.6932 93.5261 19.5576L93.6786 18.9504C94.1334 17.6623 93.5261 17.0551 92.769 16.829" fill="#1064AD"/>
+          <path d="M116.487 16.3006C110.046 16.3006 104.82 19.1028 101.408 23.5743V2.58637C101.408 1.45072 100.954 0.767295 99.6655 1.14584L98.7559 1.37196C97.694 1.67429 97.3154 2.20528 97.3154 3.0386V53.4213C97.3154 54.4071 97.8464 55.088 98.8296 55.088H99.8916C100.877 55.088 101.406 54.4071 101.406 53.4213V48.4976C104.663 53.0428 109.891 55.9975 116.484 55.9975C127.699 55.9975 135.577 47.2095 135.577 36.1478C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.2095C107.696 52.2095 101.18 46.3 101.027 36.1478C100.875 25.9955 107.77 20.0861 116.106 20.0861C125.272 20.0861 131.334 27.2836 131.334 36.1478C131.334 45.0119 125.272 52.2095 116.106 52.2095Z" fill="#1064AD"/>
+          <path d="M143.848 55.0905H144.984C145.969 55.0905 146.498 54.4096 146.498 53.4239V18.5719C146.498 17.5861 145.967 16.9814 144.984 16.9814H143.848C142.939 16.9814 142.334 17.5887 142.334 18.5719V53.4239C142.334 54.4096 142.941 55.0905 143.848 55.0905Z" fill="#1064AD"/>
+          <path d="M157.566 37.4384H188.478C189.766 37.4384 190.523 36.605 190.523 35.3932C190.523 30.6194 188.856 25.998 185.749 22.5123C182.642 18.6481 177.944 16.3005 172.111 16.3005C161.125 16.3005 153.244 24.8624 153.244 36.2265C153.244 48.6526 162.64 56 172.944 56C178.097 56 184.385 53.9548 188.704 49.4071C189.235 48.7999 189.613 47.8929 188.78 47.0596L188.325 46.6811C187.644 46.0002 186.811 45.8478 185.825 46.6811C181.961 50.5453 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.7573 157.566 37.4384ZM172.113 20.0886C176.963 20.0886 180.752 22.0575 183.099 25.3934C184.842 27.591 185.901 30.3933 186.28 33.6529H157.566C158.399 25.5458 164.083 20.0911 172.113 20.0911" fill="#1064AD"/>
+          <path d="M140.645 6.44547C141.212 8.48558 143.361 9.68982 145.442 9.13343C147.522 8.57704 148.749 6.47088 148.183 4.43077C147.616 2.39067 145.467 1.18642 143.386 1.74535C141.305 2.30175 140.078 4.40791 140.645 6.44801" fill="#29B84C"/>
+          <path d="M79.9758 3.57717C79.8513 2.26876 78.863 1.32111 78.1465 0.846021C77.547 0.447146 76.203 0 74.6812 0C70.8017 0 64.3155 1.94102 56.6276 5.38608C56.3913 5.49279 54.1327 6.6259 52.9081 7.24072C53.777 7.62689 54.618 8.05626 55.4259 8.52881L57.842 7.26359C65.5299 3.81091 71.6883 1.96897 75.4306 1.96897C76.1776 1.96897 76.9652 2.07059 77.3056 2.2027C77.6486 2.33482 78.0297 2.51266 78.0449 3.22911C78.0881 5.35559 75.4306 9.25542 70.634 14.0292C64.3688 20.2639 55.0677 27.4004 44.4428 34.1203C25.3603 46.1907 10.6528 51.5946 4.54515 51.5946C1.02132 51.5946 2.0274 49.4605 1.96643 49.9457C2.27384 47.489 5.47247 42.6466 13.9911 35.2179L15.9474 33.4979C15.8458 32.5655 15.7873 31.6178 15.7797 30.6498L12.6497 33.3937C4.4486 40.4921 0 46.2644 0 49.6815C0 50.1261 0.193086 52.2856 2.77942 53.2002C3.46031 53.4416 4.30125 53.5636 5.29717 53.5636C12.9266 53.5636 28.8232 46.6277 45.797 35.8911C56.3837 29.1966 65.6849 22.088 71.9881 15.8813C75.9616 11.9662 80.2883 6.88758 79.9758 3.57971" fill="#F79850"/>
+        </g>
+        <defs><clipPath id="cl"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
+      </svg>
+    </div>
+    <button class="btn-icon-hd"><i class="pi pi-bars"></i></button>
+  </div>
+  <div class="header-right">
+    <div class="hd-select">Professor <i class="pi pi-chevron-down" style="font-size:11px;"></i></div>
+    <div class="hd-select">Escola SESI SC - Rio do Sul <i class="pi pi-chevron-down" style="font-size:11px;"></i></div>
+    <button class="btn-icon-hd" style="position:relative;">
+      <i class="pi pi-bell"></i>
+      <span style="position:absolute;top:9px;right:9px;width:7px;height:7px;background:#f04438;border-radius:50%;border:2px solid white;"></span>
+    </button>
+    <div class="avatar">A</div>
+  </div>
+</header>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <a class="mi" href="#"><i class="pi pi-home"></i> Início</a>
+  <a class="mi" href="#"><i class="pi pi-graduation-cap"></i> Turmas</a>
+  <div class="mi"><i class="pi pi-copy"></i> Conteúdos <i class="pi pi-chevron-down mi-exp"></i></div>
+  <a class="mi" href="#"><i class="pi pi-pen-to-square"></i> Correção de Respostas</a>
+  <div class="mi active"><i class="pi pi-chart-line"></i> Relatórios <i class="pi pi-chevron-up mi-exp"></i></div>
+  <div class="msub">
+    <div class="msub-item">Acompanhamento</div>
+    <div class="msub-item active">Trilhas Adaptativas</div>
+    <div class="msub-item">Downloads</div>
+    <div class="msub-item">Feedback de Questões</div>
+  </div>
+  <a class="mi" href="#"><i class="pi pi-question-circle"></i> Central de Ajuda</a>
+  <a class="mi" href="#"><i class="pi pi-star"></i> Favoritos</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <nav class="breadcrumb">
+    <a href="#">Relatórios</a>
+    <i class="pi pi-chevron-right" style="font-size:11px;"></i>
+    <a href="#">Trilhas Adaptativas</a>
+    <i class="pi pi-chevron-right" style="font-size:11px;"></i>
+    <span class="cur">Carlos de Oliveira</span>
+    <button class="bi" style="width:24px;height:24px;font-size:12px;margin-left:2px;"><i class="pi pi-star"></i></button>
+  </nav>
+  <h1 class="page-title">Carlos de Oliveira</h1>
+
+  <div class="tabs">
+    <div class="tab" onclick="switchTab(this,'diag')">Diagnóstico</div>
+    <div class="tab active" onclick="switchTab(this,'trilha')">Trilha Sugerida</div>
+  </div>
+
+  <!-- ══ SELETOR DE CENÁRIOS ══ -->
+  <div class="scenario-bar" id="tab-trilha">
+    <i class="pi pi-sliders-h" style="color:var(--on-bg-mid);font-size:14px;"></i>
+    <span>Cenário:</span>
+    <button class="sc-btn active" onclick="setScenario('disponivel',this)">Disponível (não iniciada)</button>
+    <button class="sc-btn" onclick="setScenario('andamento',this)">Em andamento (parcial)</button>
+    <button class="sc-btn" onclick="setScenario('concluida',this)">Concluída</button>
+    <button class="sc-btn" onclick="setScenario('cancelada',this)">Cancelada</button>
+    <button class="sc-btn" onclick="setScenario('editada',this)">Editada pelo professor</button>
+  </div>
+
+  <!-- ══ CARD TRILHA SUGERIDA ══ -->
+  <div class="card">
+
+    <!-- Cabeçalho -->
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title-row">
+          <span class="card-title">Trilha Sugerida</span>
+          <!-- RF13: status visível -->
+          <span class="badge b-disponivel" id="status-badge">Disponível</span>
+          <!-- RF13: tag editada (aparece após edição salva) -->
+          <span class="badge b-editada" id="tag-editada" style="display:none;">
+            <i class="pi pi-pencil" style="font-size:10px;"></i>
+            Editada pelo Professor · Prof. Ana Silva · 12/08/2026
+          </span>
+        </div>
+        <span class="card-subtitle">Percurso de recomposição personalizado</span>
+      </div>
+      <div class="card-actions" id="hd-actions">
+        <!-- RF13: cancelar só em Disponível -->
+        <div class="tw">
+          <button class="btn btn-link" id="btn-cancelar" onclick="confirmarCancelar()">Cancelar Trilha</button>
+          <span class="tt">Disponível apenas para trilhas não iniciadas (RF13)</span>
+        </div>
+        <!-- RF13: regerar até 2x -->
+        <button class="btn btn-link" id="btn-regerar" onclick="regerarTrilha()">
+          <i class="pi pi-sync"></i> Gerar novamente
+          <span id="cont-reg" style="font-size:11px;color:var(--on-bg-light);">(1/2)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RF13: aviso ao salvar em trilha Disponível -->
+    <div class="aviso aviso-warning" id="aviso-edicao" style="display:none;">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>As alterações valerão apenas para as questões que o aluno ainda não respondeu.</span>
+    </div>
+
+    <!-- Aviso trilha somente leitura (Concluída / Cancelada) -->
+    <div class="aviso aviso-info" id="aviso-readonly" style="display:none;">
+      <i class="pi pi-lock"></i>
+      <span id="aviso-readonly-text">Esta trilha está concluída e disponível apenas em modo leitura.</span>
+    </div>
+
+    <!-- ════ BLOCO 1 ════ -->
+    <div class="bloco" id="bloco-1">
+      <div class="bloco-hd">
+        <!-- RF13: reordenar blocos -->
+        <div class="tw drag-h" id="drag-b1">
+          <i class="pi pi-bars"></i>
+          <span class="tt">Reordenar bloco (RF13)</span>
+        </div>
+        <div class="bloco-body">
+          <div class="bloco-tags">
+            <span class="chip-hab">SESI.EM13LGG104.d.2 <i class="pi pi-eye"></i></span>
+          </div>
+          <div class="bloco-title">Revisão 1 — Frações</div>
+        </div>
+        <div class="bloco-acts" id="b1-acts">
+          <div class="tw">
+            <button class="bi del" id="del-b1" onclick="removerBloco('bloco-1')"><i class="pi pi-trash"></i></button>
+            <span class="tt">Remover bloco (RF13)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RF14: justificativa por bloco — obrigatória, imutável após publicação -->
+      <div class="justif" style="margin-top:12px;">
+        <i class="pi pi-info-circle justif-icon"></i>
+        <span class="justif-text">
+          <strong>Por que este bloco?</strong> O aluno errou 3 de 4 questões de Frações
+          <strong>(SESI.EM13LGG104.d.2)</strong> no Planeta Matemática — Etapa 2, entre
+          <strong>01/05 e 31/05/2026</strong>. Performance na habilidade: <strong>25%</strong>
+          (média da turma: 68%). <em>Esta habilidade aparece como lacuna pelo 2º ciclo consecutivo.</em>
+          <em>A performance caiu 22% em relação ao ciclo anterior.</em>
+        </span>
+        <!-- RF14: ver evidências -->
+        <span class="ev-link" onclick="abrirEvidencias('Frações','SESI.EM13LGG104.d.2')">
+          Ver evidências <i class="pi pi-external-link" style="font-size:10px;"></i>
+        </span>
+        <!-- RF14: justificativa imutável após publicação -->
+        <div class="tw justif-lock" id="justif-lock-1" style="display:none;">
+          <i class="pi pi-lock" style="font-size:12px;color:var(--on-bg-light);"></i>
+          <span class="tt">Justificativa imutável — registrada no diagnóstico original (RF14)</span>
+        </div>
+      </div>
+
+      <!-- Questões bloco 1 -->
+      <div class="q-list" id="qlist-b1">
+        <!-- Questão informativa — substituível, não removível -->
+        <div class="q-item" id="q1-b1">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;" class="q-drag"></i>
+          <div class="q-info">
+            <span class="q-label">Questão #1</span>
+            <div class="q-tr">
+              <span class="q-title">Material de apoio</span>
+              <span class="badge b-ia"><i class="pi pi-sparkles" style="font-size:10px;"></i> Gerado com IA</span>
+            </div>
+          </div>
+          <div class="q-acts" id="qa-q1b1">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q1-b1','Frações')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão (RF13)</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Material de apoio')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito (RF13)</span></div>
+            <!-- informativa: remoção bloqueada pelo piso mínimo -->
+            <div class="tw"><button class="bi" disabled style="opacity:.3;cursor:not-allowed;"><i class="pi pi-trash"></i></button><span class="tt">Não removível — piso mínimo: 1 informativa por bloco (RF13)</span></div>
+          </div>
+        </div>
+        <!-- Questão prática 2 -->
+        <div class="q-item" id="q2-b1">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;"></i>
+          <div class="q-info">
+            <span class="q-label">Questão #2</span>
+            <div class="q-tr"><span class="q-title">Terras raras</span></div>
+          </div>
+          <div class="q-acts" id="qa-q2b1">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q2-b1','Frações')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão (RF13)</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Terras raras')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito (RF13)</span></div>
+            <div class="tw"><button class="bi del" onclick="removerQuestao('q2-b1','b1')"><i class="pi pi-trash"></i></button><span class="tt">Remover questão prática (RF13)</span></div>
+          </div>
+        </div>
+        <!-- Questão prática 3 -->
+        <div class="q-item" id="q3-b1">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;"></i>
+          <div class="q-info">
+            <span class="q-label">Questão #3</span>
+            <div class="q-tr"><span class="q-title">Geometria plana</span></div>
+          </div>
+          <div class="q-acts" id="qa-q3b1">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q3-b1','Frações')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão (RF13)</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Geometria plana')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito (RF13)</span></div>
+            <div class="tw"><button class="bi del" onclick="removerQuestao('q3-b1','b1')"><i class="pi pi-trash"></i></button><span class="tt">Remover questão prática (RF13)</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- RF13: adicionar questão prática sem limite máximo -->
+      <button class="add-q-btn" id="addq-b1" onclick="adicionarQuestao('b1')">
+        <i class="pi pi-plus"></i> Adicionar questão prática
+      </button>
+    </div><!-- /bloco-1 -->
+
+    <!-- ════ BLOCO 2 ════ -->
+    <div class="bloco" id="bloco-2">
+      <div class="bloco-hd">
+        <div class="tw drag-h" id="drag-b2"><i class="pi pi-bars"></i><span class="tt">Reordenar bloco (RF13)</span></div>
+        <div class="bloco-body">
+          <div class="bloco-tags">
+            <span class="chip-hab">SESI.EM13LGG105.a.1 <i class="pi pi-eye"></i></span>
+          </div>
+          <div class="bloco-title">Revisão 2 — Interpretação de texto</div>
+        </div>
+        <div class="bloco-acts" id="b2-acts">
+          <div class="tw"><button class="bi del" id="del-b2" onclick="removerBloco('bloco-2')"><i class="pi pi-trash"></i></button><span class="tt">Remover bloco (RF13)</span></div>
+        </div>
+      </div>
+
+      <!-- RF14: justificativa bloco 2 — com recorrência, avaliação e habilidade correlacionada -->
+      <div class="justif" style="margin-top:12px;">
+        <i class="pi pi-info-circle justif-icon"></i>
+        <span class="justif-text">
+          <strong>Por que este bloco?</strong> O aluno errou 4 de 5 questões de Interpretação de texto
+          <strong>(SESI.EM13LGG105.a.1)</strong> no Planeta Língua Portuguesa — Etapa 1, entre
+          <strong>01/05 e 31/05/2026</strong>. Performance na habilidade: <strong>20%</strong>
+          (média da turma: 72%). <em>Os erros ocorreram em satélite avaliativo.</em>
+          <em>Esta habilidade aparece como lacuna pelo 3º ciclo consecutivo.</em>
+          Bloco complementado com a habilidade <strong>SESI.EM13LGG106.b.2</strong>, correlacionada por Competência de Leitura.
+        </span>
+        <span class="ev-link" onclick="abrirEvidencias('Interpretação de texto','SESI.EM13LGG105.a.1')">
+          Ver evidências <i class="pi pi-external-link" style="font-size:10px;"></i>
+        </span>
+        <div class="tw justif-lock" id="justif-lock-2" style="display:none;">
+          <i class="pi pi-lock" style="font-size:12px;color:var(--on-bg-light);"></i>
+          <span class="tt">Justificativa imutável (RF14)</span>
+        </div>
+      </div>
+
+      <div class="q-list" id="qlist-b2">
+        <div class="q-item" id="q1-b2">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;"></i>
+          <div class="q-info"><span class="q-label">Questão #1</span><div class="q-tr"><span class="q-title">Material de apoio</span><span class="badge b-ia"><i class="pi pi-sparkles" style="font-size:10px;"></i> Gerado com IA</span></div></div>
+          <div class="q-acts" id="qa-q1b2">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q1-b2','Interpretação')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Material de apoio')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito</span></div>
+            <div class="tw"><button class="bi" disabled style="opacity:.3;cursor:not-allowed;"><i class="pi pi-trash"></i></button><span class="tt">Não removível — piso mínimo: 1 informativa por bloco</span></div>
+          </div>
+        </div>
+        <div class="q-item" id="q2-b2">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;"></i>
+          <div class="q-info"><span class="q-label">Questão #2</span><div class="q-tr"><span class="q-title">O conto e seus elementos</span></div></div>
+          <div class="q-acts" id="qa-q2b2">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q2-b2','Interpretação')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('O conto e seus elementos')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito</span></div>
+            <div class="tw"><button class="bi del" onclick="removerQuestao('q2-b2','b2')"><i class="pi pi-trash"></i></button><span class="tt">Remover questão prática</span></div>
+          </div>
+        </div>
+        <div class="q-item" id="q3-b2">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;"></i>
+          <div class="q-info"><span class="q-label">Questão #3</span><div class="q-tr"><span class="q-title">Inferência textual</span></div></div>
+          <div class="q-acts" id="qa-q3b2">
+            <div class="tw"><button class="bi pri" onclick="substituirQuestao('q3-b2','Interpretação')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Inferência textual')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito</span></div>
+            <div class="tw"><button class="bi del" onclick="removerQuestao('q3-b2','b2')"><i class="pi pi-trash"></i></button><span class="tt">Remover questão prática</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="add-q-btn" id="addq-b2" onclick="adicionarQuestao('b2')">
+        <i class="pi pi-plus"></i> Adicionar questão prática
+      </button>
+    </div><!-- /bloco-2 -->
+
+    <!-- ════ BLOCO 3 ════ — questão informativa respondida, prática não respondida -->
+    <div class="bloco" id="bloco-3">
+      <div class="bloco-hd" id="b3-hd">
+        <div class="tw drag-h" id="drag-b3"><i class="pi pi-bars"></i><span class="tt">Reordenar bloco (RF13)</span></div>
+        <div class="bloco-body">
+          <div class="bloco-tags">
+            <span class="chip-hab">SESI.EM13MAT302.c.4 <i class="pi pi-eye"></i></span>
+            <!-- RF13: "Em andamento" mostra badge de etapa já respondida -->
+            <span class="badge b-andamento" id="b3-fase-badge" style="display:none;">
+              <i class="pi pi-lock" style="font-size:10px;"></i> Etapa parcialmente respondida
+            </span>
+          </div>
+          <div class="bloco-title">Revisão 3 — Equações do 1º grau</div>
+        </div>
+        <div class="bloco-acts" id="b3-acts">
+          <div class="tw"><button class="bi del" id="del-b3" onclick="removerBloco('bloco-3')"><i class="pi pi-trash"></i></button><span class="tt">Remover bloco (RF13)</span></div>
+        </div>
+      </div>
+
+      <!-- RF14: justificativa bloco 3 — baixa evidência + flexibilização de série -->
+      <div class="justif" style="margin-top:12px;">
+        <i class="pi pi-info-circle justif-icon"></i>
+        <span class="justif-text">
+          <strong>Por que este bloco?</strong> O aluno errou 2 de 2 questões de Equações do 1º grau
+          <strong>(SESI.EM13MAT302.c.4)</strong> no Planeta Matemática — Etapa 3, entre
+          <strong>01/05 e 31/05/2026</strong>. Performance na habilidade: <strong>0%</strong>
+          (média da turma: 55%). <em>Diagnóstico baseado em apenas 2 questões respondidas.</em>
+          <em>Foram utilizadas questões do 8º ano por indisponibilidade no ano/série da turma.</em>
+          <em>Parte do conteúdo deste bloco foi gerado por IA por indisponibilidade de questões no banco.</em>
+        </span>
+        <span class="ev-link" onclick="abrirEvidencias('Equações do 1º grau','SESI.EM13MAT302.c.4')">
+          Ver evidências <i class="pi pi-external-link" style="font-size:10px;"></i>
+        </span>
+        <div class="tw justif-lock" id="justif-lock-3" style="display:none;">
+          <i class="pi pi-lock" style="font-size:12px;color:var(--on-bg-light);"></i>
+          <span class="tt">Justificativa imutável (RF14)</span>
+        </div>
+      </div>
+
+      <div class="q-list" id="qlist-b3">
+        <!-- Questão já respondida (aparece congelada em "Em andamento") -->
+        <div class="q-item" id="q1-b3">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;" id="drag-q1b3"></i>
+          <div class="q-info">
+            <span class="q-label">Questão #1 <span id="q1b3-resp-badge" style="display:none;color:var(--success);font-weight:600;">· Respondida</span></span>
+            <div class="q-tr">
+              <span class="q-title">Material de apoio — Equações</span>
+              <span class="badge b-ia"><i class="pi pi-sparkles" style="font-size:10px;"></i> Gerado com IA</span>
+            </div>
+          </div>
+          <div class="q-acts" id="qa-q1b3">
+            <div class="tw"><button class="bi pri" id="sub-q1b3" onclick="substituirQuestao('q1-b3','Equações')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Material de apoio — Equações')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito</span></div>
+            <div class="tw"><button class="bi" disabled style="opacity:.3;cursor:not-allowed;"><i class="pi pi-trash"></i></button><span class="tt">Não removível — piso mínimo: 1 informativa por bloco</span></div>
+          </div>
+        </div>
+        <div class="q-item" id="q2-b3">
+          <i class="pi pi-bars" style="color:var(--on-bg-light);font-size:12px;cursor:grab;" id="drag-q2b3"></i>
+          <div class="q-info">
+            <span class="q-label">Questão #2 <span id="q2b3-resp-badge" style="display:none;color:var(--success);font-weight:600;">· Respondida</span></span>
+            <div class="q-tr"><span class="q-title">Resolvendo equações simples</span></div>
+          </div>
+          <div class="q-acts" id="qa-q2b3">
+            <div class="tw"><button class="bi pri" id="sub-q2b3" onclick="substituirQuestao('q2-b3','Equações')"><i class="pi pi-sync"></i></button><span class="tt">Substituir questão</span></div>
+            <div class="tw"><button class="bi" onclick="visualizarQuestao('Resolvendo equações simples')"><i class="pi pi-eye"></i></button><span class="tt">Visualizar com gabarito</span></div>
+            <div class="tw"><button class="bi del" id="del-q2b3" onclick="removerQuestao('q2-b3','b3')"><i class="pi pi-trash"></i></button><span class="tt">Remover questão prática</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="add-q-btn" id="addq-b3" onclick="adicionarQuestao('b3')">
+        <i class="pi pi-plus"></i> Adicionar questão prática
+      </button>
+    </div><!-- /bloco-3 -->
+
+    <!-- RF13: adicionar bloco com escolha de habilidade -->
+    <button class="add-b-btn" id="btn-add-bloco" onclick="abrirAddBloco()">
+      <i class="pi pi-plus-circle"></i> Adicionar bloco
+    </button>
+
+    <!-- Footer: Aprovar / Salvar — RF13 Fluxos A e principal -->
+    <div class="card-footer" id="card-footer">
+      <!-- RF13 Fluxo A: aprovar sem alterações -->
+      <button class="btn btn-outline" onclick="aprovarTrilha()">
+        <i class="pi pi-check"></i> Aprovar sem alterações
+      </button>
+      <!-- RF13: salvar edições -->
+      <button class="btn btn-primary" onclick="salvarEdicoes()">
+        <i class="pi pi-save"></i> Salvar alterações
+      </button>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- placeholder aba diagnóstico -->
+  <div id="tab-diag" style="display:none;">
+    <div class="card" style="text-align:center;padding:48px;color:var(--on-bg-mid);">
+      <i class="pi pi-chart-bar" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+      Aba Diagnóstico — não implementada neste protótipo
+    </div>
+  </div>
+
+</main>
+</div><!-- /layout -->
+
+<!-- ════ MODAL: Evidências (RF14) ════ -->
+<div class="overlay" id="modal-ev">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="ev-title">Evidências — Frações</span>
+      <button class="bi" onclick="closeModal('modal-ev')"><i class="pi pi-times"></i></button>
+    </div>
+    <p class="modal-sub">Janela de apuração: <strong>01/05 – 31/05/2026</strong></p>
+    <table class="mtable">
+      <thead><tr><th>Questão</th><th>Origem</th><th>Data</th><th>Resultado</th></tr></thead>
+      <tbody id="ev-body">
+        <tr><td>Frações simples — Q.034</td><td>Planeta Matemática — Etapa 2</td><td>03/05/2026</td><td class="t-err">Errou</td></tr>
+        <tr><td>Frações equivalentes — Q.081</td><td>Planeta Matemática — Etapa 2</td><td>10/05/2026</td><td class="t-err">Errou</td></tr>
+        <tr><td>Operações com frações — Q.112</td><td>Satélite Regular</td><td>18/05/2026</td><td class="t-err">Errou</td></tr>
+        <tr><td>Fração como divisão — Q.045</td><td>Satélite Avaliativo</td><td>28/05/2026</td><td class="t-ok">Acertou</td></tr>
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="closeModal('modal-ev')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Visualizar questão (RF13) ════ -->
+<div class="overlay" id="modal-q">
+  <div class="modal" style="width:620px;">
+    <div class="modal-hd">
+      <span class="modal-title" id="q-title">Questão</span>
+      <button class="bi" onclick="closeModal('modal-q')"><i class="pi pi-times"></i></button>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--on-bg-mid);">
+      <span><i class="pi pi-tag"></i> Habilidade: SESI.EM13LGG104.d.2</span>
+      <span><i class="pi pi-chart-bar"></i> Dificuldade: Médio</span>
+    </div>
+    <div style="background:#f8f9fc;border-radius:var(--r-sm);padding:16px;font-size:14px;color:var(--on-bg);line-height:22px;">
+      <p><strong>Enunciado:</strong></p>
+      <p style="margin-top:8px;">Leia o trecho a seguir e responda: qual das frações representa corretamente a proporção destacada no texto?</p>
+    </div>
+    <div style="background:var(--success-bg);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;">
+      <strong style="color:var(--success);">Gabarito:</strong>
+      <span style="color:var(--on-bg);margin-left:8px;">Alternativa C — "A fração 3/4 representa 75% do total."</span>
+    </div>
+    <p style="font-size:11px;color:var(--on-bg-light);font-style:italic;">
+      <i class="pi pi-lock" style="font-size:11px;"></i>
+      Edição do conteúdo restrita a conteudistas — campos bloqueados por proteção de estatísticas (RF13).
+    </p>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="closeModal('modal-q')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Cancelar trilha (RF13) ════ -->
+<div class="overlay" id="modal-cancelar">
+  <div class="modal" style="width:480px;">
+    <div class="modal-hd">
+      <span class="modal-title">Cancelar Trilha</span>
+      <button class="bi" onclick="closeModal('modal-cancelar')"><i class="pi pi-times"></i></button>
+    </div>
+    <p class="modal-sub">Tem certeza que deseja cancelar a trilha de <strong>Carlos de Oliveira</strong>? Esta ação não poderá ser desfeita.</p>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <label style="font-size:13px;font-weight:500;color:var(--on-bg);">Motivo <span style="color:var(--on-bg-light);font-weight:400;">(opcional)</span></label>
+      <textarea id="motivo-cancelar" style="border:1px solid var(--outline);border-radius:var(--r-sm);padding:8px 12px;font-family:inherit;font-size:13px;color:var(--on-bg);resize:vertical;min-height:72px;" placeholder="Descreva o motivo do cancelamento..."></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:12px;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cancelar')">Voltar</button>
+      <button class="btn btn-danger-fill" onclick="executarCancelamento()">Confirmar cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Adicionar bloco — escolha de habilidade (RF13) ════ -->
+<div class="overlay" id="modal-add-bloco">
+  <div class="modal" style="width:560px;">
+    <div class="modal-hd">
+      <span class="modal-title">Adicionar bloco — escolher habilidade</span>
+      <button class="bi" onclick="closeModal('modal-add-bloco')"><i class="pi pi-times"></i></button>
+    </div>
+    <p class="modal-sub">Selecione uma habilidade diagnosticada ou qualquer habilidade do componente/ano da turma.</p>
+    <!-- Busca -->
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--outline);border-radius:var(--r-sm);padding:6px 12px;">
+        <i class="pi pi-search" style="color:var(--on-bg-mid);font-size:14px;"></i>
+        <input type="text" placeholder="Buscar por código ou descrição..." style="border:none;outline:none;font-family:inherit;font-size:13px;color:var(--on-bg);flex:1;background:transparent;">
+      </div>
+    </div>
+    <!-- Lista de habilidades -->
+    <div class="hab-list">
+      <div class="hab-opt selected" onclick="selecionarHab(this)">
+        <div>
+          <div class="hab-code">SESI.EM13LGG104.d.3</div>
+          <div class="hab-desc">Identificar estratégias argumentativas em textos</div>
+          <div class="hab-origin">Diagnosticada · Planeta LGG — Etapa 2</div>
+        </div>
+      </div>
+      <div class="hab-opt" onclick="selecionarHab(this)">
+        <div>
+          <div class="hab-code">SESI.EM13MAT201.a.1</div>
+          <div class="hab-desc">Números reais e suas representações</div>
+          <div class="hab-origin">Diagnosticada · Planeta MAT — Etapa 1</div>
+        </div>
+      </div>
+      <div class="hab-opt" onclick="selecionarHab(this)">
+        <div>
+          <div class="hab-code">SESI.EM13LGG201.b.2</div>
+          <div class="hab-desc">Produção de texto argumentativo</div>
+          <div class="hab-origin">Componente Língua Portuguesa — 3º ano EM</div>
+        </div>
+      </div>
+      <div class="hab-opt" onclick="selecionarHab(this)">
+        <div>
+          <div class="hab-code">SESI.EM13MAT303.d.1</div>
+          <div class="hab-desc">Funções do 1º e 2º grau — análise gráfica</div>
+          <div class="hab-origin">Componente Matemática — 3º ano EM</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:12px;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-bloco')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarAddBloco()"><i class="pi pi-plus"></i> Adicionar bloco</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SCRIPTS ════ -->
+<script>
+let regCount = 1; // já usou 1 regeção
+let currentScenario = 'disponivel';
+
+// ── TABS ──
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-trilha').style.display = tab === 'trilha' ? '' : 'none';
+  document.getElementById('tab-diag').style.display = tab === 'diag' ? '' : 'none';
+}
+
+// ── CENÁRIOS (RF13) ──
+function setScenario(sc, el) {
+  currentScenario = sc;
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  // Reset visual
+  const status = document.getElementById('status-badge');
+  const tagEd = document.getElementById('tag-editada');
+  const avisoEd = document.getElementById('aviso-edicao');
+  const avisoRO = document.getElementById('aviso-readonly');
+  const footer = document.getElementById('card-footer');
+  const btnCanc = document.getElementById('btn-cancelar');
+  const btnReg = document.getElementById('btn-regerar');
+  const btnAddB = document.getElementById('btn-add-bloco');
+  const allAddQ = document.querySelectorAll('.add-q-btn');
+  const allBiDel = document.querySelectorAll('.bi.del');
+  const allBiPri = document.querySelectorAll('.bi.pri');
+  const allJLock = document.querySelectorAll('[id^="justif-lock"]');
+
+  // Mostrar/ocultar tudo
+  avisoEd.style.display = 'none';
+  avisoRO.style.display = 'none';
+  tagEd.style.display = 'none';
+  allJLock.forEach(l => l.style.display = 'none');
+
+  // Congelar/descongelar bloco 3
+  const b3hd = document.getElementById('b3-hd');
+  const b3fase = document.getElementById('b3-fase-badge');
+  const q1b3resp = document.getElementById('q1b3-resp-badge');
+  const q2b3resp = document.getElementById('q2b3-resp-badge');
+  const q1b3item = document.getElementById('q1-b3');
+  const q2b3item = document.getElementById('q2-b3');
+  const subQ1b3 = document.getElementById('sub-q1b3');
+  const subQ2b3 = document.getElementById('sub-q2b3');
+  const delQ2b3 = document.getElementById('del-q2b3');
+  const drag1 = document.getElementById('drag-q1b3');
+  const drag2 = document.getElementById('drag-q2b3');
+
+  // Reset bloco 3
+  b3hd.classList.remove('frozen');
+  b3fase.style.display = 'none';
+  q1b3resp.style.display = 'none';
+  q2b3resp.style.display = 'none';
+  q1b3item.classList.remove('frozen');
+  q2b3item.classList.remove('frozen');
+  if (subQ1b3) { subQ1b3.disabled = false; subQ1b3.style.opacity = '1'; }
+  if (subQ2b3) { subQ2b3.disabled = false; subQ2b3.style.opacity = '1'; }
+  if (delQ2b3) { delQ2b3.disabled = false; delQ2b3.style.opacity = '1'; }
+  if (drag1) drag1.style.cursor = 'grab';
+  if (drag2) drag2.style.cursor = 'grab';
+
+  if (sc === 'disponivel') {
+    status.className = 'badge b-disponivel'; status.textContent = 'Disponível';
+    btnCanc.disabled = false; btnCanc.style.opacity = '1';
+    btnReg.disabled = false; btnReg.style.opacity = regCount >= 2 ? '0.4' : '1';
+    footer.style.display = 'flex';
+    btnAddB.style.display = 'flex';
+    allAddQ.forEach(b => b.style.display = 'flex');
+    allBiDel.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+    allBiPri.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+  }
+  else if (sc === 'andamento') {
+    status.className = 'badge b-andamento'; status.textContent = 'Em andamento';
+    // RF13: cancelar bloqueado em andamento
+    btnCanc.disabled = true; btnCanc.style.opacity = '0.4';
+    btnReg.disabled = false; btnReg.style.opacity = regCount >= 2 ? '0.4' : '1';
+    footer.style.display = 'flex';
+    btnAddB.style.display = 'flex';
+    allAddQ.forEach(b => b.style.display = 'flex');
+    allBiDel.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+    allBiPri.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+    // Bloco 3: questão 1 e 2 respondidas → congeladas
+    b3hd.classList.add('frozen');
+    b3fase.style.display = 'inline-flex';
+    q1b3resp.style.display = 'inline';
+    q2b3resp.style.display = 'inline';
+    q1b3item.classList.add('frozen');
+    q2b3item.classList.add('frozen');
+    if (subQ1b3) { subQ1b3.disabled = true; subQ1b3.style.opacity = '0.3'; }
+    if (subQ2b3) { subQ2b3.disabled = true; subQ2b3.style.opacity = '0.3'; }
+    if (delQ2b3) { delQ2b3.disabled = true; delQ2b3.style.opacity = '0.3'; }
+    if (drag1) drag1.style.cursor = 'not-allowed';
+    if (drag2) drag2.style.cursor = 'not-allowed';
+  }
+  else if (sc === 'concluida') {
+    status.className = 'badge b-concluida'; status.textContent = 'Concluída';
+    // RF13: somente leitura
+    setReadOnly('Esta trilha está concluída. Somente leitura — nenhuma edição é permitida (RF13).');
+  }
+  else if (sc === 'cancelada') {
+    status.className = 'badge b-cancelada'; status.textContent = 'Cancelada';
+    setReadOnly('Esta trilha foi cancelada. Somente leitura (RF13).');
+  }
+  else if (sc === 'editada') {
+    status.className = 'badge b-disponivel'; status.textContent = 'Disponível';
+    tagEd.style.display = 'inline-flex';
+    avisoEd.style.display = 'flex';
+    // RF14: justificativa imutável após edição
+    allJLock.forEach(l => l.style.display = 'inline-flex');
+    btnCanc.disabled = false; btnCanc.style.opacity = '1';
+    btnReg.disabled = false; btnReg.style.opacity = regCount >= 2 ? '0.4' : '1';
+    footer.style.display = 'flex';
+    btnAddB.style.display = 'flex';
+    allAddQ.forEach(b => b.style.display = 'flex');
+    allBiDel.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+    allBiPri.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+  }
+}
+
+function setReadOnly(msg) {
+  const avisoRO = document.getElementById('aviso-readonly');
+  document.getElementById('aviso-readonly-text').textContent = msg;
+  avisoRO.style.display = 'flex';
+  document.getElementById('btn-cancelar').disabled = true;
+  document.getElementById('btn-cancelar').style.opacity = '0.4';
+  document.getElementById('btn-regerar').disabled = true;
+  document.getElementById('btn-regerar').style.opacity = '0.4';
+  document.getElementById('card-footer').style.display = 'none';
+  document.getElementById('btn-add-bloco').style.display = 'none';
+  document.querySelectorAll('.add-q-btn').forEach(b => b.style.display = 'none');
+  document.querySelectorAll('.bi.del').forEach(b => { b.disabled = true; b.style.opacity = '0.3'; b.style.cursor = 'not-allowed'; });
+  document.querySelectorAll('.bi.pri').forEach(b => { b.disabled = true; b.style.opacity = '0.3'; b.style.cursor = 'not-allowed'; });
+}
+
+// ── AÇÕES TRILHA ──
+function confirmarCancelar() {
+  if (currentScenario === 'andamento') {
+    toast('Não é possível cancelar — a trilha está Em andamento (RF13).', 'error'); return;
+  }
+  openModal('modal-cancelar');
+}
+
+function executarCancelamento() {
+  const motivo = document.getElementById('motivo-cancelar').value.trim();
+  closeModal('modal-cancelar');
+  // Aplica cenário cancelada
+  setScenario('cancelada', document.querySelectorAll('.sc-btn')[3]);
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sc-btn')[3].classList.add('active');
+  currentScenario = 'cancelada';
+  // Exibe motivo no aviso de somente leitura (RF13: "com registro e motivo opcional")
+  const txt = motivo
+    ? 'Esta trilha foi cancelada. Somente leitura (RF13). <strong>Motivo registrado:</strong> "' + motivo + '"'
+    : 'Esta trilha foi cancelada. Somente leitura (RF13). Nenhum motivo foi informado.';
+  document.getElementById('aviso-readonly-text').innerHTML = txt;
+  toast('Trilha cancelada. Registro e log de auditoria gravados (RF13).', 'error');
+}
+
+function regerarTrilha() {
+  if (regCount >= 2) {
+    toast('Limite atingido: máximo de 2 regerações por trilha (RF13). Não é possível regerar novamente.', 'error'); return;
+  }
+  regCount++;
+  document.getElementById('cont-reg').textContent = '(' + regCount + '/2)';
+  if (regCount >= 2) {
+    document.getElementById('btn-regerar').disabled = true;
+    document.getElementById('btn-regerar').style.opacity = '0.4';
+  }
+  toast('Nova montagem solicitada. O Motor B reexecuta com o mesmo diagnóstico (RF13).', 'info');
+}
+
+// ── AÇÕES BLOCO ──
+function removerBloco(id) {
+  const visiveis = Array.from(document.querySelectorAll('.bloco')).filter(b => b.style.display !== 'none');
+  if (visiveis.length <= 2) {
+    toast('Não é possível remover — a trilha deve ter no mínimo 2 blocos (RF13).', 'error'); return;
+  }
+  document.getElementById(id).style.display = 'none';
+  marcarEditada();
+  toast('Bloco removido. Salve para confirmar.', 'success');
+}
+
+function abrirAddBloco() { openModal('modal-add-bloco'); }
+function selecionarHab(el) {
+  document.querySelectorAll('.hab-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function confirmarAddBloco() {
+  closeModal('modal-add-bloco');
+  marcarEditada();
+  toast('Bloco adicionado com a habilidade selecionada. Salve para confirmar (RF13).', 'success');
+}
+
+// ── AÇÕES QUESTÃO ──
+function removerQuestao(idQ, idBloco) {
+  const bloco = document.getElementById('qlist-' + idBloco);
+  const praticas = Array.from(bloco.querySelectorAll('.q-item')).filter(q => q.style.display !== 'none').slice(1);
+  if (praticas.length <= 1) {
+    toast('Não é possível remover — o bloco deve ter no mínimo 1 questão prática (RF13).', 'error'); return;
+  }
+  document.getElementById(idQ).style.display = 'none';
+  marcarEditada();
+  toast('Questão removida. Salve para confirmar.', 'success');
+}
+
+function substituirQuestao(id, hab) {
+  toast('Abrindo banco de questões — filtros por habilidade "' + (hab||'') + '", componente, tipo e dificuldade (RF13).', 'info');
+}
+
+function adicionarQuestao(idBloco) {
+  toast('Abrindo banco de questões para adicionar questão prática ao bloco (sem limite máximo — RF13).', 'info');
+}
+
+// ── SALVAR / APROVAR ──
+function salvarEdicoes() {
+  marcarEditada();
+  // Troca cenário para "editada"
+  setScenario('editada', document.querySelectorAll('.sc-btn')[4]);
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sc-btn')[4].classList.add('active');
+  currentScenario = 'editada';
+  toast('Alterações salvas. Log de auditoria registrado com usuário, ação e valores (RF13/RF15).', 'success');
+}
+
+function aprovarTrilha() {
+  toast('Trilha aprovada sem alterações e publicada para o estudante (RF13 — Fluxo A).', 'success');
+}
+
+function marcarEditada() {
+  document.getElementById('tag-editada').style.display = 'inline-flex';
+  document.getElementById('aviso-edicao').style.display = 'flex';
+  document.querySelectorAll('[id^="justif-lock"]').forEach(l => l.style.display = 'inline-flex');
+}
+
+// ── MODAIS ──
+function abrirEvidencias(hab, cod) {
+  document.getElementById('ev-title').textContent = 'Evidências — ' + hab + ' (' + cod + ')';
+  openModal('modal-ev');
+}
+function visualizarQuestao(titulo) {
+  document.getElementById('q-title').textContent = titulo;
+  openModal('modal-q');
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); }));
+
+// ── TOAST ──
+function toast(msg, type) {
+  const colors = { success:'#ECFDF3', error:'#FEF3F2', info:'#EFF8FF', warn:'#FFFAEB' };
+  const tc = { success:'#027A48', error:'#b42318', info:'#1849A9', warn:'#B54708' };
+  const ic = { success:'pi-check-circle', error:'pi-times-circle', info:'pi-info-circle', warn:'pi-exclamation-triangle' };
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.cssText += `background:${colors[type]||'#fff'};color:${tc[type]||'#344054'};`;
+  t.innerHTML = `<i class="pi ${ic[type]||'pi-info-circle'}" style="font-size:16px;flex-shrink:0;"></i>${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),350); }, 3800);
+}
+</script>
+</body>
+</html>

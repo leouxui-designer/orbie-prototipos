@@ -315,6 +315,107 @@
     }
     .cases-header .heading { font-size: 56px; color: var(--text); letter-spacing: -4.68px; line-height: 60px; }
 
+    /* ── Carrossel track ── */
+    .cases-track-wrap {
+      overflow: hidden;
+      width: 1184px;
+      border-radius: 24px;
+    }
+    .cases-track {
+      display: flex;
+      transition: transform .6s cubic-bezier(.16,1,.3,1);
+      will-change: transform;
+    }
+    .case-card-new {
+      min-width: 1184px;
+      height: 506px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      padding: 24px;
+      gap: 32px;
+      box-shadow: 0 4px 10.9px rgba(0,0,0,.25);
+      background: #f1f3f5;
+      overflow: hidden;
+      position: relative;
+    }
+    .card-copy {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 21px;
+      min-width: 0;
+      z-index: 1;
+    }
+    .card-logo {
+      width: 157px;
+      height: 157px;
+      border-radius: 26px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .card-logo-wrap { display: inline-flex; }
+    .card-title {
+      font-family: 'Michroma', sans-serif;
+      font-size: 26.6px;
+      color: #0f0f0f;
+      line-height: 1.3;
+    }
+    .card-desc { font-size: 16px; line-height: 1.5; color: #555; }
+    .card-stores { display: flex; gap: 16px; align-items: center; }
+    .card-stores img { height: 40px; transition: opacity .2s; }
+    .card-stores a:hover img { opacity: .75; }
+
+    .card-visual-1 {
+      flex-shrink: 0;
+      width: 660px;
+      height: 458px;
+      position: relative;
+    }
+    .card-bg-grad {
+      position: absolute;
+      left: 74px; top: 10px;
+      width: 326px; height: 450px;
+      border-radius: 23px;
+    }
+    .card-kira {
+      position: absolute;
+      left: -31px; top: -39px;
+      width: 415px; height: 511px;
+      object-fit: cover;
+    }
+    .card-screenshots {
+      position: absolute;
+      right: 0; top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 13.6px;
+    }
+    .card-screenshots img {
+      width: 228px; height: 109px;
+      border-radius: 11px;
+      object-fit: cover;
+      box-shadow: 3.4px 3.4px 9px rgba(0,0,0,.25);
+    }
+
+    /* Dots indicadores */
+    .cases-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+    .case-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(6,6,6,.2);
+      cursor: pointer;
+      transition: background .3s, width .3s;
+      padding: 0;
+    }
+    .case-dot.active { background: #060606; width: 24px; border-radius: 4px; }
+
     /* filtros */
     .cases-filters {
       background: var(--white);
@@ -1066,57 +1167,82 @@
       <button class="filter-btn" data-filter="data">Big Data &amp; Analytics</button>
     </div>
 
-    <!-- Carrossel -->
+    <!-- Carrossel automático 3s -->
     <div class="cases-carousel reveal" style="transition-delay:.2s">
-      <!-- Seta esquerda -->
       <button class="carousel-btn" id="btn-prev" aria-label="Anterior">
-        <svg width="18" height="24" viewBox="0 0 18 24" fill="none">
-          <path d="M12 4L6 12L12 20" stroke="#060606" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="18" height="24" viewBox="0 0 18 24" fill="none"><path d="M12 4L6 12L12 20" stroke="#060606" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
 
-      <!-- Card -->
-      <div class="case-card" id="case-card">
-        <div class="case-copy">
-          <div class="case-meta">
-            <img class="case-app-icon" src="assets/case-logo.png" alt="SENAI Lab" />
-            <h3 class="case-title">SENAI Lab experience</h3>
-            <p class="case-desc">
-              Sala de aula virtual estruturada para a prática da Metodologia SENAI de Educação. O usuário pode personalizar seu avatar e conectar-se com os docentes e colegas de turma para discutirem e criarem soluções juntos em um ambiente imersivo, utilizando texto, voz ou mesmo emojis para comunicação.
-            </p>
-          </div>
-          <div class="case-store-btns">
-            <a href="#" target="_blank" rel="noopener">
-              <img src="assets/appstore.svg" alt="App Store" />
-            </a>
-            <a href="https://play.google.com/store/apps/details?id=com.finder.yeslyvr" target="_blank" rel="noopener">
-              <img src="assets/googleplay.svg" alt="Google Play" />
-            </a>
-          </div>
-        </div>
+      <div class="cases-track-wrap">
+        <div class="cases-track" id="cases-track">
 
-        <div class="case-visual">
-          <img class="case-kira" src="assets/kira-kara.png" alt="Kira & Kara" />
-          <div class="case-screenshots">
-            <img src="assets/case-img1.png" alt="Screenshot 1" />
-            <img src="assets/case-img2.png" alt="Screenshot 2" />
-            <img src="assets/case-img3.png" alt="Screenshot 3" />
-            <img src="assets/case-img4.png" alt="Screenshot 4" />
+          <!-- ── CARD 1: SENAI Lab ── -->
+          <div class="case-card-new bg-card-1">
+            <div class="card-copy">
+              <img class="card-logo" src="assets/c1-logo.png" alt="SENAI Lab" />
+              <h3 class="card-title">SENAI Lab experience</h3>
+              <p class="card-desc">Sala de aula virtual estruturada para a prática da Metodologia SENAI de Educação. O usuário pode personalizar seu avatar e conectar-se com docentes e colegas em um ambiente imersivo.</p>
+              <div class="card-stores">
+                <a href="#" target="_blank"><img src="assets/appstore.svg" alt="App Store" /></a>
+                <a href="https://play.google.com/store/apps/details?id=com.finder.yeslyvr" target="_blank"><img src="assets/googleplay.svg" alt="Google Play" /></a>
+              </div>
+            </div>
+            <div class="card-visual card-visual-1">
+              <div class="card-bg-grad" style="background:linear-gradient(179.5deg,rgb(74,191,50)0%,rgb(55,152,147)100%)"></div>
+              <img class="card-kira" src="assets/c1-kira.png" alt="" />
+              <div class="card-screenshots">
+                <img src="assets/c1-ss1.png" alt="" />
+                <img src="assets/c1-ss2.png" alt="" />
+                <img src="assets/c1-ss3.png" alt="" />
+                <img src="assets/c1-ss4.png" alt="" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Seta direita -->
+          <!-- ── CARD 2: E-Commerce ── -->
+          <div class="case-card-new bg-card-2">
+            <div class="card-copy">
+              <img class="card-logo" src="assets/c2-logo.png" alt="E-Commerce SENAI" style="border-radius:26px;background:#2976bc" />
+              <h3 class="card-title">E-Commerce</h3>
+              <p class="card-desc">Plataforma digital responsável pela divulgação e comercialização dos cursos do SENAI/SESI. Integrada aos sistemas corporativos — SGN, AVA e Espaço do Estudante — permite compra, inscrição e matrícula online em todo o estado.</p>
+            </div>
+            <div class="card-visual card-visual-2" style="background:#2f8add;border-radius:16px;overflow:hidden;flex-shrink:0;width:725px;height:458px;position:relative">
+              <img src="assets/c2-ss3.png" alt="" style="position:absolute;width:55%;border-radius:11px;box-shadow:0 20px 40px rgba(0,0,0,.3);transform:rotate(-15deg);top:80px;left:300px" />
+              <img src="assets/c2-ss1.png" alt="" style="position:absolute;width:57%;border-radius:11px;box-shadow:0 20px 40px rgba(0,0,0,.3);transform:rotate(-15deg);top:150px;left:10px" />
+              <img src="assets/c2-ss4.png" alt="" style="position:absolute;width:45%;border-radius:11px;box-shadow:0 20px 40px rgba(0,0,0,.3);transform:rotate(-15deg);top:-60px;left:50px" />
+              <img src="assets/c2-ss2.png" alt="" style="position:absolute;width:46%;border-radius:11px;box-shadow:0 20px 40px rgba(0,0,0,.3);transform:rotate(-15deg);top:-80px;left:290px" />
+            </div>
+          </div>
+
+          <!-- ── CARD 3: Audio XP ── -->
+          <div class="case-card-new bg-card-3">
+            <div class="card-copy">
+              <div class="card-logo-wrap" style="background:linear-gradient(to bottom,#75fdac,#127446);border-radius:26px;padding:12px;display:inline-flex">
+                <img src="assets/c3-logo.png" alt="Audio XP" style="width:128px;height:119px;object-fit:cover" />
+              </div>
+              <h3 class="card-title">Audio XP</h3>
+              <p class="card-desc">Aplicativo em Realidade Virtual e Mista (VR/MR) onde o usuário estuda a composição e funcionamento do aparelho auditivo humano, com simulação de dano auditivo e identificação de componentes.</p>
+            </div>
+            <div class="card-visual card-visual-3" style="flex-shrink:0;width:725px;height:458px;position:relative;overflow:hidden;border-radius:16px">
+              <img src="assets/c3-vr.png" alt="" style="position:absolute;width:108%;height:115%;object-fit:cover;left:-4%;top:0" />
+              <img src="assets/c3-ss2.png" alt="" style="position:absolute;width:58%;border-radius:25px;box-shadow:-9px 13px 43px -8px #193e21;top:-40px;left:50px" />
+              <img src="assets/c3-ss1.png" alt="" style="position:absolute;width:40%;border-radius:15px;box-shadow:-9px 13px 43px -8px #193e21;bottom:20px;left:10px" />
+            </div>
+          </div>
+
+        </div><!-- /cases-track -->
+      </div><!-- /cases-track-wrap -->
+
       <button class="carousel-btn" id="btn-next" aria-label="Próximo">
-        <svg width="18" height="24" viewBox="0 0 18 24" fill="none">
-          <path d="M6 4L12 12L6 20" stroke="#060606" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="18" height="24" viewBox="0 0 18 24" fill="none"><path d="M6 4L12 12L6 20" stroke="#060606" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-    </div>
+    </div><!-- /cases-carousel -->
 
-    <!-- Dots -->
-    <div class="carousel-dots">
-      <img src="assets/carousel-dots.svg" alt="" />
+    <!-- Dots indicadores -->
+    <div class="cases-dots" id="cases-dots">
+      <button class="case-dot active" data-idx="0"></button>
+      <button class="case-dot" data-idx="1"></button>
+      <button class="case-dot" data-idx="2"></button>
     </div>
   </section>
 
@@ -1805,7 +1931,45 @@
     }
 
     // ═══════════════════════════
-    // CASE FILTERS
+    // CARROSSEL DE CASES — automático 3s
+    // ═══════════════════════════
+    (function () {
+      const track  = document.getElementById('cases-track');
+      const dots   = document.querySelectorAll('.case-dot');
+      const btnPrev = document.getElementById('btn-prev');
+      const btnNext = document.getElementById('btn-next');
+      if (!track) return;
+
+      const TOTAL    = 3;
+      const INTERVAL = 3000;
+      let current  = 0;
+      let timer    = null;
+
+      function goTo(idx) {
+        current = (idx + TOTAL) % TOTAL;
+        track.style.transform = `translateX(-${current * 1184}px)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+      }
+
+      function next() { goTo(current + 1); }
+      function prev() { goTo(current - 1); }
+
+      function startAuto() {
+        clearInterval(timer);
+        timer = setInterval(next, INTERVAL);
+      }
+
+      // Cliques manuais pausam e reativam
+      btnNext && btnNext.addEventListener('click', () => { next(); startAuto(); });
+      btnPrev && btnPrev.addEventListener('click', () => { prev(); startAuto(); });
+      dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.idx); startAuto(); }));
+
+      // Pausa ao hover
+      track.closest('.cases-carousel')?.addEventListener('mouseenter', () => clearInterval(timer));
+      track.closest('.cases-carousel')?.addEventListener('mouseleave', startAuto);
+
+      startAuto();
+    })();
     // ═══════════════════════════
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', function () {

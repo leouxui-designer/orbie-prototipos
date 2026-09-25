@@ -1,0 +1,699 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscar Talentos – SCTEC Empresa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; background: #f8f9fb; color: #171717; min-height: 100vh; }
+
+    :root {
+      --green: #2ca942;
+      --green-grad: linear-gradient(128deg, #2ca942 15%, #55b13a 55%, #52b934 87%);
+      --green-container: #7ab934;
+      --sidebar-bg: #22292b;
+      --bg-page: #f8f9fb;
+      --bg-card: #fff;
+      --border: #d4d4d4;
+      --text: #171717;
+      --text-2: #737373;
+      --text-head: #22292b;
+      --radius-card: 22px;
+      --shadow: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+    }
+
+    /* ── Navbar ─────────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 80px;
+      background: rgba(255,255,255,.7); backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,.5);
+      box-shadow: 0 1.2px 15px rgba(69,42,124,.10);
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 1px; width: 263px; }
+    .brand-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 31px; line-height: 1; }
+    .brand-sub  { font-size: 16px; font-weight: 600; }
+    .nav-right  { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .nav-company { font-size: 14px; color: #454545; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--green-container); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #568328; flex-shrink: 0; }
+
+    /* ── Sidebar ─────────────────────────────────────────────────── */
+    .sidebar {
+      position: fixed; top: 80px; left: 0; bottom: 0; width: 256px;
+      background: var(--sidebar-bg); display: flex; flex-direction: column; border-right: 1px solid var(--border);
+    }
+    .sidebar-hdr { padding: 16px 8px; border-bottom: 1px solid rgba(255,255,255,.10); }
+    .sidebar-hdr-inner { padding: 0 8px; }
+    .sidebar-co    { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 16px; color: #fff; }
+    .sidebar-role  { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 1px; }
+    .sidebar-body  { flex: 1; padding: 16px 8px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-item  { display: flex; align-items: center; gap: 8px; padding: 12px 8px; border-radius: 6px; color: rgba(255,255,255,.75); font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; opacity: .8; }
+    .sidebar-item.active { background: rgba(122,185,52,.18); color: var(--green-container); opacity: 1; }
+    .sidebar-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .sidebar-ftr { padding: 8px 8px 24px; border-top: 1px solid rgba(255,255,255,.10); }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .main { margin-left: 256px; margin-top: 80px; display: flex; min-height: calc(100vh - 80px); }
+
+    /* ── Sidebar de filtros ──────────────────────────────────────── */
+    .filters-panel {
+      width: 280px; flex-shrink: 0;
+      background: var(--bg-card);
+      box-shadow: 1px 0 0 var(--border);
+      display: flex; flex-direction: column;
+      padding: 20px;
+      gap: 0;
+      overflow-y: auto;
+      max-height: calc(100vh - 80px);
+      position: sticky; top: 0;
+    }
+    .filters-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .filters-title { font-size: 16px; font-weight: 700; }
+    .btn-clear { font-size: 13px; font-weight: 500; color: var(--text-2); background: none; border: none; cursor: pointer; padding: 0; }
+    .btn-clear:hover { color: #ef4444; }
+
+    .filter-group { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+    .filter-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .filter-label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-2); margin-bottom: 10px; }
+    .filter-label svg { width: 14px; height: 14px; }
+
+    .filter-select {
+      width: 100%; height: 38px; border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 12px; font-size: 13px; font-family: 'Roboto', sans-serif; color: #333;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") right 10px center no-repeat;
+      appearance: none; outline: none; cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--green); }
+
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .fchip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #f0f0f0; border-radius: 100px;
+      padding: 3px 10px; font-size: 12px; font-weight: 500; color: #333;
+    }
+    .fchip button { background: none; border: none; cursor: pointer; color: #999; font-size: 12px; line-height: 1; padding: 0; display: flex; align-items: center; }
+    .fchip button:hover { color: #ef4444; }
+
+    /* Checkboxes dentro de acordeão */
+    .accordion { margin-top: 8px; }
+    .accordion-trigger {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      background: none; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text); padding: 6px 0;
+    }
+    .accordion-trigger svg { width: 14px; height: 14px; color: #999; transition: transform .2s; }
+    .accordion-trigger.open svg { transform: rotate(180deg); }
+    .accordion-body { display: none; padding-left: 4px; padding-top: 6px; padding-bottom: 4px; }
+    .accordion-body.open { display: flex; flex-direction: column; gap: 8px; }
+    .check-row { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+    .check-row input[type=checkbox] { width: 16px; height: 16px; margin-top: 1px; accent-color: var(--green); flex-shrink: 0; cursor: pointer; }
+    .check-row span { font-size: 13px; color: var(--text); line-height: 1.4; }
+
+    /* ── Área de resultados ──────────────────────────────────────── */
+    .results-area { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+
+    /* Barra de busca por nome */
+    .search-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 0 16px; height: 46px; box-shadow: var(--shadow);
+    }
+    .search-bar svg { width: 18px; height: 18px; color: #999; flex-shrink: 0; }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; font-family: 'Roboto', sans-serif; background: transparent; }
+
+    /* Filtros rápidos horizontais */
+    .quick-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .qf-label { font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+    .qf-btn {
+      height: 32px; padding: 0 14px; border-radius: 100px;
+      border: 1px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 500; color: var(--text-2); cursor: pointer;
+      transition: all .15s; white-space: nowrap;
+    }
+    .qf-btn:hover, .qf-btn.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 600; }
+
+    /* Faixa de ativos filtros aplicados */
+    .active-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .af-label { font-size: 12px; color: var(--text-2); }
+    .af-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(44,169,66,.10); border: 1px solid rgba(44,169,66,.25); border-radius: 100px;
+      padding: 3px 10px; font-size: 12px; font-weight: 500; color: var(--green);
+    }
+    .af-chip button { background: none; border: none; cursor: pointer; color: var(--green); font-size: 12px; line-height: 1; padding: 0; display: flex; align-items: center; opacity: .7; }
+    .af-chip button:hover { opacity: 1; }
+
+    /* Contagem */
+    .results-count { font-size: 13px; color: var(--text-2); }
+    .results-count b { color: var(--text); }
+
+    /* ── Card do candidato ───────────────────────────────────────────── */
+    .candidates-list { display:flex; flex-direction:column; gap:0; background:var(--bg-card); border-radius:var(--radius-card); box-shadow:var(--shadow); overflow:hidden; }
+
+    .candidate-row {
+      display:flex; align-items:center; gap:16px;
+      padding:14px 20px; border-bottom:1px solid #f0f0f0;
+      cursor:pointer; text-decoration:none; color:inherit; transition:background .12s;
+    }
+    .candidate-row:last-child { border-bottom:none; }
+    .candidate-row:hover { background:#fafcff; }
+
+    .cand-avatar { width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#568328; background:var(--green-container); overflow:hidden; }
+    .cand-avatar img { width:100%; height:100%; object-fit:cover; }
+
+    .cand-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+
+    /* Linha 1 — nome */
+    .cand-name { font-size:15px; font-weight:700; color:var(--text-head); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* Linha 2 — especialidade · techs */
+    .cand-title-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px; }
+    .cand-spec-label { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; }
+    .cand-sep { color:#ccc; font-size:13px; }
+    .cand-techs { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+    .cand-tech { font-size:12px; font-weight:500; color:#555; border:1px solid #e0e0e0; border-radius:100px; padding:1px 9px; background:#fafafa; white-space:nowrap; }
+    .cand-tech.match { border-color:rgba(44,169,66,.45); background:rgba(44,169,66,.08); color:var(--green); font-weight:600; }
+    .cand-tech-more { font-size:11px; color:var(--text-2); }
+
+    /* Linha 3 — localização · inglês · modalidade */
+    .cand-meta-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:4px; }
+    .cand-location { display:flex; align-items:center; gap:3px; font-size:12px; color:var(--text-2); }
+    .cand-location svg { width:12px; height:12px; flex-shrink:0; }
+    .cand-dot { color:#d4d4d4; font-size:11px; }
+    .cand-english { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-2); }
+    .elevel { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .elevel.high { background:var(--green); }
+    .elevel.mid  { background:#f59e0b; }
+    .elevel.low  { background:#d1d5db; }
+    .cand-mode { font-size:11px; color:var(--text-2); background:#f5f5f5; border-radius:4px; padding:2px 7px; white-space:nowrap; }
+
+    /* botão direito */
+    .btn-view { flex-shrink:0; height:32px; padding:0 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); font-size:12px; font-weight:600; color:var(--text); cursor:pointer; transition:all .15s; white-space:nowrap; align-self:center; }
+    .btn-view:hover { background:var(--green); color:#fff; border-color:var(--green); }
+/* ── Paginação ───────────────────────────────────────────────── */
+    .pagination-wrap { display: flex; justify-content: center; padding: 8px 0 32px; }
+    .pagination { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-card); font-size: 14px; font-weight: 400; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; color: var(--text);
+      transition: all .15s;
+    }
+    .page-btn:hover { border-color: var(--green); color: var(--green); }
+    .page-btn.active { background: var(--green-grad); color: #fff; border-color: transparent; font-weight: 700; }
+    .page-btn svg { width: 14px; height: 14px; }
+    .page-of { font-size: 13px; color: var(--text-2); padding: 0 4px; }
+
+    /* ── Estado vazio ────────────────────────────────────────────── */
+    .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 20px; color: var(--text-2); }
+    .empty-state svg { width: 40px; height: 40px; opacity: .3; }
+    .empty-state p { font-size: 14px; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="brand">
+    <span class="brand-name">SCTEC</span>
+    <span class="brand-sub">Portal de Talentos</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-company">TechCorp Soluções Ltda.</span>
+    <div class="avatar">TC</div>
+  </div>
+</nav>
+
+<!-- ── Sidebar da empresa ─────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-hdr">
+    <div class="sidebar-hdr-inner">
+      <div class="sidebar-co">TechCorp Soluções Ltda.</div>
+      <div class="sidebar-role">Parceiro ativo</div>
+    </div>
+  </div>
+  <div class="sidebar-body">
+    <a class="sidebar-item active" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Buscar Talentos
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil da Empresa
+    </a>
+  </div>
+  <div class="sidebar-ftr">
+    <a class="sidebar-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </a>
+  </div>
+</aside>
+
+<!-- ── Main ───────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- ── Painel de filtros ──────────────────────────────────────── -->
+  <aside class="filters-panel">
+    <div class="filters-hdr">
+      <span class="filters-title">Filtros</span>
+      <button class="btn-clear" onclick="clearAll()">Limpar todos</button>
+    </div>
+
+    <!-- Área de interesse (Carreira SCTEC) -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        Área de interesse
+      </div>
+      <!-- Desenvolvimento de Software -->
+      <div class="accordion">
+        <button class="accordion-trigger open" onclick="toggleAccordion(this)">
+          Desenvolvimento de Software
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-body open">
+          <label class="check-row"><input type="checkbox" checked onchange="updateFilters()"><span>Front-End</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Back-End</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Full-Stack</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Mobile</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>DevOps</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>QA / Testes</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>UX/UI Design</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Cibersegurança</span></label>
+        </div>
+      </div>
+      <div class="accordion" style="margin-top:8px;">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)">
+          Análise de Dados
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-body">
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Análise de Dados com Python</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Visualização de Dados / BI</span></label>
+        </div>
+      </div>
+      <div class="accordion" style="margin-top:8px;">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)">
+          Inteligência Artificial
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-body">
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Machine Learning</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>IA Generativa</span></label>
+          <label class="check-row"><input type="checkbox" onchange="updateFilters()"><span>Análise Preditiva</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tecnologias -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Tecnologias
+      </div>
+      <select class="filter-select" onchange="addTechFilter(this)">
+        <option value="">Ex: React, Python, SQL…</option>
+        <option>React</option><option>Angular</option><option>Vue.js</option>
+        <option>Next.js</option><option>TypeScript</option><option>Node.js</option>
+        <option>Python</option><option>Java</option><option>C#</option>
+        <option>.Net</option><option>Spring Boot</option><option>SQL</option>
+        <option>Docker</option><option>AWS</option><option>Azure</option>
+        <option>Flutter</option><option>React Native</option><option>Kotlin</option>
+        <option>Git e GitHub</option><option>Power BI</option><option>Figma</option>
+      </select>
+      <div class="filter-chips" id="tech-chips">
+        <span class="fchip">React <button onclick="removeChip(this)">✕</button></span>
+        <span class="fchip">SQL <button onclick="removeChip(this)">✕</button></span>
+      </div>
+    </div>
+
+    <!-- Localização -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Localização
+      </div>
+      <select class="filter-select" onchange="addLocationFilter(this)">
+        <option value="">Região</option>
+        <option>Grande Florianópolis</option><option>Sul Catarinense</option>
+        <option>Norte Catarinense</option><option>Oeste Catarinense</option>
+        <option>Vale do Itajaí</option>
+      </select>
+      <select class="filter-select" style="margin-top:8px;" onchange="addLocationFilter(this)">
+        <option value="">Cidade</option>
+        <option>Florianópolis</option><option>Joinville</option><option>Blumenau</option>
+        <option>Criciúma</option><option>Chapecó</option><option>São José</option>
+        <option>Palhoça</option><option>Araranguá</option><option>Tubarão</option>
+      </select>
+      <div class="filter-chips" id="location-chips">
+        <span class="fchip">Grande Florianópolis <button onclick="removeChip(this)">✕</button></span>
+      </div>
+    </div>
+
+    <!-- Modalidade -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Modalidade preferida
+      </div>
+      <select class="filter-select">
+        <option value="">Qualquer</option>
+        <option>Remoto</option><option>Presencial</option><option>Híbrido</option>
+      </select>
+    </div>
+
+    <!-- Inglês -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Inglês (mínimo)
+      </div>
+      <select class="filter-select">
+        <option value="">Qualquer nível</option>
+        <option>Básico</option><option>Intermediário</option><option>Avançado</option><option>Fluente</option>
+      </select>
+    </div>
+
+    <!-- Soft Skills -->
+    <div class="filter-group">
+      <div class="filter-label">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Soft Skills
+      </div>
+      <select class="filter-select">
+        <option value="">Selecionar…</option>
+        <option>Comunicação</option><option>Colaboração</option><option>Proatividade</option>
+        <option>Resolução de problemas</option><option>Adaptabilidade</option>
+        <option>Aprendizado contínuo</option><option>Autonomia</option>
+      </select>
+    </div>
+
+  </aside><!-- /filters-panel -->
+
+  <!-- ── Área de resultados ─────────────────────────────────────── -->
+  <div class="results-area">
+
+    <!-- Busca por nome -->
+    <div class="search-bar">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar por nome…" />
+    </div>
+
+    <!-- Filtros rápidos de área (atalhos) -->
+    <div class="quick-filters">
+      <span class="qf-label">Ver por área:</span>
+      <button class="qf-btn active" onclick="toggleQf(this)">Todos</button>
+      <button class="qf-btn" onclick="toggleQf(this)">Front-End</button>
+      <button class="qf-btn" onclick="toggleQf(this)">Back-End</button>
+      <button class="qf-btn" onclick="toggleQf(this)">Mobile</button>
+      <button class="qf-btn" onclick="toggleQf(this)">Dados</button>
+      <button class="qf-btn" onclick="toggleQf(this)">IA</button>
+    </div>
+
+    <!-- Chips de filtros ativos -->
+    <div class="active-filters">
+      <span class="af-label">Filtros ativos:</span>
+      <span class="af-chip">Front-End <button>✕</button></span>
+      <span class="af-chip">React <button>✕</button></span>
+      <span class="af-chip">SQL <button>✕</button></span>
+      <span class="af-chip">Grande Florianópolis <button>✕</button></span>
+    </div>
+
+    <!-- Contagem -->
+    <div class="results-count">Exibindo <b>10</b> de <b>47</b> talentos</div>
+
+    <!-- Lista de candidatos -->
+    <div class="candidates-list">
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#e0f2fe;color:#0284c7;">JS</div>
+        <div class="cand-body">
+          <div class="cand-name">João Silva</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech match">TypeScript</span><span class="cand-tech">Next.js</span><span class="cand-tech">Git</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel mid"></span>Inglês intermediário</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#fce7f3;color:#be185d;">AC</div>
+        <div class="cand-body">
+          <div class="cand-name">Anderson Cardoso Lima</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Angular</span><span class="cand-tech">JavaScript</span><span class="cand-tech">CSS</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Tubarão, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel low"></span>Inglês básico</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Híbrido</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#f0fdf4;color:#15803d;">AL</div>
+        <div class="cand-body">
+          <div class="cand-name">Alice Lima Santos</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech match">TypeScript</span><span class="cand-tech">Vue.js</span><span class="cand-tech">Figma</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Jaguaruna, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel mid"></span>Inglês intermediário</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar">DS</div>
+        <div class="cand-body">
+          <div class="cand-name">Diana Santos</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Next.js</span><span class="cand-tech">JavaScript</span><span class="cand-tech">CSS</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Araranguá, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel high"></span>Inglês avançado</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#fef9c3;color:#854d0e;">EC</div>
+        <div class="cand-body">
+          <div class="cand-name">Eduardo Costa</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Back-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech">Node.js</span><span class="cand-tech match">TypeScript</span><span class="cand-tech">SQL</span><span class="cand-tech">Docker</span><span class="cand-tech-more">+1</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Criciúma, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel mid"></span>Inglês intermediário</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Híbrido</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#ede9fe;color:#6d28d9;">GS</div>
+        <div class="cand-body">
+          <div class="cand-name">Gabriel Silva</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Vue.js</span><span class="cand-tech">JavaScript</span><span class="cand-tech">Git</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Laguna, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel low"></span>Inglês básico</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Presencial</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#ffedd5;color:#c2410c;">HP</div>
+        <div class="cand-body">
+          <div class="cand-name">Helena Pereira</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Full-Stack</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Node.js</span><span class="cand-tech match">TypeScript</span><span class="cand-tech">SQL</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Içara, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel mid"></span>Inglês intermediário</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#e0f2fe;color:#0369a1;">LS</div>
+        <div class="cand-body">
+          <div class="cand-name">Lucas Silva</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Angular</span><span class="cand-tech">CSS</span><span class="cand-tech">HTML</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel high"></span>Inglês avançado</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Híbrido</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#f0fdf4;color:#166534;">MC</div>
+        <div class="cand-body">
+          <div class="cand-name">Mariana Costa</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Front-End</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech match">React</span><span class="cand-tech">Vue.js</span><span class="cand-tech">SQL</span><span class="cand-tech">Figma</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Joinville, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel mid"></span>Inglês intermediário</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+      <a class="candidate-row" href="#">
+        <div class="cand-avatar" style="background:#fdf2f8;color:#9d174d;">RG</div>
+        <div class="cand-body">
+          <div class="cand-name">Rafael Gomes</div>
+          <div class="cand-title-row">
+            <span class="cand-spec-label">Mobile</span>
+            <span class="cand-sep">·</span>
+            <div class="cand-techs"><span class="cand-tech">React Native</span><span class="cand-tech">Flutter</span><span class="cand-tech">JavaScript</span><span class="cand-tech">Git</span></div>
+          </div>
+          <div class="cand-meta-row">
+            <span class="cand-location"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Blumenau, SC</span>
+            <span class="cand-dot">·</span><span class="cand-english"><span class="elevel low"></span>Inglês básico</span>
+            <span class="cand-dot">·</span><span class="cand-mode">Remoto</span>
+          </div>
+        </div>
+        <button class="btn-view">Ver perfil</button>
+      </a>
+
+    </div><!-- /candidates-list -->
+
+>
+
+
+
+    <!-- Paginação -->
+    <div class="pagination-wrap">
+      <div class="pagination">
+        <button class="page-btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <span class="page-of">de 5</span>
+        <button class="page-btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /results-area -->
+</div>
+
+<script>
+function toggleAccordion(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+function toggleQf(btn) {
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function addTechFilter(sel) {
+  const val = sel.value;
+  if (!val) return;
+  const container = document.getElementById('tech-chips');
+  const existing = Array.from(container.querySelectorAll('.fchip')).map(c => c.textContent.trim().replace('✕','').trim());
+  if (!existing.includes(val)) {
+    const chip = document.createElement('span');
+    chip.className = 'fchip';
+    chip.innerHTML = val + ' <button onclick="removeChip(this)">✕</button>';
+    container.appendChild(chip);
+  }
+  sel.value = '';
+}
+
+function addLocationFilter(sel) {
+  const val = sel.value;
+  if (!val) return;
+  const container = document.getElementById('location-chips');
+  const existing = Array.from(container.querySelectorAll('.fchip')).map(c => c.textContent.trim().replace('✕','').trim());
+  if (!existing.includes(val)) {
+    const chip = document.createElement('span');
+    chip.className = 'fchip';
+    chip.innerHTML = val + ' <button onclick="removeChip(this)">✕</button>';
+    container.appendChild(chip);
+  }
+  sel.value = '';
+}
+
+function removeChip(btn) {
+  btn.closest('.fchip').remove();
+}
+
+function clearAll() {
+  document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+  document.getElementById('tech-chips').innerHTML = '';
+  document.getElementById('location-chips').innerHTML = '';
+  document.querySelectorAll('.filter-select').forEach(s => s.value = '');
+  document.querySelectorAll('.af-chip').forEach(c => c.remove());
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.qf-btn').classList.add('active');
+}
+
+function updateFilters() { /* live update — mockado */ }
+</script>
+</body>
+</html>
+
+

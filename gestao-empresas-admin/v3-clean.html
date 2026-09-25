@@ -1,0 +1,759 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Empresas - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    :root {
+      --green: #2CA942;
+      --dark: #141414;
+      --text: #000;
+      --text-2: rgba(0,0,0,.8);
+      --text-3: #454545;
+      --muted: #6B7280;
+      --white: #fff;
+      --bg: #F8F9FB;
+      --border: rgba(0,0,0,.08);
+      --font-h: 'Montserrat', sans-serif;
+      --font-b: 'Roboto', sans-serif;
+      --t: 150ms ease;
+    }
+
+    body { font-family: var(--font-b); background: var(--bg); color: var(--text); padding-top: 80px; }
+
+    /* ── NAVBAR ── */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1100; height: 80px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+    .navbar__inner { width: 100%; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+    .navbar__brand { font-family: var(--font-h); font-weight: 800; font-size: 20px; color: var(--green); }
+    .navbar__right { display: flex; align-items: center; gap: 16px; position: relative; }
+    .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--dark); color: white; }
+    .navbar__name { font-size: 14px; color: var(--muted); }
+    .navbar__avatar { width: 38px; height: 38px; border-radius: 50%; background: #303030; color: white; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: box-shadow var(--t); }
+    .navbar__avatar:hover { box-shadow: 0 0 0 3px rgba(44,169,66,.2); }
+
+    /* Avatar dropdown */
+    .av-menu { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 230px; background: var(--white); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,.12); border: 1px solid var(--border); padding: 6px 0; z-index: 1200; }
+    .av-menu--open { display: block; }
+    .av-menu__head { padding: 12px 16px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+    .av-menu__head strong { display: block; font-size: 14px; }
+    .av-menu__head span { font-size: 12px; color: var(--muted); }
+    .av-menu__link { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 14px; color: var(--text-3); transition: background var(--t); }
+    .av-menu__link:hover { background: var(--bg); }
+    .av-menu__link svg { width: 18px; height: 18px; opacity: .6; }
+    .av-menu__link--out { color: #E53935; }
+    .av-menu__sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ── LAYOUT ── */
+    .painel { display: flex; min-height: calc(100vh - 80px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: 260px; background: #1a1a1a; color: white; padding: 32px 0; display: flex; flex-direction: column; flex-shrink: 0; position: fixed; top: 80px; left: 0; height: calc(100vh - 80px); overflow-y: auto; z-index: 100; }
+    .sidebar__head { padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 16px; }
+    .sidebar__co { font-family: var(--font-h); font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .sidebar__plan { font-size: 12px; color: rgba(255,255,255,.5); }
+    .sidebar__nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; flex: 1; }
+    .sidebar__lnk { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-size: 14px; color: rgba(255,255,255,.7); transition: all var(--t); }
+    .sidebar__lnk:hover { background: rgba(255,255,255,.08); color: white; }
+    .sidebar__lnk--on { background: rgba(44,169,66,.15); color: var(--green); font-weight: 500; }
+    .sidebar__lnk svg { width: 20px; height: 20px; flex-shrink: 0; opacity: .7; }
+    .sidebar__lnk--on svg { opacity: 1; }
+    .sidebar__pill { margin-left: auto; background: #f57f17; color: white; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+    .sidebar__foot { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.1); margin-top: auto; }
+    .sidebar__out { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,.5); cursor: pointer; }
+    .sidebar__out:hover { color: white; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 32px 40px; background: var(--bg); margin-left: 260px; }
+    .pg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .pg-title { font-family: var(--font-h); font-size: 28px; font-weight: 700; }
+    .pg-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    /* ── BOTÕES ── */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; transition: all var(--t); }
+    .btn--primary { background: var(--green); color: white; }
+    .btn--primary:hover { background: #249136; }
+    .btn--ghost { background: none; color: var(--text-3); border: 1px solid rgba(0,0,0,.15); }
+    .btn--ghost:hover { background: rgba(0,0,0,.04); }
+    .btn--sm { padding: 6px 12px; font-size: 13px; }
+    .btn--danger { background: #FFEBEE; color: #C62828; border: 1px solid rgba(198,40,40,.12); }
+    .btn--danger:hover { background: #FFCDD2; }
+    .btn--ok { background: rgba(44,169,66,.1); color: #1B5E20; border: 1px solid rgba(44,169,66,.2); }
+    .btn--ok:hover { background: rgba(44,169,66,.18); }
+
+    /* ── FILTROS — idênticos à referência ── */
+    .filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .f-search {
+      padding: 8px 16px; border: 1px solid rgba(0,0,0,.12);
+      border-radius: 8px; font-size: 14px; color: var(--text);
+      background: var(--white); min-width: 260px; font-family: var(--font-b);
+    }
+    .f-search:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(44,169,66,.1); }
+    .f-search::placeholder { color: var(--muted); }
+    .f-select {
+      padding: 8px 36px 8px 16px; border: 1px solid rgba(0,0,0,.12);
+      border-radius: 8px; font-size: 14px; color: var(--text-2);
+      background: var(--white); appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; cursor: pointer;
+    }
+    .f-select:focus { outline: none; border-color: var(--green); }
+
+    /* Results count */
+    .results-ct { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+    .results-ct strong { color: var(--text-2); }
+
+    /* ── TABELA ── */
+    .tbl-wrap { background: var(--white); border-radius: 12px; border: 1px solid rgba(0,0,0,.06); overflow: hidden; margin-bottom: 32px; }
+    .tbl-wrap table { width: 100%; border-collapse: collapse; }
+    .tbl-wrap th { text-align: left; padding: 12px 24px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; background: var(--bg); border-bottom: 1px solid rgba(0,0,0,.06); white-space: nowrap; }
+    .tbl-wrap td { padding: 15px 24px; font-size: 14px; color: var(--text-2); border-bottom: 1px solid rgba(0,0,0,.04); vertical-align: middle; }
+    .tbl-wrap tbody tr:last-child td { border-bottom: none; }
+    .tbl-wrap tbody tr:hover td { background: rgba(0,0,0,.01); }
+
+    /* Linha pendente — sinal sutil */
+    .row-pending td:first-child { border-left: 3px solid #FFB300; padding-left: 21px; }
+
+    /* Linha filho (expandido) */
+    .row-child { display: none; }
+    .row-child td { padding: 10px 24px; background: rgba(0,0,0,.015); border-bottom: 1px solid rgba(0,0,0,.03); font-size: 13px; }
+    .row-child:last-child td { border-bottom: none; }
+    .row-child-actions td { background: rgba(0,0,0,.02); border-bottom: 1px dashed rgba(0,0,0,.06); padding: 10px 24px; }
+
+    /* Linha grupo aberta */
+    .row-group-head.is-open td:first-child { border-left: 3px solid #FFB300; padding-left: 21px; }
+
+    /* ── STATUS ── */
+    .status { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status--active   { background: rgba(44,169,66,.1); color: #2e7d32; }
+    .status--pending  { background: rgba(255,179,0,.12); color: #8a5700; }
+    .status--inactive { background: rgba(0,0,0,.05); color: var(--muted); }
+
+    /* Pill de duplicata — bem discreto */
+    .dup-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); margin-left: 8px; }
+    .dup-pill::before { content: '·'; margin-right: 2px; }
+
+    /* ── AÇÕES ── */
+    .ag { display: flex; align-items: center; gap: 6px; }
+    .ai { width: 30px; height: 30px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--t); color: var(--muted); border: none; background: none; position: relative; }
+    .ai:hover { background: rgba(0,0,0,.06); color: var(--text); }
+    .ai svg { width: 16px; height: 16px; }
+    .ai[title]:hover::after { content: attr(title); position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--dark); color: white; font-size: 11px; padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 10; }
+    .toggle { position: relative; width: 34px; height: 18px; display: inline-block; cursor: pointer; vertical-align: middle; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle__s { position: absolute; inset: 0; background: #ccc; border-radius: 20px; transition: background var(--t); }
+    .toggle__s::before { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: transform var(--t); }
+    .toggle input:checked + .toggle__s { background: var(--green); }
+    .toggle input:checked + .toggle__s::before { transform: translateX(16px); }
+
+    /* Expand icon */
+    .xpd { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    .xpd svg { width: 14px; height: 14px; color: var(--muted); transition: transform var(--t); flex-shrink: 0; }
+    .is-open .xpd svg { transform: rotate(180deg); }
+
+    /* Radio de seleção nos filhos */
+    .rdo { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(0,0,0,.2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all var(--t); }
+    .rdo:hover { border-color: var(--green); }
+    .rdo.on { border-color: var(--green); background: var(--green); }
+    .rdo.on::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+    .child-sel td { background: rgba(44,169,66,.03) !important; }
+    .child-sel .req-name { color: var(--green); }
+
+    /* Barra de ação do grupo */
+    .grp-bar { display: flex; align-items: center; gap: 10px; }
+    .grp-bar-hint { flex: 1; font-size: 12px; color: var(--muted); }
+
+    /* ── EMPTY STATE ── */
+    .empty { text-align: center; padding: 56px 24px; color: var(--muted); display: none; }
+    .empty__ico { font-size: 32px; margin-bottom: 10px; }
+    .empty__txt { font-size: 14px; }
+
+    /* ── PAGINAÇÃO ── */
+    .pag { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 20px 24px; }
+    .pag__btn { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--text-2); background: none; border: 1px solid transparent; cursor: pointer; transition: all var(--t); }
+    .pag__btn:hover { background: var(--bg); border-color: rgba(0,0,0,.08); }
+    .pag__btn--on { background: var(--green); color: white; border-color: var(--green); }
+    .pag__btn--on:hover { background: var(--green); }
+    .pag__btn svg { width: 16px; height: 16px; }
+    .pag__info { font-size: 12px; color: var(--muted); margin: 0 10px; }
+
+    /* ── MODAL ── */
+    .modal { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; }
+    .modal--open { display: flex; }
+    .modal__ov { position: absolute; inset: 0; background: rgba(0,0,0,.4); cursor: pointer; }
+    .modal__box { position: relative; background: var(--white); border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; box-shadow: 0 16px 48px rgba(0,0,0,.18); margin: 24px; }
+    .modal__top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 12px; }
+    .modal__ttl { font-family: var(--font-h); font-size: 18px; font-weight: 700; }
+    .modal__sub { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+    .modal__cls { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--muted); cursor: pointer; border: none; background: none; flex-shrink: 0; }
+    .modal__cls:hover { background: var(--bg); }
+    .modal__rec { margin-bottom: 14px; padding: 10px 14px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+    .modal__rec-ttl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+    .modal__rec-item { font-size: 13px; color: var(--text-2); padding: 2px 0; }
+    .modal__lbl { font-size: 13px; font-weight: 500; color: var(--text-3); margin-bottom: 6px; display: block; }
+    .modal__ta { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,0,0,.15); border-radius: 8px; font-size: 13px; font-family: var(--font-b); color: var(--text); resize: vertical; min-height: 88px; }
+    .modal__ta:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(44,169,66,.1); }
+    .modal__ft { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--dark); color: white; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; z-index: 9999; opacity: 0; transition: transform .3s ease, opacity .3s ease; pointer-events: none; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+    .toast--on { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a href="#" class="navbar__brand">SCTEC</a>
+      <div class="navbar__right">
+        <span class="badge">ADMIN</span>
+        <span class="navbar__name">Equipe SCTEC</span>
+        <div class="navbar__avatar" id="av-toggle" onclick="toggleAv()">AD</div>
+        <div class="av-menu" id="av-menu">
+          <div class="av-menu__head"><strong>Administrador</strong><span>Equipe SCTEC</span></div>
+          <a href="#" class="av-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Banco de Talentos</a>
+          <a href="#" class="av-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Gestão de Empresas</a>
+          <div class="av-menu__sep"></div>
+          <a href="#" class="av-menu__link av-menu__link--out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__head">
+        <div class="sidebar__co">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__lnk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="#" class="sidebar__lnk sidebar__lnk--on">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas
+          <span class="sidebar__pill">4</span>
+        </a>
+        <a href="#" class="sidebar__lnk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__foot">
+        <a href="#" class="sidebar__out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="pg-head">
+        <div>
+          <h1 class="pg-title">Gestão de Empresas</h1>
+          <p class="pg-sub">Gerencie empresas parceiras, aprove cadastros pendentes e cadastre novas empresas</p>
+        </div>
+        <button class="btn btn--primary" onclick="toast('Abrindo cadastro...')">+ Cadastrar Empresa</button>
+      </div>
+
+      <!-- Filtros — mesma estrutura da referência -->
+      <div class="filters">
+        <input type="text" class="f-search" id="f-search" placeholder="Buscar por nome, CNPJ ou responsável..." oninput="applyFilter()">
+        <select class="f-select" id="f-status" onchange="applyFilter()">
+          <option value="">Todos os status</option>
+          <option value="ativa">Ativa</option>
+          <option value="pendente">Aguardando avaliação</option>
+          <option value="inativa">Inativa</option>
+        </select>
+        <select class="f-select" id="f-seg" onchange="applyFilter()">
+          <option value="">Todos os segmentos</option>
+          <option>Tecnologia / IoT</option>
+          <option>E-commerce / Marketplace</option>
+          <option>Inteligência Artificial</option>
+          <option>Health Tech</option>
+          <option>Tecnologia / SaaS</option>
+          <option>Análise de Dados</option>
+          <option>Cloud / Infraestrutura</option>
+          <option>Fintech</option>
+          <option>ERP / Consultoria</option>
+        </select>
+      </div>
+
+      <p class="results-ct">Exibindo <strong id="ct">11</strong> empresas</p>
+
+      <!-- Tabela -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>CNPJ</th>
+              <th>Responsável</th>
+              <th>Vagas</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+
+            <!-- ─── GRUPO INOVATECH (pendente · dupla) ─── -->
+            <tr class="row-group-head" data-group="it" data-status="pendente" data-seg="Tecnologia / IoT" onclick="toggleGroup('it')">
+              <td>
+                <span class="xpd" id="xpd-it">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  <strong>InovaTech SC</strong>
+                </span>
+                <br><small style="color:var(--muted)">Tecnologia / IoT</small>
+              </td>
+              <td>44.555.666/0001-33</td>
+              <td style="color:var(--muted); font-style:italic; font-size:13px;">2 cadastros recebidos do mesmo CNPJ</td>
+              <td>—</td>
+              <td><span class="status status--pending">Aguardando</span></td>
+              <td><span style="font-size:12px;color:var(--muted)">Expanda para escolher qual aprovar</span></td>
+            </tr>
+            <!-- filhos inovatech: cada linha = um formulário de cadastro enviado -->
+            <tr class="row-child" data-group="it" id="cit-1" onclick="selReq('it','cit-1',['cit-2'])">
+              <td colspan="2" style="padding-left:44px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span class="rdo" id="rdo-cit-1"></span>
+                  <span>
+                    <span style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:block;">Cadastro 1 de 2</span>
+                    <span class="req-name" style="font-weight:600">André Luiz Pereira</span>
+                    <span style="color:var(--muted); margin-left:8px; font-size:12px">Gerente de TI · enviou em 08/01/2025</span>
+                  </span>
+                </div>
+              </td>
+              <td colspan="2" style="color:var(--muted)">andre@inovatech.sc · (48) 99123-4567</td>
+              <td></td>
+              <td><button class="btn btn--ghost btn--sm" onclick="event.stopPropagation();toast('Detalhes do cadastro de André')">Ver cadastro</button></td>
+            </tr>
+            <tr class="row-child" data-group="it" id="cit-2" onclick="selReq('it','cit-2',['cit-1'])">
+              <td colspan="2" style="padding-left:44px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span class="rdo" id="rdo-cit-2"></span>
+                  <span>
+                    <span style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:block;">Cadastro 2 de 2</span>
+                    <span class="req-name" style="font-weight:600">Maria Clara Santos</span>
+                    <span style="color:var(--muted); margin-left:8px; font-size:12px">Diretora Comercial · enviou em 09/01/2025</span>
+                  </span>
+                </div>
+              </td>
+              <td colspan="2" style="color:var(--muted)">maria.santos@inovatech.sc · (48) 99765-1234</td>
+              <td></td>
+              <td><button class="btn btn--ghost btn--sm" onclick="event.stopPropagation();toast('Detalhes do cadastro de Maria Clara')">Ver cadastro</button></td>
+            </tr>
+            <!-- barra ações inovatech -->
+            <tr class="row-child row-child-actions" data-group="it" id="abar-it">
+              <td colspan="6">
+                <div class="grp-bar">
+                  <span class="grp-bar-hint" id="hint-it">Selecione qual cadastro aprovar — o(s) outro(s) serão rejeitados automaticamente</span>
+                  <button class="btn btn--sm btn--danger" onclick="event.stopPropagation();openModal('InovaTech SC',['André Luiz Pereira &lt;andre@inovatech.sc&gt;','Maria Clara Santos &lt;maria.santos@inovatech.sc&gt;'],'it')">Rejeitar todos</button>
+                  <button class="btn btn--sm btn--ok" id="apbtn-it" disabled style="opacity:.35;cursor:default" onclick="event.stopPropagation();approve('it','InovaTech SC')">Aprovar selecionado</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ─── GRUPO SC DIGITAL (pendente · tripla) ─── -->
+            <tr class="row-group-head" data-group="sd" data-status="pendente" data-seg="E-commerce / Marketplace" onclick="toggleGroup('sd')">
+              <td>
+                <span class="xpd" id="xpd-sd">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  <strong>SC Digital Solutions</strong>
+                </span>
+                <br><small style="color:var(--muted)">E-commerce / Marketplace</small>
+              </td>
+              <td>77.888.999/0001-55</td>
+              <td style="color:var(--muted); font-style:italic; font-size:13px;">3 cadastros recebidos do mesmo CNPJ</td>
+              <td>—</td>
+              <td><span class="status status--pending">Aguardando</span></td>
+              <td><span style="font-size:12px;color:var(--muted)">Expanda para escolher qual aprovar</span></td>
+            </tr>
+            <!-- filhos sd: cada linha = um formulário de cadastro enviado -->
+            <tr class="row-child" data-group="sd" id="csd-1" onclick="selReq('sd','csd-1',['csd-2','csd-3'])">
+              <td colspan="2" style="padding-left:44px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span class="rdo" id="rdo-csd-1"></span>
+                  <span>
+                    <span style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:block;">Cadastro 1 de 3</span>
+                    <span class="req-name" style="font-weight:600">Patrícia Mendes</span>
+                    <span style="color:var(--muted); margin-left:8px; font-size:12px">CEO · enviou em 07/01/2025</span>
+                  </span>
+                </div>
+              </td>
+              <td colspan="2" style="color:var(--muted)">patricia@scdigital.com.br · (47) 99100-2200</td>
+              <td></td>
+              <td><button class="btn btn--ghost btn--sm" onclick="event.stopPropagation();toast('Detalhes do cadastro de Patrícia')">Ver cadastro</button></td>
+            </tr>
+            <tr class="row-child" data-group="sd" id="csd-2" onclick="selReq('sd','csd-2',['csd-1','csd-3'])">
+              <td colspan="2" style="padding-left:44px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span class="rdo" id="rdo-csd-2"></span>
+                  <span>
+                    <span style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:block;">Cadastro 2 de 3</span>
+                    <span class="req-name" style="font-weight:600">Rodrigo Faria</span>
+                    <span style="color:var(--muted); margin-left:8px; font-size:12px">Head de Parcerias · enviou em 08/01/2025</span>
+                  </span>
+                </div>
+              </td>
+              <td colspan="2" style="color:var(--muted)">rodrigo.faria@scdigital.com.br · (47) 99300-8890</td>
+              <td></td>
+              <td><button class="btn btn--ghost btn--sm" onclick="event.stopPropagation();toast('Detalhes do cadastro de Rodrigo')">Ver cadastro</button></td>
+            </tr>
+            <tr class="row-child" data-group="sd" id="csd-3" onclick="selReq('sd','csd-3',['csd-1','csd-2'])">
+              <td colspan="2" style="padding-left:44px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span class="rdo" id="rdo-csd-3"></span>
+                  <span>
+                    <span style="color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:block;">Cadastro 3 de 3</span>
+                    <span class="req-name" style="font-weight:600">Ana Paula Vieira</span>
+                    <span style="color:var(--muted); margin-left:8px; font-size:12px">Gerente Operacional · enviou em 09/01/2025</span>
+                  </span>
+                </div>
+              </td>
+              <td colspan="2" style="color:var(--muted)">apaula@scdigital.com.br · (47) 99400-5533</td>
+              <td></td>
+              <td><button class="btn btn--ghost btn--sm" onclick="event.stopPropagation();toast('Detalhes do cadastro de Ana Paula')">Ver cadastro</button></td>
+            </tr>
+            <tr class="row-child row-child-actions" data-group="sd" id="abar-sd">
+              <td colspan="6">
+                <div class="grp-bar">
+                  <span class="grp-bar-hint" id="hint-sd">Selecione qual cadastro aprovar — o(s) outro(s) serão rejeitados automaticamente</span>
+                  <button class="btn btn--sm btn--danger" onclick="event.stopPropagation();openModal('SC Digital Solutions',['Patrícia Mendes &lt;patricia@scdigital.com.br&gt;','Rodrigo Faria &lt;rodrigo.faria@scdigital.com.br&gt;','Ana Paula Vieira &lt;apaula@scdigital.com.br&gt;'],'sd')">Rejeitar todos</button>
+                  <button class="btn btn--sm btn--ok" id="apbtn-sd" disabled style="opacity:.35;cursor:default" onclick="event.stopPropagation();approve('sd','SC Digital Solutions')">Aprovar selecionado</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ─── PENDENTES SIMPLES ─── -->
+            <tr class="row-pending" data-status="pendente" data-seg="Inteligência Artificial">
+              <td><strong>NovaMind Tech</strong><br><small style="color:var(--muted)">Inteligência Artificial</small></td>
+              <td>22.333.444/0001-11</td>
+              <td>Felipe Augusto<br><small style="color:var(--muted)">felipe@novamind.tech</small></td>
+              <td>—</td>
+              <td><span class="status status--pending">Aguardando</span></td>
+              <td>
+                <div class="ag">
+                  <button class="btn btn--sm btn--ok" onclick="approveSingle(this,'NovaMind Tech','Felipe Augusto')">Aprovar</button>
+                  <button class="btn btn--sm btn--danger" onclick="openModal('NovaMind Tech',['Felipe Augusto &lt;felipe@novamind.tech&gt;'],null)">Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr class="row-pending" data-status="pendente" data-seg="Health Tech">
+              <td><strong>HealthData SC</strong><br><small style="color:var(--muted)">Health Tech</small></td>
+              <td>55.666.777/0001-99</td>
+              <td>Camila Rocha<br><small style="color:var(--muted)">camila@healthdata.sc</small></td>
+              <td>—</td>
+              <td><span class="status status--pending">Aguardando</span></td>
+              <td>
+                <div class="ag">
+                  <button class="btn btn--sm btn--ok" onclick="approveSingle(this,'HealthData SC','Camila Rocha')">Aprovar</button>
+                  <button class="btn btn--sm btn--danger" onclick="openModal('HealthData SC',['Camila Rocha &lt;camila@healthdata.sc&gt;'],null)">Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ─── ATIVAS ─── -->
+            <tr data-status="ativa" data-seg="Tecnologia / SaaS">
+              <td><strong>TechCorp Soluções</strong><br><small style="color:var(--muted)">Tecnologia / SaaS</small></td>
+              <td>12.345.678/0001-90</td>
+              <td>Carlos Eduardo<br><small style="color:var(--muted)">carlos@techcorp.com.br</small></td>
+              <td>3</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando TechCorp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+            <tr data-status="ativa" data-seg="Análise de Dados">
+              <td><strong>DataSoft Ltda.</strong><br><small style="color:var(--muted)">Análise de Dados</small></td>
+              <td>98.765.432/0001-10</td>
+              <td>Fernanda Lima<br><small style="color:var(--muted)">fernanda@datasoft.com.br</small></td>
+              <td>2</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando DataSoft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+            <tr data-status="ativa" data-seg="Cloud / Infraestrutura">
+              <td><strong>CloudSC Tecnologia</strong><br><small style="color:var(--muted)">Cloud / Infraestrutura</small></td>
+              <td>11.222.333/0001-44</td>
+              <td>Roberto Alves<br><small style="color:var(--muted)">roberto@cloudsc.com.br</small></td>
+              <td>1</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando CloudSC')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+            <tr data-status="ativa" data-seg="Fintech">
+              <td><strong>FinanSC</strong><br><small style="color:var(--muted)">Fintech</small></td>
+              <td>33.444.555/0001-22</td>
+              <td>Juliana Martins<br><small style="color:var(--muted)">juliana@finansc.com.br</small></td>
+              <td>4</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando FinanSC')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+            <tr data-status="ativa" data-seg="Fintech">
+              <td><strong>Nexus Pagamentos</strong><br><small style="color:var(--muted)">Fintech</small></td>
+              <td>66.777.888/0001-12</td>
+              <td>Bruno Cavalcanti<br><small style="color:var(--muted)">bruno@nexuspag.com.br</small></td>
+              <td>2</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando Nexus')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+            <!-- ─── INATIVA ─── -->
+            <tr data-status="inativa" data-seg="ERP / Consultoria">
+              <td><strong>OldTech Sistemas</strong><br><small style="color:var(--muted)">ERP / Consultoria</small></td>
+              <td>55.666.777/0001-88</td>
+              <td>Marcos Souza<br><small style="color:var(--muted)">marcos@oldtech.com.br</small></td>
+              <td>0</td>
+              <td><span class="status status--inactive">Inativa</span></td>
+              <td><div class="ag">
+                <button class="ai" title="Editar" onclick="toast('Editando OldTech')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="ai" title="Resetar senha" onclick="toast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                <label class="toggle" title="Ativar"><input type="checkbox" onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+              </div></td>
+            </tr>
+
+          </tbody>
+        </table>
+        <div class="empty" id="empty">
+          <div class="empty__ico">🔍</div>
+          <div class="empty__txt">Nenhuma empresa encontrada com esse filtro</div>
+        </div>
+      </div>
+
+      <div class="pag">
+        <button class="pag__btn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="pag__btn pag__btn--on">1</button>
+        <button class="pag__btn">2</button>
+        <span class="pag__info">de 2</span>
+        <button class="pag__btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal rejeitar -->
+  <div class="modal" id="modal">
+    <div class="modal__ov" onclick="closeModal()"></div>
+    <div class="modal__box">
+      <div class="modal__top">
+        <div>
+          <div class="modal__ttl">Rejeitar solicitação</div>
+          <div class="modal__sub" id="m-sub"></div>
+        </div>
+        <button class="modal__cls" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal__rec" id="m-rec">
+        <div class="modal__rec-ttl">E-mail será enviado para</div>
+      </div>
+      <label class="modal__lbl">Mensagem</label>
+      <textarea class="modal__ta" id="m-msg">Olá,
+
+Agradecemos o interesse em fazer parte da rede SCTEC. Após análise, não será possível prosseguir com a parceria no momento.
+
+Atenciosamente,
+Equipe SCTEC</textarea>
+      <div class="modal__ft">
+        <button class="btn btn--ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn--danger" onclick="confirmReject()">Enviar e rejeitar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast-el"></div>
+
+  <script>
+    /* ─── EXPAND / COLLAPSE grupo ─── */
+    function toggleGroup(g) {
+      const head = document.querySelector(`[data-group="${g}"].row-group-head`);
+      const children = document.querySelectorAll(`.row-child[data-group="${g}"]`);
+      const isOpen = head.classList.contains('is-open');
+      head.classList.toggle('is-open', !isOpen);
+      children.forEach(r => r.style.display = isOpen ? 'none' : '');
+    }
+
+    /* ─── SELEÇÃO de responsável ─── */
+    const sel = {};
+    const names = {
+      'cit-1':'André Luiz Pereira','cit-2':'Maria Clara Santos',
+      'csd-1':'Patrícia Mendes','csd-2':'Rodrigo Faria','csd-3':'Ana Paula Vieira'
+    };
+
+    function selReq(grp, picked, others) {
+      [picked, ...others].forEach(id => {
+        document.getElementById('rdo-'+id)?.classList.remove('on');
+        document.getElementById(id)?.classList.remove('child-sel');
+      });
+      document.getElementById('rdo-'+picked)?.classList.add('on');
+      document.getElementById(picked)?.classList.add('child-sel');
+      sel[grp] = { picked, others };
+
+      const btn = document.getElementById('apbtn-'+grp);
+      btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+      document.getElementById('hint-'+grp).textContent = 'Selecionado: ' + (names[picked] || picked);
+    }
+
+    /* ─── APROVAR grupo ─── */
+    function approve(grp, company) {
+      const s = sel[grp]; if (!s) return;
+      const head = document.querySelector(`[data-group="${grp}"].row-group-head`);
+      // Atualizar linha cabeçalho
+      const tds = head.querySelectorAll('td');
+      tds[0].innerHTML = `<strong>${company}</strong><br><small style="color:var(--muted)">${head.dataset.seg}</small>`;
+      tds[2].innerHTML = `${names[s.picked]}<br><small style="color:var(--muted)">${s.picked.includes('it') ? 'inovatech' : 'scdigital'}</small>`;
+      tds[4].innerHTML = `<span class="status status--active">Ativa</span>`;
+      tds[5].innerHTML = `<div class="ag">
+        <button class="ai" title="Editar" onclick="toast('Editando ${company}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <label class="toggle"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+      </div>`;
+      head.classList.remove('is-open','row-group-head','row-pending');
+      head.dataset.status = 'ativa';
+      head.removeAttribute('onclick');
+      head.style.cursor = 'default';
+
+      // Ocultar filhos
+      document.querySelectorAll(`.row-child[data-group="${grp}"]`).forEach(r => r.remove());
+
+      // Decrementar badge sidebar
+      const pill = document.querySelector('.sidebar__pill');
+      if (pill) { const v = parseInt(pill.textContent)-1; pill.textContent = Math.max(0,v); if(v<=0)pill.style.display='none'; }
+
+      toast(`✓ ${company} aprovada — ${s.others.length} e-mail(s) de comunicação enviado(s)`);
+      applyFilter();
+    }
+
+    /* ─── APROVAR simples ─── */
+    function approveSingle(btn, company, resp) {
+      const row = btn.closest('tr');
+      row.dataset.status = 'ativa';
+      row.classList.remove('row-pending');
+      const tds = row.querySelectorAll('td');
+      tds[4].innerHTML = `<span class="status status--active">Ativa</span>`;
+      tds[5].innerHTML = `<div class="ag">
+        <button class="ai" title="Editar" onclick="toast('Editando ${company}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <label class="toggle"><input type="checkbox" checked onchange="toast('Status alterado.')"><span class="toggle__s"></span></label>
+      </div>`;
+      const pill = document.querySelector('.sidebar__pill');
+      if (pill) { const v = parseInt(pill.textContent)-1; pill.textContent = Math.max(0,v); if(v<=0)pill.style.display='none'; }
+      toast(`✓ ${company} aprovada — acesso liberado para ${resp}`);
+      applyFilter();
+    }
+
+    /* ─── FILTRO ─── */
+    function applyFilter() {
+      const q   = document.getElementById('f-search').value.toLowerCase();
+      const st  = document.getElementById('f-status').value;
+      const seg = document.getElementById('f-seg').value;
+      let vis = 0;
+
+      const primaryRows = document.querySelectorAll(
+        '#tbody tr:not(.row-child)'
+      );
+
+      primaryRows.forEach(row => {
+        const rStatus = row.dataset.status || '';
+        const rSeg    = row.dataset.seg    || '';
+        const rGroup  = row.dataset.group;
+        const rText   = row.textContent.toLowerCase();
+
+        const stMatch  = !st  || rStatus === st;
+        const segMatch = !seg || rSeg === seg;
+        const qMatch   = !q   || rText.includes(q);
+        const show     = stMatch && segMatch && qMatch;
+
+        row.style.display = show ? '' : 'none';
+
+        // Filhos seguem o pai — só mostrar se o grupo estiver aberto
+        if (rGroup) {
+          const isOpen = row.classList.contains('is-open');
+          document.querySelectorAll(`.row-child[data-group="${rGroup}"]`).forEach(c => {
+            c.style.display = (!show || !isOpen) ? 'none' : '';
+          });
+        }
+
+        if (show) vis++;
+      });
+
+      document.getElementById('ct').textContent = vis;
+      document.getElementById('empty').style.display = vis === 0 ? 'block' : 'none';
+    }
+
+    /* ─── MODAL ─── */
+    let rejectCb = null;
+    function openModal(company, recipients, grp) {
+      const rec = document.getElementById('m-rec');
+      rec.innerHTML = `<div class="modal__rec-ttl">E-mail será enviado para</div>`;
+      recipients.forEach(r => {
+        const d = document.createElement('div');
+        d.className = 'modal__rec-item';
+        d.innerHTML = '· ' + r;
+        rec.appendChild(d);
+      });
+      document.getElementById('m-sub').textContent =
+        `Rejeitar solicitação(ões) de "${company}".`;
+
+      rejectCb = () => {
+        toast(`Solicitações de "${company}" rejeitadas`);
+        if (grp) {
+          document.querySelectorAll(`[data-group="${grp}"]`).forEach(r => r.remove());
+        }
+        const pill = document.querySelector('.sidebar__pill');
+        if (pill) { const v = parseInt(pill.textContent)-1; pill.textContent = Math.max(0,v); if(v<=0)pill.style.display='none'; }
+        applyFilter();
+      };
+      document.getElementById('modal').classList.add('modal--open');
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('modal--open'); }
+    function confirmReject() { closeModal(); if(rejectCb) rejectCb(); }
+
+    /* ─── AVATAR MENU ─── */
+    function toggleAv() { document.getElementById('av-menu').classList.toggle('av-menu--open'); }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('av-menu');
+      const t = document.getElementById('av-toggle');
+      if (m && !m.contains(e.target) && !t.contains(e.target)) m.classList.remove('av-menu--open');
+    });
+
+    /* ─── TOAST ─── */
+    function toast(msg) {
+      const el = document.getElementById('toast-el');
+      el.textContent = msg;
+      el.classList.add('toast--on');
+      setTimeout(() => el.classList.remove('toast--on'), 3200);
+    }
+  </script>
+</body>
+</html>
+
+

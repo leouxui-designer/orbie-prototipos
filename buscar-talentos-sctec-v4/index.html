@@ -1,0 +1,840 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCTEC – Buscar Talentos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary:           #7ab934;
+      --primary-variant:   #568328;
+      --primary-container: #d3eab4;
+      --inverted-bg:       #22292b;
+      --inverted-fg:       #ffffff;
+      --inverted-fg-muted: rgba(255,255,255,0.6);
+      --bg:                #ffffff;
+      --bg-light:          #f8f9fb;
+      --on-bg:             #171717;
+      --on-bg-variant:     #737373;
+      --outline:           #d4d4d4;
+      --shadow-card:       0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.08);
+      --radius-card:       22px;
+      --radius-lg:         10px;
+      --font-sans:         'Roboto', sans-serif;
+      --font-display:      'Montserrat', sans-serif;
+      --wapp:              #25d366;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: var(--font-sans); background: var(--bg-light); color: var(--on-bg); }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    /* ── SHELL ── */
+    .shell { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; height: 80px; padding: 16px 24px;
+      background: rgba(255,255,255,.70); backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,.50);
+      box-shadow: 0 1.2px 15px rgba(69,42,124,.10);
+    }
+    .navbar-brand { display: flex; flex-direction: column; gap: 2px; min-width: 200px; }
+    .navbar-brand-title { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1; letter-spacing: -.5px; }
+    .navbar-brand-sub { font-weight: 600; font-size: 13px; line-height: 1; }
+    .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+    .navbar-username { font-size: 14px; color: #454545; }
+    .navbar-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primary-container); display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 14px;
+      color: var(--primary-variant); flex-shrink: 0; cursor: pointer;
+    }
+
+    /* ── BODY ROW ── */
+    .body-row { display: flex; flex: 1; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: 256px; flex-shrink: 0; background: var(--inverted-bg); display: flex; flex-direction: column; min-height: calc(100vh - 80px); }
+    .sidebar-header { padding: 16px 8px; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .sidebar-team { padding: 0 8px; }
+    .sidebar-team-name { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 24px; color: var(--inverted-fg); }
+    .sidebar-team-status { font-size: 12px; color: var(--inverted-fg-muted); letter-spacing: .12px; }
+    .sidebar-content { flex: 1; padding: 16px 8px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-btn {
+      display: flex; align-items: center; gap: 8px; padding: 12px 8px; border-radius: 6px;
+      font-size: 14px; font-weight: 700; line-height: 22.75px; color: rgba(212,212,212,.8);
+      opacity: .8; transition: background .15s, opacity .15s; width: 100%;
+    }
+    .sidebar-btn:hover { background: rgba(255,255,255,.08); opacity: 1; }
+    .sidebar-btn.active { background: rgba(122,185,52,.15); color: var(--primary); opacity: 1; }
+    .sidebar-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
+    .sidebar-footer { padding: 8px 8px 24px; border-top: 1px solid rgba(255,255,255,.12); }
+
+    /* ── MAIN ── */
+    .main-content { flex: 1; display: flex; gap: 0; padding: 0 24px 40px 0; background: var(--bg-light); overflow: hidden; }
+
+    /* ── FILTER PANEL ── */
+    .filter-panel {
+      width: 300px; flex-shrink: 0; background: var(--bg);
+      box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px;
+      padding: 20px; min-height: 100%;
+    }
+    .filter-header { display: flex; align-items: center; justify-content: space-between; }
+    .filter-title { font-weight: 700; font-size: 16px; }
+    .btn-clear { font-size: 14px; font-weight: 500; color: var(--on-bg); padding: 4px 10px; border-radius: var(--radius-lg); transition: background .15s; }
+    .btn-clear:hover { background: var(--bg-light); }
+    .filter-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-top: 4px; }
+    .filter-body::-webkit-scrollbar { width: 4px; }
+    .filter-body::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 2px; }
+
+    .filter-input-wrap { position: relative; }
+    .filter-input {
+      width: 100%; height: 42px; padding: 8px 40px 8px 12px;
+      border: 1px solid var(--outline); border-radius: var(--radius-lg);
+      font-size: 14px; color: var(--on-bg); background: var(--bg); outline: none; transition: border .15s;
+    }
+    .filter-input::placeholder { color: var(--on-bg-variant); }
+    .filter-input:focus { border-color: var(--primary); }
+    .filter-input-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; pointer-events: none; color: var(--on-bg-variant); }
+
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .filter-group-head { display: flex; align-items: center; gap: 6px; }
+    .filter-group-head svg { width: 16px; height: 16px; color: var(--on-bg); }
+    .filter-group-label { font-size: 12px; font-weight: 700; letter-spacing: .5px; color: var(--on-bg-variant); text-transform: uppercase; }
+
+    .filter-select-wrap { position: relative; }
+    .filter-select {
+      width: 100%; height: 42px; padding: 8px 36px 8px 12px;
+      border: 1px solid var(--outline); border-radius: var(--radius-lg);
+      font-size: 14px; color: var(--on-bg); background: var(--bg);
+      appearance: none; outline: none; cursor: pointer; transition: border .15s;
+    }
+    .filter-select:focus { border-color: var(--primary); }
+    .filter-select-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; pointer-events: none; color: var(--on-bg-variant); }
+
+    .check-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 2px 0; }
+    .check-item input[type="checkbox"] { width: 16px; height: 16px; border-radius: 4px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+    .check-label { font-size: 13px; color: var(--on-bg); user-select: none; }
+
+    .switch-item { display: flex; align-items: center; gap: 8px; }
+    .switch-label { font-size: 13px; color: var(--on-bg); }
+    .switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; cursor: pointer; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch-track { position: absolute; inset: 0; background: #e0e0e0; border-radius: 100px; transition: background .2s; }
+    .switch-thumb { position: absolute; width: 16px; height: 16px; top: 2px; left: 2px; background: #fff; border-radius: 100px; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s; }
+    .switch input:checked ~ .switch-track { background: var(--primary); }
+    .switch input:checked ~ .switch-thumb { left: 18px; }
+
+    /* ── RESULTS ── */
+    .results-area { flex: 1; padding: 32px 0 0 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .results-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .results-count { font-size: 14px; color: #6b7280; }
+    .active-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+    .active-filter-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px 2px 10px; border-radius: 26px;
+      background: var(--primary); color: #fff; font-size: 12px; font-weight: 500;
+    }
+    .active-filter-tag button { background: none; border: none; color: #fff; cursor: pointer; line-height: 1; padding: 0; font-size: 13px; }
+    .sort-wrap { display: flex; align-items: center; gap: 8px; }
+    .sort-label { font-size: 13px; color: var(--on-bg-variant); }
+    .sort-select { height: 32px; padding: 0 28px 0 10px; border: 1px solid var(--outline); border-radius: 8px; font-size: 13px; appearance: none; background: var(--bg); color: var(--on-bg); outline: none; cursor: pointer; }
+
+    /* ── CANDIDATE CARD ── */
+    .candidates-list { background: var(--bg); border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+    .candidate-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 20px; border-bottom: 1px solid var(--outline);
+      cursor: pointer; transition: background .15s;
+    }
+    .candidate-card:last-child { border-bottom: none; }
+    .candidate-card:hover { background: var(--bg-light); }
+    .candidate-card:hover .card-quick-contacts { opacity: 1; }
+
+    .candidate-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; overflow: hidden; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
+    .candidate-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .candidate-avatar-fallback { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-container); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--primary-variant); }
+
+    .candidate-info { flex: 1; min-width: 0; }
+    .candidate-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; line-height: 22px; color: var(--on-bg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .candidate-meta { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 1px; }
+    .candidate-city { font-size: 13px; color: var(--on-bg-variant); }
+    .candidate-badges { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 5px; }
+
+    .badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 10px; border-radius: 26px; font-size: 12px; font-weight: 500; line-height: 18px; white-space: nowrap; }
+    .badge-primary { background: var(--primary); color: #fff; }
+    .badge-outline { border: 1px solid var(--outline); color: var(--on-bg); }
+    .badge-light { background: var(--bg-light); color: var(--primary); }
+    .badge-video { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 26px; background: rgba(122,185,52,.12); color: var(--primary-variant); font-size: 11px; font-weight: 500; }
+
+    /* ── QUICK CONTACTS (visíveis no hover do card) ── */
+    .card-quick-contacts {
+      display: flex; align-items: center; gap: 6px;
+      opacity: 0; transition: opacity .15s; flex-shrink: 0;
+    }
+    .qc-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--outline); color: var(--on-bg-variant);
+      transition: background .12s, border-color .12s, color .12s;
+      flex-shrink: 0;
+    }
+    .qc-btn:hover { background: var(--bg-light); border-color: var(--on-bg-variant); color: var(--on-bg); }
+    .qc-btn.wapp:hover { background: #e6faf0; border-color: var(--wapp); color: var(--wapp); }
+    .qc-btn.linkedin:hover { background: #e8f4fd; border-color: #0a66c2; color: #0a66c2; }
+    .qc-btn.github:hover { background: #f0f0f0; border-color: #333; color: #333; }
+    .qc-btn svg { width: 16px; height: 16px; }
+
+    .candidate-action { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-view-profile { padding: 6px 14px; border-radius: var(--radius-lg); background: linear-gradient(120deg,#2ca942 15%,#55b13a 55%,#52b934 87%); color: #fff; font-size: 13px; font-weight: 500; transition: opacity .15s; white-space: nowrap; }
+    .btn-view-profile:hover { opacity: .88; }
+
+    /* ── PAGINATION ── */
+    .pagination-wrap { background: var(--bg); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 16px 20px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .page-btn { width: 36px; height: 36px; border-radius: var(--radius-lg); border: 1px solid var(--outline); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--on-bg); cursor: pointer; transition: background .15s; user-select: none; }
+    .page-btn:hover { background: var(--bg-light); }
+    .page-btn.active { background: linear-gradient(110deg,#2ca942 15%,#55b13a 55%,#52b934 87%); border-color: transparent; color: #fff; font-weight: 600; }
+    .page-btn svg { width: 16px; height: 16px; }
+    .page-info { font-size: 14px; color: var(--on-bg-variant); padding: 0 4px; }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-panel { width: 780px; height: 100vh; background: var(--bg-light); overflow-y: auto; transform: translateX(40px); transition: transform .25s cubic-bezier(.4,0,.2,1); display: flex; flex-direction: column; }
+    .modal-overlay.open .modal-panel { transform: translateX(0); }
+    .modal-panel::-webkit-scrollbar { width: 6px; }
+    .modal-panel::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 3px; }
+
+    /* cabeçalho fixo do modal */
+    .modal-header {
+      background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--outline);
+      position: sticky; top: 0; z-index: 10;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .modal-header-row1 { display: flex; align-items: flex-start; gap: 16px; }
+    .modal-close { margin-left: auto; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--on-bg-variant); transition: background .15s; flex-shrink: 0; }
+    .modal-close:hover { background: var(--bg-light); }
+    .modal-close svg { width: 20px; height: 20px; }
+
+    .modal-avatar-lg { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--bg-light); }
+    .modal-avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-avatar-fallback-lg { width: 72px; height: 72px; border-radius: 50%; background: var(--primary-container); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--primary-variant); }
+
+    .modal-hero-info { flex: 1; }
+    .modal-name { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--on-bg); line-height: 1.2; }
+    .modal-subtitle { font-size: 13px; color: var(--on-bg-variant); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .modal-badges { margin-top: 6px; display: flex; gap: 5px; flex-wrap: wrap; }
+
+    /* ── CONTATO NO MODAL (estilo inline, igual à referência) ── */
+    .contact-meta {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      margin-top: 5px;
+    }
+    .contact-meta-item {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 13px; color: var(--on-bg-variant);
+    }
+    .contact-meta-item svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--on-bg-variant); }
+    .contact-meta-item a { color: var(--on-bg-variant); transition: color .12s; }
+    .contact-meta-item a:hover { color: var(--on-bg); }
+
+    .contact-links {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .contact-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 8px;
+      border: 1px solid var(--outline); background: var(--bg);
+      font-size: 13px; color: var(--on-bg); font-weight: 500;
+      transition: background .12s, border-color .12s;
+      white-space: nowrap;
+    }
+    .contact-chip svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--on-bg-variant); }
+    .contact-chip:hover { background: var(--bg-light); border-color: #bbb; }
+
+    /* ── MODAL BODY ── */
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+    .profile-section { background: var(--bg); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .section-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--on-bg); line-height: 24px; }
+    .section-text { font-size: 14px; color: var(--on-bg); line-height: 20px; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+    .info-field label { font-size: 11px; font-weight: 600; color: var(--on-bg-variant); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; display: block; }
+    .info-field p { font-size: 14px; color: var(--on-bg); }
+
+    .exp-card { display: flex; gap: 10px; align-items: flex-start; background: var(--bg-light); padding: 12px 14px; border-radius: 10px; }
+    .exp-icon { width: 20px; height: 20px; flex-shrink: 0; color: var(--on-bg-variant); margin-top: 2px; }
+    .exp-icon svg { width: 20px; height: 20px; }
+    .exp-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .exp-title { font-size: 15px; font-weight: 600; color: var(--on-bg); line-height: 22px; }
+    .exp-sub { font-size: 13px; color: var(--on-bg-variant); line-height: 18px; }
+    .exp-desc { font-size: 13px; color: var(--on-bg); line-height: 19px; margin-top: 4px; }
+
+    .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-pill { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--outline); font-size: 13px; color: var(--on-bg); font-weight: 500; }
+    .status-situacao { display: inline-block; padding: 3px 10px; border-radius: 26px; background: rgba(122,185,52,.12); color: var(--primary-variant); font-size: 12px; font-weight: 500; }
+
+    /* empty */
+    #empty-state { padding: 40px; text-align: center; background: var(--bg); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="navbar-brand">
+      <span class="navbar-brand-title">SCTEC</span>
+      <span class="navbar-brand-sub">Portal de Talentos</span>
+    </div>
+    <div class="navbar-right">
+      <span class="navbar-username">TechCorp Soluções Ltda.</span>
+      <div class="navbar-avatar">CN</div>
+    </div>
+  </header>
+
+  <div class="body-row">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-team">
+          <div class="sidebar-team-name">TechCorp Soluções Ltda.</div>
+          <div class="sidebar-team-status">Parceiro ativo</div>
+        </div>
+      </div>
+      <nav class="sidebar-content">
+        <a href="#" class="sidebar-btn active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Buscar Talentos
+        </a>
+        <a href="#" class="sidebar-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/></svg>
+          Perfil da Empresa
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- FILTROS -->
+      <section class="filter-panel">
+        <div class="filter-header">
+          <span class="filter-title">Filtros</span>
+          <button class="btn-clear" onclick="clearAllFilters()">Limpar todos</button>
+        </div>
+        <div class="filter-body">
+
+          <!-- nome -->
+          <div class="filter-input-wrap">
+            <input class="filter-input" id="search-name" type="text" placeholder="Buscar por nome..." oninput="applyFilters()" />
+            <svg class="filter-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+
+          <!-- hard skills -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span class="filter-group-label">Hard Skills / Tecnologia</span>
+            </div>
+            <div class="filter-input-wrap">
+              <input class="filter-input" id="search-tech" type="text" placeholder="Ex: React, Python, SQL…" oninput="applyFilters()" />
+              <svg class="filter-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+          </div>
+
+          <!-- localização -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="filter-group-label">Localização</span>
+            </div>
+            <div class="filter-select-wrap">
+              <select class="filter-select" id="filter-city" onchange="applyFilters()">
+                <option value="">Cidade</option>
+                <option>Florianópolis</option><option>Criciúma</option><option>Blumenau</option>
+                <option>Joinville</option><option>Tubarão</option><option>Jaguaruna</option>
+                <option>Araranguá</option><option>Içara</option><option>Laguna</option>
+              </select>
+              <svg class="filter-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- carreira SCTEC -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <span class="filter-group-label">Carreira SCTEC</span>
+            </div>
+            <div class="filter-select-wrap">
+              <select class="filter-select" id="filter-trilha" onchange="applyFilters()">
+                <option value="">Todas as carreiras</option>
+                <option value="dev">Desenvolvimento de Software</option>
+                <option value="dados">Análise de Dados</option>
+                <option value="ia">Inteligência Artificial</option>
+              </select>
+              <svg class="filter-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- área de interesse (o que o candidato quer fazer) -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span class="filter-group-label">Área de interesse</span>
+            </div>
+            <div class="filter-select-wrap">
+              <select class="filter-select" id="filter-area" onchange="applyFilters()">
+                <option value="">Todas as áreas</option>
+                <option value="Front-End">Front-End</option>
+                <option value="Back-End">Back-End</option>
+                <option value="Full Stack">Full Stack</option>
+                <option value="Dados">Análise de Dados / BI</option>
+                <option value="Machine Learning">Machine Learning / IA</option>
+                <option value="Computer Vision">Computer Vision</option>
+                <option value="NLP">NLP</option>
+              </select>
+              <svg class="filter-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- situação profissional -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+              <span class="filter-group-label">Situação profissional</span>
+            </div>
+            <div class="filter-select-wrap">
+              <select class="filter-select" id="filter-situacao" onchange="applyFilters()">
+                <option value="">Qualquer situação</option>
+                <option value="primeiro">Procurando primeiro emprego</option>
+                <option value="estagio">Estágio em andamento</option>
+                <option value="empregado">Empregado</option>
+              </select>
+              <svg class="filter-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- tipo de trabalho -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+              <span class="filter-group-label">Tipo de trabalho</span>
+            </div>
+            <label class="check-item"><input type="checkbox" id="ck-estagio" onchange="applyFilters()" /><span class="check-label">Estágio</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-emprego" onchange="applyFilters()" /><span class="check-label">Emprego</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-trainee" onchange="applyFilters()" /><span class="check-label">Trainee</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-freelancer" onchange="applyFilters()" /><span class="check-label">Freelancer</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-jovem" onchange="applyFilters()" /><span class="check-label">Jovem Aprendiz</span></label>
+          </div>
+
+          <!-- modalidade -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+              <span class="filter-group-label">Modalidade</span>
+            </div>
+            <label class="check-item"><input type="checkbox" id="ck-remoto" onchange="applyFilters()" /><span class="check-label">Remoto</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-hibrido" onchange="applyFilters()" /><span class="check-label">Híbrido</span></label>
+            <label class="check-item"><input type="checkbox" id="ck-presencial" onchange="applyFilters()" /><span class="check-label">Presencial</span></label>
+          </div>
+
+          <!-- inglês -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+              <span class="filter-group-label">Inglês (nível mínimo)</span>
+            </div>
+            <div class="filter-select-wrap">
+              <select class="filter-select" id="filter-ingles" onchange="applyFilters()">
+                <option value="">Qualquer nível</option>
+                <option value="Básico">Básico ou mais</option>
+                <option value="Intermediário">Intermediário ou mais</option>
+                <option value="Avançado">Avançado ou mais</option>
+                <option value="Fluente">Fluente</option>
+              </select>
+              <svg class="filter-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- outros -->
+          <div class="filter-group">
+            <div class="filter-group-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span class="filter-group-label">Outros</span>
+            </div>
+            <div class="switch-item">
+              <label class="switch"><input type="checkbox" id="sw-video" onchange="applyFilters()" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+              <span class="switch-label">Possui vídeo de apresentação</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RESULTADOS -->
+      <div class="results-area">
+        <div class="results-top">
+          <div>
+            <div class="results-count" id="results-count">Exibindo <strong id="visible-count">0</strong> talentos</div>
+            <div class="active-filters" id="active-filters-wrap"></div>
+          </div>
+          <div class="sort-wrap">
+            <span class="sort-label">Ordenar por:</span>
+            <select class="sort-select" id="sort-select" onchange="applyFilters()">
+              <option value="name">Nome (A–Z)</option>
+              <option value="city">Cidade</option>
+              <option value="course">Carreira</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="candidates-list" id="candidates-list"></div>
+
+        <div id="empty-state" style="display:none;">
+          <svg style="width:44px;height:44px;color:var(--outline);margin:0 auto 12px;display:block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <p style="font-size:16px;font-weight:600;color:var(--on-bg);">Nenhum talento encontrado</p>
+          <p style="font-size:14px;color:var(--on-bg-variant);margin-top:6px;">Ajuste os filtros para ver mais resultados.</p>
+        </div>
+
+        <div class="pagination-wrap" id="pagination-wrap"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ── MODAL PERFIL ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-panel" id="modal-panel">
+
+    <div class="modal-header" id="modal-header">
+      <div class="modal-header-row1">
+        <div id="modal-avatar-slot"></div>
+        <div class="modal-hero-info" id="modal-hero-info"></div>
+        <button class="modal-close" onclick="closeModalDirect()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <!-- CONTATO INLINE — sempre visível no header fixo -->
+      <div id="modal-contact-bar"></div>
+    </div>
+
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── DADOS ── */
+const CANDIDATES = [
+  { id:1,  age:20, name:"João Silva",            initials:null,  avatar:"https://www.figma.com/api/mcp/asset/efe5e972-e44c-447c-add4-61b64ad51c6c.png", city:"Florianópolis", course:"Desenvolvimento de Software", trilha:"dev",   area:"Front-End",       situation:"Procurando primeiro emprego", hardSkills:["JavaScript","TypeScript","React","Angular","Node.js"],  softSkills:["Comunicação assertiva","Postura profissional"], modalities:["Remoto","Híbrido"],           jobTypes:["Estágio","Emprego"],        certs:[{org:"SCTEC",title:"Desenvolvedor Back-End Node",hours:"16h",date:"12/04/2026"},{org:"SCTEC",title:"Desenvolvedor Front-End React",hours:"16h",date:"12/04/2026"},{org:"",title:"Primeiros Passos — Introdução a Front-End e Back-End",hours:"80h",date:"10/08/2026"}], experiences:[{role:"Estagiário de Desenvolvimento",company:"StartupSC",period:"Mar 2026 – Atual",desc:"Desenvolvimento de features no front-end com React e TypeScript. Participação em code reviews e dailys."},{role:"Desenvolvedor Front-end",company:"TechCorp",period:"Jan 2025 – Fev 2026",desc:"Construção de interfaces responsivas usando Angular e Sass."}], linkedin:"https://linkedin.com/in/joao-silva",      github:"https://github.com/joao-silva",      portfolio:"https://joaosilva.dev",      video:true,  inglés:"Intermediário", summary:"Estudante de Desenvolvimento de Software pelo SCTEC, com conhecimentos em JavaScript, TypeScript e Angular. Tenho experiência em projetos acadêmicos e busco minha primeira oportunidade como desenvolvedor Front-end.", education:"Ensino técnico completo",     phone:"48999999001", email:"joao.silva@gmail.com" },
+  { id:2,  age:22, name:"Anderson Cardoso Lima", initials:null,  avatar:"https://www.figma.com/api/mcp/asset/3d46c657-7728-4be8-8188-bccb6880931f.png", city:"Tubarão",       course:"Análise de Dados",            trilha:"dados", area:"Dados",           situation:"Procurando primeiro emprego", hardSkills:["Python","SQL","Power BI","Pandas","Excel Avançado"],     softSkills:["Feedback e Resiliência"],                      modalities:["Remoto","Híbrido","Presencial"], jobTypes:["Estágio","Trainee"],        certs:[{org:"SCTEC",title:"Python para Dados",hours:"24h",date:"01/03/2026"},{org:"SCTEC",title:"Power BI na Prática",hours:"16h",date:"15/05/2026"}],                                                                                                                         experiences:[{role:"Monitor de Informática",company:"CTT Tubarão",period:"Jul 2025 – Dez 2025",desc:"Suporte a estudantes em laboratório e auxílio em projetos de análise de dados."}],                                                                                                    linkedin:"https://linkedin.com/in/anderson-lima",  github:"https://github.com/anderson-lima",  portfolio:null,                        video:false, inglés:"Básico",        summary:"Formando em Análise de Dados pelo SCTEC com foco em Python e visualização de dados. Tenho experiência prática com projetos de BI.",                                                                                                                           education:"Ensino técnico completo",     phone:"48999999002", email:"anderson.lima@gmail.com" },
+  { id:3,  age:21, name:"Alice Silveira Santos",  initials:null,  avatar:"https://www.figma.com/api/mcp/asset/e7f4e377-9eef-4180-936c-9203fc88ef00.png", city:"Jaguaruna",     course:"Inteligência Artificial",     trilha:"ia",    area:"NLP",             situation:"Procurando primeiro emprego", hardSkills:["Python","TensorFlow","Scikit-learn","NLP","SQL"],        softSkills:["Comunicação assertiva","Postura profissional"], modalities:["Remoto"],                      jobTypes:["Estágio","Emprego","Trainee"], certs:[{org:"SCTEC",title:"Machine Learning com Python",hours:"32h",date:"20/06/2026"},{org:"SCTEC",title:"Introdução à IA",hours:"16h",date:"10/02/2026"}],                                                                                                                         experiences:[],                                                                                                                                                                                                                                                           linkedin:"https://linkedin.com/in/alice-santos",   github:"https://github.com/alice-santos",   portfolio:"https://alicesantos.dev",    video:true,  inglés:"Avançado",      summary:"Apaixonada por IA e processamento de linguagem natural. Concluí o curso de IA pelo SCTEC e desenvolvi projetos práticos de classificação e análise de sentimentos.",                                                                                            education:"Ensino técnico completo",     phone:"48999999003", email:"alice.santos@gmail.com" },
+  { id:4,  age:23, name:"Diana Santos",           initials:"DS",  avatar:null,                                                                             city:"Araranguá",     course:"Desenvolvimento de Software", trilha:"dev",   area:"Back-End",        situation:"Procurando primeiro emprego", hardSkills:["Java","Spring Boot","MySQL","Docker"],                   softSkills:["Postura profissional","Comunicação assertiva"],  modalities:["Híbrido","Presencial"],        jobTypes:["Emprego","Estágio"],        certs:[{org:"SCTEC",title:"Desenvolvedor Back-End Java",hours:"24h",date:"05/07/2026"}],                                                                                                                                                                               experiences:[{role:"Desenvolvedora Júnior",company:"SoftHouse SC",period:"Mai 2026 – Atual",desc:"Desenvolvimento de APIs REST com Java Spring Boot e integração com bancos de dados MySQL."}],                                                                           linkedin:"https://linkedin.com/in/diana-santos",   github:"https://github.com/diana-santos",   portfolio:null,                        video:false, inglés:"Básico",        summary:"Desenvolvedora back-end em início de carreira, com conhecimentos em Java, Spring Boot e Docker.",                                                                                                                                                               education:"Ensino técnico completo",     phone:"48999999004", email:"diana.santos@gmail.com" },
+  { id:5,  age:24, name:"Eduardo Costa",          initials:null,  avatar:"https://www.figma.com/api/mcp/asset/ca279d60-a859-46d7-9502-e331fd89c492.png", city:"Criciúma",      course:"Análise de Dados",            trilha:"dados", area:"Dados",           situation:"Estágio em andamento",        hardSkills:["Python","R","Tableau","SQL","Excel Avançado"],           softSkills:["Feedback e Resiliência"],                      modalities:["Híbrido","Presencial"],        jobTypes:["Emprego","Trainee"],        certs:[{org:"SCTEC",title:"Análise de Dados com Python",hours:"24h",date:"14/04/2026"}],                                                                                                                                                                               experiences:[{role:"Estagiário de Dados",company:"FIESC",period:"Fev 2026 – Atual",desc:"Elaboração de dashboards no Tableau e análise de indicadores de produção."}],                                                                                                    linkedin:"https://linkedin.com/in/eduardo-costa",  github:null,                                portfolio:null,                        video:false, inglés:"Intermediário", summary:"Estudante de análise de dados focado em BI e visualização. Estagiando na FIESC com desenvolvimento de dashboards estratégicos.",                                                                                                                             education:"Ensino técnico completo",     phone:"48999999005", email:"eduardo.costa@gmail.com" },
+  { id:6,  age:17, name:"Gabriel Silva",          initials:null,  avatar:"https://www.figma.com/api/mcp/asset/7b255ff9-c1df-42af-9ca9-e1a79c698c0e.png", city:"Laguna",        course:"Desenvolvimento de Software", trilha:"dev",   area:"Front-End",       situation:"Procurando primeiro emprego", hardSkills:["HTML","CSS","JavaScript","React","Git"],                 softSkills:["Comunicação assertiva","Postura profissional"], modalities:["Remoto","Híbrido"],           jobTypes:["Estágio","Jovem Aprendiz"], certs:[{org:"SCTEC",title:"Desenvolvedor Front-End React",hours:"16h",date:"20/08/2026"}],                                                                                                                                                                               experiences:[],                                                                                                                                                                                                                                                           linkedin:"https://linkedin.com/in/gabriel-silva",  github:"https://github.com/gabriel-silva",  portfolio:"https://gabrielsilva.dev",  video:true,  inglés:"Básico",        summary:"Jovem desenvolvedor front-end com paixão por interfaces modernas. Concluí o curso SCTEC e tenho projetos em React.",                                                                                                                                             education:"Ensino técnico em andamento", phone:"48999999006", email:"gabriel.silva@gmail.com" },
+  { id:7,  age:20, name:"Helena Pereira",         initials:null,  avatar:"https://www.figma.com/api/mcp/asset/3d46c657-7728-4be8-8188-bccb6880931f.png", city:"Içara",         course:"Análise de Dados",            trilha:"dados", area:"Dados",           situation:"Procurando primeiro emprego", hardSkills:["SQL","Python","Power BI","Excel Avançado"],              softSkills:["Postura profissional","Feedback e Resiliência"], modalities:["Híbrido","Remoto"],           jobTypes:["Estágio","Emprego"],        certs:[{org:"SCTEC",title:"Power BI na Prática",hours:"16h",date:"03/06/2026"},{org:"SCTEC",title:"SQL para Analistas",hours:"12h",date:"15/03/2026"}],                                                                                                                   experiences:[],                                                                                                                                                                                                                                                           linkedin:"https://linkedin.com/in/helena-pereira", github:null,                                portfolio:null,                        video:false, inglés:"Intermediário", summary:"Analista de dados em formação, com domínio de SQL e Power BI.",                                                                                                                                                                                          education:"Ensino técnico completo",     phone:"48999999007", email:"helena.pereira@gmail.com" },
+  { id:8,  age:22, name:"Lucas Silva",            initials:null,  avatar:"https://www.figma.com/api/mcp/asset/da2aa88c-7b90-478b-b82c-e7a2a869660d.png", city:"Florianópolis", course:"Inteligência Artificial",     trilha:"ia",    area:"Machine Learning", situation:"Procurando primeiro emprego", hardSkills:["Python","Machine Learning","Keras","Pandas","NumPy"],   softSkills:["Comunicação assertiva"],                        modalities:["Remoto"],                      jobTypes:["Estágio","Trainee"],        certs:[{org:"SCTEC",title:"Machine Learning com Python",hours:"32h",date:"25/07/2026"}],                                                                                                                                                                               experiences:[{role:"Pesquisador Voluntário",company:"UFSC",period:"Mar 2026 – Atual",desc:"Pesquisa em modelos de classificação para dados de saúde usando Keras e Scikit-learn."}],                                                                                      linkedin:"https://linkedin.com/in/lucas-silva",    github:"https://github.com/lucas-silva",    portfolio:"https://lucassilva.ai",     video:true,  inglés:"Avançado",      summary:"Desenvolvedor de IA com foco em Machine Learning. Tenho experiência em pesquisa acadêmica com Python e Keras.",                                                                                                                                                 education:"Ensino técnico completo",     phone:"48999999008", email:"lucas.silva@gmail.com" },
+  { id:9,  age:21, name:"Mariana Costa",          initials:"MC",  avatar:null,                                                                             city:"Joinville",     course:"Desenvolvimento de Software", trilha:"dev",   area:"Front-End",       situation:"Procurando primeiro emprego", hardSkills:["Vue.js","JavaScript","CSS","Figma","Git"],               softSkills:["Postura profissional","Comunicação assertiva"],  modalities:["Remoto","Híbrido"],           jobTypes:["Estágio","Emprego"],        certs:[{org:"SCTEC",title:"Desenvolvedor Front-End Vue.js",hours:"16h",date:"10/09/2026"}],                                                                                                                                                                              experiences:[],                                                                                                                                                                                                                                                           linkedin:"https://linkedin.com/in/mariana-costa",  github:"https://github.com/mariana-costa",  portfolio:"https://marianacosta.dev",  video:false, inglés:"Intermediário", summary:"Desenvolvedora front-end especializada em Vue.js com foco em acessibilidade e UI/UX.",                                                                                                                                                                          education:"Ensino técnico completo",     phone:"47999999009", email:"mariana.costa@gmail.com" },
+  { id:10, age:25, name:"Rafael Gomes",           initials:null,  avatar:"https://www.figma.com/api/mcp/asset/7f06b792-5e63-4c3e-90b3-18de92c065f3.png", city:"Blumenau",      course:"Análise de Dados",            trilha:"dados", area:"Dados",           situation:"Estágio em andamento",        hardSkills:["Python","SQL","Tableau","Spark","AWS"],                  softSkills:["Postura profissional"],                         modalities:["Híbrido","Presencial"],        jobTypes:["Emprego"],                 certs:[{org:"SCTEC",title:"Análise de Dados com Python",hours:"24h",date:"18/04/2026"}],                                                                                                                                                                               experiences:[{role:"Analista de Dados Júnior",company:"Data Insights SC",period:"Jun 2026 – Atual",desc:"Processamento e análise de grandes volumes de dados com Python e Spark. Pipelines ETL e dashboards."}],                                                          linkedin:"https://linkedin.com/in/rafael-gomes",   github:"https://github.com/rafael-gomes",   portfolio:null,                        video:false, inglés:"Avançado",      summary:"Analista de dados com experiência em Big Data e cloud. Python, Spark e AWS para processamento em escala.",                                                                                                                                                      education:"Ensino técnico completo",     phone:"47999999010", email:"rafael.gomes@gmail.com" },
+  { id:11, age:20, name:"Camila Ferreira",        initials:"CF",  avatar:null,                                                                             city:"Criciúma",      course:"Inteligência Artificial",     trilha:"ia",    area:"Computer Vision", situation:"Procurando primeiro emprego", hardSkills:["Python","Deep Learning","Computer Vision","OpenCV"],    softSkills:["Comunicação assertiva","Postura profissional"], modalities:["Remoto","Híbrido"],           jobTypes:["Estágio","Trainee"],        certs:[{org:"SCTEC",title:"Deep Learning com Python",hours:"40h",date:"30/08/2026"}],                                                                                                                                                                                  experiences:[],                                                                                                                                                                                                                                                           linkedin:"https://linkedin.com/in/camila-ferreira", github:"https://github.com/camila-ferreira", portfolio:"https://camilaferreira.ai", video:true, inglés:"Intermediário", summary:"Desenvolvedora de IA especializada em visão computacional com projetos de reconhecimento de imagens.",                                                                                                                                                           education:"Ensino técnico completo",     phone:"48999999011", email:"camila.ferreira@gmail.com" },
+  { id:12, age:21, name:"Bruno Almeida",          initials:null,  avatar:"https://www.figma.com/api/mcp/asset/ca279d60-a859-46d7-9502-e331fd89c492.png", city:"Araranguá",     course:"Desenvolvimento de Software", trilha:"dev",   area:"Back-End",        situation:"Estágio em andamento",        hardSkills:["Node.js","Express","PostgreSQL","MongoDB","Docker"],     softSkills:["Feedback e Resiliência"],                      modalities:["Remoto"],                      jobTypes:["Emprego"],                 certs:[{org:"SCTEC",title:"Desenvolvedor Back-End Node",hours:"16h",date:"08/09/2026"}],                                                                                                                                                                               experiences:[{role:"Estagiário Back-End",company:"ClickSoft",period:"Ago 2026 – Atual",desc:"APIs REST com Node.js e Express, integração com MongoDB e PostgreSQL."}],                                                                                                    linkedin:"https://linkedin.com/in/bruno-almeida",  github:"https://github.com/bruno-almeida",  portfolio:null,                        video:false, inglés:"Básico",        summary:"Desenvolvedor back-end em estágio com foco em Node.js, APIs REST e bancos de dados NoSQL/SQL.",                                                                                                                                                                 education:"Ensino técnico completo",     phone:"48999999012", email:"bruno.almeida@gmail.com" },
+];
+
+const NIVEL = { 'Básico':1, 'Intermediário':2, 'Avançado':3, 'Fluente':4 };
+let filteredData = [...CANDIDATES];
+let currentPage = 1;
+const PER_PAGE = 10;
+
+/* ── RENDER LISTA ── */
+function avatarHTML(c, size=48) {
+  if (c.avatar) return `<div class="candidate-avatar" style="width:${size}px;height:${size}px;"><img src="${c.avatar}" alt="${c.name}" loading="lazy"/></div>`;
+  const ini = c.initials || c.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  return `<div class="candidate-avatar-fallback" style="width:${size}px;height:${size}px;font-size:${size*0.28}px;">${ini}</div>`;
+}
+
+function quickContactsHTML(c) {
+  const phone = c.phone.replace(/\D/g,'');
+  let html = '';
+  html += `<a class="qc-btn wapp" href="https://wa.me/55${phone}" target="_blank" title="WhatsApp" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.989.574 3.842 1.567 5.4L2 22l4.744-1.546A9.954 9.954 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" fill="none" stroke="currentColor" stroke-width="0"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3.5C7.313 3.5 3.5 7.313 3.5 12c0 1.79.53 3.455 1.44 4.847l-.938 3.44 3.538-.91A8.5 8.5 0 1 0 12 3.5z"/></svg></a>`;
+  if (c.linkedin) html += `<a class="qc-btn linkedin" href="${c.linkedin}" target="_blank" title="LinkedIn" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>`;
+  if (c.github) html += `<a class="qc-btn github" href="${c.github}" target="_blank" title="GitHub" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></a>`;
+  return html;
+}
+
+function renderCandidates() {
+  const list  = document.getElementById('candidates-list');
+  const empty = document.getElementById('empty-state');
+  const pag   = document.getElementById('pagination-wrap');
+  const total = filteredData.length;
+  const pages = Math.ceil(total / PER_PAGE);
+  const start = (currentPage-1)*PER_PAGE;
+  const slice = filteredData.slice(start, start+PER_PAGE);
+
+  document.getElementById('visible-count').textContent = total;
+  document.getElementById('results-count').innerHTML = `Exibindo <strong>${total}</strong> talento${total!==1?'s':''}`;
+
+  if (!total) { list.style.display='none'; pag.style.display='none'; empty.style.display='block'; return; }
+  list.style.display='block'; pag.style.display='flex'; empty.style.display='none';
+
+  list.innerHTML = slice.map(c=>`
+    <div class="candidate-card" onclick="openProfile(${c.id})">
+      ${avatarHTML(c)}
+      <div class="candidate-info">
+        <div class="candidate-name">${c.name}</div>
+        <div class="candidate-meta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--on-bg-variant)" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="candidate-city">${c.city}, SC</span>
+          <span style="color:var(--outline);margin:0 4px;">·</span>
+          <span style="font-size:12px;color:var(--on-bg-variant);">${c.age} anos</span>
+          <span style="color:var(--outline);margin:0 4px;">·</span>
+          <span style="font-size:12px;color:var(--on-bg-variant);">${c.course}</span>
+          <span style="color:var(--outline);margin:0 4px;">·</span>
+          <span style="font-size:12px;color:var(--on-bg-variant);">${c.area}</span>
+        </div>
+        <div class="candidate-badges">
+          ${c.hardSkills.slice(0,3).map(s=>`<span class="badge badge-outline">${s}</span>`).join('')}
+          ${c.hardSkills.length>3?`<span class="badge badge-outline">+${c.hardSkills.length-3}</span>`:''}
+          ${c.video?`<span class="badge-video"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>vídeo</span>`:''}
+        </div>
+      </div>
+      <div class="card-quick-contacts">${quickContactsHTML(c)}</div>
+      <div class="candidate-action">
+        <button class="btn-view-profile" onclick="event.stopPropagation();openProfile(${c.id})">Ver perfil</button>
+      </div>
+    </div>`).join('');
+
+  // paginação
+  let pg = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled style="opacity:.35;cursor:default;"':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  for (let p=1;p<=pages;p++) pg+=`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  pg+=`<span class="page-info">de ${pages}</span>`;
+  pg+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled style="opacity:.35;cursor:default;"':''}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  pag.innerHTML = pg;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredData.length/PER_PAGE);
+  if (p<1||p>pages) return;
+  currentPage=p; renderCandidates();
+  document.getElementById('candidates-list').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── FILTROS ── */
+function applyFilters() {
+  const name     = document.getElementById('search-name').value.toLowerCase().trim();
+  const tech     = document.getElementById('search-tech').value.toLowerCase().trim();
+  const city     = document.getElementById('filter-city').value;
+  const trilha   = document.getElementById('filter-trilha').value;
+  const area     = document.getElementById('filter-area').value;
+  const situacao = document.getElementById('filter-situacao').value;
+  const ingles   = document.getElementById('filter-ingles').value;
+  const swVideo  = document.getElementById('sw-video').checked;
+  const tipos    = ['Estágio','Emprego','Trainee','Freelancer','Jovem Aprendiz'].filter((_,i)=>
+    document.getElementById(['ck-estagio','ck-emprego','ck-trainee','ck-freelancer','ck-jovem'][i]).checked);
+  const modais   = ['Remoto','Híbrido','Presencial'].filter((_,i)=>
+    document.getElementById(['ck-remoto','ck-hibrido','ck-presencial'][i]).checked);
+
+  filteredData = CANDIDATES.filter(c=>{
+    if (name && !c.name.toLowerCase().includes(name)) return false;
+    if (tech && !c.hardSkills.join(' ').toLowerCase().includes(tech)) return false;
+    if (city && c.city!==city) return false;
+    if (trilha && c.trilha!==trilha) return false;
+    if (area && !c.area.includes(area)) return false;
+    if (situacao) {
+      const map={primeiro:'Procurando',estagio:'Estágio',empregado:'Empregado'};
+      if (!c.situation.includes(map[situacao])) return false;
+    }
+    if (tipos.length && !tipos.some(t=>c.jobTypes.includes(t))) return false;
+    if (modais.length && !modais.some(m=>c.modalities.includes(m))) return false;
+    if (ingles) { if ((NIVEL[c.inglés]||0)<(NIVEL[ingles]||0)) return false; }
+    if (swVideo && !c.video) return false;
+    return true;
+  });
+
+  const sort = document.getElementById('sort-select').value;
+  if (sort==='name') filteredData.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sort==='city') filteredData.sort((a,b)=>a.city.localeCompare(b.city));
+  else if (sort==='course') filteredData.sort((a,b)=>a.course.localeCompare(b.course));
+
+  currentPage=1; renderCandidates(); renderActiveFilterTags();
+}
+
+function clearAllFilters() {
+  ['search-name','search-tech'].forEach(id=>document.getElementById(id).value='');
+  ['filter-city','filter-trilha','filter-area','filter-situacao','filter-ingles','sort-select']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  ['sw-video','ck-estagio','ck-emprego','ck-trainee','ck-freelancer','ck-jovem','ck-remoto','ck-hibrido','ck-presencial']
+    .forEach(id=>document.getElementById(id).checked=false);
+  applyFilters();
+}
+
+function renderActiveFilterTags() {
+  const wrap = document.getElementById('active-filters-wrap');
+  const tags=[];
+  const name=document.getElementById('search-name').value.trim();
+  if (name) tags.push({label:`Nome: ${name}`,clear:()=>{document.getElementById('search-name').value='';applyFilters();}});
+  const tech=document.getElementById('search-tech').value.trim();
+  if (tech) tags.push({label:`Skill: ${tech}`,clear:()=>{document.getElementById('search-tech').value='';applyFilters();}});
+  const city=document.getElementById('filter-city').value;
+  if (city) tags.push({label:city,clear:()=>{document.getElementById('filter-city').value='';applyFilters();}});
+  const area=document.getElementById('filter-area').value;
+  if (area) tags.push({label:area,clear:()=>{document.getElementById('filter-area').value='';applyFilters();}});
+  wrap._clears=tags.map(t=>t.clear);
+  wrap.innerHTML=tags.map((t,i)=>`<span class="active-filter-tag">${t.label}<button onclick="wrap._clears[${i}]()">✕</button></span>`).join('');
+}
+
+/* ── MODAL ── */
+function openProfile(id) {
+  const c = CANDIDATES.find(x=>x.id===id); if(!c) return;
+
+  // avatar
+  document.getElementById('modal-avatar-slot').innerHTML = c.avatar
+    ? `<div class="modal-avatar-lg"><img src="${c.avatar}" alt="${c.name}"/></div>`
+    : `<div class="modal-avatar-fallback-lg">${c.initials||c.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>`;
+
+  // hero info
+  document.getElementById('modal-hero-info').innerHTML = `
+    <div class="modal-name">${c.name}</div>
+    <div class="modal-subtitle">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      ${c.city}, SC &nbsp;·&nbsp; ${c.age} anos &nbsp;·&nbsp; ${c.course} &nbsp;·&nbsp; ${c.area}
+      &nbsp;<span class="status-situacao">${c.situation}</span>
+    </div>
+    <div class="modal-badges">
+      ${c.jobTypes.map(j=>`<span class="badge badge-primary">${j}</span>`).join('')}
+      ${c.modalities.map(m=>`<span class="badge badge-outline">${m}</span>`).join('')}
+      ${c.video?`<span class="badge-video"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>Possui vídeo</span>`:''}
+    </div>`;
+
+  // ── CONTATO — estilo inline coeso com a página ──
+  const phone = c.phone.replace(/\D/g,'');
+  const fmtPhone = c.phone.replace(/^(\d{2})(\d{2})(\d{5})(\d{4})$/, '($2) $3-$4');
+
+  let bar = `<div class="contact-meta">`;
+  bar += `<span class="contact-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><a href="mailto:${c.email}">${c.email}</a></span>`;
+  bar += `<span class="contact-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.08 6.08l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/></svg><a href="https://wa.me/55${phone}" target="_blank">${fmtPhone}</a></span>`;
+  bar += `</div>`;
+
+  bar += `<div class="contact-links">`;
+  if (c.linkedin)  bar += `<a class="contact-chip" href="${c.linkedin}"  target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>`;
+  if (c.github)    bar += `<a class="contact-chip" href="${c.github}"    target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>GitHub</a>`;
+  if (c.portfolio) bar += `<a class="contact-chip" href="${c.portfolio}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>Portfólio</a>`;
+  bar += `</div>`;
+
+  document.getElementById('modal-contact-bar').innerHTML = bar;
+
+  // ── BODY (ordem por fluxo do recrutador) ──
+  const certsHTML = c.certs.length ? c.certs.map(ct=>`
+    <div class="exp-card">
+      <div class="exp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+      <div class="exp-body">
+        ${ct.org?`<span class="badge badge-light" style="margin-bottom:4px;width:fit-content;">${ct.org}</span>`:''}
+        <div class="exp-title">${ct.title} <span style="font-weight:400;color:var(--on-bg-variant);">· ${ct.hours}</span></div>
+        <div class="exp-sub">Emitido em ${ct.date}</div>
+      </div>
+    </div>`).join('') : `<p style="font-size:14px;color:var(--on-bg-variant);">Nenhum certificado informado.</p>`;
+
+  const expHTML = c.experiences.length ? c.experiences.map(e=>`
+    <div class="exp-card">
+      <div class="exp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+      <div class="exp-body">
+        <div class="exp-title">${e.role}</div>
+        <div class="exp-sub">${e.company} · ${e.period}</div>
+        <div class="exp-desc">${e.desc}</div>
+      </div>
+    </div>`).join('') : `<p style="font-size:14px;color:var(--on-bg-variant);">Sem experiência profissional registrada.</p>`;
+
+  document.getElementById('modal-body').innerHTML = `
+    <!-- 1. Resumo -->
+    <div class="profile-section">
+      <div class="section-title">Resumo profissional</div>
+      <p class="section-text">${c.summary}</p>
+    </div>
+
+    <!-- 2. Habilidades — o recrutador quer ver isso logo -->
+    <div class="profile-section">
+      <div class="section-title">Habilidades</div>
+      <div style="margin-bottom:10px;">
+        <p style="font-size:13px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Hard Skills</p>
+        <div class="tags-row">${c.hardSkills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Soft Skills</p>
+        <div class="tags-row">${c.softSkills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Inglês</p>
+        <span class="skill-pill">${c.inglés}</span>
+      </div>
+    </div>
+
+    <!-- 3. Preferências -->
+    <div class="profile-section">
+      <div class="section-title">Interesse profissional</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div>
+          <p style="font-size:12px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Área</p>
+          <span class="badge badge-primary">${c.area}</span>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Tipo</p>
+          <div class="tags-row">${c.jobTypes.map(j=>`<span class="badge badge-primary">${j}</span>`).join('')}</div>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:600;color:var(--on-bg-variant);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Modalidade</p>
+          <div class="tags-row">${c.modalities.map(m=>`<span class="badge badge-outline">${m}</span>`).join('')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Certificados SCTEC -->
+    <div class="profile-section">
+      <div class="section-title">Formações e Certificados</div>
+      ${certsHTML}
+    </div>
+
+    <!-- 5. Experiência -->
+    <div class="profile-section">
+      <div class="section-title">Experiência profissional</div>
+      ${expHTML}
+    </div>
+
+    <!-- 6. Dados extras -->
+    <div class="profile-section">
+      <div class="section-title">Formação acadêmica</div>
+      <div class="info-grid">
+        <div class="info-field"><label>Formação</label><p>${c.education}</p></div>
+        <div class="info-field"><label>Idade</label><p>${c.age} anos</p></div>
+        <div class="info-field"><label>Cidade</label><p>${c.city}, SC</p></div>
+        <div class="info-field"><label>Situação atual</label><p>${c.situation}</p></div>
+        <div class="info-field"><label>Carreira SCTEC</label><p>${c.course}</p></div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(e) { if(e.target===document.getElementById('modal-overlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModalDirect(); });
+
+applyFilters();
+</script>
+</body>
+</html>

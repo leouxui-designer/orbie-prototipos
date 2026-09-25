@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscar Empresas - Portal de Talentos | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/painel.css">
+</head>
+<body style="padding-top: 80px;">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar--painel">
+    <div class="navbar__inner">
+      <a href="../index.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="navbar-painel__company-name">João Silva</span>
+        <div class="navbar-painel__avatar" id="avatar-toggle" onclick="toggleAvatarMenu()">JS</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header"><strong>João Silva</strong><span>Desenvolvimento de Software</span></div>
+          <a href="aluno-empresas.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Buscar Empresas</a>
+          <a href="aluno-perfil.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Meu Perfil</a>
+          <div class="avatar-menu__divider"></div>
+          <a href="login.html" class="avatar-menu__link avatar-menu__link--logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="sidebar__company">João Silva</div>
+        <div class="sidebar__plan">Desenvolvimento de Software</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="aluno-empresas.html" class="sidebar__link sidebar__link--active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Buscar Empresas</a>
+        <a href="aluno-perfil.html" class="sidebar__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Meu Perfil</a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Buscar Empresas</h1>
+          <p class="painel__subtitle">Conheça as empresas parceiras e acesse seus portais de vagas</p>
+        </div>
+      </div>
+
+      <!-- Barra de busca + selects -->
+      <div class="search-panel">
+        <div class="search-panel__main">
+          <svg class="search-panel__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="busca-texto" class="search-panel__input" placeholder="Buscar por nome da empresa ou tecnologia..." oninput="filtrarEmpresas()">
+        </div>
+        <div class="painel-filters">
+          <select class="painel-filter__select" id="filtro-segmento" onchange="filtrarEmpresas()">
+            <option value="">Todos os segmentos</option>
+            <option>Software House</option>
+            <option>Fintech</option>
+            <option>SaaS</option>
+            <option>Consultoria</option>
+            <option>E-commerce</option>
+          </select>
+          <select class="painel-filter__select" id="filtro-porte" onchange="filtrarEmpresas()">
+            <option value="">Todos os portes</option>
+            <option>Startup</option>
+            <option>Pequena</option>
+            <option>Média</option>
+            <option>Grande</option>
+          </select>
+          <select class="painel-filter__select" id="filtro-contrato" onchange="filtrarEmpresas()">
+            <option value="">Qualquer contrato</option>
+            <option>CLT</option>
+            <option>PJ</option>
+            <option>Estágio</option>
+            <option>Freelancer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Chips de tecnologias (filtro rápido) -->
+      <div class="filter-chips" id="tech-chips">
+        <span class="filter-chips__label">Tecnologias:</span>
+        <button class="chip" data-tech="JavaScript" onclick="toggleTech(this)">JavaScript</button>
+        <button class="chip" data-tech="Java" onclick="toggleTech(this)">Java</button>
+        <button class="chip" data-tech="Python" onclick="toggleTech(this)">Python</button>
+        <button class="chip" data-tech="React" onclick="toggleTech(this)">React</button>
+        <button class="chip" data-tech="Node.js" onclick="toggleTech(this)">Node.js</button>
+        <button class="chip" data-tech=".NET" onclick="toggleTech(this)">.NET</button>
+        <button class="chip" data-tech="PHP" onclick="toggleTech(this)">PHP</button>
+        <button class="chip" data-tech="Go" onclick="toggleTech(this)">Go</button>
+      </div>
+
+      <!-- Resultados -->
+      <p class="painel-results-count">Exibindo <strong id="results-count">6</strong> empresas</p>
+
+      <!-- Grid de empresas -->
+      <div class="empresas-grid" id="empresas-grid">
+
+        <article class="empresa-card" data-nome="TechCorp Soluções" data-segmento="Software House" data-porte="Média" data-contrato="CLT,PJ" data-tech="JavaScript,React,Node.js,TypeScript">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">TC</div>
+            <div>
+              <h3 class="empresa-card__name">TechCorp Soluções</h3>
+              <p class="empresa-card__segmento">Software House · Média · Florianópolis</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Desenvolvemos software sob medida para clientes de todo o Brasil. Time enxuto e cultura de aprendizado contínuo.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Node.js</span>
+            <span class="tech-tag">TypeScript</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+        <article class="empresa-card" data-nome="DataSoft Ltda." data-segmento="SaaS" data-porte="Grande" data-contrato="CLT" data-tech="Python,Java,SQL">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">DS</div>
+            <div>
+              <h3 class="empresa-card__name">DataSoft Ltda.</h3>
+              <p class="empresa-card__segmento">SaaS · Grande · Joinville</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Plataforma de dados usada por centenas de empresas. Trabalhamos com dados em larga escala e engenharia de qualidade.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Java</span>
+            <span class="tech-tag">SQL</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+        <article class="empresa-card" data-nome="InovaTech SC" data-segmento="Fintech" data-porte="Startup" data-contrato="PJ,Estágio" data-tech="Node.js,React,Go">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">IT</div>
+            <div>
+              <h3 class="empresa-card__name">InovaTech SC</h3>
+              <p class="empresa-card__segmento">Fintech · Startup · Florianópolis</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Fintech em crescimento acelerado. Buscamos gente curiosa para construir produtos financeiros do zero.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">Node.js</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Go</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+        <article class="empresa-card" data-nome="CloudSC Tecnologia" data-segmento="Consultoria" data-porte="Média" data-contrato="CLT,PJ" data-tech="Java,.NET,Python">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">CS</div>
+            <div>
+              <h3 class="empresa-card__name">CloudSC Tecnologia</h3>
+              <p class="empresa-card__segmento">Consultoria · Média · Blumenau</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Consultoria de tecnologia e cloud para grandes clientes. Projetos variados e trilha de crescimento clara.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">Java</span>
+            <span class="tech-tag">.NET</span>
+            <span class="tech-tag">Python</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+        <article class="empresa-card" data-nome="LojaJá E-commerce" data-segmento="E-commerce" data-porte="Grande" data-contrato="CLT" data-tech="PHP,JavaScript,React">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">LJ</div>
+            <div>
+              <h3 class="empresa-card__name">LojaJá E-commerce</h3>
+              <p class="empresa-card__segmento">E-commerce · Grande · Chapecó</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Um dos maiores e-commerces do sul do país. Alto volume de tráfego e desafios de performance no dia a dia.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">PHP</span>
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">React</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+        <article class="empresa-card" data-nome="DevHouse Studio" data-segmento="Software House" data-porte="Pequena" data-contrato="PJ,Freelancer" data-tech="JavaScript,React,Node.js,Python">
+          <div class="empresa-card__header">
+            <div class="empresa-card__logo">DH</div>
+            <div>
+              <h3 class="empresa-card__name">DevHouse Studio</h3>
+              <p class="empresa-card__segmento">Software House · Pequena · Criciúma</p>
+            </div>
+          </div>
+          <p class="empresa-card__desc">Estúdio de produtos digitais. Trabalho remoto, projetos ágeis e contato direto com clientes.</p>
+          <div class="empresa-card__tags">
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Node.js</span>
+            <span class="tech-tag">Python</span>
+          </div>
+          <div class="empresa-card__footer">
+            <a href="empresa-perfil-publico.html" class="btn btn--outline btn--sm">Ver perfil</a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <p>Nenhuma empresa encontrada com esses filtros.</p>
+        <button class="btn btn--ghost btn--sm" onclick="limparFiltros()">Limpar filtros</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const techSelecionadas = new Set();
+
+    function toggleTech(btn) {
+      const tech = btn.dataset.tech;
+      if (techSelecionadas.has(tech)) {
+        techSelecionadas.delete(tech);
+        btn.classList.remove('chip--active');
+      } else {
+        techSelecionadas.add(tech);
+        btn.classList.add('chip--active');
+      }
+      filtrarEmpresas();
+    }
+
+    function filtrarEmpresas() {
+      const texto = document.getElementById('busca-texto').value.trim().toLowerCase();
+      const segmento = document.getElementById('filtro-segmento').value;
+      const porte = document.getElementById('filtro-porte').value;
+      const contrato = document.getElementById('filtro-contrato').value;
+      const cards = document.querySelectorAll('#empresas-grid .empresa-card');
+      let visiveis = 0;
+
+      cards.forEach(card => {
+        const nome = (card.dataset.nome || '').toLowerCase();
+        const cardTech = (card.dataset.tech || '').toLowerCase();
+        const cardSegmento = card.dataset.segmento || '';
+        const cardPorte = card.dataset.porte || '';
+        const cardContrato = card.dataset.contrato || '';
+
+        const matchTexto = !texto || nome.includes(texto) || cardTech.includes(texto);
+        const matchSegmento = !segmento || cardSegmento === segmento;
+        const matchPorte = !porte || cardPorte === porte;
+        const matchContrato = !contrato || cardContrato.split(',').includes(contrato);
+        const matchTech = techSelecionadas.size === 0 ||
+          [...techSelecionadas].every(t => cardTech.includes(t.toLowerCase()));
+
+        const mostrar = matchTexto && matchSegmento && matchPorte && matchContrato && matchTech;
+        card.style.display = mostrar ? '' : 'none';
+        if (mostrar) visiveis++;
+      });
+
+      document.getElementById('results-count').textContent = visiveis;
+      document.getElementById('empty-state').style.display = visiveis === 0 ? 'flex' : 'none';
+      document.getElementById('empresas-grid').style.display = visiveis === 0 ? 'none' : 'grid';
+    }
+
+    function limparFiltros() {
+      document.getElementById('busca-texto').value = '';
+      document.getElementById('filtro-segmento').value = '';
+      document.getElementById('filtro-porte').value = '';
+      document.getElementById('filtro-contrato').value = '';
+      techSelecionadas.clear();
+      document.querySelectorAll('#tech-chips .chip').forEach(c => c.classList.remove('chip--active'));
+      filtrarEmpresas();
+    }
+
+    function toggleAvatarMenu() {
+      document.getElementById('avatar-menu').classList.toggle('avatar-menu--open');
+    }
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('avatar-menu');
+      const toggle = document.getElementById('avatar-toggle');
+      if (menu && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.classList.remove('avatar-menu--open');
+      }
+    });
+  </script>
+</body>
+</html>

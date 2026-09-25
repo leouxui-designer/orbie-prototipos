@@ -1,0 +1,328 @@
+<script>
+/* ─── STORE ───────────────────────────────────────────────────── */
+const areas = {
+  dev:   'Desenvolvimento de Software',
+  dados: 'Análise de Dados',
+  ia:    'Inteligência Artificial'
+};
+
+const especialidades = {
+  dev: [
+    { id:'dev-backend',  label:'Back-End' },
+    { id:'dev-frontend', label:'Front-End' },
+    { id:'dev-fullstack',label:'Full-Stack' },
+    { id:'dev-mobile',   label:'Mobile' },
+    { id:'dev-devops',   label:'DevOps' },
+    { id:'dev-qa',       label:'Qualidade e Testes (QA)' },
+    { id:'dev-ciber',    label:'Cibersegurança' },
+    { id:'dev-ux',       label:'UX/UI Design' }
+  ],
+  dados: [
+    { id:'dados-analise', label:'Análise e Visualização' }
+  ],
+  ia: [
+    { id:'ia-ml',  label:'Machine Learning' },
+    { id:'ia-gen', label:'IA Generativa' }
+  ]
+};
+
+const tecnologias = {
+  'dev-backend':   ['Node.js', 'Spring Boot', '.Net'],
+  'dev-frontend':  ['React', 'Angular', 'Vue.js', 'Next.js', 'TypeScript'],
+  'dev-fullstack': [],
+  'dev-mobile':    ['React Native', 'Flutter'],
+  'dev-devops':    ['Docker', 'Kubernetes', 'CI/CD'],
+  'dev-qa':        ['Cypress', 'Jest'],
+  'dev-ciber':     [],
+  'dev-ux':        ['Figma'],
+  'dados-analise': ['Python', 'Power BI', 'Tableau', 'SQL', 'Data/Looker Studio'],
+  'ia-ml':         ['Scikit-learn', 'Machine Learning', 'Visão Computacional', 'Deep Learning'],
+  'ia-gen':        ['LLMs', 'RAG', 'Prompt Engineering', 'IA Generativa']
+};
+
+const store = {
+  'hard': [
+    'Agentes de IA','Angular','APIs REST','AWS','Azure','Bancos de Dados','C#',
+    'Cibersegurança','CI/CD','Cloud Computing','CSS','Cypress','Data/Looker Studio',
+    'DAX','Deep Learning','DevOps','Docker','ETL/ELT','Figma','Flutter','Git e GitHub',
+    'Google Cloud','HTML','IA Generativa','Java','JavaScript','Jest','Kotlin',
+    'Kubernetes','LLMs','Machine Learning','Modelagem de Dados','Next.js','Node.js',
+    '.Net','NumPy','OpenCV','Pandas','Power BI','Power Query','Prompt Engineering',
+    'Python','RAG','React','React Native','Scikit-learn','SQL','Tableau','Terraform',
+    'Testes (Automatizados, API, Integração, E2E, Unitários)','TypeScript',
+    'UX/UI Design','Visualização de Dados','Visão Computacional','Web Scraping',
+    'Swift','Rust','Go'
+  ],
+  'soft': [
+    'Comunicação','Colaboração','Criatividade','Resolução de problemas',
+    'Pensamento crítico','Adaptabilidade','Aprendizado contínuo',
+    'Organização','Proatividade','Inteligência emocional','Autonomia'
+  ]
+};
+
+/* ─── HELPERS ─────────────────────────────────────────────────── */
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeJs(str) {
+  return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+function safeSet(id, val) {
+  const el = document.getElementById(id); if (el) el.textContent = val;
+}
+
+/* ─── RENDER TECNOLOGIAS ──────────────────────────────────────── */
+function renderTecnologias(especId) {
+  const el = document.getElementById('tags-' + especId);
+  if (!el) return;
+  const items = tecnologias[especId] || [];
+  el.innerHTML = '';
+  if (items.length === 0) {
+    el.innerHTML = '<span class="empty-row">Nenhuma tecnologia cadastrada.</span>';
+    return;
+  }
+  items.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" title="Remover" onclick="requestDeleteTecnologia('${escapeJs(especId)}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+}
+
+/* ─── RENDER TAGS legadas (hard/soft) ────────────────────────── */
+function renderTags(storeId) {
+  const el = document.getElementById('tags-' + storeId);
+  if (!el) return;
+  const items = store[storeId] || [];
+  el.innerHTML = '';
+  items.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" title="Remover" onclick="requestDelete('${storeId}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+  if (items.length === 0) {
+    el.innerHTML = '<span style="font-size:13px;color:#aaa;font-style:italic;">Nenhuma tag cadastrada.</span>';
+  }
+  updateCounts();
+}
+
+function renderAll() {
+  Object.keys(tecnologias).forEach(id => renderTecnologias(id));
+  ['hard','soft'].forEach(id => renderTags(id));
+  updateCounts();
+}
+
+/* ─── CONTADORES ─────────────────────────────────────────────── */
+function updateCounts() {
+  safeSet('count-hard-display', (store['hard']?.length || 0) + ' tags');
+  safeSet('count-soft-display', (store['soft']?.length || 0) + ' tags');
+}
+
+/* ─── TABS ───────────────────────────────────────────────────── */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).style.display = 'block';
+  btn.classList.add('active');
+}
+
+/* ─── MODAL: NOVA ESPECIALIDADE ──────────────────────────────── */
+let addEspecTarget = { areaKey: null };
+
+function openAddEspecialidadeModal(areaKey) {
+  addEspecTarget.areaKey = areaKey;
+  document.getElementById('modal-espec-area-name').textContent = areas[areaKey] || areaKey;
+  document.getElementById('input-espec-name').value = '';
+  openModal('modal-add-espec');
+  setTimeout(() => document.getElementById('input-espec-name').focus(), 60);
+}
+
+function confirmAddEspec() {
+  const name = document.getElementById('input-espec-name').value.trim();
+  if (!name) { document.getElementById('input-espec-name').focus(); return; }
+  const areaKey = addEspecTarget.areaKey;
+  const id = areaKey + '-' + name.toLowerCase().replace(/[^a-z0-9]/g,'-') + '-' + Date.now();
+  if (!especialidades[areaKey]) especialidades[areaKey] = [];
+  especialidades[areaKey].push({ id, label: name });
+  tecnologias[id] = [];
+  injectEspecBlock(areaKey, id, name);
+  closeModal('modal-add-espec');
+  showToast('Especialidade "' + name + '" adicionada!');
+}
+
+function injectEspecBlock(areaKey, especId, especLabel) {
+  const dynEl = document.getElementById('espec-' + areaKey + '-dynamic');
+  if (!dynEl) return;
+  const block = document.createElement('div');
+  block.className = 'espec-block';
+  block.id = 'espec-block-' + especId;
+  block.innerHTML = `
+    <div class="espec-header">
+      <div class="espec-header-left">
+        <span class="espec-label">Especialidade</span>
+        <span class="espec-title">${escapeHtml(especLabel)}</span>
+      </div>
+      <div class="espec-actions">
+        <button class="btn btn-outline btn-sm" onclick="openAddTecnologiaModal('${escapeJs(especLabel)}','${escapeJs(especId)}')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar tecnologia
+        </button>
+        <button class="btn-icon-del" onclick="requestDeleteEspec('${escapeJs(areaKey)}','${escapeJs(especLabel)}','${escapeJs(especId)}')" title="Remover especialidade">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tecnologias-row" id="tags-${escapeHtml(especId)}">
+      <span class="empty-row">Nenhuma tecnologia cadastrada.</span>
+    </div>`;
+  dynEl.before(block);
+}
+
+/* ─── MODAL: NOVA TECNOLOGIA ─────────────────────────────────── */
+let addTecTarget = { especId: null, especLabel: null };
+
+function openAddTecnologiaModal(especLabel, especId) {
+  addTecTarget = { especId, especLabel };
+  document.getElementById('modal-tec-espec-name').textContent = especLabel;
+  document.getElementById('input-tec-name').value = '';
+  openModal('modal-add-tec');
+  setTimeout(() => document.getElementById('input-tec-name').focus(), 60);
+}
+
+function confirmAddTecnologia() {
+  const name = document.getElementById('input-tec-name').value.trim();
+  if (!name) { document.getElementById('input-tec-name').focus(); return; }
+  const { especId } = addTecTarget;
+  if (!tecnologias[especId]) tecnologias[especId] = [];
+  if (!tecnologias[especId].includes(name)) {
+    tecnologias[especId].push(name);
+    renderTecnologias(especId);
+  }
+  closeModal('modal-add-tec');
+  showToast('"' + name + '" adicionado!');
+}
+
+/* ─── EXCLUIR TECNOLOGIA ─────────────────────────────────────── */
+let deleteTarget = { type: null };
+
+function requestDeleteTecnologia(especId, tagName) {
+  deleteTarget = { type: 'tec', especId, tagName };
+  document.getElementById('delete-tag-label').textContent = '"' + tagName + '"';
+  openModal('modal-delete');
+}
+
+function requestDelete(storeId, tagName) {
+  deleteTarget = { type: 'legacy', storeId, tagName };
+  document.getElementById('delete-tag-label').textContent = '"' + tagName + '"';
+  openModal('modal-delete');
+}
+
+function requestDeleteEspec(areaKey, label, especId) {
+  deleteTarget = { type: 'espec', areaKey, label, especId, tagName: label };
+  document.getElementById('delete-tag-label').textContent = 'a especialidade "' + label + '"';
+  openModal('modal-delete');
+}
+
+function confirmDelete() {
+  const { type } = deleteTarget;
+  if (type === 'tec') {
+    const { especId, tagName } = deleteTarget;
+    if (tecnologias[especId]) {
+      tecnologias[especId] = tecnologias[especId].filter(t => t !== tagName);
+      renderTecnologias(especId);
+    }
+    showToast('Tecnologia "' + tagName + '" removida.');
+  } else if (type === 'espec') {
+    const { areaKey, label } = deleteTarget;
+    if (especialidades[areaKey])
+      especialidades[areaKey] = especialidades[areaKey].filter(e => e.label !== label);
+    document.querySelectorAll('.espec-block').forEach(el => {
+      if (el.querySelector('.espec-title')?.textContent.trim() === label) el.remove();
+    });
+    showToast('Especialidade "' + label + '" removida.');
+  } else {
+    const { storeId, tagName } = deleteTarget;
+    if (store[storeId]) {
+      store[storeId] = store[storeId].filter(t => t !== tagName);
+      renderTags(storeId);
+    }
+    showToast('Tag "' + tagName + '" removida.');
+  }
+  closeModal('modal-delete');
+}
+
+/* ─── MODAL: ADICIONAR TAG genérica ──────────────────────────── */
+let addTarget = { containerId: null };
+
+function openAddTagModal(title, containerId) {
+  addTarget.containerId = containerId;
+  document.getElementById('modal-add-title').textContent = 'Adicionar Tag — ' + title;
+  document.getElementById('input-tag-name').value = '';
+  openModal('modal-add');
+  setTimeout(() => document.getElementById('input-tag-name').focus(), 60);
+}
+
+function confirmAddTag() {
+  const name = document.getElementById('input-tag-name').value.trim();
+  if (!name) { document.getElementById('input-tag-name').focus(); return; }
+  const cid = addTarget.containerId;
+  if (!store[cid]) store[cid] = [];
+  if (!store[cid].includes(name)) {
+    store[cid].push(name);
+    renderTags(cid);
+  }
+  closeModal('modal-add');
+  showToast('Tag "' + name + '" adicionada!');
+}
+
+/* ─── BUSCA (Hard Skills) ────────────────────────────────────── */
+function filterTags(containerId, query) {
+  const el = document.getElementById('tags-' + containerId);
+  if (!el) return;
+  const q = query.toLowerCase().trim();
+  const items = store[containerId] || [];
+  el.innerHTML = '';
+  const filtered = q ? items.filter(t => t.toLowerCase().includes(q)) : items;
+  filtered.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHtml(tag) +
+      `<button class="tag-del" onclick="requestDelete('${containerId}','${escapeJs(tag)}')">✕</button>`;
+    el.appendChild(chip);
+  });
+  if (filtered.length === 0)
+    el.innerHTML = '<span style="font-size:13px;color:#aaa;font-style:italic;">Nenhuma tag encontrada.</span>';
+}
+
+/* ─── MODAIS HELPERS ─────────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); })
+);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
+});
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ─── INIT ───────────────────────────────────────────────────── */
+document.getElementById('input-espec-name')?.addEventListener('keydown', e => { if(e.key==='Enter') confirmAddEspec(); });
+document.getElementById('input-tec-name')?.addEventListener('keydown',  e => { if(e.key==='Enter') confirmAddTecnologia(); });
+document.getElementById('input-tag-name')?.addEventListener('keydown',  e => { if(e.key==='Enter') confirmAddTag(); });
+
+renderAll();
+</script>

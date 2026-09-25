@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificar Dados - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/painel.css">
+  <style>
+    /* Steps */
+    .import-steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .import-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .import-step__number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      border: 2px solid rgba(0,0,0,0.12);
+      color: var(--color-text-muted);
+      background: var(--color-bg-white);
+    }
+    .import-step--active .import-step__number {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+    .import-step--done .import-step__number {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+    .import-step__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+    .import-step--active .import-step__label {
+      color: var(--color-text-default);
+      font-weight: 600;
+    }
+    .import-step--done .import-step__label { color: var(--color-primary); }
+    .import-step__connector {
+      flex: 1;
+      height: 2px;
+      background: rgba(0,0,0,0.08);
+      margin: 0 12px;
+    }
+    .import-step__connector--done { background: var(--color-primary); }
+
+    /* Summary bar */
+    .import-summary {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 20px 28px;
+      background: var(--color-bg-white);
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.07);
+      margin-bottom: 24px;
+    }
+    .import-summary__item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .import-summary__value {
+      font-family: var(--font-header);
+      font-weight: 700;
+      font-size: 24px;
+    }
+    .import-summary__value--ok { color: #2e7d32; }
+    .import-summary__value--warn { color: #e65100; }
+    .import-summary__label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+    .import-summary__divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(0,0,0,0.08);
+    }
+    .import-summary__note {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(230,81,0,0.08);
+      border-radius: 8px;
+      font-size: 12px;
+      color: #e65100;
+      font-weight: 500;
+    }
+
+    /* Checagem table */
+    .checagem-table-wrap {
+      background: var(--color-bg-white);
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.07);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .checagem-table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .checagem-table-header__title {
+      font-family: var(--font-header);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .checagem-table-header__actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .checagem-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .checagem-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--color-bg-light);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .checagem-table td {
+      padding: 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      vertical-align: middle;
+    }
+    .checagem-table tr:last-child td { border-bottom: none; }
+    .checagem-table tr:hover td { background: rgba(0,0,0,0.01); }
+
+    /* Célula editável */
+    .cell-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-family: var(--font-body);
+      color: var(--color-text-default);
+      outline: none;
+      transition: background var(--transition-fast);
+      box-sizing: border-box;
+    }
+    .cell-input:focus {
+      background: rgba(44,169,66,0.05);
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+
+    /* Erro de validação */
+    .cell-error .cell-input {
+      background: rgba(229,57,53,0.07);
+      color: #c62828;
+    }
+    .cell-error .cell-input:focus {
+      background: rgba(229,57,53,0.06);
+      outline-color: #e53935;
+    }
+    .cell-error-icon {
+      display: none;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+    }
+    .cell-error .cell-error-icon { display: flex; }
+    .cell-wrapper {
+      position: relative;
+    }
+    .cell-error-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 12px;
+      background: #b71c1c;
+      color: white;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .cell-error .cell-input:focus ~ .cell-error-tooltip { display: block; }
+
+    /* Row status */
+    .row-ok td { }
+    .row-warn td:first-child { border-left: 3px solid #ff9800; }
+    .row-error td:first-child { border-left: 3px solid #e53935; }
+    .row-num {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      padding: 12px 16px;
+      text-align: center;
+      width: 40px;
+    }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--color-bg-light);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .filter-tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      transition: all var(--transition-fast);
+    }
+    .filter-tab.active {
+      background: white;
+      color: var(--color-text-default);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .filter-tab .count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 10px;
+      background: rgba(0,0,0,0.08);
+      margin-left: 4px;
+    }
+    .filter-tab.active .count { background: rgba(0,0,0,0.1); }
+    .filter-tab .count.warn { background: rgba(230,81,0,0.15); color: #e65100; }
+
+    /* Footer actions */
+    .import-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 28px;
+      background: var(--color-bg-white);
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.07);
+    }
+    .import-footer__info {
+      flex: 1;
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .import-footer__info strong { color: var(--color-text-default); }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-overlay.visible { display: flex; }
+    .success-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px 40px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+      margin: 24px;
+    }
+    .success-card__icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(44,169,66,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .success-card__title {
+      font-family: var(--font-header);
+      font-weight: 700;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .success-card__desc {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .success-card__count {
+      font-family: var(--font-header);
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-bottom: 4px;
+    }
+    .success-card__label {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: 32px;
+    }
+  </style>
+</head>
+<body style="padding-top: 80px;">
+
+  <nav class="navbar navbar--painel navbar--admin">
+    <div class="navbar__inner">
+      <a href="login.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="badge badge--dark" style="font-size: 11px; padding: 4px 10px;">ADMIN</span>
+        <span class="navbar-painel__company-name">Equipe SCTEC</span>
+        <div class="navbar-painel__avatar" style="background: #303030;">AD</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <aside class="sidebar sidebar--admin">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="admin-alunos.html" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <main class="painel__main">
+      <div style="margin-bottom: 24px;">
+        <a href="admin-importar-planilha.html" style="font-size: 14px; color: var(--color-primary); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          Voltar
+        </a>
+      </div>
+
+      <div class="painel__header" style="margin-bottom: 32px;">
+        <div>
+          <h1 class="painel__title">Verificar Dados Importados</h1>
+          <p class="painel__subtitle">Confira e corrija os dados antes de concluir a importação</p>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="import-steps">
+        <div class="import-step import-step--done">
+          <div class="import-step__number">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="import-step__label">Baixar modelo</span>
+        </div>
+        <div class="import-step__connector import-step__connector--done"></div>
+        <div class="import-step import-step--done">
+          <div class="import-step__number">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="import-step__label">Enviar planilha</span>
+        </div>
+        <div class="import-step__connector import-step__connector--done"></div>
+        <div class="import-step import-step--active">
+          <div class="import-step__number">3</div>
+          <span class="import-step__label">Verificar dados</span>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="import-summary">
+        <div class="import-summary__item">
+          <span class="import-summary__value">12</span>
+          <span class="import-summary__label">Registros encontrados</span>
+        </div>
+        <div class="import-summary__divider"></div>
+        <div class="import-summary__item">
+          <span class="import-summary__value import-summary__value--ok">10</span>
+          <span class="import-summary__label">Prontos para importar</span>
+        </div>
+        <div class="import-summary__divider"></div>
+        <div class="import-summary__item">
+          <span class="import-summary__value import-summary__value--warn">2</span>
+          <span class="import-summary__label">Precisam de correção</span>
+        </div>
+        <div class="import-summary__note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          2 campos com dados inválidos
+        </div>
+      </div>
+
+      <!-- Tabela de checagem -->
+      <div class="checagem-table-wrap">
+        <div class="checagem-table-header">
+          <span class="checagem-table-header__title">Dados importados</span>
+          <div class="checagem-table-header__actions">
+            <div class="filter-tabs">
+              <button class="filter-tab active" onclick="filterRows('all', this)">Todos <span class="count">12</span></button>
+              <button class="filter-tab" onclick="filterRows('error', this)">Com erro <span class="count warn">2</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="checagem-table">
+          <table id="checagem-table">
+            <thead>
+              <tr>
+                <th style="width:40px; text-align:center;">#</th>
+                <th>Nome Completo</th>
+                <th>CPF</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Cidade</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Linhas geradas via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Footer com ações -->
+      <div class="import-footer">
+        <div class="import-footer__info">
+          <strong>10 alunos</strong> serão importados. Os registros com erro precisam ser corrigidos para serem incluídos.
+        </div>
+        <button class="btn btn--ghost" onclick="window.location.href='admin-importar-planilha.html'">Reimportar</button>
+        <button class="btn btn--primary" onclick="confirmarImportacao()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Importação
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Success overlay -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-card">
+      <div class="success-card__icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2CA942" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-card__count" id="success-count">10</div>
+      <div class="success-card__label">alunos importados com sucesso</div>
+      <div class="success-card__title">Importação concluída!</div>
+      <div class="success-card__desc">Os alunos já estão disponíveis no Banco de Talentos e podem acessar o portal.</div>
+      <a href="admin-alunos.html" class="btn btn--primary" style="width: 100%; justify-content: center;">Ver Banco de Talentos</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const mockData = [
+      { nome: 'Ana Carolina Pereira',    cpf: '012.345.678-90', email: 'ana.pereira@email.com',      tel: '(48) 99100-1234', cidade: 'Florianópolis', erro: null },
+      { nome: 'Bruno Costa Almeida',     cpf: '123.456.789-01', email: 'bruno.almeida@email.com',     tel: '(47) 98200-5678', cidade: 'Joinville',     erro: null },
+      { nome: 'Carla Ferreira dos Santos',cpf: '234.567.890-12', email: 'carla.santos@email.com',     tel: '(47) 97300-9012', cidade: 'Blumenau',      erro: null },
+      { nome: 'Diego Martins',           cpf: '345.678.901-23', email: 'diego.martins@email.com',     tel: '(49) 96400-3456', cidade: 'Chapecó',       erro: null },
+      { nome: 'Eduarda Lima',            cpf: '456.789.012-34', email: 'eduarda.lima@email.com',      tel: '(48) 95500-7890', cidade: 'Criciúma',      erro: null },
+      { nome: 'Felipe Rocha',            cpf: '56789013-45',    email: 'felipe.rocha@email.com',      tel: '(47) 94600-2345', cidade: 'Joinville',     erro: { campo: 'cpf', msg: 'CPF inválido — formato incorreto' } },
+      { nome: 'Gabriela Nunes',          cpf: '678.901.234-56', email: 'gabriela.nunes@email.com',    tel: '(48) 93700-6789', cidade: 'Florianópolis', erro: null },
+      { nome: 'Henrique Oliveira',       cpf: '789.012.345-67', email: 'henrique.oliveira@email.com', tel: '(47) 92800-0123', cidade: 'Blumenau',      erro: null },
+      { nome: 'Isabela Cardoso',         cpf: '890.123.456-78', email: 'isabela.cardosoemail.com',    tel: '(49) 91900-4567', cidade: 'Lages',         erro: { campo: 'email', msg: 'E-mail inválido — falta o @' } },
+      { nome: 'João Victor Mendes',      cpf: '901.234.567-89', email: 'joao.mendes@email.com',       tel: '(48) 90000-8901', cidade: 'Florianópolis', erro: null },
+      { nome: 'Larissa Teixeira',        cpf: '012.345.678-91', email: 'larissa.teixeira@email.com',  tel: '(47) 89100-2345', cidade: 'Joinville',     erro: null },
+      { nome: 'Mateus Barbosa',          cpf: '123.456.789-02', email: 'mateus.barbosa@email.com',    tel: '(47) 88200-6789', cidade: 'Blumenau',      erro: null },
+    ];
+
+    let currentFilter = 'all';
+
+    function renderTable(filter) {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      const filtered = filter === 'error' ? mockData.filter(r => r.erro) : mockData;
+
+      filtered.forEach((row, i) => {
+        const realIdx = mockData.indexOf(row);
+        const hasError = !!row.erro;
+        const tr = document.createElement('tr');
+        tr.className = hasError ? 'row-error' : 'row-ok';
+        tr.dataset.idx = realIdx;
+
+        tr.innerHTML = `
+          <td class="row-num">${realIdx + 1}</td>
+          ${makeCell(realIdx, 'nome',   row.nome,   row.erro && row.erro.campo === 'nome'   ? row.erro.msg : null)}
+          ${makeCell(realIdx, 'cpf',    row.cpf,    row.erro && row.erro.campo === 'cpf'    ? row.erro.msg : null)}
+          ${makeCell(realIdx, 'email',  row.email,  row.erro && row.erro.campo === 'email'  ? row.erro.msg : null)}
+          ${makeCell(realIdx, 'tel',    row.tel,    row.erro && row.erro.campo === 'tel'    ? row.erro.msg : null)}
+          ${makeCell(realIdx, 'cidade', row.cidade, row.erro && row.erro.campo === 'cidade' ? row.erro.msg : null)}
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function makeCell(idx, campo, valor, erroMsg) {
+      const isErr = !!erroMsg;
+      return `
+        <td class="${isErr ? 'cell-error' : ''}">
+          <div class="cell-wrapper">
+            <input
+              class="cell-input"
+              type="text"
+              value="${valor}"
+              data-idx="${idx}"
+              data-campo="${campo}"
+              oninput="handleEdit(this)"
+              onfocus="this.select()"
+            >
+            ${isErr ? `
+              <svg class="cell-error-icon" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" title="${erroMsg}">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div class="cell-error-tooltip">${erroMsg}</div>
+            ` : ''}
+          </div>
+        </td>
+      `;
+    }
+
+    function handleEdit(input) {
+      const idx = parseInt(input.dataset.idx);
+      const campo = input.dataset.campo;
+      const val = input.value.trim();
+      const row = mockData[idx];
+
+      // Atualiza dado
+      if (campo === 'nome')   row.nome   = val;
+      if (campo === 'cpf')    row.cpf    = val;
+      if (campo === 'email')  row.email  = val;
+      if (campo === 'tel')    row.tel    = val;
+      if (campo === 'cidade') row.cidade = val;
+
+      // Valida em tempo real
+      let erroMsg = null;
+      if (campo === 'cpf' && val && !validarCPF(val)) {
+        erroMsg = 'CPF inválido — formato incorreto';
+      }
+      if (campo === 'email' && val && !validarEmail(val)) {
+        erroMsg = 'E-mail inválido — verifique o formato';
+      }
+
+      // Atualiza estado de erro
+      if (row.erro && row.erro.campo === campo) {
+        if (!erroMsg) {
+          row.erro = null;
+          atualizarSummary();
+        }
+      } else if (erroMsg) {
+        row.erro = { campo, msg: erroMsg };
+        atualizarSummary();
+      }
+
+      // Atualiza visual da célula sem re-renderizar toda a tabela
+      const td = input.closest('td');
+      if (erroMsg) {
+        td.classList.add('cell-error');
+        let errIcon = td.querySelector('.cell-error-icon');
+        if (!errIcon) {
+          td.querySelector('.cell-wrapper').insertAdjacentHTML('beforeend', `
+            <svg class="cell-error-icon" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div class="cell-error-tooltip">${erroMsg}</div>
+          `);
+        }
+      } else {
+        td.classList.remove('cell-error');
+        const icon = td.querySelector('.cell-error-icon');
+        const tooltip = td.querySelector('.cell-error-tooltip');
+        if (icon) icon.remove();
+        if (tooltip) tooltip.remove();
+        // Atualiza cor da linha
+        const tr = td.closest('tr');
+        const rowData = mockData[idx];
+        if (!rowData.erro) tr.className = 'row-ok';
+      }
+    }
+
+    function validarCPF(cpf) {
+      return /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf);
+    }
+    function validarEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function atualizarSummary() {
+      const erros = mockData.filter(r => r.erro).length;
+      const ok = mockData.length - erros;
+      document.querySelectorAll('.import-summary__value')[0].textContent = mockData.length;
+      document.querySelectorAll('.import-summary__value')[1].textContent = ok;
+      document.querySelectorAll('.import-summary__value')[2].textContent = erros;
+      document.querySelector('.import-summary__note').style.display = erros > 0 ? 'flex' : 'none';
+      document.querySelector('.import-summary__note').innerHTML = erros > 0
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${erros} campo${erros > 1 ? 's' : ''} com dados inválidos`
+        : '';
+      document.querySelector('.import-footer__info').innerHTML = `<strong>${ok} alunos</strong> serão importados. ${erros > 0 ? 'Os registros com erro precisam ser corrigidos para serem incluídos.' : 'Todos os registros estão prontos.'}`;
+      document.getElementById('success-count').textContent = ok;
+
+      // Atualiza badge do filtro
+      document.querySelectorAll('.filter-tab')[1].innerHTML = `Com erro <span class="count warn">${erros}</span>`;
+    }
+
+    function filterRows(type, btn) {
+      currentFilter = type;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable(type);
+    }
+
+    function confirmarImportacao() {
+      const erros = mockData.filter(r => r.erro).length;
+      const ok = mockData.length - erros;
+      document.getElementById('success-count').textContent = ok;
+      document.getElementById('success-overlay').classList.add('visible');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+
+    // Init
+    renderTable('all');
+  </script>
+</body>
+</html>

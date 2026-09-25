@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCTEC — Complete seu Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fb;
+      color: #171717;
+      min-height: 100vh;
+    }
+
+    :root {
+      --green: #7ab934;
+      --green-dark: #2ca942;
+      --green-grad: linear-gradient(135deg, #2ca942 0%, #55b13a 55%, #52b934 100%);
+      --sidebar-bg: #262626;
+      --radius: 22px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* ─── Navbar ─── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 80px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 1px 14px rgba(69,42,124,0.08);
+      z-index: 100;
+      display: flex; align-items: center; padding: 0 24px;
+      gap: 16px;
+    }
+    .navbar-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px; font-weight: 800; color: #0a0a0a;
+    }
+    .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+    .badge-role {
+      background: #7ab934; color: #3a5c14;
+      font-size: 12px; font-weight: 500;
+      padding: 2px 10px; border-radius: 26px;
+    }
+    .navbar-name { font-size: 14px; color: #454545; }
+    .navbar-av {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e8f5e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #466822;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      position: fixed; top: 80px; left: 0;
+      width: 256px; height: calc(100vh - 80px);
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      z-index: 90;
+    }
+    .sidebar-header {
+      padding: 16px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-team { font-size: 15px; font-weight: 700; color: #fafafa; }
+    .sidebar-sub { font-size: 12px; color: #737373; margin-top: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 10px; border-radius: 6px;
+      font-size: 14px; font-weight: 600; color: #fafafa;
+      text-decoration: none; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sidebar-item.active { background: rgba(122,185,52,0.15); color: #7ab934; }
+    .sidebar-item svg { flex-shrink: 0; }
+    .sidebar-footer {
+      padding: 8px 8px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ─── Main ─── */
+    .main { margin-left: 256px; padding-top: 80px; }
+    .main-inner { padding: 32px 40px; max-width: 1160px; display: flex; flex-direction: column; gap: 16px; }
+
+    .breadcrumb { font-size: 14px; font-weight: 500; color: var(--green-dark); cursor: pointer; }
+    .page-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 700; color: #000; margin-top: 4px; }
+    .page-sub { font-size: 14px; color: #737373; margin-top: 4px; }
+
+    /* ─── Progress bar strip ─── */
+    .progress-strip {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .progress-label-wrap { flex-shrink: 0; }
+    .progress-pct {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px; font-weight: 800; color: var(--green-dark);
+      line-height: 1;
+    }
+    .progress-label-text { font-size: 12px; color: #737373; margin-top: 2px; }
+    .progress-bar-wrap { flex: 1; }
+    .progress-track {
+      height: 8px; background: #e4e4e7;
+      border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--green-grad);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .progress-hint { font-size: 12px; color: #a1a1aa; margin-top: 6px; }
+    .progress-hint strong { color: var(--green-dark); }
+    .progress-status {
+      flex-shrink: 0;
+      font-size: 13px; font-weight: 600;
+      color: #a1a1aa;
+      white-space: nowrap;
+    }
+    .progress-status span { color: var(--green-dark); }
+
+    /* ─── Body layout ─── */
+    .body-layout { display: grid; grid-template-columns: 1fr 264px; gap: 16px; align-items: start; }
+    .form-col { display: flex; flex-direction: column; gap: 14px; }
+    .checklist-col { position: sticky; top: 104px; }
+
+    /* ─── Card ─── */
+    .card {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+    }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+    .card-title { font-size: 17px; font-weight: 700; color: #171717; }
+    .card-subtitle { font-size: 13px; color: #737373; margin-top: 3px; line-height: 1.5; }
+    .card-done-badge {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px; font-weight: 600;
+      color: var(--green-dark);
+      background: rgba(44,169,66,0.1);
+      border-radius: 99px;
+      padding: 3px 10px;
+      flex-shrink: 0;
+    }
+    .card-done-badge.show { display: flex; }
+
+    /* ─── Form ─── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); }
+    .form-label em { color: #d5271a; font-style: normal; margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      height: 44px;
+      border: 1px solid #d4d4d8;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      color: #0a0a0a;
+      outline: none;
+      background: white;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: rgba(0,0,0,0.35); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(122,185,52,0.18);
+    }
+    .form-input.ok, .form-select.ok, .form-textarea.ok {
+      border-color: var(--green);
+    }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23737373' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+      padding-right: 36px;
+    }
+    .form-textarea { height: 100px; padding: 10px 14px; resize: vertical; border-radius: 8px; }
+    .char-count { font-size: 11px; color: #a1a1aa; text-align: right; margin-top: 3px; }
+    .char-count.ok { color: var(--green-dark); }
+
+    /* ─── Photo ─── */
+    .photo-row { display: flex; align-items: center; gap: 20px; }
+    .photo-circle {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #f0f7e6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .photo-circle.done {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(122,185,52,0.12);
+    }
+    .photo-upload-btn {
+      background: var(--green-grad);
+      border: none; border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 13px; font-weight: 600; color: white;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .photo-upload-btn:hover { opacity: 0.88; }
+    .photo-hint-txt { font-size: 12px; color: #a1a1aa; margin-top: 4px; }
+
+    /* ─── Skills ─── */
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+    .skill {
+      padding: 5px 13px;
+      border: 1.5px solid #e4e4e7;
+      border-radius: 99px;
+      font-size: 13px; font-weight: 500; color: #737373;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: #fafafa;
+    }
+    .skill:hover { border-color: var(--green); color: #466822; }
+    .skill.on { border-color: var(--green); background: var(--green-grad); color: white; }
+    .skills-hint { font-size: 12px; color: #a1a1aa; margin-top: 10px; }
+    .skills-hint strong { color: var(--green-dark); }
+
+    /* ─── Add btn ─── */
+    .add-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; font-weight: 600; color: var(--green);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      padding: 0;
+    }
+    .add-btn:hover { color: var(--green-dark); }
+
+    /* ─── List item ─── */
+    .list-item {
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      padding: 12px 16px;
+      background: #fafafa;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    /* ─── Empty state ─── */
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: #a1a1aa;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .empty-state-icon { font-size: 28px; margin-bottom: 6px; }
+
+    /* ─── Actions ─── */
+    .actions { display: flex; gap: 10px; align-items: center; margin-top: 4px; }
+    .btn-save {
+      background: var(--green-grad);
+      color: white; border: none;
+      border-radius: 80px;
+      padding: 10px 24px;
+      font-size: 15px; font-weight: 600;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(44,169,66,0.25);
+      transition: opacity 0.15s;
+    }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-cancel {
+      background: none; border: none;
+      font-size: 15px; font-weight: 500; color: #737373;
+      font-family: 'Roboto', sans-serif; cursor: pointer;
+      padding: 10px 12px;
+    }
+
+    /* ═══════════════════════════════════════
+       CHECKLIST SIDEBAR
+    ═══════════════════════════════════════ */
+    .checklist-card {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .checklist-header {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .checklist-title {
+      font-size: 14px; font-weight: 700; color: #171717;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .checklist-count {
+      font-size: 12px; font-weight: 600;
+      color: var(--green-dark);
+      background: rgba(44,169,66,0.08);
+      border-radius: 99px;
+      padding: 2px 8px;
+    }
+    .checklist-body { padding: 8px 0; }
+    .cl-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 18px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .cl-item:hover { background: #fafafa; }
+    .cl-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid #d4d4d8;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.22s;
+    }
+    .cl-item.done .cl-check {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .cl-check svg { display: none; }
+    .cl-item.done .cl-check svg { display: block; }
+    .cl-text { flex: 1; }
+    .cl-name {
+      font-size: 13px; font-weight: 500; color: #171717;
+      transition: color 0.2s;
+    }
+    .cl-item.done .cl-name { color: #a1a1aa; text-decoration: line-through; }
+    .cl-sub {
+      font-size: 11px; color: #a1a1aa;
+      margin-top: 1px;
+    }
+    .cl-item.done .cl-sub { color: #c4c4c4; }
+    .cl-arrow {
+      font-size: 12px; color: #d4d4d8;
+      flex-shrink: 0;
+    }
+    .cl-item.done .cl-arrow { display: none; }
+
+    /* next to fill indicator */
+    .cl-item.next .cl-name { color: var(--green-dark); font-weight: 600; }
+    .cl-item.next .cl-check { border-color: var(--green); }
+    .cl-item.next .cl-arrow { color: var(--green); }
+
+    .checklist-footer {
+      padding: 12px 18px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 12px; color: #737373;
+      line-height: 1.5;
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a1a; color: white;
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 9999;
+      transform: translateY(60px); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">SCTEC</div>
+    <div class="navbar-right">
+      <span class="badge-role">TALENT</span>
+      <span class="navbar-name">João da Silva</span>
+      <div class="navbar-av">JS</div>
+    </div>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-team">Portal de Talentos</div>
+      <div class="sidebar-sub">Banco de Talentos</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="sidebar-item active">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Meu Perfil
+      </a>
+      <a class="sidebar-item">
+        <svg width="18" height="18" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+        Banco de Talentos
+      </a>
+      <a class="sidebar-item">
+        <svg width="18" height="18" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Candidaturas
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-item">
+        <svg width="18" height="18" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-inner">
+
+      <div class="breadcrumb">← Voltar para Banco de Talentos</div>
+      <h1 class="page-title">Cadastrar Novo Aluno</h1>
+      <p class="page-sub">Preencha todas as seções para aumentar suas chances de ser visto pelas empresas parceiras.</p>
+
+      <!-- PROGRESS STRIP -->
+      <div class="progress-strip">
+        <div class="progress-label-wrap">
+          <div class="progress-pct" id="pct">0%</div>
+          <div class="progress-label-text">do perfil</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-hint" id="progressHint">
+            Comece pelo <strong>próximo item</strong> da lista ao lado →
+          </div>
+        </div>
+        <div class="progress-status">
+          <span id="doneCount">0</span> / 7 seções
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="body-layout">
+
+        <!-- FORM -->
+        <div class="form-col">
+
+          <!-- Foto de perfil -->
+          <div class="card" id="card-photo">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Foto de perfil</div>
+              </div>
+              <div class="card-done-badge" id="done-photo">✓ Concluído</div>
+            </div>
+            <div class="photo-row">
+              <div class="photo-circle" id="photoCircle">👤</div>
+              <div>
+                <button class="photo-upload-btn" onclick="uploadPhoto()">Enviar foto</button>
+                <div class="photo-hint-txt">JPG ou PNG, até 5 MB</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dados pessoais -->
+          <div class="card" id="card-dados">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Dados pessoais</div>
+              </div>
+              <div class="card-done-badge" id="done-dados">✓ Concluído</div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Nome completo <em>*</em></label>
+                <input class="form-input" id="f-nome" placeholder="Nome do aluno" oninput="fieldChange('f-nome','dados')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">CPF <em>*</em></label>
+                <input class="form-input" id="f-cpf" placeholder="000.000.000-00" oninput="maskCPF(this);fieldChange('f-cpf','dados')" maxlength="14" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Telefone <em>*</em></label>
+                <input class="form-input" id="f-tel" placeholder="(00) 00000-0000" oninput="maskPhone(this);fieldChange('f-tel','dados')" maxlength="15" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">E-mail <em>*</em></label>
+                <input class="form-input" id="f-email" type="email" placeholder="email@exemplo.com" oninput="fieldChange('f-email','dados')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Data de nascimento</label>
+                <input class="form-input" id="f-nasc" type="date" oninput="fieldChange('f-nasc','dados')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cidade <em>*</em></label>
+                <select class="form-select" id="f-cidade" onchange="fieldChange('f-cidade','dados')">
+                  <option value="">Selecione</option>
+                  <option>São Paulo</option><option>Rio de Janeiro</option>
+                  <option>Belo Horizonte</option><option>Curitiba</option>
+                  <option>Porto Alegre</option><option>Florianópolis</option>
+                  <option>Brasília</option><option>Fortaleza</option>
+                  <option>Recife</option><option>Salvador</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sobre mim -->
+          <div class="card" id="card-sobre">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Sobre mim</div>
+                <div class="card-subtitle">Compartilhe sua formação, interesses e o que te motiva.</div>
+              </div>
+              <div class="card-done-badge" id="done-sobre">✓ Concluído</div>
+            </div>
+            <div class="form-group">
+              <textarea class="form-textarea" id="f-sobre" placeholder="Descreva sua trajetória, interesses profissionais e o que você busca…" oninput="taChange('f-sobre','sobre',50)"></textarea>
+              <div class="char-count" id="cc-sobre">0 / 50 mínimo</div>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div class="card" id="card-links">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Links</div>
+                <div class="card-subtitle">Adicione ao menos 2 links para concluir esta seção.</div>
+              </div>
+              <div class="card-done-badge" id="done-links">✓ Concluído</div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">LinkedIn</label>
+                <input class="form-input" id="f-linkedin" placeholder="https://linkedin.com/in/perfil" oninput="fieldChange('f-linkedin','links')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub</label>
+                <input class="form-input" id="f-github" placeholder="https://github.com/usuario" oninput="fieldChange('f-github','links')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Portfólio</label>
+                <input class="form-input" id="f-portfolio" placeholder="https://meuportfolio.com" oninput="fieldChange('f-portfolio','links')" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vídeo de apresentação</label>
+                <input class="form-input" id="f-video" placeholder="Link do vídeo (YouTube ou Vimeo)" oninput="fieldChange('f-video','links')" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Habilidades -->
+          <div class="card" id="card-skills">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Habilidades</div>
+                <div class="card-subtitle">Selecione ao menos 3 habilidades que representam você.</div>
+              </div>
+              <div class="card-done-badge" id="done-skills">✓ Concluído</div>
+            </div>
+            <div class="skills-grid">
+              <span class="skill" onclick="toggleSkill(this)">JavaScript</span>
+              <span class="skill" onclick="toggleSkill(this)">Python</span>
+              <span class="skill" onclick="toggleSkill(this)">React</span>
+              <span class="skill" onclick="toggleSkill(this)">Node.js</span>
+              <span class="skill" onclick="toggleSkill(this)">SQL</span>
+              <span class="skill" onclick="toggleSkill(this)">Machine Learning</span>
+              <span class="skill" onclick="toggleSkill(this)">Design UI/UX</span>
+              <span class="skill" onclick="toggleSkill(this)">Comunicação</span>
+              <span class="skill" onclick="toggleSkill(this)">Trabalho em equipe</span>
+              <span class="skill" onclick="toggleSkill(this)">Liderança</span>
+              <span class="skill" onclick="toggleSkill(this)">Git</span>
+              <span class="skill" onclick="toggleSkill(this)">Figma</span>
+            </div>
+            <div class="skills-hint" id="skillsHint"><strong>0 / 3</strong> selecionadas</div>
+          </div>
+
+          <!-- Experiência -->
+          <div class="card" id="card-exp">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Experiência profissional</div>
+                <div class="card-subtitle">Projetos pessoais e de cursos também são válidos.</div>
+              </div>
+              <div class="card-done-badge" id="done-exp">✓ Concluído</div>
+            </div>
+            <button class="add-btn" onclick="addExp()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar experiência
+            </button>
+            <div id="expList"></div>
+            <div id="expEmpty" class="empty-state">
+              <div class="empty-state-icon">💼</div>
+              Nenhuma experiência adicionada.
+            </div>
+          </div>
+
+          <!-- Certificados -->
+          <div class="card" id="card-cert">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Certificados</div>
+              </div>
+              <div class="card-done-badge" id="done-cert">✓ Concluído</div>
+            </div>
+            <button class="add-btn" onclick="addCert()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar certificado
+            </button>
+            <div id="certList"></div>
+            <div id="certEmpty" class="empty-state">
+              <div class="empty-state-icon">🏆</div>
+              Nenhum certificado adicionado.
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-save" onclick="save()">Cadastrar Aluno</button>
+            <button class="btn-cancel">Cancelar</button>
+          </div>
+
+        </div><!-- /form-col -->
+
+        <!-- CHECKLIST SIDEBAR -->
+        <div class="checklist-col">
+          <div class="checklist-card">
+            <div class="checklist-header">
+              <div class="checklist-title">
+                O que falta preencher
+                <span class="checklist-count" id="clCount">0/7</span>
+              </div>
+            </div>
+            <div class="checklist-body" id="checklistBody">
+
+              <div class="cl-item next" id="cl-photo" onclick="scrollTo('card-photo')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Foto de perfil</div>
+                  <div class="cl-sub">Envie uma foto sua</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-dados" onclick="scrollTo('card-dados')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Dados pessoais</div>
+                  <div class="cl-sub" id="cl-dados-sub">Nome, CPF, telefone, e-mail e cidade</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-sobre" onclick="scrollTo('card-sobre')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Sobre mim</div>
+                  <div class="cl-sub">Mínimo 50 caracteres</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-links" onclick="scrollTo('card-links')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Links</div>
+                  <div class="cl-sub" id="cl-links-sub">Adicione ao menos 2 links</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-skills" onclick="scrollTo('card-skills')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Habilidades</div>
+                  <div class="cl-sub" id="cl-skills-sub">Selecione ao menos 3</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-exp" onclick="scrollTo('card-exp')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Experiência profissional</div>
+                  <div class="cl-sub">Ao menos 1 entrada</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+              <div class="cl-item" id="cl-cert" onclick="scrollTo('card-cert')">
+                <div class="cl-check">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="cl-text">
+                  <div class="cl-name">Certificados</div>
+                  <div class="cl-sub">Ao menos 1 certificado</div>
+                </div>
+                <div class="cl-arrow">›</div>
+              </div>
+
+            </div>
+            <div class="checklist-footer" id="clFooter">
+              Preencha todas as seções para maximizar sua visibilidade.
+            </div>
+          </div>
+        </div><!-- /checklist-col -->
+
+      </div>
+    </div>
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toastMsg">Seção concluída</span>
+  </div>
+
+  <script>
+    // ─── State ───
+    const done = new Set();
+    const ALL = ['photo','dados','sobre','links','skills','exp','cert'];
+    const WEIGHTS = { photo:1, dados:4, sobre:1, links:2, skills:1, exp:1, cert:1 };
+    const TOTAL_W = Object.values(WEIGHTS).reduce((a,b)=>a+b,0); // 11
+
+    let fields = {};    // field id → filled boolean
+    let skillCount = 0;
+    let expCount = 0;
+    let certCount = 0;
+
+    const REQUIRED_DADOS = ['f-nome','f-cpf','f-tel','f-email','f-cidade'];
+    const LINK_FIELDS = ['f-linkedin','f-github','f-portfolio','f-video'];
+
+    // ─── Scroll to ───
+    function scrollTo(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ─── Toast ───
+    let toastT;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastT);
+      toastT = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ─── Mark section done / undone ───
+    function markDone(key) {
+      if (done.has(key)) return;
+      done.add(key);
+      document.getElementById('done-' + key).classList.add('show');
+      document.getElementById('cl-' + key).classList.add('done');
+      document.getElementById('cl-' + key).classList.remove('next');
+      showToast('Seção "' + labelOf(key) + '" concluída ✓');
+      updateProgress();
+      markNextItem();
+    }
+
+    function markUndone(key) {
+      if (!done.has(key)) return;
+      done.delete(key);
+      document.getElementById('done-' + key).classList.remove('show');
+      document.getElementById('cl-' + key).classList.remove('done');
+      updateProgress();
+      markNextItem();
+    }
+
+    function labelOf(k) {
+      const map = { photo:'Foto de perfil', dados:'Dados pessoais', sobre:'Sobre mim', links:'Links', skills:'Habilidades', exp:'Experiência', cert:'Certificados' };
+      return map[k];
+    }
+
+    // ─── Mark next pending ───
+    function markNextItem() {
+      ALL.forEach(k => {
+        const el = document.getElementById('cl-' + k);
+        el.classList.remove('next');
+      });
+      const next = ALL.find(k => !done.has(k));
+      if (next) document.getElementById('cl-' + next).classList.add('next');
+    }
+
+    // ─── Progress ───
+    function updateProgress() {
+      const completedWeight = ALL.filter(k => done.has(k)).reduce((a,k) => a + WEIGHTS[k], 0);
+      const pct = Math.round((completedWeight / TOTAL_W) * 100);
+
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('pct').textContent = pct + '%';
+      document.getElementById('doneCount').textContent = done.size;
+      document.getElementById('clCount').textContent = done.size + '/7';
+
+      // Hint
+      const remaining = ALL.filter(k => !done.has(k));
+      const hint = document.getElementById('progressHint');
+      if (remaining.length === 0) {
+        hint.innerHTML = 'Perfil <strong>100% completo</strong>. Ótimo trabalho! 🎉';
+        document.getElementById('clFooter').textContent = 'Perfil completo! Seu cadastro está pronto.';
+      } else {
+        const next = remaining[0];
+        hint.innerHTML = 'Próximo: <strong>' + labelOf(next) + '</strong>';
+        const left = remaining.length;
+        document.getElementById('clFooter').textContent =
+          left === 1 ? 'Falta apenas 1 seção!' : 'Faltam ' + left + ' seções para completar.';
+      }
+    }
+
+    // ─── Photo ───
+    function uploadPhoto() {
+      document.getElementById('photoCircle').textContent = '😊';
+      document.getElementById('photoCircle').classList.add('done');
+      markDone('photo');
+    }
+
+    // ─── Generic field ───
+    function fieldChange(id, section) {
+      const v = document.getElementById(id).value.trim();
+      fields[id] = v.length > 0;
+      const el = document.getElementById(id);
+      if (fields[id]) el.classList.add('ok'); else el.classList.remove('ok');
+      checkSection(section);
+    }
+
+    function taChange(id, section, minLen) {
+      const v = document.getElementById(id).value.trim();
+      const len = v.length;
+      const cc = document.getElementById('cc-' + id.replace('f-',''));
+      if (cc) {
+        cc.textContent = len + ' / ' + minLen + ' mínimo';
+        cc.className = 'char-count' + (len >= minLen ? ' ok' : '');
+      }
+      fields[id] = len >= minLen;
+      const el = document.getElementById(id);
+      if (fields[id]) el.classList.add('ok'); else el.classList.remove('ok');
+      checkSection(section);
+    }
+
+    function checkSection(section) {
+      if (section === 'dados') {
+        const filled = REQUIRED_DADOS.filter(id => fields[id]).length;
+        // update sub
+        const missing = REQUIRED_DADOS.filter(id => !fields[id]);
+        const names = { 'f-nome':'Nome', 'f-cpf':'CPF', 'f-tel':'Telefone', 'f-email':'E-mail', 'f-cidade':'Cidade' };
+        const sub = document.getElementById('cl-dados-sub');
+        if (missing.length === 0) {
+          sub.textContent = 'Tudo preenchido ✓';
+        } else {
+          sub.textContent = 'Falta: ' + missing.map(id => names[id]).join(', ');
+        }
+        if (filled === REQUIRED_DADOS.length) markDone('dados'); else markUndone('dados');
+      } else if (section === 'sobre') {
+        if (fields['f-sobre']) markDone('sobre'); else markUndone('sobre');
+      } else if (section === 'links') {
+        const count = LINK_FIELDS.filter(id => fields[id]).length;
+        const sub = document.getElementById('cl-links-sub');
+        sub.textContent = count >= 2 ? 'Links adicionados ✓' : count + ' / 2 links adicionados';
+        if (count >= 2) markDone('links'); else markUndone('links');
+      }
+    }
+
+    // ─── Skills ───
+    function toggleSkill(el) {
+      el.classList.toggle('on');
+      skillCount = document.querySelectorAll('.skill.on').length;
+      const hint = document.getElementById('skillsHint');
+      hint.innerHTML = '<strong>' + skillCount + ' / 3</strong> selecionadas';
+      const sub = document.getElementById('cl-skills-sub');
+      if (skillCount >= 3) {
+        hint.innerHTML = '<strong>' + skillCount + '</strong> habilidades selecionadas ✓';
+        sub.textContent = skillCount + ' habilidades selecionadas ✓';
+        markDone('skills');
+      } else {
+        sub.textContent = skillCount + ' / 3 selecionadas';
+        markUndone('skills');
+      }
+    }
+
+    // ─── Experience ───
+    function addExp() {
+      expCount++;
+      document.getElementById('expEmpty').style.display = 'none';
+      const li = document.createElement('div');
+      li.className = 'list-item';
+      li.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Cargo / Projeto</label>
+          <input class="form-input" placeholder="Ex: Desenvolvedor Frontend" style="font-size:13px;height:38px;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Empresa / Curso</label>
+          <input class="form-input" placeholder="Ex: SCTEC" style="font-size:13px;height:38px;" />
+        </div>`;
+      document.getElementById('expList').appendChild(li);
+      markDone('exp');
+    }
+
+    // ─── Certificate ───
+    function addCert() {
+      certCount++;
+      document.getElementById('certEmpty').style.display = 'none';
+      const li = document.createElement('div');
+      li.className = 'list-item';
+      li.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Nome do certificado</label>
+          <input class="form-input" placeholder="Ex: AWS Cloud Practitioner" style="font-size:13px;height:38px;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instituição</label>
+          <input class="form-input" placeholder="Ex: Amazon" style="font-size:13px;height:38px;" />
+        </div>`;
+      document.getElementById('certList').appendChild(li);
+      markDone('cert');
+    }
+
+    // ─── Save ───
+    function save() {
+      const left = ALL.length - done.size;
+      if (left === 0) showToast('Perfil salvo com sucesso! ✓');
+      else showToast('Ainda ' + left + ' seção(ões) pendente(s)');
+    }
+
+    // ─── Masks ───
+    function maskCPF(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,11);
+      v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+      el.value = v;
+    }
+    function maskPhone(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,11);
+      v = v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+      el.value = v;
+    }
+
+    // ─── Init ───
+    markNextItem();
+    updateProgress();
+  </script>
+</body>
+</html>

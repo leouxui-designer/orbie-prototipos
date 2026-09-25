@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Missão Concluída!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --surface-dark: #0e1e40;
+      --border: #1e3a6e;
+      --brand: #0059E7;
+      --cyan: #00C1FE;
+      --text: #FFFFFF;
+      --text-2: #99C0FF;
+      --green: #12B76A;
+      --green2: #37EC65;
+      --yellow: #FFEA24;
+      --locked: #526D98;
+      --red: #F04438;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
+      overflow-x: hidden;
+    }
+    canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+
+    /* ─── CELEBRATION HERO ─── */
+    .victory-bg {
+      position: relative;
+      text-align: center;
+      padding: 56px 24px 32px;
+      overflow: hidden;
+    }
+    .victory-bg::before {
+      content: '';
+      position: absolute; top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(18,183,106,0.22) 0%, transparent 68%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* troféu animado */
+    .trophy-wrap {
+      position: relative;
+      width: 110px; height: 110px;
+      margin: 0 auto 20px;
+      z-index: 1;
+    }
+    .trophy-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid rgba(18,183,106,0.4);
+      animation: spin-slow 10s linear infinite;
+    }
+    .trophy-ring2 {
+      position: absolute; inset: 10px; border-radius: 50%;
+      border: 1px dashed rgba(18,183,106,0.25);
+      animation: spin-slow 7s linear reverse infinite;
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .trophy-core {
+      position: absolute; inset: 18px; border-radius: 50%;
+      background: linear-gradient(135deg, #0E511F, #12B76A 60%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 40px rgba(18,183,106,0.45);
+      animation: pop-in 600ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.2); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .victory-title {
+      position: relative; z-index: 1;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900; font-size: 28px; line-height: 36px;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .victory-sub {
+      position: relative; z-index: 1;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px; color: rgba(255,255,255,0.5);
+      margin-bottom: 24px;
+    }
+
+    /* ─── STATS GRID ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto 28px;
+      padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .stat-box {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 8px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 26px; margin-bottom: 4px;
+      background: linear-gradient(135deg, #37EC65, #00C1FE);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-val.yellow { background: linear-gradient(135deg, var(--yellow), #F79009); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-val.blue   { background: linear-gradient(135deg, #3F84F3, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-lbl {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; color: var(--text-2);
+    }
+
+    /* ─── XP REWARD CARD ─── */
+    .reward-wrap {
+      max-width: 400px; margin: 0 auto 12px; padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .reward-card {
+      background: linear-gradient(135deg, rgba(0,50,120,0.5), rgba(58,0,168,0.4));
+      border: 1px solid rgba(63,132,243,0.4);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: 0 4px 24px rgba(0,89,231,0.2);
+    }
+    .reward-orb {
+      width: 56px; height: 56px; flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3A00A8, #0059E7);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 24px rgba(0,89,231,0.4);
+      animation: pop-in 600ms 200ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .reward-orb svg { animation: spin-slow 6s linear infinite; }
+    .reward-body { flex: 1; }
+    .reward-eyebrow {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-2); margin-bottom: 4px;
+    }
+    .reward-value {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900; font-size: 22px; color: var(--text);
+    }
+    .reward-note {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;
+    }
+
+    /* ─── ISOLAMENTO ─── */
+    .isolation-wrap {
+      max-width: 400px; margin: 0 auto 24px; padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .isolation-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--locked); margin-bottom: 10px;
+    }
+    .iso-list { display: flex; flex-direction: column; gap: 6px; }
+    .iso-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .iso-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .iso-dot.no  { background: rgba(240,68,56,0.12); }
+    .iso-dot.yes { background: rgba(18,183,106,0.12); }
+    .iso-txt {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: rgba(255,255,255,0.6); line-height: 18px;
+    }
+    .iso-txt strong { color: var(--text); }
+
+    /* ─── ACTIONS ─── */
+    .actions-wrap {
+      max-width: 400px; margin: 0 auto; padding: 0 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      position: relative; z-index: 1;
+    }
+    .btn-home {
+      width: 100%; height: 54px;
+      background: linear-gradient(135deg, var(--brand), #3A00A8);
+      color: #fff; border: none;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.08em;
+      border-radius: 14px; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(0,89,231,0.4);
+      transition: transform 150ms, box-shadow 150ms;
+    }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,89,231,0.55); }
+    .btn-link {
+      text-align: center; font-family: 'Outfit', sans-serif;
+      font-size: 13px; color: var(--text-2);
+      background: none; border: none; cursor: pointer;
+      text-decoration: underline; padding: 8px;
+      transition: color 150ms;
+    }
+    .btn-link:hover { color: #fff; }
+
+    /* ─── RF ANOTAÇÕES ─── */
+    .annot-float {
+      max-width: 400px; margin: 0 auto 14px; padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .annot-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px; margin-bottom: 6px;
+      background: rgba(0,89,231,0.07); border: 1px dashed rgba(63,132,243,0.3);
+      border-radius: 8px;
+    }
+    .annot-item.warn { background: rgba(247,144,9,0.06); border-color: rgba(247,144,9,0.25); }
+    .annot-rf {
+      font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+      padding: 2px 5px; border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+      background: rgba(63,132,243,0.18); color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3); margin-top: 1px;
+    }
+    .annot-item.warn .annot-rf { background: rgba(247,144,9,0.15); color: #F79009; border-color: rgba(247,144,9,0.3); }
+    .annot-txt { font-family: 'Outfit', sans-serif; font-size: 10px; line-height: 14px; color: rgba(153,192,255,0.75); }
+    .annot-txt strong { color: #fff; }
+  </style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<!-- CELEBRATION HERO -->
+<div class="victory-bg">
+  <div class="trophy-wrap">
+    <div class="trophy-ring"></div>
+    <div class="trophy-ring2"></div>
+    <div class="trophy-core">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <path d="M22 8L25.6 16L35 16.7L27.8 23.2L30.1 32.5L22 27.7L13.9 32.5L16.2 23.2L9 16.7L18.4 16L22 8Z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="victory-title">MISSÃO CONCLUÍDA!</div>
+  <div class="victory-sub">Todos os blocos de revisão completados.</div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-box"><div class="stat-val">8</div><div class="stat-lbl">Acertos</div></div>
+  <div class="stat-box"><div class="stat-val blue">67%</div><div class="stat-lbl">Aproveit.</div></div>
+  <div class="stat-box"><div class="stat-val yellow">12</div><div class="stat-lbl">Fases</div></div>
+</div>
+
+<!-- XP REWARD -->
+<div class="reward-wrap">
+  <div class="reward-card">
+    <div class="reward-orb">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path d="M15 3L17.6 9.8L25 10.2L19.7 15L21.6 22.3L15 18.5L8.4 22.3L10.3 15L5 10.2L12.4 9.8L15 3Z" fill="none" stroke="white" stroke-width="1.5"/>
+        <circle cx="15" cy="15" r="4" fill="rgba(255,255,255,0.25)"/>
+      </svg>
+    </div>
+    <div class="reward-body">
+      <div class="reward-eyebrow">Recompensa · RF10</div>
+      <div class="reward-value">+120 XP</div>
+      <div class="reward-note">Pelo esforço — independente do % de acertos</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANOTAÇÕES RF -->
+<div class="annot-float">
+  <div class="annot-item">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Conclusão</strong> — Trilha concluída ao responder a última fase. Container some da home sem reload (RF08).</span>
+  </div>
+  <div class="annot-item warn">
+    <span class="annot-rf">RF10</span>
+    <span class="annot-txt"><strong>Recompensa por esforço</strong> — 20% de acerto = mesmo XP que 100%. Creditado uma única vez.</span>
+  </div>
+</div>
+
+<!-- ISOLAMENTO -->
+<div class="isolation-wrap">
+  <div class="isolation-title">O que esta revisão NÃO afeta · RF10</div>
+  <div class="iso-list">
+    <div class="iso-item">
+      <div class="iso-dot no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="iso-txt"><strong>Ranking</strong> — Nenhum ponto de ranking geral ou por planeta</div>
+    </div>
+    <div class="iso-item">
+      <div class="iso-dot no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="iso-txt"><strong>Progresso da temporada</strong> — Planetas, etapas e fases inalterados</div>
+    </div>
+    <div class="iso-item">
+      <div class="iso-dot no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="iso-txt"><strong>Performance_jogador</strong> — Fora do Dashboard de Desempenho</div>
+    </div>
+    <div class="iso-item">
+      <div class="iso-dot yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17L20 7" stroke="#12B76A" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="iso-txt"><strong>D9 (tendência)</strong> — Alimenta diagnóstico do próximo ciclo</div>
+    </div>
+    <div class="iso-item">
+      <div class="iso-dot yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17L20 7" stroke="#12B76A" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <div class="iso-txt"><strong>Revisões anteriores</strong> — Disponível em modo leitura</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions-wrap">
+  <button class="btn-home" onclick="voltarInicio()">← VOLTAR AO INÍCIO</button>
+  <button class="btn-link" onclick="window.location.href='revisoes-anteriores.html'">Ver revisões anteriores</button>
+</div>
+
+<script>
+/* ═══ CONFETTI ESPACIAL ════════════════════ */
+(function() {
+  const c = document.getElementById('confetti');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+
+  const colors = ['#FFEA24','#3F84F3','#37EC65','#00C1FE','#8455DD','#F79009'];
+  const particles = Array.from({length: 80}, () => ({
+    x: Math.random() * c.width,
+    y: -10 - Math.random() * 60,
+    vx: (Math.random() - 0.5) * 2,
+    vy: 1.5 + Math.random() * 2.5,
+    size: 3 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * 360,
+    rotV: (Math.random() - 0.5) * 4,
+    opacity: 1,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle'
+  }));
+
+  let frame = 0;
+  function loop() {
+    frame++;
+    ctx.clearRect(0, 0, c.width, c.height);
+    let alive = false;
+    particles.forEach(p => {
+      if (p.y > c.height + 20) return;
+      alive = true;
+      p.x += p.vx; p.y += p.vy;
+      p.rot += p.rotV;
+      p.opacity -= 0.004;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'rect') {
+        ctx.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
+      } else {
+        ctx.beginPath(); ctx.arc(0, 0, p.size/2, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    });
+    if (alive && frame < 300) requestAnimationFrame(loop);
+    else ctx.clearRect(0,0,c.width,c.height);
+  }
+  loop();
+})();
+
+function voltarInicio() {
+  window.location.href = 'home.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbie Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1A32;--surface:#142A51;--surface-dk:#10203D;--border:#224476;
+  --blue:#0059E7;--blue2:#3F84F3;--blue1:#99C0FF;
+  --green:#12B76A;--red:#F04438;--orange:#FDB022;--yellow:#FFEA24;
+  --purple:#591FC7;--cyan:#00B4FD;--white:#fff;--txt2:#99C0FF;--txtl:#C0CADB;
+}
+html,body{width:100%;min-height:100vh;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden}
+.screen{display:none;width:100%;min-height:100vh;position:relative;overflow:hidden}
+.screen.active{display:flex}
+
+/* starfield */
+.starfield{position:absolute;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:rgba(255,255,255,.8);animation:twinkle var(--d,2s) ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.2;transform:scale(1)}to{opacity:1;transform:scale(1.4)}}
+.meteor{position:absolute;width:120px;height:2px;background:linear-gradient(to right,transparent,rgba(0,180,253,.8));border-radius:2px;animation:mfly var(--d,3s) linear infinite;opacity:0}
+@keyframes mfly{0%{transform:translateX(-200px) translateY(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(1600px) translateY(200px);opacity:0}}
+
+/* ── SCREEN 1 PREP ── */
+#sp{width:100%;flex-direction:row;background:radial-gradient(ellipse at 60% 40%,#1a0550 0%,var(--bg) 70%)}
+.pl{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 56px;gap:36px;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:700;font-size:18px;color:#fff}
+.brand-name{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px}
+.quiz-title{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:700;line-height:1.2}
+.quiz-title span{color:var(--cyan)}
+.subject-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(0,180,253,.15);border:1px solid rgba(0,180,253,.4);border-radius:1000px;font-size:13px;font-weight:500;color:var(--cyan)}
+.pin-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 32px;display:flex;flex-direction:column;gap:8px}
+.pin-lbl{font-size:12px;font-weight:500;color:var(--txt2);text-transform:uppercase;letter-spacing:1.5px}
+.pin-num{font-family:'Orbitron',sans-serif;font-size:48px;font-weight:700;color:var(--yellow);letter-spacing:12px;text-shadow:0 0 30px rgba(255,234,36,.5)}
+.pin-hint{font-size:13px;color:var(--txtl)}
+.pin-hint strong{color:var(--white)}
+.meta-row{display:flex;gap:16px}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--txtl)}
+
+.pr{width:460px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 40px;gap:28px;background:rgba(20,42,81,.5);backdrop-filter:blur(4px);border-left:1px solid var(--border);position:relative;z-index:1}
+.qr-lbl{font-size:13px;font-weight:500;color:var(--txt2);text-transform:uppercase;letter-spacing:1px}
+.qr-frame{width:176px;height:176px;background:#fff;border-radius:12px;padding:10px;box-shadow:0 0 40px rgba(0,89,231,.4)}
+.qr-frame svg{width:100%;height:100%}
+.qr-url{font-size:12px;color:var(--txtl)}
+.qr-url strong{color:var(--cyan)}
+.divider{width:100%;height:1px;background:var(--border)}
+.stu-header{width:100%;display:flex;align-items:center;justify-content:space-between}
+.stu-title{font-size:14px;font-weight:600}
+.stu-count{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)}
+.stu-list{width:100%;display:flex;flex-wrap:wrap;gap:8px;max-height:180px;overflow-y:auto}
+.stu-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(0,180,253,.12);border:1px solid rgba(0,180,253,.25);border-radius:1000px;font-size:12px;font-weight:500;animation:chipin .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes chipin{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+.stu-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.stu-list::-webkit-scrollbar{width:4px}
+.stu-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.btn-start{width:100%;height:56px;background:var(--blue);border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;box-shadow:0 4px 24px rgba(0,89,231,.4)}
+.btn-start:hover{background:var(--blue2);box-shadow:0 6px 32px rgba(0,89,231,.6);transform:translateY(-1px)}
+.btn-start svg{width:20px;height:20px;flex-shrink:0}
+
+/* ── SCREEN 2 COUNTDOWN ── */
+#sc{width:100%;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 50%,#1a0550 0%,var(--bg) 70%)}
+.cd-lbl{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:500;color:var(--txt2);text-transform:uppercase;letter-spacing:3px;margin-bottom:40px;z-index:1}
+.cd-ring{position:relative;width:280px;height:280px;display:flex;align-items:center;justify-content:center;z-index:1}
+.cd-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.cd-track{fill:none;stroke:var(--border);stroke-width:8}
+.cd-arc{fill:none;stroke:var(--cyan);stroke-width:8;stroke-linecap:round;stroke-dasharray:816;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s}
+.cd-num{font-family:'Orbitron',sans-serif;font-size:120px;font-weight:700;color:var(--white);text-shadow:0 0 60px rgba(0,180,253,.6);z-index:1;line-height:1;animation:numpop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes numpop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.cd-go{font-family:'Orbitron',sans-serif;font-size:72px;font-weight:700;color:var(--yellow);text-shadow:0 0 60px rgba(255,234,36,.8);display:none;animation:gopop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes gopop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.cd-sub{font-size:14px;color:var(--txt2);z-index:1;margin-top:40px}
+
+/* ── SCREEN 3 QUESTION ── */
+#sq{width:100%;flex-direction:column;background:var(--bg)}
+.qh{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:var(--surface);border-bottom:1px solid var(--border);position:relative;z-index:1}
+.qpw{display:flex;flex-direction:column;gap:8px;flex:1}
+.qmeta{display:flex;align-items:center;gap:16px}
+.qctr{font-size:13px;font-weight:500;color:var(--txt2)}
+.qpill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(0,180,253,.15);border:1px solid rgba(0,180,253,.3);border-radius:1000px;font-size:12px;color:var(--cyan)}
+.qpbar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.qpfill{height:100%;background:var(--blue);border-radius:2px;transition:width .6s ease-out}
+.timer-blk{display:flex;align-items:center;gap:12px;padding-left:40px}
+.timer-ring{position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.timer-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.t-track{fill:none;stroke:var(--border);stroke-width:5}
+.t-arc{fill:none;stroke:var(--cyan);stroke-width:5;stroke-linecap:round;stroke-dasharray:201;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .5s}
+.t-num{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:var(--white);z-index:1}
+.qbody{flex:1;display:flex;flex-direction:column;padding:48px;gap:28px;position:relative;z-index:1}
+.qnlbl{font-size:12px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:2px}
+.qtxt{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:700;line-height:1.35;color:var(--white);max-width:900px}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1}
+.qopt{display:flex;align-items:center;gap:16px;padding:20px 24px;background:var(--surface);border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.qopt:hover{border-color:var(--blue2);background:rgba(63,132,243,.1);transform:translateY(-2px)}
+.qopt.sel{border-color:var(--blue);background:rgba(0,89,231,.15)}
+.qopt.cor{border-color:var(--green);background:rgba(18,183,106,.2);animation:corfl .4s}
+.qopt.wrg{border-color:var(--red);background:rgba(240,68,56,.15)}
+@keyframes corfl{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+.oltr{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;flex-shrink:0}
+.la{background:rgba(0,89,231,.25);color:var(--blue1)}
+.lb{background:rgba(253,176,34,.25);color:#FDB022}
+.lc{background:rgba(18,183,106,.25);color:#12B76A}
+.ld{background:rgba(240,68,56,.25);color:#F04438}
+.otxt{font-size:16px;font-weight:400;color:var(--white);line-height:1.4}
+.oico{position:absolute;right:20px;width:24px;height:24px;opacity:0;transition:opacity .3s}
+.qopt.cor .ico-ok,.qopt.wrg .ico-no{opacity:1}
+.qfoot{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-top:1px solid var(--border);background:var(--surface-dk)}
+.qrlive{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--txt2)}
+.qrcount{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700;color:var(--white)}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pdot 1s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.btn-rev{height:48px;padding:0 32px;background:var(--blue);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;opacity:0;pointer-events:none}
+.btn-rev.vis{opacity:1;pointer-events:all}
+.btn-rev:hover{background:var(--blue2);transform:translateY(-1px)}
+
+/* ── SCREEN 4 RESULT ── */
+#sr{width:100%;flex-direction:column;align-items:center;background:radial-gradient(ellipse at 50% 30%,#1a0550 0%,var(--bg) 65%)}
+.rh{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 48px;border-bottom:1px solid var(--border)}
+.rtitle{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700}
+.rqlbl{font-size:14px;color:var(--txt2);margin-top:4px}
+.btn-next{height:44px;padding:0 24px;background:var(--blue);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-next:hover{background:var(--blue2);transform:translateY(-1px)}
+.rbody{flex:1;width:100%;display:flex;gap:40px;padding:40px 48px;align-items:flex-start;position:relative;z-index:1}
+.rleft{flex:1;display:flex;flex-direction:column;gap:28px}
+.rrecap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.rqn{font-size:12px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.rqt{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:600;line-height:1.4}
+.ranslbl{font-size:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-top:12px}
+.rans{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:8px 16px;background:rgba(18,183,106,.15);border:1px solid var(--green);border-radius:8px;font-size:14px;font-weight:600;color:var(--green)}
+.rbars{display:flex;flex-direction:column;gap:10px}
+.rbar-row{display:flex;align-items:center;gap:12px}
+.rbar-ltr{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;flex-shrink:0}
+.rbar-wrap{flex:1;height:32px;background:var(--surface);border-radius:6px;overflow:hidden}
+.rbar-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.34,1.56,.64,1);width:0;display:flex;align-items:center;padding-left:12px;font-size:13px;font-weight:600;color:rgba(255,255,255,.9)}
+.rbar-n{font-size:13px;font-weight:600;color:var(--txt2);width:36px;text-align:right}
+.rstats{display:flex;gap:14px}
+.scard{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}
+.sval{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:700}
+.slbl{font-size:12px;color:var(--txt2)}
+.rright{width:400px;display:flex;flex-direction:column;gap:24px;align-items:center}
+.pie-ttl{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:1.5px;align-self:flex-start}
+.pie-wrap{width:250px;height:250px;position:relative}
+.pie-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pie-pct{font-family:'Orbitron',sans-serif;font-size:36px;font-weight:700}
+.pie-sub{font-size:12px;color:var(--txt2)}
+.pie-legend{width:100%;display:flex;flex-direction:column;gap:8px}
+.leg-row{display:flex;align-items:center;gap:10px}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.leg-lbl{font-size:13px;flex:1}
+.leg-val{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--txt2)}
+.podium{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+.pod-ttl{font-size:13px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.pod-row{display:flex;align-items:center;gap:12px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:6px;animation:chipin .3s cubic-bezier(.34,1.56,.64,1) both}
+.pod-rank{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;width:24px;text-align:center}
+.r1{color:var(--yellow)}.r2{color:var(--txtl)}.r3{color:var(--orange)}
+.pod-name{flex:1;font-size:14px;font-weight:500}
+.pod-score{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--cyan)}
+
+/* overlay & confetti */
+.ovl{display:none;position:fixed;inset:0;background:rgba(18,183,106,.08);pointer-events:none;z-index:100;animation:ovlfade .8s ease forwards}
+@keyframes ovlfade{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.cfti{position:fixed;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:99;animation:cfall var(--d,1.5s) ease-out var(--dl,0s) forwards}
+@keyframes cfall{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+</style><style id="sf5-css">#sf5{width:100%;flex-direction:column;align-items:center;background:radial-gradient(ellipse at 50% 20%,#1a0550 0%,#0D1A32 60%)}.sf5-hdr{width:100%;display:flex;align-items:center;justify-content:space-between;padding:28px 60px;border-bottom:1px solid #224476;position:relative;z-index:1}.sf5-title{font-family:Orbitron,sans-serif;font-size:24px;font-weight:700;color:#fff}.sf5-title span{color:#00B4FD}.sf5-sub{font-size:14px;color:#99C0FF;margin-top:4px}.sf5-actions{display:flex;gap:12px}.btn-export{height:40px;padding:0 20px;background:#142A51;border:1px solid #224476;border-radius:10px;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;color:#99C0FF;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s}.btn-export:hover{border-color:#3F84F3;color:#fff}.btn-new-quiz{height:40px;padding:0 20px;background:#0059E7;border:none;border-radius:10px;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 16px rgba(0,89,231,.4)}.btn-new-quiz:hover{background:#3F84F3;transform:translateY(-1px)}.sf5-body{width:100%;flex:1;display:flex;gap:0;position:relative;z-index:1}.sf5-left{flex:1;padding:40px 48px;display:flex;flex-direction:column;gap:28px;border-right:1px solid #224476;overflow-y:auto}.sf5-right{width:400px;padding:36px 36px;display:flex;flex-direction:column;gap:24px;flex-shrink:0;overflow-y:auto}.sf5-podium-title{font-family:Orbitron,sans-serif;font-size:13px;font-weight:700;color:#99C0FF;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}.pod-entry{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:14px;border:1px solid #224476;background:#142A51;position:relative;overflow:hidden;transition:transform .2s;margin-bottom:8px}.pod-entry:hover{transform:translateY(-2px)}.pod-entry.p1{background:linear-gradient(135deg,rgba(255,234,36,.12),rgba(255,234,36,.03));border-color:rgba(255,234,36,.4)}.pod-entry.p2{background:linear-gradient(135deg,rgba(192,202,219,.08),rgba(192,202,219,.02));border-color:rgba(192,202,219,.3)}.pod-entry.p3{background:linear-gradient(135deg,rgba(253,176,34,.1),rgba(253,176,34,.03));border-color:rgba(253,176,34,.3)}.pod-glow{position:absolute;left:0;top:0;width:4px;height:100%}.p1 .pod-glow{background:#FFEA24}.p2 .pod-glow{background:#C0CADB}.p3 .pod-glow{background:#FDB022}.p4 .pod-glow,.p5 .pod-glow{background:#3F84F3}.pod-medal{font-size:26px;flex-shrink:0;line-height:1;width:32px;text-align:center}.pod-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Orbitron,sans-serif;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}.pod-info{flex:1;display:flex;flex-direction:column;gap:2px}.pod-name{font-family:Orbitron,sans-serif;font-size:14px;font-weight:700;color:#fff}.pod-detail{font-size:12px;color:#99C0FF}.pod-score-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.pod-score{font-family:Orbitron,sans-serif;font-size:22px;font-weight:700;color:#FFEA24}.pod-acertos{font-size:12px;color:#99C0FF}.sf5-full-table{background:#142A51;border:1px solid #224476;border-radius:14px;overflow:hidden}.tbl-hdr{display:grid;grid-template-columns:36px 1fr 72px 72px 80px;padding:10px 16px;background:#10203D;border-bottom:1px solid #224476}.tbl-hdr-cell{font-size:10px;font-weight:600;color:#526D98;text-transform:uppercase;letter-spacing:1px;text-align:center}.tbl-hdr-cell:nth-child(2){text-align:left}.tbl-row{display:grid;grid-template-columns:36px 1fr 72px 72px 80px;padding:11px 16px;border-bottom:1px solid rgba(34,68,118,.4);transition:background .15s;cursor:default}.tbl-row:last-child{border-bottom:none}.tbl-row:hover{background:rgba(0,89,231,.07)}.tbl-pos{font-family:Orbitron,sans-serif;font-size:11px;font-weight:700;color:#526D98;display:flex;align-items:center}.tbl-player{display:flex;align-items:center;gap:9px}.tbl-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.tbl-nm{font-size:13px;font-weight:500;color:#fff}.tbl-val{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;color:#99C0FF;text-align:center;display:flex;align-items:center;justify-content:center}.tbl-val.hi{color:#FFEA24}.tbl-val.ok{color:#12B76A}.tbl-val.no{color:#F04438}.sum-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sum-card{background:#142A51;border:1px solid #224476;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}.sum-val{font-family:Orbitron,sans-serif;font-size:28px;font-weight:700;color:#fff}.sum-lbl{font-size:12px;color:#99C0FF}.sect-ttl{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;color:#99C0FF;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}.qb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#142A51;border:1px solid #224476;border-radius:10px;margin-bottom:6px}.qb-num{font-family:Orbitron,sans-serif;font-size:10px;font-weight:700;color:#526D98;width:18px;flex-shrink:0}.qb-txt{flex:1;font-size:12px;color:#C0CADB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qb-pct{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;flex-shrink:0;min-width:36px;text-align:right}.qb-bar-bg{width:80px;height:4px;background:#224476;border-radius:2px;overflow:hidden;flex-shrink:0}.qb-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}</style>
+<style id="dnav-css">#dnav{position:fixed;bottom:0;left:0;right:0;z-index:9999;height:52px;display:flex;align-items:center;background:rgba(4,9,20,.96);backdrop-filter:blur(10px);border-top:1px solid #224476;font-family:Outfit,sans-serif;padding:0 8px;gap:2px}.dnav-lbl{font-size:10px;font-weight:700;color:#526D98;text-transform:uppercase;letter-spacing:1.5px;padding:0 12px 0 8px;white-space:nowrap;border-right:1px solid #224476;margin-right:4px;flex-shrink:0}.dn{flex:1;height:36px;border:none;background:transparent;color:#99C0FF;font-family:Outfit,sans-serif;font-size:11px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-width:0}.dn:hover{background:rgba(0,89,231,.22);color:#fff}.dn.on{background:rgba(0,89,231,.4);color:#fff;box-shadow:inset 0 -2px 0 #0059E7}.dn-num{font-family:Orbitron,sans-serif;font-size:9px;font-weight:700;opacity:.7}</style><style id="sf5-css">#sf5{width:100%;flex-direction:column;align-items:center;background:radial-gradient(ellipse at 50% 20%,#1a0550 0%,#0D1A32 60%)}.sf5-hdr{width:100%;display:flex;align-items:center;justify-content:space-between;padding:28px 60px;border-bottom:1px solid #224476;position:relative;z-index:1}.sf5-title{font-family:Orbitron,sans-serif;font-size:24px;font-weight:700;color:#fff}.sf5-title span{color:#00B4FD}.sf5-sub{font-size:14px;color:#99C0FF;margin-top:4px}.sf5-actions{display:flex;gap:12px}.btn-export{height:40px;padding:0 20px;background:#142A51;border:1px solid #224476;border-radius:10px;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;color:#99C0FF;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s}.btn-export:hover{border-color:#3F84F3;color:#fff}.btn-new-quiz{height:40px;padding:0 20px;background:#0059E7;border:none;border-radius:10px;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow:0 4px 16px rgba(0,89,231,.4)}.btn-new-quiz:hover{background:#3F84F3;transform:translateY(-1px)}.sf5-body{width:100%;flex:1;display:flex;gap:0;position:relative;z-index:1}.sf5-left{flex:1;padding:40px 48px;display:flex;flex-direction:column;gap:28px;border-right:1px solid #224476;overflow-y:auto}.sf5-right{width:400px;padding:36px 36px;display:flex;flex-direction:column;gap:24px;flex-shrink:0;overflow-y:auto}.sf5-podium-title{font-family:Orbitron,sans-serif;font-size:13px;font-weight:700;color:#99C0FF;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}.pod-entry{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:14px;border:1px solid #224476;background:#142A51;position:relative;overflow:hidden;transition:transform .2s;margin-bottom:8px}.pod-entry:hover{transform:translateY(-2px)}.pod-entry.p1{background:linear-gradient(135deg,rgba(255,234,36,.12),rgba(255,234,36,.03));border-color:rgba(255,234,36,.4)}.pod-entry.p2{background:linear-gradient(135deg,rgba(192,202,219,.08),rgba(192,202,219,.02));border-color:rgba(192,202,219,.3)}.pod-entry.p3{background:linear-gradient(135deg,rgba(253,176,34,.1),rgba(253,176,34,.03));border-color:rgba(253,176,34,.3)}.pod-glow{position:absolute;left:0;top:0;width:4px;height:100%}.p1 .pod-glow{background:#FFEA24}.p2 .pod-glow{background:#C0CADB}.p3 .pod-glow{background:#FDB022}.p4 .pod-glow,.p5 .pod-glow{background:#3F84F3}.pod-medal{font-size:26px;flex-shrink:0;line-height:1;width:32px;text-align:center}.pod-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Orbitron,sans-serif;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}.pod-info{flex:1;display:flex;flex-direction:column;gap:2px}.pod-name{font-family:Orbitron,sans-serif;font-size:14px;font-weight:700;color:#fff}.pod-detail{font-size:12px;color:#99C0FF}.pod-score-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.pod-score{font-family:Orbitron,sans-serif;font-size:22px;font-weight:700;color:#FFEA24}.pod-acertos{font-size:12px;color:#99C0FF}.sf5-full-table{background:#142A51;border:1px solid #224476;border-radius:14px;overflow:hidden}.tbl-hdr{display:grid;grid-template-columns:36px 1fr 72px 72px 80px;padding:10px 16px;background:#10203D;border-bottom:1px solid #224476}.tbl-hdr-cell{font-size:10px;font-weight:600;color:#526D98;text-transform:uppercase;letter-spacing:1px;text-align:center}.tbl-hdr-cell:nth-child(2){text-align:left}.tbl-row{display:grid;grid-template-columns:36px 1fr 72px 72px 80px;padding:11px 16px;border-bottom:1px solid rgba(34,68,118,.4);transition:background .15s;cursor:default}.tbl-row:last-child{border-bottom:none}.tbl-row:hover{background:rgba(0,89,231,.07)}.tbl-pos{font-family:Orbitron,sans-serif;font-size:11px;font-weight:700;color:#526D98;display:flex;align-items:center}.tbl-player{display:flex;align-items:center;gap:9px}.tbl-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.tbl-nm{font-size:13px;font-weight:500;color:#fff}.tbl-val{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;color:#99C0FF;text-align:center;display:flex;align-items:center;justify-content:center}.tbl-val.hi{color:#FFEA24}.tbl-val.ok{color:#12B76A}.tbl-val.no{color:#F04438}.sum-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sum-card{background:#142A51;border:1px solid #224476;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}.sum-val{font-family:Orbitron,sans-serif;font-size:28px;font-weight:700;color:#fff}.sum-lbl{font-size:12px;color:#99C0FF}.sect-ttl{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;color:#99C0FF;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}.qb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#142A51;border:1px solid #224476;border-radius:10px;margin-bottom:6px}.qb-num{font-family:Orbitron,sans-serif;font-size:10px;font-weight:700;color:#526D98;width:18px;flex-shrink:0}.qb-txt{flex:1;font-size:12px;color:#C0CADB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qb-pct{font-family:Orbitron,sans-serif;font-size:12px;font-weight:700;flex-shrink:0;min-width:36px;text-align:right}.qb-bar-bg{width:80px;height:4px;background:#224476;border-radius:2px;overflow:hidden;flex-shrink:0}.qb-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}</style><style id="podium-css">
+/* ── TELA PÓDIO ── */
+#sf6{width:100%;min-height:100vh;flex-direction:column;align-items:center;justify-content:flex-start;position:relative;overflow:hidden;background:#000814}
+
+/* Céu estrelado em camadas */
+.pod-sky{position:absolute;inset:0;z-index:0}
+.pod-nebula{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.nb1{width:600px;height:400px;top:-100px;left:-100px;background:radial-gradient(ellipse,rgba(89,31,199,.35) 0%,transparent 70%)}
+.nb2{width:500px;height:350px;top:100px;right:-80px;background:radial-gradient(ellipse,rgba(0,89,231,.3) 0%,transparent 70%)}
+.nb3{width:700px;height:300px;bottom:0;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(0,180,253,.15) 0%,transparent 70%)}
+
+/* Planeta decorativo fundo */
+.pod-planet-bg{position:absolute;border-radius:50%;pointer-events:none;z-index:1}
+.pp1{width:320px;height:320px;bottom:-80px;left:-60px;background:radial-gradient(circle at 35% 35%,#3A00A8,#0D1A32);box-shadow:inset -20px -20px 60px rgba(0,0,0,.5),0 0 60px rgba(58,0,168,.3)}
+.pp2{width:180px;height:180px;top:40px;right:80px;background:radial-gradient(circle at 35% 35%,#0059E7,#002868);box-shadow:inset -10px -10px 40px rgba(0,0,0,.5),0 0 40px rgba(0,89,231,.25)}
+/* Anéis do planeta grande */
+.pp1::after{content:'';position:absolute;width:440px;height:100px;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(75deg);border-radius:50%;border:14px solid rgba(89,31,199,.3);pointer-events:none}
+
+/* Chão espacial — piso em perspectiva */
+.pod-floor{position:absolute;bottom:0;left:0;right:0;height:280px;z-index:2;perspective:600px}
+.pod-floor-inner{position:absolute;bottom:0;left:-20%;right:-20%;height:100%;background:repeating-linear-gradient(90deg,rgba(34,68,118,.35) 0px,rgba(34,68,118,.35) 1px,transparent 1px,transparent 80px),repeating-linear-gradient(0deg,rgba(34,68,118,.35) 0px,rgba(34,68,118,.35) 1px,transparent 1px,transparent 80px),linear-gradient(to top,rgba(13,26,50,.95),rgba(13,26,50,.2));transform:rotateX(55deg);transform-origin:bottom center}
+
+/* Pódio estrutura */
+.pod-stage{position:relative;z-index:10;display:flex;align-items:flex-end;justify-content:center;gap:0;margin-top:auto;padding-bottom:60px;width:100%}
+.pod-col{display:flex;flex-direction:column;align-items:center;position:relative}
+
+/* Degraus */
+/* rochas flutuantes */
+.pod-step{display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:visible;width:220px;background:none;border:none;box-shadow:none}
+.pod-step svg{display:block;width:100%;height:auto;filter:drop-shadow(0 20px 40px var(--rock-glow,rgba(124,58,237,.55)))}
+.pod-step-1{width:240px;--rock-glow:rgba(255,234,36,.4)}
+.pod-step-2{width:210px;--rock-glow:rgba(192,202,219,.3)}
+.pod-step-3{width:190px;--rock-glow:rgba(253,176,34,.35)}
+/* número dentro da rocha */
+.pod-step-num{position:absolute;bottom:34%;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;font-size:36px;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+
+/* Número no degrau */
+.pod-step-num{font-family:'Orbitron',sans-serif;font-size:40px;font-weight:700;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.n1{color:#FFEA24;text-shadow:0 0 20px rgba(255,234,36,.6)}
+.n2{color:#C0CADB;text-shadow:0 0 16px rgba(192,202,219,.4)}
+.n3{color:#FDB022;text-shadow:0 0 16px rgba(253,176,34,.4)}
+
+/* Avatar no topo do degrau */
+.pod-avatar-wrap{position:absolute;bottom:100%;display:flex;flex-direction:column;align-items:center;gap:8px;width:200px;padding-bottom:8px}
+.pod-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:26px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.25);box-shadow:0 0 30px var(--av-glow,rgba(0,89,231,.5)),0 4px 16px rgba(0,0,0,.4);position:relative}
+/* Coroa 1º lugar */
+.pod-crown{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:22px;animation:crown-bob 2s ease-in-out infinite}
+@keyframes crown-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
+/* Brilho pulsante 1º */
+.pod-avatar.glow1::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255,234,36,.5);animation:av-pulse 2s ease-in-out infinite}
+@keyframes av-pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+.pod-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#fff;text-align:center;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.8);letter-spacing:.5px}
+.pod-score-badge{padding:4px 14px;border-radius:1000px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px}
+.sb1{background:rgba(255,234,36,.15);border:1px solid rgba(255,234,36,.4);color:#FFEA24}
+.sb2{background:rgba(192,202,219,.1);border:1px solid rgba(192,202,219,.3);color:#C0CADB}
+.sb3{background:rgba(253,176,34,.12);border:1px solid rgba(253,176,34,.35);color:#FDB022}
+
+/* Animações de entrada dos degraus */
+.pod-col{animation:col-rise 0.7s cubic-bezier(.34,1.56,.64,1) both}
+.col-1{animation-delay:.1s}.col-2{animation-delay:.4s}.col-3{animation-delay:.6s}
+@keyframes col-rise{from{opacity:0;transform:translateY(120px)}.pod-col.col-1 .pod-step{animation:rock-float 3.5s ease-in-out infinite}.pod-col.col-2 .pod-step{animation:rock-float 3.8s ease-in-out infinite .4s}.pod-col.col-3 .pod-step{animation:rock-float 3.2s ease-in-out infinite .8s}@keyframes rock-float{0%,100%{transform:translateY(0) rotate(0deg)}40%{transform:translateY(-12px) rotate(-.8deg)}70%{transform:translateY(-6px) rotate(.5deg)}}to{opacity:1;transform:translateY(0)}}
+.pod-avatar-wrap{animation:av-drop 0.6s cubic-bezier(.34,1.56,.64,1) both}
+.col-1 .pod-avatar-wrap{animation-delay:.7s}
+.col-2 .pod-avatar-wrap{animation-delay:.9s}
+.col-3 .pod-avatar-wrap{animation-delay:1.1s}
+@keyframes av-drop{from{opacity:0;transform:translateY(-40px) scale(.5)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Header */
+.pod-header{width:100%;padding:28px 60px 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+.pod-brand{display:flex;align-items:center;gap:10px}
+.pod-brand-logo{width:36px;height:36px;background:#0059E7;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:700;font-size:16px}
+.pod-brand-name{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px}
+.pod-quiz-info{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pod-quiz-name{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:#fff;text-align:center}
+.pod-quiz-sub{font-size:13px;color:#99C0FF;text-align:center}
+.pod-header-actions{display:flex;gap:10px}
+.btn-ranking{height:38px;padding:0 18px;background:#142A51;border:1px solid #224476;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#99C0FF;cursor:pointer;transition:all .2s}
+.btn-ranking:hover{border-color:#3F84F3;color:#fff}
+.btn-podium-next{height:38px;padding:0 18px;background:#0059E7;border:none;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,89,231,.4)}
+.btn-podium-next:hover{background:#3F84F3;transform:translateY(-1px)}
+
+/* Faixa de título "QUIZ ENCERRADO" */
+.pod-title-strip{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:20px}
+.pod-end-label{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:500;color:#99C0FF;text-transform:uppercase;letter-spacing:4px}
+.pod-end-title{font-family:'Orbitron',sans-serif;font-size:clamp(26px,3.5vw,40px);font-weight:700;color:#fff;text-align:center;text-shadow:0 0 40px rgba(0,180,253,.4)}
+.pod-end-title span{color:#FFEA24;text-shadow:0 0 30px rgba(255,234,36,.6)}
+
+/* Outros participantes (4º e 5º) */
+.pod-others{position:relative;z-index:10;display:flex;gap:12px;margin-top:16px;margin-bottom:0}
+.pod-other{display:flex;align-items:center;gap:10px;padding:8px 16px;background:rgba(20,42,81,.7);border:1px solid #224476;border-radius:10px;backdrop-filter:blur(4px);animation:chipin .4s cubic-bezier(.34,1.56,.64,1) both}
+.pod-other:nth-child(1){animation-delay:1.3s}.pod-other:nth-child(2){animation-delay:1.45s}
+@keyframes chipin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.pod-other-pos{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:#526D98;width:16px;text-align:center}
+.pod-other-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.pod-other-name{font-size:13px;font-weight:500;color:#C0CADB}
+.pod-other-score{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#99C0FF;margin-left:6px}
+
+/* Estrelas de fundo (starfield já existente, mas este é o sf6) */
+#sf6-stars{position:absolute;inset:0;pointer-events:none;z-index:1}
+</style><style id="podium-css">
+/* ── TELA PÓDIO ── */
+#sf6{width:100%;min-height:100vh;flex-direction:column;align-items:center;justify-content:flex-start;position:relative;overflow:hidden;background:#000814}
+
+/* Céu estrelado em camadas */
+.pod-sky{position:absolute;inset:0;z-index:0}
+.pod-nebula{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.nb1{width:600px;height:400px;top:-100px;left:-100px;background:radial-gradient(ellipse,rgba(89,31,199,.35) 0%,transparent 70%)}
+.nb2{width:500px;height:350px;top:100px;right:-80px;background:radial-gradient(ellipse,rgba(0,89,231,.3) 0%,transparent 70%)}
+.nb3{width:700px;height:300px;bottom:0;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(0,180,253,.15) 0%,transparent 70%)}
+
+/* Planeta decorativo fundo */
+.pod-planet-bg{position:absolute;border-radius:50%;pointer-events:none;z-index:1}
+.pp1{width:320px;height:320px;bottom:-80px;left:-60px;background:radial-gradient(circle at 35% 35%,#3A00A8,#0D1A32);box-shadow:inset -20px -20px 60px rgba(0,0,0,.5),0 0 60px rgba(58,0,168,.3)}
+.pp2{width:180px;height:180px;top:40px;right:80px;background:radial-gradient(circle at 35% 35%,#0059E7,#002868);box-shadow:inset -10px -10px 40px rgba(0,0,0,.5),0 0 40px rgba(0,89,231,.25)}
+/* Anéis do planeta grande */
+.pp1::after{content:'';position:absolute;width:440px;height:100px;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(75deg);border-radius:50%;border:14px solid rgba(89,31,199,.3);pointer-events:none}
+
+/* Chão espacial — piso em perspectiva */
+.pod-floor{position:absolute;bottom:0;left:0;right:0;height:280px;z-index:2;perspective:600px}
+.pod-floor-inner{position:absolute;bottom:0;left:-20%;right:-20%;height:100%;background:repeating-linear-gradient(90deg,rgba(34,68,118,.35) 0px,rgba(34,68,118,.35) 1px,transparent 1px,transparent 80px),repeating-linear-gradient(0deg,rgba(34,68,118,.35) 0px,rgba(34,68,118,.35) 1px,transparent 1px,transparent 80px),linear-gradient(to top,rgba(13,26,50,.95),rgba(13,26,50,.2));transform:rotateX(55deg);transform-origin:bottom center}
+
+/* Pódio estrutura */
+.pod-stage{position:relative;z-index:10;display:flex;align-items:flex-end;justify-content:center;gap:0;margin-top:auto;padding-bottom:60px;width:100%}
+.pod-col{display:flex;flex-direction:column;align-items:center;position:relative}
+
+/* Degraus */
+/* rochas flutuantes */
+.pod-step{display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:visible;width:220px;background:none;border:none;box-shadow:none}
+.pod-step svg{display:block;width:100%;height:auto;filter:drop-shadow(0 20px 40px var(--rock-glow,rgba(124,58,237,.55)))}
+.pod-step-1{width:240px;--rock-glow:rgba(255,234,36,.4)}
+.pod-step-2{width:210px;--rock-glow:rgba(192,202,219,.3)}
+.pod-step-3{width:190px;--rock-glow:rgba(253,176,34,.35)}
+/* número dentro da rocha */
+.pod-step-num{position:absolute;bottom:34%;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;font-size:36px;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+
+/* Número no degrau */
+.pod-step-num{font-family:'Orbitron',sans-serif;font-size:40px;font-weight:700;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.n1{color:#FFEA24;text-shadow:0 0 20px rgba(255,234,36,.6)}
+.n2{color:#C0CADB;text-shadow:0 0 16px rgba(192,202,219,.4)}
+.n3{color:#FDB022;text-shadow:0 0 16px rgba(253,176,34,.4)}
+
+/* Avatar no topo do degrau */
+.pod-avatar-wrap{position:absolute;bottom:100%;display:flex;flex-direction:column;align-items:center;gap:8px;width:200px;padding-bottom:8px}
+.pod-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:26px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.25);box-shadow:0 0 30px var(--av-glow,rgba(0,89,231,.5)),0 4px 16px rgba(0,0,0,.4);position:relative}
+/* Coroa 1º lugar */
+.pod-crown{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:22px;animation:crown-bob 2s ease-in-out infinite}
+@keyframes crown-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
+/* Brilho pulsante 1º */
+.pod-avatar.glow1::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255,234,36,.5);animation:av-pulse 2s ease-in-out infinite}
+@keyframes av-pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+.pod-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#fff;text-align:center;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.8);letter-spacing:.5px}
+.pod-score-badge{padding:4px 14px;border-radius:1000px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px}
+.sb1{background:rgba(255,234,36,.15);border:1px solid rgba(255,234,36,.4);color:#FFEA24}
+.sb2{background:rgba(192,202,219,.1);border:1px solid rgba(192,202,219,.3);color:#C0CADB}
+.sb3{background:rgba(253,176,34,.12);border:1px solid rgba(253,176,34,.35);color:#FDB022}
+
+/* Animações de entrada dos degraus */
+.pod-col{animation:col-rise 0.7s cubic-bezier(.34,1.56,.64,1) both}
+.col-1{animation-delay:.1s}.col-2{animation-delay:.4s}.col-3{animation-delay:.6s}
+@keyframes col-rise{from{opacity:0;transform:translateY(120px)}.pod-col.col-1 .pod-step{animation:rock-float 3.5s ease-in-out infinite}.pod-col.col-2 .pod-step{animation:rock-float 3.8s ease-in-out infinite .4s}.pod-col.col-3 .pod-step{animation:rock-float 3.2s ease-in-out infinite .8s}@keyframes rock-float{0%,100%{transform:translateY(0) rotate(0deg)}40%{transform:translateY(-12px) rotate(-.8deg)}70%{transform:translateY(-6px) rotate(.5deg)}}to{opacity:1;transform:translateY(0)}}
+.pod-avatar-wrap{animation:av-drop 0.6s cubic-bezier(.34,1.56,.64,1) both}
+.col-1 .pod-avatar-wrap{animation-delay:.7s}
+.col-2 .pod-avatar-wrap{animation-delay:.9s}
+.col-3 .pod-avatar-wrap{animation-delay:1.1s}
+@keyframes av-drop{from{opacity:0;transform:translateY(-40px) scale(.5)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Header */
+.pod-header{width:100%;padding:28px 60px 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+.pod-brand{display:flex;align-items:center;gap:10px}
+.pod-brand-logo{width:36px;height:36px;background:#0059E7;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:700;font-size:16px}
+.pod-brand-name{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px}
+.pod-quiz-info{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pod-quiz-name{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:#fff;text-align:center}
+.pod-quiz-sub{font-size:13px;color:#99C0FF;text-align:center}
+.pod-header-actions{display:flex;gap:10px}
+.btn-ranking{height:38px;padding:0 18px;background:#142A51;border:1px solid #224476;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#99C0FF;cursor:pointer;transition:all .2s}
+.btn-ranking:hover{border-color:#3F84F3;color:#fff}
+.btn-podium-next{height:38px;padding:0 18px;background:#0059E7;border:none;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,89,231,.4)}
+.btn-podium-next:hover{background:#3F84F3;transform:translateY(-1px)}
+
+/* Faixa de título "QUIZ ENCERRADO" */
+.pod-title-strip{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:20px}
+.pod-end-label{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:500;color:#99C0FF;text-transform:uppercase;letter-spacing:4px}
+.pod-end-title{font-family:'Orbitron',sans-serif;font-size:clamp(26px,3.5vw,40px);font-weight:700;color:#fff;text-align:center;text-shadow:0 0 40px rgba(0,180,253,.4)}
+.pod-end-title span{color:#FFEA24;text-shadow:0 0 30px rgba(255,234,36,.6)}
+
+/* Outros participantes (4º e 5º) */
+.pod-others{position:relative;z-index:10;display:flex;gap:12px;margin-top:16px;margin-bottom:0}
+.pod-other{display:flex;align-items:center;gap:10px;padding:8px 16px;background:rgba(20,42,81,.7);border:1px solid #224476;border-radius:10px;backdrop-filter:blur(4px);animation:chipin .4s cubic-bezier(.34,1.56,.64,1) both}
+.pod-other:nth-child(1){animation-delay:1.3s}.pod-other:nth-child(2){animation-delay:1.45s}
+@keyframes chipin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+.pod-other-pos{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:#526D98;width:16px;text-align:center}
+.pod-other-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.pod-other-name{font-size:13px;font-weight:500;color:#C0CADB}
+.pod-other-score{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#99C0FF;margin-left:6px}
+
+/* Estrelas de fundo (starfield já existente, mas este é o sf6) */
+#sf6-stars{position:absolute;inset:0;pointer-events:none;z-index:1}
+</style></head>
+<body>
+
+<!-- ══ TELA 1: PREPARAÇÃO ══ -->
+<section id="sp" class="screen active">
+  <div class="starfield" id="sf1"></div>
+  <div class="pl">
+    <div class="brand">
+      <div class="brand-logo">O</div>
+      <div class="brand-name">ORBIE QUIZ</div>
+    </div>
+    <div>
+      <div class="quiz-title">Sistema Solar<br><span>e Planetas</span></div>
+      <div style="margin-top:12px"><span class="subject-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" stroke="currentColor" stroke-width="2"/></svg>Ciências — 8º Ano</span></div>
+    </div>
+    <div class="pin-block">
+      <div class="pin-lbl">PIN da sessão</div>
+      <div class="pin-num">874 219</div>
+      <div class="pin-hint">Acesse <strong>orbie.app/quiz</strong> e digite o PIN</div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="currentColor" stroke-width="2"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="currentColor" stroke-width="2"/></svg>10 perguntas</div>
+      <div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>30s por pergunta</div>
+      <div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>Turma 8B</div>
+    </div>
+  </div>
+  <div class="pr">
+    <div class="qr-lbl">Escaneie para entrar</div>
+    <div class="qr-frame">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="white"/>
+        <rect x="10" y="10" width="60" height="60" fill="black"/><rect x="18" y="18" width="44" height="44" fill="white"/><rect x="26" y="26" width="28" height="28" fill="black"/>
+        <rect x="130" y="10" width="60" height="60" fill="black"/><rect x="138" y="18" width="44" height="44" fill="white"/><rect x="146" y="26" width="28" height="28" fill="black"/>
+        <rect x="10" y="130" width="60" height="60" fill="black"/><rect x="18" y="138" width="44" height="44" fill="white"/><rect x="26" y="146" width="28" height="28" fill="black"/>
+        <rect x="80" y="10" width="8" height="8" fill="black"/><rect x="96" y="10" width="8" height="8" fill="black"/><rect x="112" y="10" width="8" height="8" fill="black"/>
+        <rect x="88" y="18" width="8" height="8" fill="black"/><rect x="104" y="26" width="8" height="8" fill="black"/><rect x="80" y="34" width="8" height="8" fill="black"/>
+        <rect x="96" y="42" width="8" height="8" fill="black"/><rect x="80" y="50" width="8" height="8" fill="black"/><rect x="112" y="50" width="8" height="8" fill="black"/>
+        <rect x="80" y="80" width="8" height="8" fill="black"/><rect x="96" y="80" width="8" height="8" fill="black"/><rect x="112" y="88" width="8" height="8" fill="black"/>
+        <rect x="88" y="96" width="8" height="8" fill="black"/><rect x="80" y="104" width="8" height="8" fill="black"/><rect x="104" y="104" width="8" height="8" fill="black"/>
+        <rect x="120" y="80" width="8" height="8" fill="black"/><rect x="136" y="88" width="8" height="8" fill="black"/><rect x="128" y="96" width="8" height="8" fill="black"/>
+        <rect x="144" y="80" width="8" height="8" fill="black"/><rect x="160" y="88" width="8" height="8" fill="black"/><rect x="152" y="104" width="8" height="8" fill="black"/>
+        <rect x="80" y="130" width="8" height="8" fill="black"/><rect x="96" y="138" width="8" height="8" fill="black"/><rect x="112" y="130" width="8" height="8" fill="black"/>
+        <rect x="128" y="146" width="8" height="8" fill="black"/><rect x="144" y="138" width="8" height="8" fill="black"/><rect x="160" y="146" width="8" height="8" fill="black"/>
+        <rect x="80" y="154" width="8" height="8" fill="black"/><rect x="104" y="162" width="8" height="8" fill="black"/><rect x="120" y="170" width="8" height="8" fill="black"/>
+        <rect x="136" y="154" width="8" height="8" fill="black"/><rect x="152" y="162" width="8" height="8" fill="black"/><rect x="80" y="178" width="8" height="8" fill="black"/>
+      </svg>
+    </div>
+    <div class="qr-url">orbie.app/quiz · PIN: <strong>874219</strong></div>
+    <div class="divider"></div>
+    <div class="stu-header"><div class="stu-title">Estudantes conectados</div><div class="stu-count" id="stu-count">0</div></div>
+    <div class="stu-list" id="stu-list"></div>
+    <div class="divider"></div>
+    <button class="btn-start" onclick="startQuiz()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <span>Iniciar quiz</span>
+    </button>
+  </div>
+</section>
+
+<!-- ══ TELA 2: CONTAGEM ══ -->
+<section id="sc" class="screen">
+  <div class="starfield" id="sf2"></div>
+  <div class="cd-lbl" id="cd-lbl">Preparando…</div>
+  <div class="cd-ring">
+    <svg class="cd-svg" viewBox="0 0 280 280">
+      <circle class="cd-track" cx="140" cy="140" r="130"/>
+      <circle class="cd-arc" id="cd-arc" cx="140" cy="140" r="130"/>
+    </svg>
+    <div class="cd-num" id="cd-num">3</div>
+    <div class="cd-go" id="cd-go">GO!</div>
+  </div>
+  <div class="cd-sub"><span id="cd-sub">18 estudantes</span> prontos</div>
+</section>
+
+<!-- ══ TELA 3: PERGUNTA ══ -->
+<section id="sq" class="screen">
+  <div class="starfield" id="sf3"></div>
+  <div class="qh">
+    <div class="qpw">
+      <div class="qmeta">
+        <span class="qctr" id="q-ctr">Pergunta 1 de 10</span>
+        <span class="qpill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>Ciências</span>
+      </div>
+      <div class="qpbar"><div class="qpfill" id="q-pfill" style="width:10%"></div></div>
+    </div>
+    <div class="timer-blk">
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px">Tempo</div>
+        <div style="font-size:11px;color:var(--txtl)" id="q-rinline">0 respostas</div>
+      </div>
+      <div class="timer-ring">
+        <svg class="timer-svg" viewBox="0 0 72 72">
+          <circle class="t-track" cx="36" cy="36" r="32"/>
+          <circle class="t-arc" id="t-arc" cx="36" cy="36" r="32"/>
+        </svg>
+        <div class="t-num" id="t-num">30</div>
+      </div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnlbl" id="q-nlbl">Pergunta 1</div>
+    <div class="qtxt" id="q-txt">Qual é o maior planeta do Sistema Solar?</div>
+    <div class="qopts">
+      <div class="qopt" id="o0" onclick="pick(0)"><div class="oltr la">A</div><div class="otxt" id="ot0">Saturno</div><svg class="oico ico-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#12B76A"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><svg class="oico ico-no" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#F04438"/><path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="qopt" id="o1" onclick="pick(1)"><div class="oltr lb">B</div><div class="otxt" id="ot1">Júpiter</div><svg class="oico ico-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#12B76A"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><svg class="oico ico-no" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#F04438"/><path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="qopt" id="o2" onclick="pick(2)"><div class="oltr lc">C</div><div class="otxt" id="ot2">Netuno</div><svg class="oico ico-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#12B76A"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><svg class="oico ico-no" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#F04438"/><path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="qopt" id="o3" onclick="pick(3)"><div class="oltr ld">D</div><div class="otxt" id="ot3">Urano</div><svg class="oico ico-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#12B76A"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><svg class="oico ico-no" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#F04438"/><path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+    </div>
+  </div>
+  <div class="qfoot">
+    <div class="qrlive"><div class="pdot"></div><div class="qrcount" id="q-rcnt">0</div><div>de <span id="q-rtot">18</span> respostas</div></div>
+    <button class="btn-rev" id="btn-rev" onclick="reveal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>Revelar resposta</button>
+  </div>
+</section>
+
+<!-- ══ TELA 4: RESULTADO ══ -->
+<section id="sr" class="screen">
+  <div class="starfield" id="sf4"></div>
+  <div class="rh">
+    <div><div class="rtitle" id="r-title">Resultado — Pergunta 1</div><div class="rqlbl">Sistema Solar e Planetas</div></div>
+    <button class="btn-next" onclick="nextQ()">Próxima pergunta <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="rbody">
+    <div class="rleft">
+      <div class="rrecap">
+        <div class="rqn" id="r-qn">Pergunta 1 de 10</div>
+        <div class="rqt" id="r-qt">Qual é o maior planeta do Sistema Solar?</div>
+        <div class="ranslbl">Resposta correta</div>
+        <div class="rans" id="r-ans"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>B — Júpiter</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px">Distribuição por opção</div>
+        <div class="rbars" id="r-bars"></div>
+      </div>
+      <div class="rstats">
+        <div class="scard"><div class="sval" id="s-cor" style="color:var(--green)">—</div><div class="slbl">acertaram</div></div>
+        <div class="scard"><div class="sval" id="s-wrg" style="color:var(--red)">—</div><div class="slbl">erraram</div></div>
+        <div class="scard"><div class="sval" id="s-pct">—</div><div class="slbl">de acerto</div></div>
+        <div class="scard"><div class="sval" id="s-avg" style="color:var(--cyan)">—</div><div class="slbl">tempo médio</div></div>
+      </div>
+    </div>
+    <div class="rright">
+      <div class="pie-ttl">Distribuição</div>
+      <div class="pie-wrap"><svg class="pie-svg" viewBox="0 0 200 200" id="pie-svg"></svg><div class="pie-center"><div class="pie-pct" id="pie-pct">—</div><div class="pie-sub">acerto</div></div></div>
+      <div class="pie-legend" id="pie-leg"></div>
+      <div class="divider" style="width:100%"></div>
+      <div class="podium" style="width:100%">
+        <div class="pod-ttl">🏆 Ranking parcial</div>
+        <div id="pod-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sf5" class="screen"><div class="starfield" id="sf5-stars"></div><div class="sf5-hdr"><div><div class="sf5-title">Quiz Encerrado <span>— Placar Final</span></div><div class="sf5-sub">Sistema Solar e Planetas &middot; Turma 8B &middot; 18 participantes</div></div><div class="sf5-actions"><button class="btn-export" onclick="alert('Exportando PDF...')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>Exportar PDF</button><button class="btn-new-quiz" onclick="dnGo(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Novo Quiz</button></div></div><div class="sf5-body"><div class="sf5-left"><div><div class="sect-ttl">Top 5 — Melhores Pontuacoes</div><div id="sf5-podium"></div></div><div><div class="sect-ttl">Classificacao Completa</div><div class="sf5-full-table"><div class="tbl-hdr"><div class="tbl-hdr-cell">#</div><div class="tbl-hdr-cell">Estudante</div><div class="tbl-hdr-cell">Pts</div><div class="tbl-hdr-cell">Acertos</div><div class="tbl-hdr-cell">T. medio</div></div><div id="sf5-table"></div></div></div></div><div class="sf5-right"><div><div class="sect-ttl">Resumo da Sessao</div><div class="sum-cards"><div class="sum-card"><div class="sum-val" style="color:#12B76A">72%</div><div class="sum-lbl">taxa de acerto geral</div></div><div class="sum-card"><div class="sum-val" style="color:#00B4FD">14s</div><div class="sum-lbl">tempo medio resp.</div></div><div class="sum-card"><div class="sum-val">18</div><div class="sum-lbl">participantes</div></div><div class="sum-card"><div class="sum-val" style="color:#FFEA24">5</div><div class="sum-lbl">questoes respondidas</div></div></div></div><div><div class="sect-ttl">Acerto por Questao</div><div id="sf5-qb"></div></div></div></div></section><section id="sf6" class="screen"><div class="pod-sky" id="sf6-stars"></div><div class="pod-nebula nb1"></div><div class="pod-nebula nb2"></div><div class="pod-nebula nb3"></div><div class="pod-planet-bg pp1"></div><div class="pod-planet-bg pp2"></div><div class="pod-floor"><div class="pod-floor-inner"></div></div><div class="pod-header"><div class="pod-brand"><div class="pod-brand-logo">O</div><div class="pod-brand-name">ORBIE QUIZ</div></div><div class="pod-quiz-info"><div class="pod-end-label">Encerrado</div><div class="pod-quiz-name" id="pod-quiz-name">Sistema Solar e Planetas</div><div class="pod-quiz-sub">Turma 8B &middot; 18 participantes</div></div><div class="pod-header-actions"><button class="btn-ranking" onclick="dnGo(5)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="margin-right:4px"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Ver ranking completo</button><button class="btn-podium-next" onclick="dnGo(1)">Novo quiz</button></div></div><div class="pod-stage" id="pod-stage"><div class="pod-col col-2"><div class="pod-avatar-wrap"><div class="pod-avatar" id="pod-av-2" style="--av-glow:rgba(192,202,219,.4)">C</div><div class="pod-name" id="pod-nm-2">Carla S.</div><div class="pod-score-badge sb2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" fill="#C0CADB"/></svg><span id="pod-sc-2">8.750</span></div></div><div class="pod-step pod-step-2"><svg viewBox="0 0 210 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="r2sh" cx="50%" cy="100%" r="50%"><stop offset="0%" stop-color="rgba(192,202,219,.2)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <linearGradient id="r2top" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#1E293B"/></linearGradient>
+    <linearGradient id="r2dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0F172A"/><stop offset="100%" stop-color="#1E293B"/></linearGradient>
+  </defs>
+  <ellipse cx="105" cy="171" rx="68" ry="7" fill="url(#r2sh)" opacity="0.6"/>
+  <polygon points="48,140 162,140 175,112 158,70 138,52 105,48 72,54 50,72 35,112" fill="url(#r2top)"/>
+  <polygon points="162,140 175,112 192,126 188,150 170,157" fill="url(#r2dark)"/>
+  <polygon points="48,140 35,112 20,128 23,152 42,158" fill="#0F172A" opacity="0.8"/>
+  <polygon points="42,158 48,140 70,145 105,148 140,145 162,140 170,157 188,150 175,165 148,170 105,172 62,169 38,164" fill="#0F172A"/>
+  <polygon points="50,73 72,55 105,49 138,53 158,71 175,112 162,140 48,140 35,112" fill="#64748B" opacity="0.5"/>
+  <polyline points="50,74 72,56 105,50 138,54 158,72" fill="none" stroke="rgba(226,232,240,.35)" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Cristais prata/azul -->
+  <polygon points="88,50 92,35 96,50" fill="#C0CADB" opacity="0.9"/>
+  <polygon points="102,47 106,30 110,47" fill="#E2E8F0" opacity="1"/>
+  <polygon points="116,51 119,38 122,51" fill="#99C0FF" opacity="0.85"/>
+  <polygon points="78,57 81,46 84,57" fill="#C0CADB" opacity="0.7"/>
+  <polygon points="128,55 131,45 134,55" fill="#99C0FF" opacity="0.75"/>
+  <polygon points="150,74 162,100 158,128 155,72" fill="rgba(255,255,255,.06)"/>
+  <line x1="80" y1="78" x2="70" y2="115" stroke="rgba(0,0,0,.25)" stroke-width="0.9"/>
+  <line x1="126" y1="73" x2="138" y2="118" stroke="rgba(0,0,0,.2)" stroke-width="0.9"/>
+  <polygon points="50,74 72,56 80,68 58,86" fill="rgba(255,255,255,.08)"/>
+</svg><div class="pod-step-num n2">2</div></div></div><div class="pod-col col-1"><div class="pod-avatar-wrap"><div class="pod-crown">&#128081;</div><div class="pod-avatar glow1" id="pod-av-1" style="--av-glow:rgba(255,234,36,.6);width:88px;height:88px;font-size:32px">F</div><div class="pod-name" id="pod-nm-1" style="font-size:14px">Felipe R.</div><div class="pod-score-badge sb1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" fill="#FFEA24"/></svg><span id="pod-sc-1">9.500</span></div></div><div class="pod-step pod-step-1"><svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="r1sh" cx="50%" cy="100%" r="50%"><stop offset="0%" stop-color="rgba(255,234,36,.25)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <linearGradient id="r1top" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6D28D9"/><stop offset="100%" stop-color="#4C1D95"/></linearGradient>
+    <linearGradient id="r1side" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3B0764"/><stop offset="100%" stop-color="#5B21B6"/></linearGradient>
+    <linearGradient id="r1dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2E1065"/><stop offset="100%" stop-color="#1E0A4A"/></linearGradient>
+  </defs>
+  <!-- Sombra embaixo -->
+  <ellipse cx="120" cy="196" rx="80" ry="8" fill="url(#r1sh)" opacity="0.7"/>
+  <!-- Corpo da rocha - facetas principais -->
+  <!-- Face frontal escura -->
+  <polygon points="55,160 185,160 200,130 175,80 155,60 120,55 85,62 62,85 42,130" fill="url(#r1top)"/>
+  <!-- Face direita mais escura -->
+  <polygon points="185,160 200,130 220,145 215,170 195,178" fill="url(#r1dark)"/>
+  <!-- Face esquerda média -->
+  <polygon points="55,160 42,130 25,148 28,172 48,178" fill="url(#r1side)"/>
+  <!-- Base inferior afilada -->
+  <polygon points="48,178 55,160 80,165 120,168 160,165 185,160 195,178 215,170 200,188 170,194 120,196 70,193 42,187" fill="#1E0A4A"/>
+  <!-- Face topo (mais clara) -->
+  <polygon points="62,85 85,62 120,55 155,60 175,80 200,130 185,160 55,160 42,130" fill="#7C3AED" opacity="0.6"/>
+  <!-- Linha de destaque topo -->
+  <polyline points="62,86 85,63 120,56 155,61 175,81" fill="none" stroke="rgba(196,181,253,.4)" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Cristais dourados no topo -->
+  <polygon points="100,57 104,40 108,57" fill="#FFEA24" opacity="0.9"/>
+  <polygon points="115,54 120,34 125,54" fill="#FFEA24" opacity="1"/>
+  <polygon points="132,57 136,43 140,57" fill="#FDB022" opacity="0.85"/>
+  <polygon points="88,63 91,50 94,63" fill="#FFEA24" opacity="0.7"/>
+  <polygon points="148,62 151,50 154,62" fill="#FDB022" opacity="0.75"/>
+  <!-- Brilho lateral -->
+  <polygon points="170,82 185,110 180,140 175,80" fill="rgba(255,255,255,.07)"/>
+  <!-- Fissuras -->
+  <line x1="90" y1="90" x2="80" y2="130" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+  <line x1="140" y1="85" x2="155" y2="135" stroke="rgba(0,0,0,.25)" stroke-width="1"/>
+  <line x1="115" y1="60" x2="108" y2="120" stroke="rgba(0,0,0,.2)" stroke-width="0.8"/>
+  <!-- Brilho topo esquerdo -->
+  <polygon points="62,86 85,63 95,75 70,95" fill="rgba(255,255,255,.09)"/>
+</svg><div class="pod-step-num n1">1</div></div></div><div class="pod-col col-3"><div class="pod-avatar-wrap"><div class="pod-avatar" id="pod-av-3" style="--av-glow:rgba(253,176,34,.4)">A</div><div class="pod-name" id="pod-nm-3">Ana Luiza</div><div class="pod-score-badge sb3"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" fill="#FDB022"/></svg><span id="pod-sc-3">8.200</span></div></div><div class="pod-step pod-step-3"><svg viewBox="0 0 190 158" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="r3sh" cx="50%" cy="100%" r="50%"><stop offset="0%" stop-color="rgba(253,176,34,.18)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    <linearGradient id="r3top" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#92400E"/><stop offset="100%" stop-color="#451A03"/></linearGradient>
+    <linearGradient id="r3dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2C0A00"/><stop offset="100%" stop-color="#451A03"/></linearGradient>
+  </defs>
+  <ellipse cx="95" cy="154" rx="60" ry="6" fill="url(#r3sh)" opacity="0.6"/>
+  <polygon points="42,126 148,126 160,100 144,62 126,46 95,42 64,48 44,65 30,100" fill="url(#r3top)"/>
+  <polygon points="148,126 160,100 175,112 171,134 154,142" fill="url(#r3dark)"/>
+  <polygon points="42,126 30,100 16,114 19,136 37,142" fill="#2C0A00" opacity="0.85"/>
+  <polygon points="37,142 42,126 62,131 95,133 128,131 148,126 154,142 171,134 158,149 133,154 95,156 57,153 34,148" fill="#2C0A00"/>
+  <polygon points="44,66 64,49 95,43 126,47 144,63 160,100 148,126 42,126 30,100" fill="#B45309" opacity="0.5"/>
+  <polyline points="44,67 64,50 95,44 126,48 144,64" fill="none" stroke="rgba(253,176,34,.35)" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Cristais laranja/cobre -->
+  <polygon points="80,44 83,31 86,44" fill="#FDB022" opacity="0.9"/>
+  <polygon points="92,41 95,26 98,41" fill="#FFEA24" opacity="0.85"/>
+  <polygon points="106,44 109,33 112,44" fill="#F79009" opacity="0.9"/>
+  <polygon points="70,51 73,41 76,51" fill="#FDB022" opacity="0.7"/>
+  <polygon points="116,49 119,40 122,49" fill="#F79009" opacity="0.75"/>
+  <polygon points="136,65 148,90 144,115 141,63" fill="rgba(255,255,255,.06)"/>
+  <line x1="72" y1="70" x2="63" y2="103" stroke="rgba(0,0,0,.25)" stroke-width="0.9"/>
+  <line x1="114" y1="66" x2="124" y2="106" stroke="rgba(0,0,0,.2)" stroke-width="0.9"/>
+  <polygon points="44,67 64,50 72,61 52,78" fill="rgba(255,255,255,.08)"/>
+</svg><div class="pod-step-num n3">3</div></div></div></div><div class="pod-others"><div class="pod-other"><div class="pod-other-pos">4</div><div class="pod-other-av" id="pod-ov-4" style="background:#591FC7">B</div><div class="pod-other-name" id="pod-on-4">Bruno M.</div><div class="pod-other-score" id="pod-os-4">7.900</div></div><div class="pod-other"><div class="pod-other-pos">5</div><div class="pod-other-av" id="pod-ov-5" style="background:#3F84F3">S</div><div class="pod-other-name" id="pod-on-5">Sara W.</div><div class="pod-other-score" id="pod-os-5">7.400</div></div></div></section><div class="ovl" id="ovl"></div>
+
+<script>
+const QS=[
+  {t:"Qual é o maior planeta do Sistema Solar?",o:["Saturno","Júpiter","Netuno","Urano"],c:1,r:[3,11,2,2]},
+  {t:"Quantos planetas existem no Sistema Solar?",o:["7","8","9","10"],c:1,r:[2,14,1,1]},
+  {t:"Qual planeta é chamado de Planeta Vermelho?",o:["Vênus","Mercúrio","Marte","Júpiter"],c:2,r:[1,2,12,3]},
+  {t:"O que é uma Estrela Anã Branca?",o:["Um asteroide gigante","Um buraco negro","O núcleo remanescente de uma estrela","Uma nebulosa nova"],c:2,r:[2,3,9,4]},
+  {t:"Qual é a distância média da Terra ao Sol?",o:["150 mil km","150 milhões de km","1,5 bilhão de km","15 milhões de km"],c:1,r:[3,10,2,3]}
+];
+const STUS=[
+  {n:"Ana Luiza",cl:"#0059E7"},{n:"Bruno M.",cl:"#591FC7"},{n:"Carla S.",cl:"#12B76A"},{n:"Diego F.",cl:"#FDB022"},
+  {n:"Eduarda P.",cl:"#F04438"},{n:"Felipe R.",cl:"#00B4FD"},{n:"Gabriela T.",cl:"#3F84F3"},{n:"Hugo A.",cl:"#2ABC4E"},
+  {n:"Isabela C.",cl:"#8455DD"},{n:"João V.",cl:"#F79009"},{n:"Larissa M.",cl:"#0059E7"},{n:"Matheus B.",cl:"#12B76A"},
+  {n:"Nathalia K.",cl:"#591FC7"},{n:"Otávio L.",cl:"#00B4FD"},{n:"Paula G.",cl:"#F04438"},{n:"Rafael N.",cl:"#FDB022"},
+  {n:"Sara W.",cl:"#3F84F3"},{n:"Thiago C.",cl:"#2ABC4E"}
+];
+const POD=[{n:"Ana Luiza",s:9500},{n:"Felipe R.",s:8750},{n:"Carla S.",s:8200},{n:"Bruno M.",s:7900},{n:"Sara W.",s:7400}];
+const OCOLS=["rgba(0,89,231,.7)","rgba(18,183,106,.8)","rgba(253,176,34,.7)","rgba(240,68,56,.7)"];
+const LCOLS=["#3F84F3","#12B76A","#FDB022","#F04438"];
+const OTAGS=["A","B","C","D"];
+const AVGT=[14,16,11,19,13];
+let cq=0,tl=30,ti=null,rev=false,rCount=0;
+
+function stars(id,n=70){
+  const el=document.getElementById(id);if(!el)return;el.innerHTML='';
+  for(let i=0;i<n;i++){const s=document.createElement('div');s.className='star';const z=Math.random()*2.5+.5;s.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+1).toFixed(1)}s;animation-delay:${(Math.random()*3).toFixed(1)}s`;el.appendChild(s);}
+  for(let m=0;m<4;m++){const mt=document.createElement('div');mt.className='meteor';mt.style.cssText=`top:${10+Math.random()*60}%;--d:${(4+Math.random()*4).toFixed(1)}s;animation-delay:${(Math.random()*7).toFixed(1)}s`;el.appendChild(mt);}
+}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+/* PREP */
+function initPrep(){
+  stars('sf1');
+  let i=0;
+  function add(){
+    if(i>=STUS.length)return;
+    const s=STUS[i];
+    const chip=document.createElement('div');chip.className='stu-chip';
+    const av=document.createElement('div');av.className='stu-av';av.style.background=s.cl;av.textContent=s.n[0];
+    chip.appendChild(av);chip.appendChild(document.createTextNode(s.n));
+    document.getElementById('stu-list').appendChild(chip);
+    document.getElementById('stu-count').textContent=++i;
+    setTimeout(add,300+Math.random()*700);
+  }
+  setTimeout(add,600);
+}
+
+/* START */
+function startQuiz(){show('sc');stars('sf2');runCD(3);}
+
+function runCD(n){
+  const num=document.getElementById('cd-num'),go=document.getElementById('cd-go'),arc=document.getElementById('cd-arc'),lbl=document.getElementById('cd-lbl');
+  const C=816,cols={3:'#00B4FD',2:'#FDB022',1:'#F04438'};
+  num.style.display='block';go.style.display='none';
+  function tick(x){
+    if(x===0){num.style.display='none';go.style.display='block';go.style.animation='none';go.offsetHeight;go.style.animation='gopop .5s cubic-bezier(.34,1.56,.64,1)';arc.style.stroke='#FFEA24';arc.style.strokeDashoffset='0';setTimeout(()=>loadQ(cq),900);return;}
+    num.textContent=x;num.style.animation='none';num.offsetHeight;num.style.animation='numpop .4s cubic-bezier(.34,1.56,.64,1)';
+    arc.style.stroke=cols[x]||'#00B4FD';arc.style.strokeDashoffset=C*(1-x/3);
+    lbl.textContent=x===3?'Preparando…':x===2?'Quase lá…':'Atenção!';
+    setTimeout(()=>tick(x-1),1000);
+  }
+  tick(n);
+}
+
+/* QUESTION */
+function loadQ(idx){
+  cq=idx;rev=false;tl=30;rCount=0;
+  show('sq');stars('sf3',60);
+  const q=QS[idx%QS.length],tot=QS.length;
+  document.getElementById('q-ctr').textContent=`Pergunta ${idx+1} de ${tot}`;
+  document.getElementById('q-nlbl').textContent=`Pergunta ${idx+1}`;
+  document.getElementById('q-txt').textContent=q.t;
+  document.getElementById('q-pfill').style.width=`${((idx+1)/tot)*100}%`;
+  document.getElementById('q-rcnt').textContent='0';
+  document.getElementById('q-rinline').textContent='0 respostas';
+  document.getElementById('q-rtot').textContent=STUS.length;
+  document.getElementById('btn-rev').classList.remove('vis');
+  [0,1,2,3].forEach(i=>{document.getElementById('o'+i).className='qopt';document.getElementById('ot'+i).textContent=q.o[i];});
+  startTimer();simR(q);
+}
+
+function startTimer(){
+  clearInterval(ti);
+  const arc=document.getElementById('t-arc'),num=document.getElementById('t-num');
+  const C=201;
+  function upd(){
+    const pct=tl/30;arc.style.strokeDashoffset=C*(1-pct);num.textContent=tl;
+    if(tl<=10){arc.style.stroke='#F04438';num.style.color='#F04438';}
+    else if(tl<=20){arc.style.stroke='#FDB022';num.style.color='#FDB022';}
+    else{arc.style.stroke='#00B4FD';num.style.color='#fff';}
+    if(tl<=0){clearInterval(ti);document.getElementById('btn-rev').classList.add('vis');}
+    tl--;
+  }
+  upd();ti=setInterval(upd,1000);
+}
+
+function simR(q){
+  const tot=q.r.reduce((a,b)=>a+b,0);let sent=0;
+  function one(){
+    if(sent>=tot){document.getElementById('btn-rev').classList.add('vis');return;}
+    sent++;rCount=sent;
+    document.getElementById('q-rcnt').textContent=sent;
+    document.getElementById('q-rinline').textContent=sent+' respostas';
+    setTimeout(one,150+Math.random()*1200);
+  }
+  setTimeout(one,1200);
+}
+
+function pick(i){
+  if(rev)return;
+  [0,1,2,3].forEach(j=>document.getElementById('o'+j).className='qopt'+(j===i?' sel':''));
+}
+
+function reveal(){
+  if(rev)return;rev=true;clearInterval(ti);
+  const q=QS[cq%QS.length];
+  [0,1,2,3].forEach(i=>document.getElementById('o'+i).className='qopt '+(i===q.c?'cor':'wrg'));
+  const ov=document.getElementById('ovl');ov.style.display='block';ov.style.animation='none';ov.offsetHeight;ov.style.animation='ovlfade .8s ease forwards';setTimeout(()=>ov.style.display='none',900);
+  confetti();
+  setTimeout(()=>showR(cq),1800);
+}
+
+function confetti(){
+  const cols=['#FFEA24','#12B76A','#00B4FD','#0059E7','#FDB022','#F04438','#8455DD'];
+  for(let i=0;i<60;i++){
+    const c=document.createElement('div');c.className='cfti';
+    c.style.cssText=`left:${Math.random()*1280}px;top:${200+Math.random()*400}px;background:${cols[Math.floor(Math.random()*cols.length)]};--x:${(Math.random()-.5)*300}px;--y:${-(100+Math.random()*400)}px;--r:${Math.random()*720}deg;--d:${(.8+Math.random()*.8).toFixed(2)}s;--dl:${(Math.random()*.3).toFixed(2)}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    document.body.appendChild(c);setTimeout(()=>c.remove(),2000);
+  }
+}
+
+/* RESULT */
+function showR(idx){
+  show('sr');stars('sf4',60);
+  const q=QS[idx%QS.length],tot=QS.length,opts=OTAGS,labs=q.o;
+  const totR=q.r.reduce((a,b)=>a+b,0),corN=q.r[q.c],pct=Math.round(corN/totR*100);
+  document.getElementById('r-title').textContent=`Resultado — Pergunta ${idx+1}`;
+  document.getElementById('r-qn').textContent=`Pergunta ${idx+1} de ${tot}`;
+  document.getElementById('r-qt').textContent=q.t;
+  document.getElementById('r-ans').innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>${opts[q.c]} — ${q.o[q.c]}`;
+  document.getElementById('s-cor').textContent=corN;
+  document.getElementById('s-wrg').textContent=totR-corN;
+  document.getElementById('s-pct').textContent=pct+'%';
+  document.getElementById('s-avg').textContent=AVGT[idx%AVGT.length]+'s';
+  document.getElementById('pie-pct').textContent=pct+'%';
+  // bars
+  const bars=document.getElementById('r-bars');bars.innerHTML='';
+  const mx=Math.max(...q.r);
+  q.r.forEach((v,i)=>{
+    const row=document.createElement('div');row.className='rbar-row';
+    row.innerHTML=`<div class="rbar-ltr l${['a','b','c','d'][i]}">${opts[i]}</div><div class="rbar-wrap"><div class="rbar-fill" id="rb${i}" style="background:${OCOLS[i]}"></div></div><div class="rbar-n">${v}</div>`;
+    bars.appendChild(row);
+  });
+  setTimeout(()=>{q.r.forEach((v,i)=>{const f=document.getElementById('rb'+i);if(f){f.style.width=(v/mx*88)+'%';f.textContent=v+' aluno'+(v!==1?'s':'');}});},150);
+  // pie
+  renderPie(q.r,q.c,q.o);
+  // podium
+  const pl=document.getElementById('pod-list');pl.innerHTML='';
+  POD.forEach((p,i)=>{const row=document.createElement('div');row.className='pod-row';const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';row.innerHTML=`<div class="pod-rank r${i+1}">${med||i+1}</div><div class="pod-name">${p.n}</div><div class="pod-score">${p.s.toLocaleString('pt-BR')}</div>`;row.style.animationDelay=(i*.08)+'s';pl.appendChild(row);});
+}
+
+function renderPie(resp,cor,labs){
+  const svg=document.getElementById('pie-svg'),leg=document.getElementById('pie-leg');
+  svg.innerHTML='';leg.innerHTML='';
+  const tot=resp.reduce((a,b)=>a+b,0),cx=100,cy=100,r=80;
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  defs.innerHTML='<filter id="gw"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg.appendChild(defs);
+  let sa=0;
+  resp.forEach((v,i)=>{
+    const pct=v/tot,ang=pct*2*Math.PI,ea=sa+ang;
+    const x1=cx+r*Math.cos(sa),y1=cy+r*Math.sin(sa),x2=cx+r*Math.cos(ea),y2=cy+r*Math.sin(ea),lg=ang>Math.PI?1:0;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${cx},${cy}L${x1},${y1}A${r},${r} 0 ${lg},1 ${x2},${y2}Z`);
+    p.setAttribute('fill',LCOLS[i]);
+    if(i===cor)p.setAttribute('filter','url(#gw)');
+    p.style.opacity='0';p.style.transition=`opacity .4s ease ${i*.1}s`;
+    svg.appendChild(p);setTimeout(()=>p.style.opacity='1',50);
+    const gl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    gl.setAttribute('x1',cx);gl.setAttribute('y1',cy);gl.setAttribute('x2',x1);gl.setAttribute('y2',y1);
+    gl.setAttribute('stroke','#0D1A32');gl.setAttribute('stroke-width','2');svg.appendChild(gl);
+    sa=ea;
+    const lr=document.createElement('div');lr.className='leg-row';
+    lr.innerHTML=`<div class="leg-dot" style="background:${LCOLS[i]}"></div><div class="leg-lbl">${OTAGS[i]} — ${labs[i]}</div><div class="leg-val">${Math.round(pct*100)}%</div>`;
+    leg.appendChild(lr);
+  });
+  const hole=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hole.setAttribute('cx',cx);hole.setAttribute('cy',cy);hole.setAttribute('r','50');
+  hole.setAttribute('fill','#0D1A32');svg.appendChild(hole);
+}
+
+function nextQ(){
+  cq=(cq+1)%QS.length;show('sc');stars('sf2');
+  document.getElementById('cd-lbl').textContent='Próxima pergunta…';
+  runCD(3);setTimeout(()=>loadQ(cq),4200);
+}
+
+window.addEventListener('DOMContentLoaded',()=>{stars('sf1');initPrep();});
+</script>
+<div id="dnav"><div class="dnav-lbl">Telas</div><button class="dn on" id="dn1" onclick="dnGo(1)"><span class="dn-num">1</span>Preparacao</button><button class="dn" id="dn2" onclick="dnGo(2)"><span class="dn-num">2</span>Contagem</button><button class="dn" id="dn3" onclick="dnGo(3)"><span class="dn-num">3</span>Pergunta</button><button class="dn" id="dn4" onclick="dnGo(4)"><span class="dn-num">4</span>Resultado</button><button class="dn" id="dn5" onclick="dnGo(5)"><span class="dn-num">5</span>Placar Final</button><button class="dn" id="dn6" onclick="dnGo(6)"><span class="dn-num">6</span>&#127942; Podio</button></div><script id="dnav-js">function dnGo(n){clearInterval(window._dnTi);clearInterval(window._dnTimerI);document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});document.querySelectorAll(".dn").forEach(function(b){b.classList.remove("on");});document.getElementById("dn"+n).classList.add("on");window.scrollTo(0,0);if(n===1){document.getElementById("sp").classList.add("active");}else if(n===2){document.getElementById("sc").classList.add("active");_dnCD();}else if(n===3){document.getElementById("sq").classList.add("active");_dnQ();}else if(n===4){document.getElementById("sr").classList.add("active");_dnResult();}else if(n===5){document.getElementById("sf5").classList.add("active");_dnFinal();}else if(n===6){document.getElementById("sf6").classList.add("active");_dnPodium();}}function _dnCD(){buildStarfield("sf2");var num=document.getElementById("cd-num"),go=document.getElementById("cd-go"),arc=document.getElementById("cd-arc"),lbl=document.getElementById("cd-lbl");var C=816,cols={3:"#00B4FD",2:"#FDB022",1:"#F04438"};num.style.display="block";go.style.display="none";function tick(x){if(x===0){num.style.display="none";go.style.display="block";arc.style.stroke="#FFEA24";lbl.textContent="VAMOS LA!";return;}num.textContent=x;num.style.animation="none";void num.offsetHeight;num.style.animation="numpop .4s cubic-bezier(.34,1.56,.64,1)";arc.style.stroke=cols[x];arc.style.strokeDashoffset=C*(1-x/3);lbl.textContent=x===3?"Preparando...":x===2?"Quase la...":"Atencao!";window._dnTi=setTimeout(function(){tick(x-1);},1000);}tick(3);}function _dnQ(){buildStarfield("sf3",60);loadQ(0);}function _dnResult(){buildStarfield("sf4",60);showR(0);}document.addEventListener("DOMContentLoaded",function(){document.body.style.paddingBottom="60px";});</script><script id="sf5-js">function _dnFinal(){buildStarfield("sf5-stars",80);var ALL=[{n:"Felipe R.",cl:"#00B4FD",s:9500,ac:5,avg:"11s"},{n:"Carla S.",cl:"#12B76A",s:8750,ac:5,avg:"14s"},{n:"Ana Luiza",cl:"#0059E7",s:8200,ac:4,avg:"12s"},{n:"Bruno M.",cl:"#591FC7",s:7900,ac:4,avg:"16s"},{n:"Sara W.",cl:"#3F84F3",s:7400,ac:4,avg:"18s"},{n:"Eduarda P.",cl:"#F04438",s:6800,ac:3,avg:"15s"},{n:"Hugo A.",cl:"#2ABC4E",s:6200,ac:3,avg:"17s"},{n:"Gabriela T.",cl:"#8455DD",s:5900,ac:3,avg:"20s"},{n:"Thiago C.",cl:"#2ABC4E",s:5400,ac:2,avg:"22s"},{n:"Isabela C.",cl:"#8455DD",s:5100,ac:2,avg:"21s"},{n:"Diego F.",cl:"#FDB022",s:4800,ac:2,avg:"19s"},{n:"Matheus B.",cl:"#12B76A",s:4200,ac:2,avg:"25s"},{n:"Joao V.",cl:"#F79009",s:3900,ac:1,avg:"24s"},{n:"Nathalia K.",cl:"#591FC7",s:3400,ac:1,avg:"26s"},{n:"Otavio L.",cl:"#00B4FD",s:2800,ac:1,avg:"28s"},{n:"Paula G.",cl:"#F04438",s:2200,ac:0,avg:"-"},{n:"Larissa M.",cl:"#0059E7",s:1500,ac:0,avg:"-"},{n:"Rafael N.",cl:"#FDB022",s:800,ac:0,avg:"-"}];var QS2=[{t:"Maior planeta do Sistema Solar?",pct:61},{t:"Quantos planetas no Sistema Solar?",pct:78},{t:"Qual e o Planeta Vermelho?",pct:67},{t:"O que e Estrela Ana Branca?",pct:50},{t:"Distancia media Terra-Sol?",pct:56}];var MEDALS=["gold","silver","bronze","",""];var PCLS=["p1","p2","p3","p4","p5"];var pod=document.getElementById("sf5-podium");pod.innerHTML="";ALL.slice(0,5).forEach(function(p,i){var div=document.createElement("div");div.className="pod-entry "+PCLS[i];var glow=document.createElement("div");glow.className="pod-glow";div.appendChild(glow);var medal=document.createElement("div");medal.className="pod-medal";medal.textContent=i===0?"1":i===1?"2":i===2?"3":String(i+1);div.appendChild(medal);var av=document.createElement("div");av.className="pod-av";av.style.background=p.cl;av.textContent=p.n[0];div.appendChild(av);var info=document.createElement("div");info.className="pod-info";var nm=document.createElement("div");nm.className="pod-name";nm.textContent=p.n;info.appendChild(nm);var det=document.createElement("div");det.className="pod-detail";det.textContent=p.ac+" acertos de 5";info.appendChild(det);div.appendChild(info);var sw=document.createElement("div");sw.className="pod-score-wrap";var sc=document.createElement("div");sc.className="pod-score";sc.textContent=p.s.toLocaleString("pt-BR");sw.appendChild(sc);var ac=document.createElement("div");ac.className="pod-acertos";ac.textContent="Tempo med.: "+p.avg;sw.appendChild(ac);div.appendChild(sw);div.style.animation="chipin .3s cubic-bezier(.34,1.56,.64,1) "+(i*.1)+"s both";pod.appendChild(div);});var tbl=document.getElementById("sf5-table");tbl.innerHTML="";ALL.forEach(function(p,i){var row=document.createElement("div");row.className="tbl-row";var pos=document.createElement("div");pos.className="tbl-pos";pos.textContent=String(i+1);row.appendChild(pos);var pl=document.createElement("div");pl.className="tbl-player";var av=document.createElement("div");av.className="tbl-av";av.style.background=p.cl;av.textContent=p.n[0];pl.appendChild(av);var nm=document.createElement("div");nm.className="tbl-nm";nm.textContent=p.n;pl.appendChild(nm);row.appendChild(pl);var sc=document.createElement("div");sc.className="tbl-val hi";sc.textContent=p.s.toLocaleString("pt-BR");row.appendChild(sc);var ac=document.createElement("div");ac.className="tbl-val "+(p.ac>=4?"ok":p.ac>=2?"":"no");ac.textContent=p.ac+"/5";row.appendChild(ac);var avg=document.createElement("div");avg.className="tbl-val";avg.textContent=p.avg;row.appendChild(avg);tbl.appendChild(row);});var qb=document.getElementById("sf5-qb");qb.innerHTML="";QS2.forEach(function(q,i){var row=document.createElement("div");row.className="qb-row";var num=document.createElement("div");num.className="qb-num";num.textContent="Q"+(i+1);row.appendChild(num);var txt=document.createElement("div");txt.className="qb-txt";txt.textContent=q.t;row.appendChild(txt);var bg=document.createElement("div");bg.className="qb-bar-bg";var fill=document.createElement("div");fill.className="qb-fill";fill.style.background=q.pct>=70?"#12B76A":q.pct>=50?"#FDB022":"#F04438";fill.style.width="0%";bg.appendChild(fill);row.appendChild(bg);var pct=document.createElement("div");pct.className="qb-pct";pct.style.color=q.pct>=70?"#12B76A":q.pct>=50?"#FDB022":"#F04438";pct.textContent=q.pct+"%";row.appendChild(pct);qb.appendChild(row);setTimeout(function(f,v){return function(){f.style.width=v+"%";};}(fill,q.pct), 200+i*80);});setTimeout(function(){var cols=["#FFEA24","#12B76A","#00B4FD","#0059E7","#FDB022","#F04438","#8455DD"];for(var i=0;i<60;i++){var c=document.createElement("div");c.className="cfti";var w=window.innerWidth;c.style.cssText="width:"+(6+Math.random()*8)+"px;height:"+(6+Math.random()*8)+"px;left:"+Math.random()*w+"px;top:"+(80+Math.random()*300)+"px;background:"+cols[Math.floor(Math.random()*cols.length)]+";--x:"+(Math.random()-.5)*300+"px;--y:-"+(100+Math.random()*400)+"px;--r:"+Math.random()*700+"deg;--d:"+(.8+Math.random()*.9).toFixed(2)+"s;--dl:"+(Math.random()*.3).toFixed(2)+"s;border-radius:"+(Math.random()>.5?"50%":"2px");document.body.appendChild(c);setTimeout(function(el){return function(){el.remove();};}(c),2000);}},300);}</script><script id="pod-js"></script><script id="pod-js">function _dnPodium(){var el=document.getElementById("sf6-stars");if(el){el.innerHTML="";for(var i=0;i<120;i++){var s=document.createElement("div");s.className="star";var z=Math.random()*2.5+.4;s.style.cssText="width:"+z+"px;height:"+z+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--d:"+(Math.random()*3+1).toFixed(1)+"s;animation-delay:"+(Math.random()*3).toFixed(1)+"s";el.appendChild(s);}for(var m=0;m<6;m++){var mt=document.createElement("div");mt.className="meteor";mt.style.cssText="top:"+(5+Math.random()*50)+"%;--d:"+(4+Math.random()*5).toFixed(1)+"s;animation-delay:"+(Math.random()*8).toFixed(1)+"s";el.appendChild(mt);}}var TOP=[{n:"Felipe R.",cl:"#00B4FD",s:9500},{n:"Carla S.",cl:"#12B76A",s:8750},{n:"Ana Luiza",cl:"#0059E7",s:8200},{n:"Bruno M.",cl:"#591FC7",s:7900},{n:"Sara W.",cl:"#3F84F3",s:7400}];var order=[1,0,2];var positions=[1,2,3];for(var i=0;i<3;i++){var p=TOP[i];var pos=i+1;var av=document.getElementById("pod-av-"+pos);var nm=document.getElementById("pod-nm-"+pos);var sc=document.getElementById("pod-sc-"+pos);if(av){av.textContent=p.n[0];av.style.background=p.cl;}if(nm)nm.textContent=p.n;if(sc)sc.textContent=p.s.toLocaleString("pt-BR");}for(var j=3;j<5;j++){var p2=TOP[j];var pos2=j+1;var ov=document.getElementById("pod-ov-"+pos2);var on2=document.getElementById("pod-on-"+pos2);var os=document.getElementById("pod-os-"+pos2);if(ov){ov.textContent=p2.n[0];ov.style.background=p2.cl;}if(on2)on2.textContent=p2.n;if(os)os.textContent=p2.s.toLocaleString("pt-BR");}var cols=["#FFEA24","#12B76A","#00B4FD","#0059E7","#FDB022","#F04438","#8455DD","#fff"];function launchConfetti(burst){for(var i=0;i<burst;i++){var c=document.createElement("div");var isRect=Math.random()>.4;var w2=isRect?4+Math.random()*6:8+Math.random()*8;var h2=isRect?10+Math.random()*16:w2;c.style.cssText="position:fixed;border-radius:"+(isRect?"2px":"50%")+";pointer-events:none;z-index:9998;";c.style.width=w2+"px";c.style.height=h2+"px";c.style.background=cols[Math.floor(Math.random()*cols.length)];var startX=Math.random()*window.innerWidth;c.style.left=startX+"px";c.style.top="-20px";document.body.appendChild(c);var vx=(Math.random()-.5)*200;var vy=200+Math.random()*400;var rot=Math.random()*720*(Math.random()>.5?1:-1);var dur=1200+Math.random()*1600;var delay=Math.random()*800;c.animate([{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:"translate("+vx+"px,"+vy+"px) rotate("+rot+"deg)",opacity:0}],{duration:dur,delay:delay,easing:"cubic-bezier(.25,.46,.45,.94)",fill:"forwards"}).onfinish=function(el){return function(){el.remove();};}(c);}}launchConfetti(80);setTimeout(function(){launchConfetti(60);},600);setTimeout(function(){launchConfetti(40);},1200);}</script></body>
+</html>

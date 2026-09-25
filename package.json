@@ -1,0 +1,24 @@
+{
+  "name": "mocks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/designer-leo-sd/orbie-prototipos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/designer-leo-sd/orbie-prototipos/issues"
+  },
+  "homepage": "https://github.com/designer-leo-sd/orbie-prototipos#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

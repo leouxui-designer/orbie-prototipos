@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Banco de Talentos | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #F8F9FB;
+      color: #000;
+      padding-top: 80px;
+      line-height: 1.5;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; background: none; cursor: pointer; font-family: inherit; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ===== TOKENS ===== */
+    :root {
+      --primary: #2CA942;
+      --primary-light: #55B13A;
+      --primary-dark: #52B934;
+      --primary-grad: linear-gradient(136deg, #2CA942 16%, #55B13A 55%, #52B934 87%);
+      --dark: #141414;
+      --dark-bg: #303030;
+      --text: #000;
+      --text-sec: rgba(0,0,0,0.8);
+      --text-ter: #454545;
+      --text-muted: #6B7280;
+      --bg: #F8F9FB;
+      --bg-white: #fff;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font-head: 'Montserrat', sans-serif;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
+      height: 80px; background: #fff;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      display: flex; align-items: center; padding: 0 24px;
+    }
+    .navbar__inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1440px; margin: 0 auto; }
+    .navbar__brand { font-family: var(--font-head); font-weight: 800; font-size: 24px; color: var(--text); }
+    .navbar__right { display: flex; align-items: center; gap: 16px; position: relative; }
+    .navbar__name { font-size: 14px; color: var(--text-muted); }
+    .navbar__avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+    .navbar__avatar:hover { box-shadow: 0 0 0 3px rgba(122,185,52,0.25); }
+
+    /* ===== LAYOUT ===== */
+    .painel { display: flex; min-height: calc(100vh - 80px); }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px; background: var(--dark); color: #fff;
+      padding: 32px 0; display: flex; flex-direction: column;
+      position: fixed; top: 80px; left: 0;
+      height: calc(100vh - 80px); overflow-y: auto; z-index: 100;
+    }
+    .sidebar__head { padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .sidebar__name { font-family: var(--font-head); font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+    .sidebar__sub { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .sidebar__nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; flex: 1; }
+    .sidebar__link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 8px;
+      font-size: 14px; color: rgba(255,255,255,0.7);
+      transition: all 0.15s;
+    }
+    .sidebar__link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .sidebar__link--active { background: rgba(122,185,52,0.15); color: var(--primary); font-weight: 500; }
+    .sidebar__link svg { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
+    .sidebar__link--active svg { opacity: 1; }
+    .sidebar__footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; }
+    .sidebar__logout { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.5); transition: color 0.15s; }
+    .sidebar__logout:hover { color: #fff; }
+
+    /* Main */
+    .main { flex: 1; padding: 32px 40px; margin-left: 260px; }
+    .main__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .main__title { font-family: var(--font-head); font-size: 28px; font-weight: 700; }
+    .main__sub { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Roboto', sans-serif; font-weight: 600; font-size: 14px;
+      padding: 12px 24px; border-radius: 80px; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      white-space: nowrap; border: none;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn:active { transform: none; }
+    .btn--primary { background: var(--primary-grad); color: #fff; }
+    .btn--outline { border: 1.5px solid var(--primary); color: var(--primary); background: rgba(255,255,255,0.9); }
+    .btn--outline:hover { background: rgba(122,185,52,0.06); }
+    .btn--ghost { color: var(--text-ter); padding: 8px 16px; font-size: 13px; }
+    .btn--ghost:hover { background: rgba(0,0,0,0.04); box-shadow: none; transform: none; }
+    .btn--sm { padding: 8px 16px; font-size: 13px; }
+    .btn--danger { color: #c0392b; }
+    .btn--danger:hover { background: rgba(192,57,43,0.06); box-shadow: none; transform: none; }
+
+    /* ===== GAMIFICATION BANNER ===== */
+    .progress-banner {
+      background: linear-gradient(135deg, #1a3a1f 0%, #0d2010 100%);
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-banner::before {
+      content: '';
+      position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(44,169,66,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .progress-ring { flex-shrink: 0; position: relative; width: 88px; height: 88px; }
+    .progress-ring svg { width: 88px; height: 88px; transform: rotate(-90deg); }
+    .progress-ring__track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
+    .progress-ring__fill { fill: none; stroke: url(#ringGrad); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 75.36; /* 70% */ transition: stroke-dashoffset 1s ease; }
+    .progress-ring__label {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .progress-ring__pct { font-family: var(--font-head); font-weight: 800; font-size: 22px; color: #fff; line-height: 1; }
+    .progress-ring__txt { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+    .progress-info { flex: 1; }
+    .progress-info__title { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .progress-info__desc { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-bottom: 16px; }
+    .progress-info__disclaimer { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-top: 8px; }
+
+    /* Checklist */
+    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+    .checklist__item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .checklist__item--done { color: rgba(255,255,255,0.9); }
+    .checklist__item--pending { color: rgba(255,255,255,0.4); }
+    .checklist__icon {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .checklist__icon--done { background: var(--primary); }
+    .checklist__icon--pending { background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); }
+    .checklist__anchor { color: #7AB934; text-decoration: underline; text-decoration-style: dotted; cursor: pointer; }
+    .checklist__layer {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 4px; margin-right: 2px;
+    }
+    .layer--1 { background: rgba(44,169,66,0.25); color: #7AB934; }
+    .layer--2 { background: rgba(255,193,7,0.2); color: #f5a623; }
+    .layer--3 { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+
+    /* ===== SECTIONS ===== */
+    .section {
+      background: var(--bg-white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px 32px;
+      margin-bottom: 20px;
+    }
+    .section__head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px;
+    }
+    .section__head-left { display: flex; align-items: center; gap: 10px; }
+    .section__icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(44,169,66,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .section__icon svg { width: 18px; height: 18px; color: var(--primary); }
+    .section__title { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
+    .section__badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+    .badge--obrig { background: rgba(44,169,66,0.12); color: #1a7a30; }
+    .badge--recom { background: rgba(245,166,35,0.12); color: #b57a10; }
+    .badge--opc { background: rgba(0,0,0,0.06); color: var(--text-muted); }
+
+    /* ===== SCTEC AUTO BADGE ===== */
+    .auto-field {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      background: rgba(44,169,66,0.05);
+      border: 1px solid rgba(44,169,66,0.15);
+      border-radius: 8px;
+    }
+    .auto-field__icon { color: var(--primary); flex-shrink: 0; }
+    .auto-field__label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .auto-field__value { font-size: 14px; font-weight: 600; color: var(--text); }
+    .auto-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(44,169,66,0.1); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+
+    /* ===== FORM ===== */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+    .form-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group--full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 13px; font-weight: 500; color: var(--text-ter);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-label--req::after { content: '*'; color: var(--primary); margin-left: 2px; }
+    .form-input {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
+      font-size: 15px; color: var(--text);
+      background: var(--bg-white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44,169,66,0.1); outline: none; }
+    .form-input::placeholder { color: #bbb; }
+    .form-input--disabled { background: var(--bg); color: var(--text-muted); pointer-events: none; border-style: dashed; }
+    select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+    textarea.form-input { resize: vertical; min-height: 90px; }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .char-count { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+    /* ===== AVATAR AREA ===== */
+    .avatar-area { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+    .avatar-wrap { position: relative; cursor: pointer; }
+    .avatar-circle {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #e2e4e9; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 700; font-size: 26px; color: var(--text-muted);
+    }
+    .avatar-edit {
+      position: absolute; bottom: -2px; right: -2px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--primary); border: 2px solid #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-edit svg { width: 12px; height: 12px; color: #fff; }
+    .avatar-info { font-size: 13px; color: var(--text-muted); }
+    .avatar-info strong { display: block; font-size: 14px; color: var(--text-ter); margin-bottom: 2px; }
+
+    /* ===== VISIBILIDADE TOGGLE ===== */
+    .visibility-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08); background: var(--bg);
+      margin-bottom: 16px;
+    }
+    .visibility-toggle__label { font-size: 14px; font-weight: 600; }
+    .visibility-toggle__sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .toggle { position: relative; width: 42px; height: 24px; display: inline-block; cursor: pointer; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle__slider { position: absolute; inset: 0; background: #ccc; border-radius: 24px; transition: background 0.2s; }
+    .toggle__slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+    .toggle input:checked + .toggle__slider { background: var(--primary); }
+    .toggle input:checked + .toggle__slider::before { transform: translateX(18px); }
+
+    /* ===== TAGS ===== */
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: rgba(0,0,0,0.04);
+      border-radius: 6px; font-size: 13px; color: var(--text-ter);
+    }
+    .tag--primary { background: rgba(44,169,66,0.1); color: #1a7a30; }
+    .tag__remove { width: 16px; height: 16px; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 15px; line-height: 1; transition: color 0.15s; }
+    .tag__remove:hover { color: #c0392b; }
+    .tag-add { cursor: pointer; border: 1.5px dashed rgba(0,0,0,0.2); background: none; color: var(--text-muted); padding: 5px 12px; border-radius: 6px; font-size: 13px; transition: all 0.15s; }
+    .tag-add:hover { border-color: var(--primary); color: var(--primary); background: rgba(44,169,66,0.04); }
+
+    /* ===== EXPERIENCE CARDS ===== */
+    .exp-card {
+      padding: 16px 20px; background: var(--bg);
+      border-radius: 8px; border: 1px solid var(--border);
+      position: relative; margin-bottom: 12px;
+    }
+    .exp-card__title { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+    .exp-card__meta { font-size: 13px; color: var(--text-muted); }
+    .exp-card__desc { font-size: 13px; color: var(--text-sec); margin-top: 6px; line-height: 1.5; }
+    .exp-card__current { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: rgba(44,169,66,0.1); color: #1a7a30; margin-left: 8px; }
+    .exp-card__actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; }
+    .icon-btn { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
+    .icon-btn:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+    .icon-btn--del:hover { color: #c0392b; background: rgba(192,57,43,0.06); }
+    .icon-btn svg { width: 16px; height: 16px; }
+
+    /* ===== INLINE ADD FORM ===== */
+    .inline-form {
+      display: none; padding: 20px; background: var(--bg);
+      border: 1.5px dashed rgba(44,169,66,0.3); border-radius: 8px; margin-bottom: 16px;
+    }
+    .inline-form--open { display: block; }
+    .inline-form__footer { display: flex; gap: 8px; margin-top: 16px; }
+
+    /* ===== LINKS ROW ===== */
+    .link-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .link-item__icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .link-item__icon--github { background: #24292e; color: #fff; }
+    .link-item__icon--linkedin { background: #0077B5; color: #fff; }
+    .link-item__icon--portfolio { background: rgba(44,169,66,0.12); color: var(--primary); }
+    .link-item__icon--video { background: rgba(255,0,0,0.08); color: #e53935; }
+    .link-item__icon--sctec { background: rgba(44,169,66,0.1); color: var(--primary); }
+    .link-item svg { width: 18px; height: 18px; }
+
+    /* ===== PCD ===== */
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-label {
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.12);
+      font-size: 14px; color: var(--text-sec); transition: all 0.15s;
+    }
+    .radio-label:has(input:checked) { border-color: var(--primary); background: rgba(44,169,66,0.06); color: var(--primary); font-weight: 500; }
+    .radio-label input { accent-color: var(--primary); }
+    .pcd-extra { margin-top: 16px; display: none; }
+    .pcd-extra--show { display: block; }
+
+    /* ===== DIVIDER ===== */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ===== SOFT SKILLS SELECT ===== */
+    .softskill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .softskill-chip {
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      padding: 8px 12px; border-radius: 8px;
+      border: 1.5px solid rgba(0,0,0,0.1);
+      font-size: 13px; color: var(--text-sec);
+      transition: all 0.15s; user-select: none;
+    }
+    .softskill-chip input { display: none; }
+    .softskill-chip--selected { border-color: var(--primary); background: rgba(44,169,66,0.07); color: #1a7a30; font-weight: 500; }
+    .softskill-chip__check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid rgba(0,0,0,0.2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .softskill-chip--selected .softskill-chip__check { background: var(--primary); border-color: var(--primary); }
+    .softskill-hint { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+    /* ===== AREA INTERESSE ===== */
+    .interesse-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .interesse-item__num { width: 24px; height: 24px; border-radius: 50%; background: rgba(44,169,66,0.12); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+
+    /* ===== CERTIFICADOS SCTEC ===== */
+    .cert-sctec {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; background: rgba(44,169,66,0.05);
+      border: 1px solid rgba(44,169,66,0.15); border-radius: 8px; margin-bottom: 8px;
+    }
+    .cert-sctec__logo { width: 32px; height: 32px; border-radius: 6px; background: var(--primary-grad); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cert-sctec__logo svg { width: 18px; height: 18px; color: #fff; }
+    .cert-sctec__name { font-size: 14px; font-weight: 600; }
+    .cert-sctec__meta { font-size: 12px; color: var(--text-muted); }
+
+    /* ===== DROPZONE ===== */
+    .dropzone {
+      border: 2px dashed rgba(0,0,0,0.15); border-radius: 8px;
+      padding: 24px; text-align: center; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .dropzone:hover, .dropzone--over { border-color: var(--primary); background: rgba(44,169,66,0.03); }
+    .dropzone__text { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+    .dropzone__file { display: none; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sec); justify-content: center; margin-top: 8px; }
+    .dropzone__file--show { display: flex; }
+
+    /* ===== SECTION NAV ===== */
+    .section-nav {
+      display: flex; gap: 4px; overflow-x: auto; margin-bottom: 8px;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .section-nav::-webkit-scrollbar { display: none; }
+    .section-nav__btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      color: var(--text-muted); white-space: nowrap; flex-shrink: 0;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .section-nav__btn:hover { background: rgba(0,0,0,0.04); color: var(--text-ter); }
+    .section-nav__btn--done { background: rgba(44,169,66,0.1); color: #1a7a30; }
+
+    /* ===== ACTIONS STICKY ===== */
+    .sticky-save {
+      position: sticky; bottom: 0; z-index: 50;
+      background: linear-gradient(to top, rgba(248,249,251,1) 70%, transparent);
+      padding: 16px 0 8px; margin-top: 8px;
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; }
+    .modal--open { display: flex; }
+    .modal__bg { position: absolute; inset: 0; background: rgba(0,0,0,0.5); cursor: pointer; }
+    .modal__box { position: relative; background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 16px 48px rgba(0,0,0,0.2); margin: 20px; }
+    .modal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal__title { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
+    .modal__close { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--text-muted); transition: background 0.15s; }
+    .modal__close:hover { background: var(--bg); }
+
+    /* Skills modal */
+    .skills-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--text-muted); margin: 16px 0 8px; }
+    .skills-check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .skills-check { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-sec); transition: background 0.12s; }
+    .skills-check:hover { background: var(--bg); }
+    .skills-check input { accent-color: var(--primary); width: 15px; height: 15px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--dark); color: #fff; padding: 12px 24px;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      z-index: 9999; opacity: 0; transition: transform 0.3s, opacity 0.3s;
+      pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast--ok { border-left: 3px solid var(--primary); }
+    .toast--visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .checklist { grid-template-columns: 1fr; }
+      .softskill-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .sidebar { width: 220px; }
+      .main { margin-left: 220px; padding: 24px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 20px 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid--3 { grid-template-columns: 1fr; }
+      .progress-banner { flex-direction: column; gap: 20px; }
+      .softskill-grid { grid-template-columns: 1fr 1fr; }
+      .section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a href="../index.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar__right">
+        <span class="navbar__name">João Silva</span>
+        <div class="navbar__avatar">JS</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__head">
+        <div class="sidebar__name">João Silva</div>
+        <div class="sidebar__sub">Desenvolvimento de Software</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="../pages/aluno-empresas.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Buscar Empresas
+        </a>
+        <a href="#" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Meu Perfil
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="../pages/login.html" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="main__header">
+        <div>
+          <h1 class="main__title">Meu Perfil</h1>
+          <p class="main__sub">Gerencie como as empresas enxergam você no Banco de Talentos</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="../pages/aluno-perfil-publico.html" class="btn btn--outline btn--sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Ver como empresa vê
+          </a>
+        </div>
+      </div>
+
+      <!-- ===== GAMIFICATION BANNER ===== -->
+      <div class="progress-banner">
+        <svg width="0" height="0" style="position:absolute">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2CA942"/>
+              <stop offset="100%" stop-color="#7AB934"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div class="progress-ring">
+          <svg viewBox="0 0 88 88">
+            <circle class="progress-ring__track" cx="44" cy="44" r="40"/>
+            <circle class="progress-ring__fill" cx="44" cy="44" r="40"/>
+          </svg>
+          <div class="progress-ring__label">
+            <span class="progress-ring__pct" id="pct-display">70%</span>
+            <span class="progress-ring__txt">completo</span>
+          </div>
+        </div>
+
+        <div class="progress-info">
+          <div class="progress-info__title">🚀 Seu perfil está 70% completo!</div>
+          <div class="progress-info__desc">Perfis mais completos têm maior visibilidade para empresas parceiras do SCTEC. Complete os itens abaixo para aparecer em mais buscas.</div>
+
+          <div class="checklist" id="checklist">
+            <!-- itens injetados via JS -->
+          </div>
+
+          <div class="progress-info__disclaimer">
+            ⚠️ Perfis completos têm maior potencial de visibilidade. A participação em processos seletivos depende da disponibilidade de vagas, critérios das empresas e desempenho nos processos.
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VISIBILIDADE ===== -->
+      <div class="visibility-toggle">
+        <div>
+          <div class="visibility-toggle__label">Perfil visível para empresas</div>
+          <div class="visibility-toggle__sub">Quando ativo, sua apresentação profissional aparece nas buscas do Banco de Talentos</div>
+        </div>
+        <label class="toggle" title="Ativar visibilidade">
+          <input type="checkbox" checked onchange="showToast(this.checked ? 'Perfil ativado — empresas já podem te encontrar 👍' : 'Perfil oculto das buscas.', this.checked)">
+          <span class="toggle__slider"></span>
+        </label>
+      </div>
+
+      <!-- ===== SEC 1: APRESENTAÇÃO ===== -->
+      <div class="section" id="sec-apresentacao">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div>
+              <div class="section__title">Apresentação</div>
+            </div>
+          </div>
+          <span class="section__badge badge--obrig">● Obrigatório</span>
+        </div>
+
+        <!-- Foto + nome -->
+        <div class="avatar-area">
+          <div class="avatar-wrap" onclick="document.getElementById('avatar-upload').click()" title="Alterar foto">
+            <div class="avatar-circle" id="avatar-preview">JS</div>
+            <div class="avatar-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+            <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+          </div>
+          <div class="avatar-info">
+            <strong>Clique para adicionar sua foto</strong>
+            Uma boa foto aumenta a confiança das empresas no seu perfil.
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label form-label--req">Nome completo</label>
+            <input type="text" class="form-input" value="João Silva" id="f-nome">
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label--req">Cidade</label>
+            <input type="text" class="form-input" value="Florianópolis, SC" id="f-cidade" placeholder="Preenchida pelo CEP">
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label form-label--req">Resumo profissional</label>
+            <textarea class="form-input" id="f-resumo" maxlength="600" rows="3" oninput="updateCharCount(this, 'resumo-count')">Estudante de Desenvolvimento de Software pelo SCTEC, com conhecimentos em JavaScript, TypeScript e Angular. Tenho experiência em projetos acadêmicos de desenvolvimento web e interesse em atuar como desenvolvedor Front-end. Busco minha primeira oportunidade profissional na área de tecnologia.</textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="form-hint">3 a 6 linhas — apresente sua formação, habilidades e o que você busca</span>
+              <span class="char-count"><span id="resumo-count">287</span>/600</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEC 2: FORMAÇÃO & SITUAÇÃO ===== -->
+      <div class="section" id="sec-formacao">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+            <div>
+              <div class="section__title">Formação & Situação profissional</div>
+            </div>
+          </div>
+          <span class="section__badge badge--obrig">● Obrigatório</span>
+        </div>
+
+        <!-- Dados SCTEC — automáticos -->
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Dados do SCTEC preenchidos automaticamente — não editáveis
+        </p>
+        <div class="form-grid" style="margin-bottom:16px;">
+          <div class="auto-field">
+            <div class="auto-field__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg></div>
+            <div>
+              <div class="auto-field__label">Trilha SCTEC</div>
+              <div class="auto-field__value">Desenvolvimento de Software</div>
+            </div>
+            <span class="auto-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> SCTEC</span>
+          </div>
+          <div class="auto-field">
+            <div class="auto-field__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+            <div>
+              <div class="auto-field__label">Curso SCTEC</div>
+              <div class="auto-field__value">Desenvolvimento Front-End [Angular]</div>
+            </div>
+            <span class="auto-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> SCTEC</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label form-label--req">Escolaridade (última)</label>
+            <select class="form-input" id="f-escolaridade">
+              <option>Ensino médio incompleto</option>
+              <option selected>Ensino médio completo</option>
+              <option>Ensino técnico incompleto</option>
+              <option>Ensino técnico completo</option>
+              <option>Ensino superior incompleto</option>
+              <option>Ensino superior completo</option>
+              <option>Pós-graduação incompleta</option>
+              <option>Pós-graduação completa</option>
+              <option>Mestrado incompleto</option>
+              <option>Mestrado completo</option>
+              <option>Doutorado ou pós-doutorado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label--req">Modalidade de trabalho preferida</label>
+            <select class="form-input" id="f-modalidade">
+              <option value="">Selecione…</option>
+              <option>Remoto</option>
+              <option selected>Híbrido</option>
+              <option>Presencial</option>
+              <option>Indiferente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEC 3: EXPERIÊNCIA PROFISSIONAL ===== -->
+      <div class="section" id="sec-experiencia">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+            <div>
+              <div class="section__title">Experiência profissional</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">A situação atual é inferida automaticamente pelas experiências cadastradas</div>
+            </div>
+          </div>
+          <span class="section__badge badge--recom">◑ Recomendado</span>
+        </div>
+
+        <!-- Card experiência atual -->
+        <div id="exp-list">
+          <div class="exp-card">
+            <div class="exp-card__actions">
+              <button class="icon-btn" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="icon-btn icon-btn--del" onclick="this.closest('.exp-card').remove();updateProgress()" title="Remover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg></button>
+            </div>
+            <div class="exp-card__title">Estagiário de Desenvolvimento<span class="exp-card__current">● Atual</span></div>
+            <div class="exp-card__meta">StartupSC · Mar 2026 – presente · Tecnologia</div>
+            <div class="exp-card__desc">Desenvolvimento de features no front-end com React e TypeScript. Participação em code reviews e dailys.</div>
+          </div>
+        </div>
+
+        <!-- Situação inferida -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(44,169,66,0.05);border-radius:8px;border:1px solid rgba(44,169,66,0.15);margin-bottom:16px;" id="situacao-infer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span style="font-size:13px;color:var(--text-sec);">Situação identificada: <strong>Fazendo estágio em tecnologia</strong> — <a class="checklist__anchor" onclick="toggleSituacaoOverride()">alterar manualmente</a></span>
+        </div>
+
+        <!-- Override manual (oculto por padrão) -->
+        <div id="situacao-override" style="display:none;margin-bottom:16px;">
+          <label class="form-label" style="margin-bottom:8px;">Situação profissional atual</label>
+          <select class="form-input">
+            <option>Estou procurando meu primeiro emprego</option>
+            <option>Estou desempregado(a) e procurando emprego</option>
+            <option>Estou trabalhando na área de Tecnologia</option>
+            <option>Estou trabalhando em outra área</option>
+            <option>Sou Autônomo/Freelancer/Empreendedor na Tecnologia</option>
+            <option>Sou Autônomo/Freelancer/Empreendedor em outra área</option>
+            <option selected>Estou fazendo estágio em tecnologia</option>
+            <option>Estou fazendo estágio em outra área</option>
+            <option>Sou jovem aprendiz na área de tecnologia</option>
+            <option>Sou jovem aprendiz em outra área</option>
+          </select>
+        </div>
+
+        <!-- Form adicionar experiência -->
+        <div id="exp-form" class="inline-form">
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label class="form-label">Cargo</label>
+              <input type="text" class="form-input" id="exp-cargo" placeholder="Ex: Desenvolvedor Júnior">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Empresa</label>
+              <input type="text" class="form-input" id="exp-empresa" placeholder="Nome da empresa">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Área</label>
+              <select class="form-input" id="exp-area">
+                <option value="">Selecione…</option>
+                <option>Tecnologia</option>
+                <option>Administrativo</option>
+                <option>Atendimento</option>
+                <option>Indústria</option>
+                <option>Comércio</option>
+                <option>Educação</option>
+                <option>Financeiro</option>
+                <option>Saúde</option>
+                <option>Outra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Período</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="month" class="form-input" id="exp-inicio" style="flex:1">
+                <span style="font-size:13px;color:var(--text-muted);">até</span>
+                <input type="month" class="form-input" id="exp-fim" style="flex:1" placeholder="Atual">
+              </div>
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label">Descrição (opcional)</label>
+              <textarea class="form-input" id="exp-desc" rows="2" placeholder="Principais atividades…"></textarea>
+            </div>
+          </div>
+          <div class="inline-form__footer">
+            <button class="btn btn--primary btn--sm" onclick="addExperience()">Salvar experiência</button>
+            <button class="btn btn--ghost" onclick="toggleExpForm(false)">Cancelar</button>
+          </div>
+        </div>
+
+        <button class="btn btn--ghost btn--sm" style="color:var(--primary);border:1.5px dashed rgba(44,169,66,0.4);border-radius:8px;padding:8px 16px;width:100%;justify-content:center;" onclick="toggleExpForm(true)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar experiência
+        </button>
+      </div>
+
+      <!-- ===== SEC 4: INTERESSES & PREFERÊNCIAS ===== -->
+      <div class="section" id="sec-interesses">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div><div class="section__title">Interesses & preferências</div></div>
+          </div>
+          <span class="section__badge badge--recom">◑ Recomendado</span>
+        </div>
+
+        <div class="form-grid">
+          <!-- Área de interesse principal -->
+          <div class="form-group">
+            <label class="form-label">Área de interesse principal</label>
+            <select class="form-input" id="f-interesse1" onchange="updateInteresse2()">
+              <option value="">Selecione…</option>
+              <option selected>Desenvolvimento Front-End</option>
+              <option>Desenvolvimento Back-End</option>
+              <option>Desenvolvimento Full-Stack</option>
+              <option>Desenvolvimento Mobile</option>
+              <option>Business Intelligence (BI)</option>
+              <option>Análise de Dados</option>
+              <option>Ciência de Dados</option>
+              <option>Machine Learning</option>
+              <option>Visão Computacional</option>
+              <option>Automação</option>
+              <option>Computação em Nuvem (Cloud)</option>
+              <option>Qualidade e Testes (QA)</option>
+              <option>DevOps</option>
+              <option>UX/UI Design</option>
+              <option>Cibersegurança</option>
+              <option>Outra</option>
+            </select>
+            <span class="form-hint">Área onde você quer atuar</span>
+          </div>
+          <!-- Área de interesse secundário (sugerida pelo César) -->
+          <div class="form-group">
+            <label class="form-label">Área de interesse secundário <span style="font-size:11px;color:var(--text-muted);font-weight:400">(opcional)</span></label>
+            <select class="form-input" id="f-interesse2">
+              <option value="">Selecione…</option>
+              <option>Desenvolvimento Front-End</option>
+              <option>Desenvolvimento Back-End</option>
+              <option>Desenvolvimento Full-Stack</option>
+              <option>Desenvolvimento Mobile</option>
+              <option>Business Intelligence (BI)</option>
+              <option>Análise de Dados</option>
+              <option>Ciência de Dados</option>
+              <option selected>Machine Learning</option>
+              <option>Visão Computacional</option>
+              <option>Automação</option>
+              <option>Computação em Nuvem (Cloud)</option>
+              <option>Qualidade e Testes (QA)</option>
+              <option>DevOps</option>
+              <option>UX/UI Design</option>
+              <option>Cibersegurança</option>
+              <option>Outra</option>
+            </select>
+            <span class="form-hint">Área paralela de interesse (ex: back-end + ML)</span>
+          </div>
+          <!-- Tipo de oportunidade -->
+          <div class="form-group">
+            <label class="form-label form-label--req">Tipo de oportunidade</label>
+            <select class="form-input" id="f-tipoopor">
+              <option value="">Selecione…</option>
+              <option>Jovem Aprendiz</option>
+              <option selected>Estágio</option>
+              <option>Trainee</option>
+              <option>Emprego CLT</option>
+              <option>Autônomo/Freelancer</option>
+            </select>
+          </div>
+          <!-- Inglês -->
+          <div class="form-group">
+            <label class="form-label form-label--req">Inglês</label>
+            <select class="form-input" id="f-ingles">
+              <option>Não possuo</option>
+              <option>Básico</option>
+              <option selected>Intermediário</option>
+              <option>Avançado</option>
+              <option>Fluente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEC 5: HABILIDADES ===== -->
+      <div class="section" id="sec-habilidades">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <div>
+              <div class="section__title">Habilidades técnicas</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">Até 10 habilidades — destaque as 5 principais primeiro</div>
+            </div>
+          </div>
+          <span class="section__badge badge--recom">◑ Recomendado</span>
+        </div>
+
+        <div class="tags-wrap" id="skills-list">
+          <span class="tag tag--primary">Angular <button class="tag__remove" onclick="removeTag(this)">×</button></span>
+          <span class="tag tag--primary">TypeScript <button class="tag__remove" onclick="removeTag(this)">×</button></span>
+          <span class="tag tag--primary">JavaScript <button class="tag__remove" onclick="removeTag(this)">×</button></span>
+          <span class="tag tag--primary">HTML/CSS <button class="tag__remove" onclick="removeTag(this)">×</button></span>
+          <span class="tag tag--primary">Git <button class="tag__remove" onclick="removeTag(this)">×</button></span>
+          <button class="tag-add" onclick="document.getElementById('modal-skills').classList.add('modal--open')">+ Adicionar</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Soft Skills -->
+        <div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+          <label class="form-label">Competências comportamentais <span style="font-size:11px;color:var(--text-muted);font-weight:400">(escolha até 5)</span></label>
+          <span id="soft-count" style="font-size:12px;color:var(--text-muted);">3/5 selecionadas</span>
+        </div>
+        <div class="softskill-grid" id="softskill-grid">
+          <label class="softskill-chip softskill-chip--selected"><input type="checkbox" checked onchange="updateSoftCount()"><div class="softskill-chip__check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Comunicação</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Colaboração</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Criatividade</label>
+          <label class="softskill-chip softskill-chip--selected"><input type="checkbox" checked onchange="updateSoftCount()"><div class="softskill-chip__check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Resolução de problemas</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Pensamento crítico</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Adaptabilidade</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Aprendizado contínuo</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Organização</label>
+          <label class="softskill-chip softskill-chip--selected"><input type="checkbox" checked onchange="updateSoftCount()"><div class="softskill-chip__check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Proatividade</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Inteligência emocional</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Autonomia</label>
+          <label class="softskill-chip"><input type="checkbox" onchange="updateSoftCount()"><div class="softskill-chip__check"></div>Negociação</label>
+        </div>
+      </div>
+
+      <!-- ===== SEC 6: LINKS & CURRÍCULO ===== -->
+      <div class="section" id="sec-links">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+            <div><div class="section__title">Links & Currículo</div></div>
+          </div>
+          <span class="section__badge badge--recom">◑ Recomendado</span>
+        </div>
+
+        <!-- Currículo -->
+        <div style="margin-bottom:20px;">
+          <label class="form-label" style="margin-bottom:8px;">Currículo (PDF ou link)</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div class="dropzone" id="pdf-dropzone" onclick="document.getElementById('pdf-input').click()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);margin-bottom:6px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <div class="dropzone__text">Arraste um PDF ou clique</div>
+                <div class="dropzone__file" id="pdf-file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+                  <span id="pdf-name">curriculo.pdf</span>
+                  <button onclick="event.stopPropagation();clearPdf()" style="color:var(--text-muted);font-size:16px;margin-left:4px;">×</button>
+                </div>
+                <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handlePdf(this)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:12px;">Ou cole um link do currículo</label>
+              <input type="url" class="form-input" placeholder="https://docs.google.com/…" value="">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Links profissionais -->
+        <label class="form-label" style="margin-bottom:14px;">Links profissionais</label>
+
+        <div class="link-item">
+          <div class="link-item__icon link-item__icon--github">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+          </div>
+          <input type="url" class="form-input" placeholder="https://github.com/seu-usuario" value="https://github.com/joaosilva" style="flex:1">
+        </div>
+
+        <div class="link-item">
+          <div class="link-item__icon link-item__icon--linkedin">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+          <input type="url" class="form-input" placeholder="https://linkedin.com/in/seu-perfil" value="" style="flex:1">
+        </div>
+
+        <div class="link-item">
+          <div class="link-item__icon link-item__icon--portfolio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+          </div>
+          <input type="url" class="form-input" placeholder="https://seu-portfolio.com" value="https://joaosilva.dev" style="flex:1">
+        </div>
+      </div>
+
+      <!-- ===== SEC 7: CERTIFICADOS ===== -->
+      <div class="section" id="sec-certificados">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+            <div><div class="section__title">Certificados & Cursos</div></div>
+          </div>
+          <span class="section__badge badge--recom">◑ Recomendado</span>
+        </div>
+
+        <!-- Certificados SCTEC automáticos -->
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Certificados SCTEC adicionados automaticamente
+        </p>
+        <div class="cert-sctec">
+          <div class="cert-sctec__logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+          <div style="flex:1">
+            <div class="cert-sctec__name">Desenvolvimento Front-End [Angular]</div>
+            <div class="cert-sctec__meta">SCTEC / SENAI · Concluído em 2026 · 160h</div>
+          </div>
+          <span class="auto-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> SCTEC</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Certificados complementares -->
+        <p style="font-size:13px;font-weight:600;color:var(--text-ter);margin-bottom:12px;">Outros cursos e certificações <span style="font-weight:400;color:var(--text-muted)">(até 2)</span></p>
+
+        <div id="certs-extra">
+          <!-- vazio por padrão -->
+        </div>
+
+        <div id="cert-form" class="inline-form">
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label class="form-label">Nome do curso / certificação</label>
+              <input type="text" class="form-input" id="cert-nome" placeholder="Ex: Curso de Python">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Instituição</label>
+              <input type="text" class="form-input" id="cert-inst" placeholder="Ex: Alura, Udemy…">
+            </div>
+          </div>
+          <div class="inline-form__footer">
+            <button class="btn btn--primary btn--sm" onclick="addCert()">Salvar</button>
+            <button class="btn btn--ghost" onclick="toggleCertForm(false)">Cancelar</button>
+          </div>
+        </div>
+
+        <button id="cert-add-btn" class="btn btn--ghost btn--sm" style="color:var(--primary);border:1.5px dashed rgba(44,169,66,0.4);border-radius:8px;padding:8px 16px;width:100%;justify-content:center;" onclick="toggleCertForm(true)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar certificado externo
+        </button>
+      </div>
+
+      <!-- ===== SEC 8: OPCIONAIS (VÍDEO + PROJETO SCTEC + PCD) ===== -->
+      <div class="section" id="sec-opcionais">
+        <div class="section__head">
+          <div class="section__head-left">
+            <div class="section__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div><div class="section__title">Informações adicionais</div></div>
+          </div>
+          <span class="section__badge badge--opc">○ Opcional</span>
+        </div>
+
+        <!-- Vídeo de apresentação -->
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            Vídeo de apresentação
+          </label>
+          <input type="url" class="form-input" id="video-url" placeholder="https://youtube.com/watch?v=…" oninput="updateVideoPreview()">
+          <span class="form-hint">Cole o link de um vídeo curto (1–2 min) se apresentando para as empresas</span>
+          <div id="video-preview" style="display:none;margin-top:12px;border-radius:8px;overflow:hidden;aspect-ratio:16/9;max-width:400px;background:#000;"></div>
+        </div>
+
+        <!-- Projeto SCTEC -->
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Projeto SCTEC
+          </label>
+          <input type="url" class="form-input" placeholder="https://github.com/… ou link do deploy" value="">
+          <span class="form-hint">Link do projeto final ou TCC desenvolvido no SCTEC</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Outros idiomas -->
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <label class="form-label">Outros idiomas</label>
+            <button class="btn btn--ghost btn--sm" style="font-size:12px;padding:4px 10px;" onclick="addIdioma()">+ Adicionar</button>
+          </div>
+          <div id="idiomas-list"></div>
+          <div id="idioma-form" class="inline-form">
+            <div class="form-grid" style="margin-bottom:10px;">
+              <div class="form-group"><label class="form-label">Idioma</label><input type="text" class="form-input" id="idioma-nome" placeholder="Ex: Espanhol"></div>
+              <div class="form-group"><label class="form-label">Nível</label>
+                <select class="form-input" id="idioma-nivel">
+                  <option>Básico</option><option>Intermediário</option><option>Avançado</option><option>Fluente</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-form__footer">
+              <button class="btn btn--primary btn--sm" onclick="saveIdioma()">Salvar</button>
+              <button class="btn btn--ghost" onclick="toggleIdiomaForm(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- PCD -->
+        <div>
+          <label class="form-label" style="margin-bottom:10px;">Pessoa com deficiência (PCD)</label>
+          <div class="radio-group" id="pcd-group">
+            <label class="radio-label"><input type="radio" name="pcd" value="nao" checked onchange="updatePCD(this)"> Não</label>
+            <label class="radio-label"><input type="radio" name="pcd" value="sim" onchange="updatePCD(this)"> Sim</label>
+            <label class="radio-label"><input type="radio" name="pcd" value="nao-informar" onchange="updatePCD(this)"> Prefiro não informar</label>
+          </div>
+
+          <div class="pcd-extra" id="pcd-adaptacao">
+            <label class="form-label" style="margin:12px 0 8px;">Necessita de alguma adaptação para processos seletivos?</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="pcd-adapt" value="sim"> Sim</label>
+              <label class="radio-label"><input type="radio" name="pcd-adapt" value="nao"> Não</label>
+              <label class="radio-label"><input type="radio" name="pcd-adapt" value="depois" checked> Informarei posteriormente</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVE STICKY -->
+      <div class="sticky-save">
+        <button class="btn btn--primary" onclick="savePerfil()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar alterações
+        </button>
+        <span style="font-size:13px;color:var(--text-muted);">Alterações salvas automaticamente a cada seção</span>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== MODAL HARD SKILLS ===== -->
+  <div class="modal" id="modal-skills">
+    <div class="modal__bg" onclick="this.parentElement.classList.remove('modal--open')"></div>
+    <div class="modal__box">
+      <div class="modal__head">
+        <div class="modal__title">Habilidades técnicas</div>
+        <button class="modal__close" onclick="document.getElementById('modal-skills').classList.remove('modal--open')">×</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">Selecione até 10 habilidades. As 5 primeiras serão exibidas em destaque.</p>
+      <input type="text" class="form-input" placeholder="Buscar habilidade…" oninput="filterSkills(this.value)" style="margin-bottom:12px;">
+
+      <div class="skills-group-title">Desenvolvimento Web & Mobile</div>
+      <div class="skills-check-grid" id="skills-web">
+        <label class="skills-check"><input type="checkbox" value="React"> React</label>
+        <label class="skills-check"><input type="checkbox" value="Angular" checked> Angular</label>
+        <label class="skills-check"><input type="checkbox" value="Vue.js"> Vue.js</label>
+        <label class="skills-check"><input type="checkbox" value="TypeScript" checked> TypeScript</label>
+        <label class="skills-check"><input type="checkbox" value="JavaScript" checked> JavaScript</label>
+        <label class="skills-check"><input type="checkbox" value="HTML/CSS" checked> HTML/CSS</label>
+        <label class="skills-check"><input type="checkbox" value="Node.js"> Node.js</label>
+        <label class="skills-check"><input type="checkbox" value="Next.js"> Next.js</label>
+        <label class="skills-check"><input type="checkbox" value="React Native"> React Native</label>
+        <label class="skills-check"><input type="checkbox" value="Flutter"> Flutter</label>
+        <label class="skills-check"><input type="checkbox" value="Spring"> Spring</label>
+        <label class="skills-check"><input type="checkbox" value=".NET"> .NET</label>
+      </div>
+
+      <div class="skills-group-title">Infraestrutura & DevOps</div>
+      <div class="skills-check-grid">
+        <label class="skills-check"><input type="checkbox" value="Git" checked> Git</label>
+        <label class="skills-check"><input type="checkbox" value="Docker"> Docker</label>
+        <label class="skills-check"><input type="checkbox" value="AWS"> AWS</label>
+        <label class="skills-check"><input type="checkbox" value="Azure"> Azure</label>
+        <label class="skills-check"><input type="checkbox" value="DevOps/CI-CD"> DevOps/CI-CD</label>
+        <label class="skills-check"><input type="checkbox" value="Linux"> Linux</label>
+      </div>
+
+      <div class="skills-group-title">Dados & IA</div>
+      <div class="skills-check-grid">
+        <label class="skills-check"><input type="checkbox" value="Python"> Python</label>
+        <label class="skills-check"><input type="checkbox" value="SQL"> SQL</label>
+        <label class="skills-check"><input type="checkbox" value="Power BI"> Power BI</label>
+        <label class="skills-check"><input type="checkbox" value="Machine Learning"> Machine Learning</label>
+        <label class="skills-check"><input type="checkbox" value="TensorFlow"> TensorFlow</label>
+        <label class="skills-check"><input type="checkbox" value="Pandas"> Pandas</label>
+        <label class="skills-check"><input type="checkbox" value="Tableau"> Tableau</label>
+        <label class="skills-check"><input type="checkbox" value="ETL"> ETL</label>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <button class="btn btn--ghost" onclick="document.getElementById('modal-skills').classList.remove('modal--open')">Cancelar</button>
+        <button class="btn btn--primary" onclick="saveSkills()">Aplicar habilidades</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toast-msg">Salvo!</span>
+  </div>
+
+  <script>
+    // ===== CHECKLIST DATA =====
+    const checklistItems = [
+      { id: 'foto',       label: 'Foto de perfil',          layer: 1, done: false, anchor: 'sec-apresentacao' },
+      { id: 'resumo',     label: 'Resumo profissional',     layer: 1, done: true,  anchor: 'sec-apresentacao' },
+      { id: 'cidade',     label: 'Cidade',                  layer: 1, done: true,  anchor: 'sec-apresentacao' },
+      { id: 'escolar',    label: 'Escolaridade',            layer: 1, done: true,  anchor: 'sec-formacao' },
+      { id: 'modalidade', label: 'Modalidade preferida',    layer: 1, done: true,  anchor: 'sec-interesses' },
+      { id: 'interesse',  label: 'Área de interesse',       layer: 1, done: true,  anchor: 'sec-interesses' },
+      { id: 'tipoopor',   label: 'Tipo de oportunidade',    layer: 1, done: true,  anchor: 'sec-interesses' },
+      { id: 'ingles',     label: 'Nível de inglês',         layer: 1, done: true,  anchor: 'sec-interesses' },
+      { id: 'skills',     label: 'Habilidades técnicas',    layer: 2, done: true,  anchor: 'sec-habilidades' },
+      { id: 'softskills', label: 'Competências comportamentais', layer: 2, done: true, anchor: 'sec-habilidades' },
+      { id: 'experiencia',label: 'Experiência profissional',layer: 2, done: true,  anchor: 'sec-experiencia' },
+      { id: 'linkedin',   label: 'LinkedIn',                layer: 2, done: false, anchor: 'sec-links' },
+      { id: 'curriculo',  label: 'Currículo (PDF ou link)', layer: 2, done: false, anchor: 'sec-links' },
+      { id: 'github',     label: 'GitHub',                  layer: 3, done: true,  anchor: 'sec-links' },
+      { id: 'video',      label: 'Vídeo de apresentação',   layer: 3, done: false, anchor: 'sec-opcionais' },
+      { id: 'projeto',    label: 'Projeto SCTEC',           layer: 3, done: false, anchor: 'sec-opcionais' },
+    ];
+
+    const layerLabel = { 1: '1', 2: '2', 3: '3' };
+    const layerClass = { 1: 'layer--1', 2: 'layer--2', 3: 'layer--3' };
+    const checkSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+    function renderChecklist() {
+      const el = document.getElementById('checklist');
+      const done = checklistItems.filter(i => i.done).length;
+      const total = checklistItems.length;
+      const pct = Math.round((done / total) * 100);
+
+      // Atualiza % e anel
+      document.getElementById('pct-display').textContent = pct + '%';
+      const circ = 2 * Math.PI * 40;
+      const offset = circ * (1 - pct / 100);
+      document.querySelector('.progress-ring__fill').style.strokeDashoffset = offset;
+
+      // Mostra pendentes primeiro, depois concluídos (max 8)
+      const pending = checklistItems.filter(i => !i.done);
+      const doneItems = checklistItems.filter(i => i.done);
+      const shown = [...pending, ...doneItems].slice(0, 10);
+
+      el.innerHTML = shown.map(item => `
+        <div class="checklist__item checklist__item--${item.done ? 'done' : 'pending'}">
+          <div class="checklist__icon checklist__icon--${item.done ? 'done' : 'pending'}">${item.done ? checkSvg : ''}</div>
+          <span>
+            <span class="checklist__layer ${layerClass[item.layer]}">${item.layer}</span>
+            ${item.done ? item.label : `<a class="checklist__anchor" onclick="scrollToSec('${item.anchor}')">${item.label}</a>`}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function updateProgress() { renderChecklist(); }
+
+    function scrollToSec(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    renderChecklist();
+
+    // ===== SOFT SKILLS =====
+    function updateSoftCount() {
+      const chips = document.querySelectorAll('#softskill-grid .softskill-chip');
+      let count = 0;
+      chips.forEach(chip => {
+        const cb = chip.querySelector('input');
+        const isChecked = cb.checked;
+        if (isChecked) count++;
+        if (count > 5 && isChecked) { cb.checked = false; return; }
+        chip.classList.toggle('softskill-chip--selected', cb.checked);
+        const checkDiv = chip.querySelector('.softskill-chip__check');
+        checkDiv.innerHTML = cb.checked ? checkSvg : '';
+      });
+      const finalCount = document.querySelectorAll('#softskill-grid input:checked').length;
+      document.getElementById('soft-count').textContent = finalCount + '/5 selecionadas';
+      document.getElementById('soft-count').style.color = finalCount === 5 ? 'var(--primary)' : 'var(--text-muted)';
+    }
+
+    // ===== EXPERIÊNCIA =====
+    function toggleExpForm(open) {
+      document.getElementById('exp-form').classList.toggle('inline-form--open', open);
+      if (open) document.getElementById('exp-cargo').focus();
+    }
+
+    function addExperience() {
+      const cargo = document.getElementById('exp-cargo').value.trim();
+      const empresa = document.getElementById('exp-empresa').value.trim();
+      const area = document.getElementById('exp-area').value;
+      const inicio = document.getElementById('exp-inicio').value;
+      const fim = document.getElementById('exp-fim').value;
+      if (!cargo || !empresa) { showToast('Preencha cargo e empresa', false); return; }
+      const atual = !fim;
+      const meta = [empresa, area, inicio, atual ? 'Atual' : fim].filter(Boolean).join(' · ');
+      const desc = document.getElementById('exp-desc').value.trim();
+      const html = `<div class="exp-card">
+        <div class="exp-card__actions">
+          <button class="icon-btn icon-btn--del" onclick="this.closest('.exp-card').remove();updateProgress()" title="Remover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg></button>
+        </div>
+        <div class="exp-card__title">${cargo}${atual ? '<span class="exp-card__current">● Atual</span>' : ''}</div>
+        <div class="exp-card__meta">${meta}</div>
+        ${desc ? `<div class="exp-card__desc">${desc}</div>` : ''}
+      </div>`;
+      document.getElementById('exp-list').insertAdjacentHTML('beforeend', html);
+      ['exp-cargo','exp-empresa','exp-area','exp-inicio','exp-fim','exp-desc'].forEach(id => { document.getElementById(id).value = ''; });
+      toggleExpForm(false);
+      showToast('Experiência adicionada!');
+    }
+
+    function toggleSituacaoOverride() {
+      const el = document.getElementById('situacao-override');
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // ===== CERTIFICADOS =====
+    let certCount = 0;
+    function toggleCertForm(open) {
+      if (certCount >= 2 && open) { showToast('Limite de 2 certificados complementares atingido', false); return; }
+      document.getElementById('cert-form').classList.toggle('inline-form--open', open);
+      if (open) document.getElementById('cert-nome').focus();
+    }
+
+    function addCert() {
+      const nome = document.getElementById('cert-nome').value.trim();
+      const inst = document.getElementById('cert-inst').value.trim();
+      if (!nome) { showToast('Informe o nome do certificado', false); return; }
+      certCount++;
+      const html = `<div class="exp-card" style="margin-bottom:8px;">
+        <div class="exp-card__actions">
+          <button class="icon-btn icon-btn--del" onclick="this.closest('.exp-card').remove();certCount--;document.getElementById('cert-add-btn').style.display='';updateProgress()" title="Remover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg></button>
+        </div>
+        <div class="exp-card__title">${nome}</div>
+        ${inst ? `<div class="exp-card__meta">${inst}</div>` : ''}
+      </div>`;
+      document.getElementById('certs-extra').insertAdjacentHTML('beforeend', html);
+      document.getElementById('cert-nome').value = '';
+      document.getElementById('cert-inst').value = '';
+      toggleCertForm(false);
+      if (certCount >= 2) document.getElementById('cert-add-btn').style.display = 'none';
+      showToast('Certificado adicionado!');
+    }
+
+    // ===== IDIOMAS =====
+    function addIdioma() { toggleIdiomaForm(true); }
+    function toggleIdiomaForm(open) {
+      document.getElementById('idioma-form').classList.toggle('inline-form--open', open);
+      if (open) document.getElementById('idioma-nome').focus();
+    }
+    function saveIdioma() {
+      const nome = document.getElementById('idioma-nome').value.trim();
+      const nivel = document.getElementById('idioma-nivel').value;
+      if (!nome) return;
+      const html = `<div class="exp-card" style="margin-bottom:8px;">
+        <div class="exp-card__actions">
+          <button class="icon-btn icon-btn--del" onclick="this.closest('.exp-card').remove()" title="Remover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg></button>
+        </div>
+        <div class="exp-card__title">${nome}</div>
+        <div class="exp-card__meta">${nivel}</div>
+      </div>`;
+      document.getElementById('idiomas-list').insertAdjacentHTML('beforeend', html);
+      document.getElementById('idioma-nome').value = '';
+      toggleIdiomaForm(false);
+      showToast('Idioma adicionado!');
+    }
+
+    // ===== AVATAR =====
+    function previewAvatar(input) {
+      if (!input.files?.[0]) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const p = document.getElementById('avatar-preview');
+        p.innerHTML = '';
+        p.style.background = 'none';
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+        p.appendChild(img);
+        checklistItems.find(i => i.id === 'foto').done = true;
+        updateProgress();
+        showToast('Foto atualizada!');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    // ===== PDF =====
+    function handlePdf(input) {
+      if (!input.files?.[0]) return;
+      document.getElementById('pdf-name').textContent = input.files[0].name;
+      document.getElementById('pdf-file').classList.add('dropzone__file--show');
+      checklistItems.find(i => i.id === 'curriculo').done = true;
+      updateProgress();
+      showToast('Currículo enviado!');
+    }
+    function clearPdf() {
+      document.getElementById('pdf-input').value = '';
+      document.getElementById('pdf-file').classList.remove('dropzone__file--show');
+    }
+
+    // Dropzone drag
+    const dz = document.getElementById('pdf-dropzone');
+    ['dragenter','dragover'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.add('dropzone--over'); }));
+    ['dragleave','drop'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.remove('dropzone--over'); }));
+    dz.addEventListener('drop', ev => {
+      const f = ev.dataTransfer.files?.[0];
+      if (f?.type === 'application/pdf') { document.getElementById('pdf-input').files = ev.dataTransfer.files; handlePdf(document.getElementById('pdf-input')); }
+      else if (f) showToast('Envie um PDF', false);
+    });
+
+    // ===== VIDEO =====
+    function updateVideoPreview() {
+      const url = document.getElementById('video-url').value.trim();
+      const preview = document.getElementById('video-preview');
+      const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+      const vm = url.match(/vimeo\.com\/(\d+)/);
+      let src = '';
+      if (yt) src = 'https://www.youtube.com/embed/' + yt[1];
+      else if (vm) src = 'https://player.vimeo.com/video/' + vm[1];
+      if (src) {
+        preview.style.display = 'block';
+        preview.innerHTML = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen style="border:none;"></iframe>`;
+        checklistItems.find(i => i.id === 'video').done = true;
+        updateProgress();
+      } else {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+      }
+    }
+
+    // ===== TAGS =====
+    function removeTag(btn) {
+      btn.closest('.tag').remove();
+    }
+
+    // ===== SKILLS MODAL =====
+    function filterSkills(q) {
+      const labels = document.querySelectorAll('#modal-skills .skills-check');
+      labels.forEach(l => {
+        l.style.display = l.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+
+    function saveSkills() {
+      const checked = document.querySelectorAll('#modal-skills input[type="checkbox"]:checked');
+      const list = document.getElementById('skills-list');
+      const existing = Array.from(list.querySelectorAll('.tag')).map(t => t.childNodes[0].textContent.trim());
+      const addBtn = list.querySelector('.tag-add');
+      checked.forEach(cb => {
+        if (!existing.includes(cb.value)) {
+          const t = document.createElement('span');
+          t.className = 'tag tag--primary';
+          t.innerHTML = `${cb.value} <button class="tag__remove" onclick="removeTag(this)">×</button>`;
+          list.insertBefore(t, addBtn);
+        }
+      });
+      document.getElementById('modal-skills').classList.remove('modal--open');
+      showToast('Habilidades atualizadas!');
+    }
+
+    // ===== PCD =====
+    function updatePCD(el) {
+      document.getElementById('pcd-adaptacao').classList.toggle('pcd-extra--show', el.value === 'sim');
+    }
+
+    // ===== CHAR COUNT =====
+    function updateCharCount(el, countId) {
+      document.getElementById(countId).textContent = el.value.length;
+    }
+
+    // ===== SAVE =====
+    function savePerfil() {
+      showToast('Perfil salvo com sucesso! ✓');
+    }
+
+    // ===== TOAST =====
+    function showToast(msg, ok = true) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      t.className = 'toast toast--ok' + (ok ? '' : ' toast--error') + ' toast--visible';
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+  </script>
+</body>
+</html>

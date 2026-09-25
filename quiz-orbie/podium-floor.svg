@@ -1,0 +1,86 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 700" width="1280" height="700" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="floor-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0D1A32" stop-opacity="1"/>
+      <stop offset="18%"  stop-color="#0D1A32" stop-opacity="0.7"/>
+      <stop offset="55%"  stop-color="#0D1A32" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0D1A32" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="side-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#0D1A32" stop-opacity="0.85"/>
+      <stop offset="15%"  stop-color="#0D1A32" stop-opacity="0"/>
+      <stop offset="85%"  stop-color="#0D1A32" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0D1A32" stop-opacity="0.85"/>
+    </linearGradient>
+    <mask id="m-top">
+      <rect width="1280" height="700" fill="white"/>
+      <rect width="1280" height="700" fill="url(#floor-fade)"/>
+    </mask>
+    <mask id="m-side">
+      <rect width="1280" height="700" fill="white"/>
+      <rect width="1280" height="700" fill="url(#side-fade)"/>
+    </mask>
+  </defs>
+
+  <rect width="1280" height="700" fill="none"/>
+
+  <g mask="url(#m-top)">
+    <g mask="url(#m-side)">
+    <line x1="-300" y1="700" x2="1580" y2="700" stroke="rgba(34,68,118,0.58)" stroke-width="1.6"/>
+    <line x1="-271.8" y1="681.4" x2="1551.8" y2="681.4" stroke="rgba(34,68,118,0.56)" stroke-width="1.56"/>
+    <line x1="-247.8" y1="665.6" x2="1527.8" y2="665.6" stroke="rgba(34,68,118,0.55)" stroke-width="1.53"/>
+    <line x1="-227.5" y1="652.2" x2="1507.5" y2="652.2" stroke="rgba(34,68,118,0.54)" stroke-width="1.51"/>
+    <line x1="-210.2" y1="640.8" x2="1490.2" y2="640.8" stroke="rgba(34,68,118,0.53)" stroke-width="1.49"/>
+    <line x1="-195.7" y1="631.2" x2="1475.7" y2="631.2" stroke="rgba(34,68,118,0.52)" stroke-width="1.47"/>
+    <line x1="-183.4" y1="623.1" x2="1463.4" y2="623.1" stroke="rgba(34,68,118,0.52)" stroke-width="1.45"/>
+    <line x1="-172.8" y1="616.1" x2="1452.8" y2="616.1" stroke="rgba(34,68,118,0.51)" stroke-width="1.44"/>
+    <line x1="-164" y1="610.3" x2="1444" y2="610.3" stroke="rgba(34,68,118,0.51)" stroke-width="1.43"/>
+    <line x1="-156.4" y1="605.3" x2="1436.4" y2="605.3" stroke="rgba(34,68,118,0.5)" stroke-width="1.42"/>
+    <line x1="-150.1" y1="601.1" x2="1430.1" y2="601.1" stroke="rgba(34,68,118,0.5)" stroke-width="1.41"/>
+    <line x1="-144.7" y1="597.6" x2="1424.7" y2="597.6" stroke="rgba(34,68,118,0.5)" stroke-width="1.4"/>
+    <line x1="-140" y1="594.5" x2="1420" y2="594.5" stroke="rgba(34,68,118,0.49)" stroke-width="1.4"/>
+    <line x1="-136.3" y1="592" x2="1416.3" y2="592" stroke="rgba(34,68,118,0.49)" stroke-width="1.39"/>
+    <line x1="-132.9" y1="589.8" x2="1412.9" y2="589.8" stroke="rgba(34,68,118,0.49)" stroke-width="1.39"/>
+    <line x1="-130.2" y1="588" x2="1410.2" y2="588" stroke="rgba(34,68,118,0.49)" stroke-width="1.38"/>
+    <line x1="-127.8" y1="586.4" x2="1407.8" y2="586.4" stroke="rgba(34,68,118,0.49)" stroke-width="1.38"/>
+    <line x1="-125.8" y1="585.1" x2="1405.8" y2="585.1" stroke="rgba(34,68,118,0.49)" stroke-width="1.38"/>
+    <line x1="-124.1" y1="584" x2="1404.1" y2="584" stroke="rgba(34,68,118,0.49)" stroke-width="1.38"/>
+    <line x1="-122.6" y1="583" x2="1402.6" y2="583" stroke="rgba(34,68,118,0.49)" stroke-width="1.37"/>
+    <line x1="-121.4" y1="582.2" x2="1401.4" y2="582.2" stroke="rgba(34,68,118,0.49)" stroke-width="1.37"/>
+    <line x1="-280" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.08)" stroke-width="0.9"/>
+    <line x1="-212" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.11)" stroke-width="0.9"/>
+    <line x1="-144" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.13)" stroke-width="0.9"/>
+    <line x1="-76" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.16)" stroke-width="0.9"/>
+    <line x1="-8" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.18)" stroke-width="0.9"/>
+    <line x1="60" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.21)" stroke-width="0.9"/>
+    <line x1="128" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.23)" stroke-width="0.9"/>
+    <line x1="196" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.26)" stroke-width="0.9"/>
+    <line x1="264" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.28)" stroke-width="0.9"/>
+    <line x1="332" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.31)" stroke-width="0.9"/>
+    <line x1="400" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.33)" stroke-width="0.9"/>
+    <line x1="468" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.36)" stroke-width="0.9"/>
+    <line x1="536" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.38)" stroke-width="0.9"/>
+    <line x1="604" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.41)" stroke-width="0.9"/>
+    <line x1="672" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.41)" stroke-width="0.9"/>
+    <line x1="740" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.38)" stroke-width="0.9"/>
+    <line x1="808" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.36)" stroke-width="0.9"/>
+    <line x1="876" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.33)" stroke-width="0.9"/>
+    <line x1="944" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.31)" stroke-width="0.9"/>
+    <line x1="1012" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.28)" stroke-width="0.9"/>
+    <line x1="1080" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.26)" stroke-width="0.9"/>
+    <line x1="1148" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.23)" stroke-width="0.9"/>
+    <line x1="1216" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.21)" stroke-width="0.9"/>
+    <line x1="1284" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.18)" stroke-width="0.9"/>
+    <line x1="1352" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.16)" stroke-width="0.9"/>
+    <line x1="1420" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.13)" stroke-width="0.9"/>
+    <line x1="1488" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.11)" stroke-width="0.9"/>
+    <line x1="1556" y1="700" x2="640" y2="80" stroke="rgba(34,68,118,0.08)" stroke-width="0.9"/>
+
+    </g>
+  </g>
+
+  <!-- Brilho no horizonte -->
+  <ellipse cx="640" cy="80" rx="280" ry="55" fill="rgba(0,180,253,0.07)"/>
+  <ellipse cx="640" cy="80" rx="120" ry="25" fill="rgba(0,89,231,0.09)"/>
+
+</svg>

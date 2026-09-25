@@ -1,0 +1,1701 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Conta - SENAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f5f5f5;
+      color: #212121;
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-logo { font-size: 22px; font-weight: 700; color: #c0392b; letter-spacing: -0.5px; }
+    .topbar-logo span { color: #212121; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .topbar-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 20px;
+      background: #fff; font-size: 13px; color: #424242; cursor: pointer;
+    }
+    .topbar-btn .material-icons { font-size: 18px; color: #c0392b; }
+    .topbar-icon-btn {
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid #e0e0e0; border-radius: 50%; background: #fff; cursor: pointer; color: #424242;
+    }
+    .topbar-icon-btn .material-icons { font-size: 18px; }
+    .avatar-topbar {
+      width: 36px; height: 36px; border-radius: 50%; background: #1565c0;
+      color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── HERO BANNER ── */
+    .hero {
+      background: linear-gradient(120deg, #f8d7c8 0%, #f0e0f0 50%, #d0e8f8 100%);
+      padding: 28px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .hero-left { display: flex; align-items: center; gap: 20px; }
+    .hero-avatar {
+      width: 64px; height: 64px; border-radius: 50%; background: #1565c0;
+      color: #fff; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .hero-name { font-size: 22px; font-weight: 700; color: #212121; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px; padding: 2px 10px; font-size: 12px; color: #424242; margin-top: 4px;
+    }
+    .hero-badge .material-icons { font-size: 14px; color: #616161; }
+    .hero-email { font-size: 13px; color: #616161; margin-top: 4px; }
+    .hero-right { display: flex; align-items: center; gap: 24px; }
+    .hero-level-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #c0392b; font-weight: 500; cursor: pointer;
+    }
+    .hero-level-btn .material-icons { font-size: 16px; }
+    .hero-progress-wrap { text-align: right; }
+    .hero-progress-label { font-size: 12px; color: #424242; margin-bottom: 6px; }
+    .hero-progress-label span { font-weight: 700; }
+    .hero-progress-bar { width: 180px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 4px; overflow: hidden; }
+    .hero-progress-fill { height: 100%; width: 70%; background: #c0392b; border-radius: 4px; }
+    .hero-progress-pct { font-size: 13px; font-weight: 700; color: #212121; margin-top: 4px; text-align: right; }
+
+    /* ── LAYOUT PRINCIPAL ── */
+    .layout {
+      max-width: 1100px; margin: 0 auto; padding: 32px 40px;
+      display: grid; grid-template-columns: 220px 1fr; gap: 32px;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { grid-column: 1 / -1; font-size: 13px; color: #616161; margin-bottom: -16px; }
+    .breadcrumb span { color: #424242; font-weight: 500; }
+
+    /* ── SIDEBAR ── */
+    .sidebar-tabs { display: flex; gap: 0; margin-bottom: 8px; }
+    .sidebar-tab {
+      flex: 1; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 500;
+      border-radius: 6px; cursor: pointer; background: transparent; color: #616161;
+      border: none; transition: all 0.15s;
+    }
+    .sidebar-tab.active { background: #c0392b; color: #fff; }
+    .sidebar-nav { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; overflow: hidden; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+      font-size: 14px; color: #424242; cursor: pointer;
+      border-bottom: 1px solid #f0f0f0; transition: background 0.15s;
+    }
+    .sidebar-item:last-child { border-bottom: none; }
+    .sidebar-item:hover { background: #fafafa; }
+    .sidebar-item.active { background: #fdf0ee; color: #c0392b; font-weight: 500; }
+    .sidebar-item .material-icons { font-size: 20px; color: #616161; }
+    .sidebar-item.active .material-icons { color: #c0392b; }
+    .sidebar-dot { width: 8px; height: 8px; border-radius: 50%; background: #1565c0; margin-left: auto; }
+    .sidebar-dot-red { width: 8px; height: 8px; border-radius: 50%; background: #c0392b; margin-left: auto; }
+    .sidebar-badge {
+      margin-left: auto; background: #c0392b; color: #fff;
+      border-radius: 10px; padding: 1px 7px; font-size: 11px; font-weight: 700;
+    }
+    .sidebar-check { margin-left: auto; color: #2e7d32; font-size: 18px; }
+
+    /* ── TELAS (views) ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── TIPOGRAFIA GERAL ── */
+    .page-title { font-size: 22px; font-weight: 700; color: #212121; margin-bottom: 4px; }
+    .page-subtitle { font-size: 14px; color: #616161; margin-bottom: 24px; }
+
+    /* ══════════════════════════════════
+       VISAO GERAL
+    ══════════════════════════════════ */
+    .vg-section {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .vg-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid #f0f0f0;
+    }
+    .vg-section-icon-row { display: flex; align-items: center; gap: 10px; }
+    .vg-section-icon .material-icons { font-size: 22px; color: #616161; }
+    .vg-section-title { font-size: 14px; font-weight: 500; color: #424242; }
+    .vg-section-meta { font-size: 12px; color: #9e9e9e; margin-top: 2px; }
+    .btn-icon-edit {
+      background: none; border: none; cursor: pointer; color: #c0392b; padding: 4px;
+    }
+    .btn-icon-edit .material-icons { font-size: 20px; }
+    .btn-outline-sm {
+      display: flex; align-items: center; gap: 6px;
+      background: #fff; border: 1px solid #c0392b; color: #c0392b;
+      border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-outline-sm:hover { background: #fdf0ee; }
+    .btn-outline-sm .material-icons { font-size: 16px; }
+
+    .vg-user-row {
+      display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+    }
+    .vg-user-avatar {
+      width: 52px; height: 52px; border-radius: 50%; background: #e0e0e0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vg-user-avatar .material-icons { font-size: 28px; color: #9e9e9e; }
+    .vg-user-name { font-size: 15px; font-weight: 500; color: #212121; }
+    .vg-user-docs { font-size: 13px; color: #616161; margin-top: 3px; }
+    .vg-user-docs span { margin-right: 16px; }
+
+    /* Menores na visao geral */
+    .vg-minor-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 20px; border-top: 1px solid #f0f0f0;
+    }
+    .vg-minor-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .vg-minor-avatar.lm { background: #1565c0; }
+    .vg-minor-avatar.ao { background: #f4511e; }
+    .vg-minor-avatar.ft { background: #2e7d32; }
+    .vg-minor-name { font-size: 14px; font-weight: 500; color: #212121; }
+    .vg-minor-age { font-size: 12px; color: #9e9e9e; margin-top: 2px; }
+    .vg-minor-action { margin-left: auto; }
+    .btn-link {
+      background: none; border: none; color: #c0392b;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .btn-link .material-icons { font-size: 16px; }
+
+    /* Badge */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
+    }
+    .badge-pending { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .badge-active { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .badge-inactive { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
+
+    /* ── BLOCO DE PENDENCIAS ── */
+    .pendencias-block {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-top: 3px solid #f9a825;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .pendencias-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+    }
+    .pendencias-header-left { display: flex; align-items: center; gap: 10px; }
+    .pendencias-header-left .material-icons { font-size: 20px; color: #f9a825; }
+    .pendencias-header-title { font-size: 14px; font-weight: 600; color: #212121; }
+    .pendencias-count {
+      background: #f9a825; color: #fff; border-radius: 10px;
+      padding: 1px 8px; font-size: 12px; font-weight: 700;
+    }
+    .btn-ver-todas {
+      background: none; border: none; color: #c0392b;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .btn-ver-todas .material-icons { font-size: 15px; }
+
+    /* item de pendencia */
+    .pendencia-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 20px; border-bottom: 1px solid #f5f5f5;
+      transition: background 0.12s;
+    }
+    .pendencia-item:last-child { border-bottom: none; }
+    .pendencia-item:hover { background: #fafafa; }
+    .pendencia-type-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .pendencia-type-icon.vinculo { background: #fff3e0; }
+    .pendencia-type-icon.vinculo .material-icons { color: #e65100; font-size: 18px; }
+    .pendencia-type-icon.documento { background: #e8f0fe; }
+    .pendencia-type-icon.documento .material-icons { color: #1565c0; font-size: 18px; }
+    .pendencia-type-icon.empresa { background: #e8f5e9; }
+    .pendencia-type-icon.empresa .material-icons { color: #2e7d32; font-size: 18px; }
+    .pendencia-type-icon.seguranca { background: #fce4ec; }
+    .pendencia-type-icon.seguranca .material-icons { color: #c62828; font-size: 18px; }
+    .pendencia-body { flex: 1; min-width: 0; }
+    .pendencia-title { font-size: 13px; font-weight: 500; color: #212121; }
+    .pendencia-desc { font-size: 12px; color: #757575; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pendencia-tag {
+      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .pendencia-tag.tag-urgente { background: #fff3e0; color: #e65100; }
+    .pendencia-tag.tag-info { background: #e8f0fe; color: #1565c0; }
+    .btn-pendencia-acao {
+      background: none; border: 1px solid #e0e0e0; color: #424242;
+      border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 500;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: border-color 0.12s, color 0.12s;
+    }
+    .btn-pendencia-acao:hover { border-color: #c0392b; color: #c0392b; }
+    .btn-pendencia-acao.destaque {
+      background: #c0392b; color: #fff; border-color: #c0392b;
+    }
+    .btn-pendencia-acao.destaque:hover { background: #a93226; }
+
+    /* ══════════════════════════════════
+       CONTROLE PARENTAL
+    ══════════════════════════════════ */
+    .minor-list { display: flex; flex-direction: column; gap: 12px; }
+    .minor-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+    }
+    .minor-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .minor-avatar.ao { background: #f4511e; }
+    .minor-avatar.lm { background: #1565c0; }
+    .minor-avatar.ft { background: #2e7d32; }
+    .minor-info { flex: 1; }
+    .minor-name { font-size: 15px; font-weight: 500; color: #212121; }
+    .minor-age { font-size: 13px; color: #616161; margin-top: 2px; }
+    .minor-action { margin-left: auto; }
+    .btn-authorize {
+      background: #c0392b; color: #fff; border: none; border-radius: 6px;
+      padding: 9px 18px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-authorize:hover { background: #a93226; }
+    .btn-manage {
+      background: transparent; border: none; color: #c0392b;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ══════════════════════════════════
+       OVERLAY E MODAL
+    ══════════════════════════════════ */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 12px; width: 560px;
+      max-width: 95vw; max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18); position: relative;
+    }
+    .modal-header {
+      padding: 24px 28px 0; display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: #212121; }
+    .modal-subtitle { font-size: 13px; color: #616161; margin-top: 4px; line-height: 1.5; }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: #757575; padding: 4px; flex-shrink: 0; margin-top: -2px;
+    }
+    .modal-close .material-icons { font-size: 22px; }
+    .modal-close:hover { color: #212121; }
+    .minor-chip {
+      margin: 16px 28px 0; background: #fdf0ee; border: 1px solid #f5c6bf;
+      border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .minor-chip-avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: #f4511e;
+      color: #fff; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .minor-chip-label { font-size: 12px; color: #757575; }
+    .minor-chip-name { font-size: 14px; font-weight: 600; color: #212121; margin-top: 2px; }
+    .steps-indicator {
+      display: flex; align-items: center; padding: 20px 28px 0; gap: 0;
+    }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0; transition: all 0.2s;
+    }
+    .step-dot.done { background: #c0392b; color: #fff; }
+    .step-dot.active { background: #c0392b; color: #fff; box-shadow: 0 0 0 3px #f5c6bf; }
+    .step-dot.pending { background: #e0e0e0; color: #9e9e9e; }
+    .step-line { flex: 1; height: 2px; background: #e0e0e0; }
+    .step-line.done { background: #c0392b; }
+    .step-labels { display: flex; padding: 6px 28px 0; gap: 0; }
+    .step-label { font-size: 11px; color: #9e9e9e; flex: 1; text-align: center; }
+    .step-label:first-child { text-align: left; }
+    .step-label:last-child { text-align: right; }
+    .step-label.active { color: #c0392b; font-weight: 500; }
+    .step-label.done { color: #424242; }
+    .modal-body { padding: 20px 28px; }
+    .field-label { font-size: 13px; font-weight: 500; color: #424242; margin-bottom: 10px; }
+    .field-label .required { color: #c0392b; margin-left: 2px; }
+    .radio-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-option {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      border: 1.5px solid #e0e0e0; border-radius: 8px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .radio-option:hover { border-color: #c0392b; background: #fdf8f8; }
+    .radio-option.selected { border-color: #c0392b; background: #fdf0ee; }
+    .radio-option input[type="radio"] { display: none; }
+    .radio-circle {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid #bdbdbd;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.15s;
+    }
+    .radio-option.selected .radio-circle { border-color: #c0392b; }
+    .radio-dot { width: 8px; height: 8px; border-radius: 50%; background: #c0392b; display: none; }
+    .radio-option.selected .radio-dot { display: block; }
+    .radio-icon .material-icons { font-size: 20px; color: #616161; }
+    .radio-option.selected .radio-icon .material-icons { color: #c0392b; }
+    .radio-title { font-size: 14px; font-weight: 500; color: #212121; }
+    .radio-desc { font-size: 12px; color: #757575; margin-top: 2px; }
+    .upload-info-box {
+      background: #e8f0fe; border: 1px solid #c5d8fd; border-radius: 8px;
+      padding: 12px 16px; display: flex; gap: 10px; margin-bottom: 20px;
+    }
+    .upload-info-box .material-icons { color: #1565c0; font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .upload-info-text { font-size: 13px; color: #1a237e; line-height: 1.5; }
+    .upload-info-text strong { font-weight: 600; }
+    .upload-zone {
+      border: 2px dashed #e0e0e0; border-radius: 8px; padding: 32px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .upload-zone:hover { border-color: #c0392b; background: #fdf8f8; }
+    .upload-zone.has-file { border-color: #2e7d32; background: #f1f8e9; border-style: solid; }
+    .upload-zone .material-icons { font-size: 36px; color: #9e9e9e; }
+    .upload-zone.has-file .material-icons { color: #2e7d32; }
+    .upload-title { font-size: 14px; font-weight: 500; color: #424242; text-align: center; }
+    .upload-hint { font-size: 12px; color: #9e9e9e; text-align: center; }
+    .upload-file-name { font-size: 13px; color: #2e7d32; font-weight: 500; text-align: center; }
+    .term-box {
+      border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px;
+      background: #fafafa; margin-bottom: 20px;
+    }
+    .term-box p { font-size: 13px; color: #424242; margin-bottom: 8px; font-weight: 500; }
+    .term-box ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .term-box ul li {
+      font-size: 13px; color: #424242; display: flex; align-items: flex-start;
+      gap: 8px; line-height: 1.5;
+    }
+    .term-box ul li .material-icons { font-size: 16px; color: #c0392b; margin-top: 2px; flex-shrink: 0; }
+    .checkbox-row {
+      display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 0;
+    }
+    .checkbox-row input[type="checkbox"] { display: none; }
+    .checkbox-box {
+      width: 20px; height: 20px; border: 2px solid #bdbdbd; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;
+    }
+    .checkbox-box .material-icons { font-size: 14px; color: #fff; display: none; }
+    .checkbox-row.checked .checkbox-box { background: #c0392b; border-color: #c0392b; }
+    .checkbox-row.checked .checkbox-box .material-icons { display: block; }
+    .checkbox-label { font-size: 13px; color: #424242; }
+    .checkbox-label strong { font-weight: 600; color: #212121; }
+    .modal-footer {
+      padding: 0 28px 24px; display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid #f0f0f0; padding-top: 20px; margin-top: 4px;
+    }
+    .btn-ghost {
+      background: none; border: none; color: #c0392b;
+      font-size: 14px; font-weight: 500; cursor: pointer; padding: 10px 0;
+    }
+    .btn-ghost:hover { color: #a93226; }
+    .btn-ghost:disabled { color: #bdbdbd; cursor: default; }
+    .btn-primary {
+      background: #c0392b; color: #fff; border: none; border-radius: 6px;
+      padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: background 0.15s; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { background: #a93226; }
+    .btn-primary:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
+    .btn-primary .material-icons { font-size: 18px; }
+    .success-screen {
+      padding: 40px 28px 32px; display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+    }
+    .success-icon-wrap {
+      width: 72px; height: 72px; border-radius: 50%; background: #e8f5e9;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    }
+    .success-icon-wrap .material-icons { font-size: 40px; color: #2e7d32; }
+    .success-title { font-size: 20px; font-weight: 700; color: #212121; margin-bottom: 8px; }
+    .success-desc { font-size: 14px; color: #616161; line-height: 1.6; max-width: 380px; }
+    .success-minor-chip {
+      margin: 20px 0; background: #fdf0ee; border: 1px solid #f5c6bf;
+      border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .btn-done {
+      margin-top: 8px; background: #c0392b; color: #fff; border: none;
+      border-radius: 6px; padding: 12px 32px; font-size: 15px; font-weight: 500; cursor: pointer;
+    }
+    .btn-done:hover { background: #a93226; }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* ══════════════════════════════════
+       CONSENTIMENTOS
+    ══════════════════════════════════ */
+    .consent-section {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .consent-section-header {
+      padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+    }
+    .consent-section-title { font-size: 15px; font-weight: 700; color: #212121; margin-bottom: 6px; }
+    .consent-section-desc { font-size: 13px; color: #616161; line-height: 1.6; }
+
+
+    /* Barra busca + tabs (toolbar) */
+    .consent-toolbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-bottom: 1px solid #f0f0f0;
+      background: #fff;
+    }
+    .consent-search-wrap {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 8px 14px; background: #fff; transition: border-color 0.15s;
+    }
+    .consent-search-wrap:focus-within { border-color: #c0392b; }
+    .consent-search-wrap .material-icons { font-size: 18px; color: #9e9e9e; flex-shrink: 0; }
+    .consent-search-input {
+      border: none; outline: none; font-family: inherit;
+      font-size: 13px; color: #212121; flex: 1; background: transparent;
+    }
+    .consent-search-input::placeholder { color: #bdbdbd; }
+
+    /* Tabs pill */
+    .consent-tabs-pill {
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .consent-tab-pill {
+      padding: 7px 14px; font-size: 13px; font-weight: 500;
+      color: #616161; cursor: pointer; border: 1px solid #e0e0e0;
+      background: #fff; border-radius: 8px;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .consent-tab-pill:hover { border-color: #bdbdbd; color: #212121; }
+    .consent-tab-pill.active {
+      background: #c0392b; color: #fff; border-color: #c0392b;
+    }
+
+    /* Select-all dentro da lista */
+    .consent-select-all-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; border-bottom: 1px solid #f0f0f0;
+      background: #fafafa;
+    }
+
+    /* Legenda dos tipos */
+    .consent-legend {
+      display: flex; align-items: center; gap: 20px;
+      padding: 10px 20px; background: #fafafa; border-bottom: 1px solid #f0f0f0;
+      font-size: 12px; color: #757575;
+    }
+    .consent-legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot {
+      display: inline-block; padding: 2px 8px; border-radius: 8px;
+      font-size: 11px; font-weight: 600;
+    }
+    .legend-dot.consent { background: #fff3e0; color: #e65100; }
+    .legend-dot.resp { background: #fce4ec; color: #c62828; }
+
+    /* Barra de acao flutuante (selecao multipla) */
+    .consent-action-bar {
+      display: none; align-items: center; justify-content: space-between;
+      padding: 10px 20px; background: #212121; border-radius: 0 0 0 0;
+    }
+    .consent-action-bar.visible { display: flex; }
+    .consent-action-count { font-size: 13px; color: #fff; font-weight: 500; }
+    .btn-revogar-sel {
+      background: #c0392b; color: #fff; border: none; border-radius: 6px;
+      padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+    }
+    .btn-revogar-sel:hover { background: #a93226; }
+    .btn-revogar-sel .material-icons { font-size: 16px; }
+    .btn-cancelar-sel {
+      background: none; border: 1px solid rgba(255,255,255,0.3); color: #fff;
+      border-radius: 6px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+    }
+
+    /* Lista de plataformas */
+    .consent-list { padding: 0; }
+    .consent-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+      transition: background 0.12s;
+    }
+    .consent-item:last-child { border-bottom: none; }
+    .consent-item:hover { background: #fafafa; }
+    .consent-item.is-resp { opacity: 0.75; }
+    .consent-item.selected { background: #fdf0ee; }
+    .consent-item .checkbox-box { flex-shrink: 0; }
+    .consent-item.is-resp .checkbox-box {
+      background: #f5f5f5; border-color: #e0e0e0; cursor: not-allowed; pointer-events: none;
+    }
+
+    .plat-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; background: #f5f5f5;
+    }
+    .plat-info { flex: 1; min-width: 0; }
+    .plat-name { font-size: 14px; font-weight: 600; color: #212121; }
+    .plat-meta { font-size: 12px; color: #757575; margin-top: 3px; line-height: 1.5; }
+    .plat-meta span { margin-right: 12px; }
+    .plat-date { font-size: 11px; color: #bdbdbd; margin-top: 4px; }
+
+    .tipo-tag {
+      font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 8px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .tipo-tag.consent { background: #fff3e0; color: #e65100; }
+    .tipo-tag.resp { background: #fce4ec; color: #c62828; }
+
+    .btn-revogar-item {
+      background: #fff; border: 1px solid #c0392b; color: #c0392b;
+      border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 500;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.12s;
+    }
+    .btn-revogar-item:hover { background: #fdf0ee; }
+    .consent-item.is-resp .btn-revogar-item { display: none; }
+
+    /* Modal de revogacao */
+    .modal-revog { width: 480px; }
+    .revog-aviso {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 4px;
+    }
+    .revog-aviso .material-icons { color: #f9a825; font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .revog-aviso-title { font-size: 13px; font-weight: 600; color: #212121; margin-bottom: 6px; }
+    .revog-aviso-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .revog-aviso-list li {
+      font-size: 12px; color: #616161; display: flex; align-items: flex-start;
+      gap: 6px; line-height: 1.5;
+    }
+    .revog-aviso-list li::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: #9e9e9e; flex-shrink: 0; margin-top: 6px;
+    }
+    .revog-plat-list { list-style: none; padding: 0; margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .revog-plat-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px;
+      background: #fafafa; font-size: 13px; color: #212121; font-weight: 500;
+    }
+    .revog-plat-item .plat-icon { width: 28px; height: 28px; font-size: 15px; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #fff; border-radius: 12px; padding: 14px 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.14); display: flex; align-items: center; gap: 14px;
+      min-width: 340px; max-width: 480px; z-index: 200;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-icon-wrap {
+      width: 32px; height: 32px; border-radius: 50%; background: #e8f5e9;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .toast-icon-wrap .material-icons { font-size: 18px; color: #2e7d32; }
+    .toast-title { font-size: 14px; font-weight: 600; color: #212121; }
+    .toast-desc { font-size: 13px; color: #616161; margin-top: 2px; }
+    .toast-close {
+      background: none; border: none; cursor: pointer;
+      color: #9e9e9e; padding: 4px; margin-left: auto; flex-shrink: 0;
+    }
+    .toast-close .material-icons { font-size: 18px; }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="topbar-logo">SENA<span>I</span></div>
+  <div class="topbar-actions">
+    <button class="topbar-btn">
+      <span class="material-icons">grade</span>
+      Padrao
+    </button>
+    <button class="topbar-icon-btn"><span class="material-icons">dark_mode</span></button>
+    <button class="topbar-icon-btn"><span class="material-icons">notifications_none</span></button>
+    <button class="topbar-icon-btn"><span class="material-icons">grid_view</span></button>
+    <div class="avatar-topbar">MS</div>
+  </div>
+</header>
+
+<!-- ── HERO BANNER ── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-avatar">MS</div>
+    <div>
+      <div class="hero-name">Maria Silva</div>
+      <div class="hero-badge">
+        <span class="material-icons">badge</span>
+        Responsavel Legal
+      </div>
+      <div class="hero-email">maria.silva@email.com</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <button class="hero-level-btn">
+      <span class="material-icons">trending_up</span>
+      Aumentar Nivel
+    </button>
+    <div class="hero-progress-wrap">
+      <div class="hero-progress-label">Sua conta SENAI BR e Nivel <span>Prata</span></div>
+      <div class="hero-progress-bar"><div class="hero-progress-fill"></div></div>
+      <div class="hero-progress-pct">70%</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+  <!-- Breadcrumb (atualizado via JS) -->
+  <div class="breadcrumb" id="breadcrumb">
+    Minha Conta &rsaquo; <span id="breadcrumb-current">Visao Geral</span>
+  </div>
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active">Minha Conta</button>
+      <button class="sidebar-tab">Minhas Empresas</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-item active" id="nav-visao" onclick="showView('visao')">
+        <span class="material-icons">grid_view</span> Visao Geral
+      </div>
+      <div class="sidebar-item" id="nav-dados" onclick="showView('dados')">
+        <span class="material-icons">person_outline</span> Dados pessoais
+      </div>
+      <div class="sidebar-item" id="nav-end" onclick="">
+        <span class="material-icons">location_on</span> Enderecos
+      </div>
+      <div class="sidebar-item" id="nav-cont" onclick="">
+        <span class="material-icons">phone</span> Contatos
+      </div>
+      <div class="sidebar-item" id="nav-doc" onclick="">
+        <span class="material-icons">description</span> Documentos
+        <span class="sidebar-badge">1</span>
+      </div>
+      <div class="sidebar-item" id="nav-parental" onclick="showView('parental')">
+        <span class="material-icons">supervisor_account</span> Controle parental
+        <span class="sidebar-dot-red"></span>
+      </div>
+      <div class="sidebar-item" id="nav-vinc" onclick="">
+        <span class="material-icons">business</span> Vinculos empresariais
+        <span class="sidebar-dot"></span>
+      </div>
+      <div class="sidebar-item" id="nav-seg" onclick="">
+        <span class="material-icons">security</span> Seguranca e acesso
+        <span class="material-icons sidebar-check">check_circle</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Conteudo principal -->
+  <main class="main-content">
+
+    <!-- ════ VIEW: VISAO GERAL ════ -->
+    <div class="view active" id="view-visao">
+      <h1 class="page-title">Visao Geral</h1>
+      <p class="page-subtitle">Resumo das informacoes e dados da sua conta</p>
+
+      <!-- Bloco de pendencias -->
+      <div class="pendencias-block" id="bloco-pendencias">
+        <div class="pendencias-header">
+          <div class="pendencias-header-left">
+            <span class="material-icons">pending_actions</span>
+            <span class="pendencias-header-title">Pendencias na sua conta</span>
+            <span class="pendencias-count" id="pendencias-count">4</span>
+          </div>
+          <button class="btn-ver-todas" onclick="togglePendencias()">
+            <span id="btn-ver-label">Ver todas</span>
+            <span class="material-icons" id="btn-ver-icon">expand_more</span>
+          </button>
+        </div>
+
+        <!-- Item 1: vinculo pendente (destaque) -->
+        <div class="pendencia-item" id="pend-vinculo">
+          <div class="pendencia-type-icon vinculo">
+            <span class="material-icons">supervisor_account</span>
+          </div>
+          <div class="pendencia-body">
+            <div class="pendencia-title">Solicitacao de vinculo parental</div>
+            <div class="pendencia-desc">Ana Oliveira Santos, 12 anos &mdash; aguardando autorizacao</div>
+          </div>
+          <span class="pendencia-tag tag-urgente">Requer acao</span>
+          <button class="btn-pendencia-acao destaque" onclick="showView('parental')">Autorizar</button>
+        </div>
+
+        <!-- Item 2: documento pendente -->
+        <div class="pendencia-item pend-extra" style="display:none">
+          <div class="pendencia-type-icon documento">
+            <span class="material-icons">description</span>
+          </div>
+          <div class="pendencia-body">
+            <div class="pendencia-title">Documento vencido</div>
+            <div class="pendencia-desc">RG de Maria Silva expirou em jan/2024 &mdash; atualize em Documentos</div>
+          </div>
+          <span class="pendencia-tag tag-urgente">Requer acao</span>
+          <button class="btn-pendencia-acao">Atualizar</button>
+        </div>
+
+        <!-- Item 3: vinculo empresarial -->
+        <div class="pendencia-item pend-extra" style="display:none">
+          <div class="pendencia-type-icon empresa">
+            <span class="material-icons">business</span>
+          </div>
+          <div class="pendencia-body">
+            <div class="pendencia-title">Confirmacao de vinculo empresarial</div>
+            <div class="pendencia-desc">SENAI SP Unidade Centro enviou convite de vinculo</div>
+          </div>
+          <span class="pendencia-tag tag-info">Aguardando</span>
+          <button class="btn-pendencia-acao">Revisar</button>
+        </div>
+
+        <!-- Item 4: seguranca -->
+        <div class="pendencia-item pend-extra" style="display:none">
+          <div class="pendencia-type-icon seguranca">
+            <span class="material-icons">security</span>
+          </div>
+          <div class="pendencia-body">
+            <div class="pendencia-title">Verificacao de seguranca pendente</div>
+            <div class="pendencia-desc">Confirme seu telefone celular para proteger o acesso</div>
+          </div>
+          <span class="pendencia-tag tag-info">Recomendado</span>
+          <button class="btn-pendencia-acao">Verificar</button>
+        </div>
+
+      </div><!-- /bloco-pendencias -->
+
+      <!-- Card: Dados pessoais -->
+      <div class="vg-section">
+        <div class="vg-section-header">
+          <div class="vg-section-icon-row">
+            <div class="vg-section-icon"><span class="material-icons">account_circle</span></div>
+            <div>
+              <div class="vg-section-title">Dados pessoais</div>
+              <div class="vg-section-meta">Informacoes do titular da conta</div>
+            </div>
+          </div>
+          <button class="btn-icon-edit"><span class="material-icons">edit</span></button>
+        </div>
+        <div class="vg-user-row">
+          <div class="vg-user-avatar"><span class="material-icons">account_circle</span></div>
+          <div>
+            <div class="vg-user-name">Maria Silva</div>
+            <div class="vg-user-docs">
+              <span>CPF: 123.456.789-10</span>
+              <span>RG: 12 345 678-9</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Menores vinculados -->
+      <div class="vg-section">
+        <div class="vg-section-header">
+          <div class="vg-section-icon-row">
+            <div class="vg-section-icon"><span class="material-icons">supervisor_account</span></div>
+            <div>
+              <div class="vg-section-title">Menores vinculados</div>
+              <div class="vg-section-meta">3 menores cadastrados sob sua responsabilidade</div>
+            </div>
+          </div>
+          <button class="btn-outline-sm" onclick="showView('parental')">
+            <span class="material-icons">add</span>
+            Vincular novo menor
+          </button>
+        </div>
+
+        <!-- Lucas - Conta ativa -->
+        <div class="vg-minor-row">
+          <div class="vg-minor-avatar lm">LM</div>
+          <div>
+            <div class="vg-minor-name">Lucas Mendes</div>
+            <div class="vg-minor-age">14 anos</div>
+          </div>
+          <span class="badge badge-active" style="margin-left:16px">Conta ativa</span>
+          <div class="vg-minor-action">
+            <button class="btn-link" onclick="showView('parental')">
+              Ver perfil <span class="material-icons">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ana - Pendente -->
+        <div class="vg-minor-row">
+          <div class="vg-minor-avatar ao">AO</div>
+          <div>
+            <div class="vg-minor-name">Ana Oliveira Santos</div>
+            <div class="vg-minor-age">12 anos</div>
+          </div>
+          <span class="badge badge-pending" style="margin-left:16px">Pendente</span>
+          <div class="vg-minor-action">
+            <button class="btn-link" onclick="showView('parental')">
+              Ver perfil <span class="material-icons">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Felipe - Conta desativada -->
+        <div class="vg-minor-row">
+          <div class="vg-minor-avatar ft">FT</div>
+          <div>
+            <div class="vg-minor-name">Felipe Teixeira</div>
+            <div class="vg-minor-age">15 anos</div>
+          </div>
+          <span class="badge badge-inactive" style="margin-left:16px">Conta desativada</span>
+          <div class="vg-minor-action">
+            <button class="btn-link" onclick="showView('parental')">
+              Ver perfil <span class="material-icons">arrow_forward</span>
+            </button>
+          </div>
+      </div>
+      </div>
+
+      <!-- ── SECAO: CONSENTIMENTOS ── -->
+      <div class="consent-section" id="consent-section">
+        <div class="consent-section-header">
+          <div class="consent-section-title">Termos de responsabilidade e compartilhamento de dados</div>
+          <div class="consent-section-desc">
+            Mediante sua autorizacao, o SENAI podera compartilhar seus dados pessoais, conforme previsto em nossa
+            Politica de Privacidade, a fim de viabilizar o acompanhamento de sua carga horaria de aprendizagem
+            para fins de credito academico associado.
+          </div>
+        </div>
+
+        <!-- Legenda -->
+        <div class="consent-legend">
+          <div class="consent-legend-item">
+            <span class="legend-dot consent">Consentimento</span>
+            Pode ser revogado
+          </div>
+          <div class="consent-legend-item">
+            <span class="legend-dot resp">Responsabilidade</span>
+            Obrigatorio para o servico
+          </div>
+        </div>
+
+        <!-- Toolbar: busca + tabs pill -->
+        <div class="consent-toolbar">
+          <div class="consent-search-wrap">
+            <span class="material-icons">search</span>
+            <input class="consent-search-input" id="consent-search"
+              type="text" placeholder="Buscar por plataformas"
+              oninput="searchConsent(this.value)" />
+          </div>
+          <div class="consent-tabs-pill">
+            <button class="consent-tab-pill active" onclick="filterConsent('todos', this)">Todos</button>
+            <button class="consent-tab-pill" onclick="filterConsent('consentimento', this)">Consentimento</button>
+            <button class="consent-tab-pill" onclick="filterConsent('responsabilidade', this)">Responsabilidade</button>
+          </div>
+        </div>
+
+        <!-- Select-all dentro da lista (apenas para consentimentos) -->
+        <div class="consent-select-all-row" id="consent-select-all-row">
+          <div class="checkbox-row" id="cb-select-all" onclick="toggleSelectAll()" style="padding:0">
+            <div class="checkbox-box" id="cb-all-box"><span class="material-icons">check</span></div>
+            <div class="checkbox-label" id="cb-all-label">Selecionar todos os consentimentos (4)</div>
+          </div>
+        </div>
+
+        <!-- Barra de acao multipla -->
+        <div class="consent-action-bar" id="consent-action-bar">
+          <span class="consent-action-count" id="action-count-label">0 selecionados</span>
+          <div style="display:flex;gap:10px">
+            <button class="btn-cancelar-sel" onclick="clearSelection()">Cancelar</button>
+            <button class="btn-revogar-sel" onclick="openRevogModal()">
+              <span class="material-icons">remove_circle_outline</span>
+              Revogar selecionados
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de plataformas -->
+        <div class="consent-list" id="consent-list">
+
+          <div class="consent-item" data-tipo="consentimento" data-id="saga" data-name="Saga SENAI">
+            <div class="checkbox-box item-cb" onclick="toggleItem(this)"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F4DA;</div>
+            <div class="plat-info">
+              <div class="plat-name">Saga SENAI</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, email, CPF</span><span><strong>Finalidade:</strong> Acompanhamento de aprendizagem</span></div>
+              <div class="plat-date">Consentido em: 15/01/2025</div>
+            </div>
+            <span class="tipo-tag consent">Consentimento</span>
+            <button class="btn-revogar-item" onclick="openRevogModalItem('saga','Saga SENAI')">Revogar</button>
+          </div>
+
+          <div class="consent-item" data-tipo="consentimento" data-id="ava" data-name="AVA SENAI">
+            <div class="checkbox-box item-cb" onclick="toggleItem(this)"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F4D6;</div>
+            <div class="plat-info">
+              <div class="plat-name">AVA SENAI</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, email, matricula</span><span><strong>Finalidade:</strong> Acesso ao ambiente virtual</span></div>
+              <div class="plat-date">Consentido em: 10/01/2025</div>
+            </div>
+            <span class="tipo-tag consent">Consentimento</span>
+            <button class="btn-revogar-item" onclick="openRevogModalItem('ava','AVA SENAI')">Revogar</button>
+          </div>
+
+          <div class="consent-item" data-tipo="consentimento" data-id="ra" data-name="SENAI RA">
+            <div class="checkbox-box item-cb" onclick="toggleItem(this)"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F97D;</div>
+            <div class="plat-info">
+              <div class="plat-name">SENAI RA</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, email, historico academico</span><span><strong>Finalidade:</strong> Realidade aumentada educacional</span></div>
+              <div class="plat-date">Consentido em: 05/02/2025</div>
+            </div>
+            <span class="tipo-tag consent">Consentimento</span>
+            <button class="btn-revogar-item" onclick="openRevogModalItem('ra','SENAI RA')">Revogar</button>
+          </div>
+
+          <div class="consent-item" data-tipo="consentimento" data-id="estante" data-name="Estante Virtual">
+            <div class="checkbox-box item-cb" onclick="toggleItem(this)"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F4D7;</div>
+            <div class="plat-info">
+              <div class="plat-name">Estante Virtual</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, matricula, historico de leitura</span><span><strong>Finalidade:</strong> Recomendacao de livros</span></div>
+              <div class="plat-date">Consentido em: 10/02/2025</div>
+            </div>
+            <span class="tipo-tag consent">Consentimento</span>
+            <button class="btn-revogar-item" onclick="openRevogModalItem('estante','Estante Virtual')">Revogar</button>
+          </div>
+
+          <div class="consent-item is-resp" data-tipo="responsabilidade" data-id="libras" data-name="SENAI Libras">
+            <div class="checkbox-box item-cb"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F91F;</div>
+            <div class="plat-info">
+              <div class="plat-name">SENAI Libras</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, email</span><span><strong>Finalidade:</strong> Recursos de acessibilidade obrigatorios</span></div>
+              <div class="plat-date">Vinculado em: 01/01/2024</div>
+            </div>
+            <span class="tipo-tag resp">Responsabilidade</span>
+          </div>
+
+          <div class="consent-item is-resp" data-tipo="responsabilidade" data-id="mundo" data-name="Mundo SENAI">
+            <div class="checkbox-box item-cb"><span class="material-icons">check</span></div>
+            <div class="plat-icon">&#x1F310;</div>
+            <div class="plat-info">
+              <div class="plat-name">Mundo SENAI</div>
+              <div class="plat-meta"><span><strong>Dados:</strong> nome, email, CPF</span><span><strong>Finalidade:</strong> Servico essencial da plataforma</span></div>
+              <div class="plat-date">Vinculado em: 01/01/2024</div>
+            </div>
+            <span class="tipo-tag resp">Responsabilidade</span>
+          </div>
+
+        </div><!-- /consent-list -->
+      </div><!-- /consent-section -->
+    </div><!-- /view-visao -->
+
+    <!-- ════ VIEW: CONTROLE PARENTAL ════ -->
+    <div class="view" id="view-parental">
+      <h1 class="page-title">Controle parental</h1>
+      <p class="page-subtitle">Gerencie as contas dos menores sob sua responsabilidade</p>
+
+      <div class="minor-list">
+        <!-- Ana Oliveira - Pendente -->
+        <div class="minor-card" id="card-ana">
+          <div class="minor-avatar ao">AO</div>
+          <div class="minor-info">
+            <div class="minor-name">Ana Oliveira Santos</div>
+            <div class="minor-age">12 anos</div>
+          </div>
+          <span class="badge badge-pending" id="badge-ana">Pendente</span>
+          <div class="minor-action" id="action-ana">
+            <button class="btn-authorize" onclick="openModal()">Autorizar acesso</button>
+          </div>
+        </div>
+
+        <!-- Lucas Mendes - Conta ativa -->
+        <div class="minor-card">
+          <div class="minor-avatar lm">LM</div>
+          <div class="minor-info">
+            <div class="minor-name">Lucas Mendes</div>
+            <div class="minor-age">14 anos</div>
+          </div>
+          <span class="badge badge-active">Conta ativa</span>
+          <div class="minor-action">
+            <button class="btn-manage">Gerenciar <span class="material-icons" style="font-size:16px">arrow_forward</span></button>
+          </div>
+        </div>
+
+        <!-- Felipe Teixeira - Conta inativada -->
+        <div class="minor-card">
+          <div class="minor-avatar ft">FT</div>
+          <div class="minor-info">
+            <div class="minor-name">Felipe Teixeira</div>
+            <div class="minor-age">15 anos</div>
+          </div>
+          <span class="badge badge-inactive">Conta inativada</span>
+          <div class="minor-action">
+            <button class="btn-manage">Gerenciar <span class="material-icons" style="font-size:16px">arrow_forward</span></button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-parental -->
+
+    <!-- ════ VIEW: DADOS PESSOAIS (placeholder) ════ -->
+    <div class="view" id="view-dados">
+      <h1 class="page-title">Dados pessoais</h1>
+      <p class="page-subtitle">Informacoes cadastrais do titular da conta</p>
+      <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:40px;text-align:center;color:#9e9e9e;">
+        <span class="material-icons" style="font-size:40px;display:block;margin-bottom:12px">construction</span>
+        Tela em construcao
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════
+     OVERLAY + MODAL
+════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-header-text">
+        <div class="modal-title" id="modal-title">Autorizar vinculo parental</div>
+        <div class="modal-subtitle" id="modal-subtitle">Informe sua relacao com o menor para prosseguir com a autorizacao de acesso.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="minor-chip" id="modal-chip">
+      <div class="minor-chip-avatar">AO</div>
+      <div>
+        <div class="minor-chip-label">Autorizando acesso para</div>
+        <div class="minor-chip-name">Ana Oliveira Santos &mdash; 12 anos</div>
+      </div>
+    </div>
+
+    <div class="steps-indicator" id="steps-indicator">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot pending" id="dot-2">2</div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot pending" id="dot-3">3</div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label active" id="lbl-1">Parentesco</span>
+      <span class="step-label" id="lbl-2">Comprovante</span>
+      <span class="step-label" id="lbl-3">Termo</span>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="modal-body step-panel active" id="step-1">
+      <div class="field-label">Qual e o seu grau de parentesco com Ana Oliveira Santos?<span class="required">*</span></div>
+      <div class="radio-group">
+        <label class="radio-option" id="opt-pai" onclick="selectParentesco('pai', this)">
+          <input type="radio" name="parentesco" value="pai" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="radio-icon"><span class="material-icons">man</span></div>
+          <div class="radio-text">
+            <div class="radio-title">Pai</div>
+            <div class="radio-desc">Pai biologico ou adotivo do menor</div>
+          </div>
+        </label>
+        <label class="radio-option" id="opt-mae" onclick="selectParentesco('mae', this)">
+          <input type="radio" name="parentesco" value="mae" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="radio-icon"><span class="material-icons">woman</span></div>
+          <div class="radio-text">
+            <div class="radio-title">Mae</div>
+            <div class="radio-desc">Mae biologica ou adotiva do menor</div>
+          </div>
+        </label>
+        <label class="radio-option" id="opt-tutor" onclick="selectParentesco('tutor', this)">
+          <input type="radio" name="parentesco" value="tutor" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="radio-icon"><span class="material-icons">gavel</span></div>
+          <div class="radio-text">
+            <div class="radio-title">Tutor Legal</div>
+            <div class="radio-desc">Responsavel legal designado por decisao judicial</div>
+          </div>
+        </label>
+        <label class="radio-option" id="opt-resp" onclick="selectParentesco('resp', this)">
+          <input type="radio" name="parentesco" value="resp" />
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="radio-icon"><span class="material-icons">account_balance_wallet</span></div>
+          <div class="radio-text">
+            <div class="radio-title">Responsavel Financeiro</div>
+            <div class="radio-desc">Responsavel financeiro conforme contrato de matricula</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="modal-body step-panel" id="step-2">
+      <div class="upload-info-box">
+        <span class="material-icons">info</span>
+        <div class="upload-info-text" id="upload-info-text">
+          Selecione o tipo de parentesco no passo anterior para ver o documento necessario.
+        </div>
+      </div>
+      <div class="upload-zone" id="upload-zone" onclick="simulateUpload()">
+        <span class="material-icons" id="upload-icon">cloud_upload</span>
+        <div class="upload-title" id="upload-title">Clique para selecionar ou arraste o arquivo aqui</div>
+        <div class="upload-hint" id="upload-hint">PDF, JPG ou PNG &mdash; tamanho maximo 10 MB</div>
+        <div class="upload-file-name" id="upload-file-name" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="modal-body step-panel" id="step-3">
+      <div class="term-box">
+        <p>Ao autorizar este vinculo, declaro que:</p>
+        <ul>
+          <li><span class="material-icons">check_circle</span>Sou legalmente responsavel por Ana Oliveira Santos;</li>
+          <li><span class="material-icons">check_circle</span>Autorizo o tratamento dos dados pessoais do menor conforme a LGPD;</li>
+          <li><span class="material-icons">check_circle</span>Comprometo-me a supervisionar as atividades nas plataformas SENAI;</li>
+          <li><span class="material-icons">check_circle</span>Reconheco que posso gerenciar os consentimentos pelo Controle Parental.</li>
+        </ul>
+      </div>
+      <label class="checkbox-row" id="checkbox-row" onclick="toggleCheckbox()">
+        <input type="checkbox" id="termo-check" />
+        <div class="checkbox-box"><span class="material-icons">check</span></div>
+        <div class="checkbox-label"><strong>Li e aceito o Termo de Responsabilidade</strong></div>
+      </label>
+    </div>
+
+    <div class="modal-footer" id="modal-footer">
+      <button class="btn-ghost" id="btn-back" onclick="prevStep()" disabled>Voltar</button>
+      <button class="btn-primary" id="btn-next" onclick="nextStep()" disabled>
+        Continuar <span class="material-icons">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast">
+  <div class="toast-icon-wrap">
+    <span class="material-icons">check</span>
+  </div>
+  <div>
+    <div class="toast-title">Vinculo autorizado</div>
+    <div class="toast-desc">O acesso de Ana Oliveira Santos foi liberado com sucesso.</div>
+  </div>
+  <button class="toast-close" onclick="hideToast()"><span class="material-icons">close</span></button>
+</div>
+
+<script>
+  // ══ NAVEGACAO ENTRE VIEWS ══
+  const views = {
+    visao:    { id: 'view-visao',    nav: 'nav-visao',    label: 'Visao Geral' },
+    parental: { id: 'view-parental', nav: 'nav-parental', label: 'Controle parental' },
+    dados:    { id: 'view-dados',    nav: 'nav-dados',    label: 'Dados pessoais' },
+  };
+
+  function showView(name) {
+    Object.values(views).forEach(v => {
+      const el = document.getElementById(v.id);
+      const nav = document.getElementById(v.nav);
+      if (el) el.classList.remove('active');
+      if (nav) nav.classList.remove('active');
+    });
+    const v = views[name];
+    if (v) {
+      document.getElementById(v.id).classList.add('active');
+      document.getElementById(v.nav).classList.add('active');
+      document.getElementById('breadcrumb-current').textContent = v.label;
+    }
+  }
+
+  // ══ MODAL ══
+  let currentStep = 1;
+  let parentesco = null;
+  let fileUploaded = false;
+  let termoAccepted = false;
+
+  const docLabels = {
+    pai:   { desc: 'Certidao de Nascimento do menor onde conste seu nome como pai.' },
+    mae:   { desc: 'Certidao de Nascimento do menor onde conste seu nome como mae.' },
+    tutor: { desc: 'Termo de Tutela Judicial emitido pelo juizo competente.' },
+    resp:  { desc: 'Documento de responsabilidade financeira (ex: contrato de matricula).' },
+  };
+
+  function openModal() {
+    document.getElementById('overlay').classList.add('open');
+    resetModal();
+  }
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+  document.getElementById('overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  function resetModal() {
+    currentStep = 1;
+    parentesco = null;
+    fileUploaded = false;
+    termoAccepted = false;
+    document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+    const zone = document.getElementById('upload-zone');
+    zone.classList.remove('has-file');
+    document.getElementById('upload-icon').textContent = 'cloud_upload';
+    document.getElementById('upload-title').textContent = 'Clique para selecionar ou arraste o arquivo aqui';
+    document.getElementById('upload-hint').style.display = '';
+    document.getElementById('upload-file-name').style.display = 'none';
+    document.getElementById('checkbox-row').classList.remove('checked');
+    document.getElementById('modal-footer').style.display = '';
+    document.getElementById('steps-indicator').style.display = '';
+    document.getElementById('modal-chip').style.display = '';
+    document.getElementById('modal-subtitle').style.display = '';
+
+    const old = document.getElementById('success-screen');
+    if (old) old.remove();
+
+    document.querySelectorAll('.step-labels')[0].style.display = '';
+    goToStep(1);
+  }
+
+  function goToStep(n) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+    currentStep = n;
+    updateStepIndicator(n);
+    updateButtons(n);
+    updateHeaderText(n);
+  }
+
+  function updateStepIndicator(n) {
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById('dot-' + i);
+      const lbl = document.getElementById('lbl-' + i);
+      dot.className = 'step-dot';
+      lbl.className = 'step-label';
+      if (i < n) {
+        dot.classList.add('done');
+        dot.innerHTML = '<span class="material-icons" style="font-size:14px">check</span>';
+        lbl.classList.add('done');
+      } else if (i === n) {
+        dot.classList.add('active');
+        dot.textContent = i;
+        lbl.classList.add('active');
+      } else {
+        dot.classList.add('pending');
+        dot.textContent = i;
+      }
+    }
+    for (let i = 1; i <= 2; i++) {
+      document.getElementById('line-' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+
+  function updateHeaderText(n) {
+    const titles    = ['Autorizar vinculo parental', 'Enviar comprovante', 'Termo de responsabilidade'];
+    const subtitles = [
+      'Informe sua relacao com o menor para prosseguir com a autorizacao de acesso.',
+      'Anexe o documento que comprova sua relacao com Ana Oliveira Santos.',
+      'Leia e aceite os termos para concluir a autorizacao do vinculo.',
+    ];
+    document.getElementById('modal-title').textContent = titles[n - 1];
+    document.getElementById('modal-subtitle').textContent = subtitles[n - 1];
+  }
+
+  function updateButtons(n) {
+    const btnBack = document.getElementById('btn-back');
+    const btnNext = document.getElementById('btn-next');
+    btnBack.disabled = n === 1;
+    if (n === 1) {
+      btnNext.innerHTML = 'Continuar <span class="material-icons">arrow_forward</span>';
+      btnNext.disabled = !parentesco;
+    } else if (n === 2) {
+      btnNext.innerHTML = 'Continuar <span class="material-icons">arrow_forward</span>';
+      btnNext.disabled = !fileUploaded;
+    } else {
+      btnNext.innerHTML = 'Autorizar vinculo <span class="material-icons">verified_user</span>';
+      btnNext.disabled = !termoAccepted;
+    }
+  }
+
+  function nextStep() {
+    if (currentStep < 3) {
+      goToStep(currentStep + 1);
+    } else {
+      showSuccess();
+    }
+  }
+  function prevStep() {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  }
+
+  function selectParentesco(tipo, el) {
+    document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    parentesco = tipo;
+    const info = docLabels[tipo];
+    document.getElementById('upload-info-text').innerHTML =
+      '<strong>Documento necessario:</strong> ' + info.desc;
+    updateButtons(currentStep);
+  }
+
+  function simulateUpload() {
+    if (fileUploaded) return;
+    fileUploaded = true;
+    const zone = document.getElementById('upload-zone');
+    zone.classList.add('has-file');
+    document.getElementById('upload-icon').textContent = 'check_circle';
+    document.getElementById('upload-title').textContent = 'Arquivo enviado com sucesso';
+    document.getElementById('upload-hint').style.display = 'none';
+    const fn = document.getElementById('upload-file-name');
+    fn.style.display = 'block';
+    fn.textContent = 'comprovante-ana-oliveira.pdf';
+    updateButtons(currentStep);
+  }
+
+  function toggleCheckbox() {
+    termoAccepted = !termoAccepted;
+    const row = document.getElementById('checkbox-row');
+    termoAccepted ? row.classList.add('checked') : row.classList.remove('checked');
+    updateButtons(currentStep);
+  }
+
+  function showSuccess() {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('steps-indicator').style.display = 'none';
+    document.querySelectorAll('.step-labels')[0].style.display = 'none';
+    document.getElementById('modal-footer').style.display = 'none';
+    document.getElementById('modal-chip').style.display = 'none';
+    document.getElementById('modal-subtitle').style.display = 'none';
+    document.getElementById('modal-title').textContent = '';
+
+    const old = document.getElementById('success-screen');
+    if (old) old.remove();
+
+    document.getElementById('modal').insertAdjacentHTML('beforeend', `
+      <div class="success-screen" id="success-screen">
+        <div class="success-icon-wrap">
+          <span class="material-icons">verified_user</span>
+        </div>
+        <div class="success-title">Vinculo autorizado com sucesso</div>
+        <div class="success-desc">
+          O acesso de <strong>Ana Oliveira Santos</strong> as plataformas SENAI foi autorizado.
+          Voce pode gerenciar os consentimentos a qualquer momento pelo Controle Parental.
+        </div>
+        <div class="success-minor-chip">
+          <div class="minor-chip-avatar">AO</div>
+          <div>
+            <div class="minor-chip-label">Vinculo autorizado para</div>
+            <div class="minor-chip-name">Ana Oliveira Santos &mdash; 12 anos</div>
+          </div>
+        </div>
+        <button class="btn-done" onclick="onConcluir()">Concluir</button>
+      </div>
+    `);
+  }
+
+  function onConcluir() {
+    closeModal();
+    // Atualiza card no controle parental
+    document.getElementById('badge-ana').className = 'badge badge-active';
+    document.getElementById('badge-ana').textContent = 'Conta ativa';
+    document.getElementById('action-ana').innerHTML =
+      '<button class="btn-manage">Gerenciar <span class="material-icons" style="font-size:16px">arrow_forward</span></button>';
+    // Remove apenas o item de vinculo do bloco de pendencias
+    const itemVinculo = document.getElementById('pend-vinculo');
+    if (itemVinculo) itemVinculo.remove();
+    // Atualiza contagem
+    const countEl = document.getElementById('pendencias-count');
+    if (countEl) {
+      const atual = parseInt(countEl.textContent) - 1;
+      if (atual <= 0) {
+        document.getElementById('bloco-pendencias').remove();
+      } else {
+        countEl.textContent = atual;
+      }
+    }
+    // Remove dot vermelho do sidebar
+    const dot = document.querySelector('#nav-parental .sidebar-dot-red');
+    if (dot) dot.remove();
+    // Mostra toast
+    showToast();
+  }
+
+  // ══ TOGGLE PENDENCIAS ══
+  let pendenciasExpandidas = false;
+  function togglePendencias() {
+    pendenciasExpandidas = !pendenciasExpandidas;
+    const extras = document.querySelectorAll('.pend-extra');
+    extras.forEach(el => el.style.display = pendenciasExpandidas ? 'flex' : 'none');
+    document.getElementById('btn-ver-label').textContent = pendenciasExpandidas ? 'Recolher' : 'Ver todas';
+    document.getElementById('btn-ver-icon').textContent = pendenciasExpandidas ? 'expand_less' : 'expand_more';
+  }
+
+  // ══ TOAST ══
+  let toastTimer;
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => hideToast(), 5000);
+  }
+  function hideToast() {
+    document.getElementById('toast').classList.remove('show');
+  }
+
+  // ══ CONSENTIMENTOS ══
+  let selectedItems = new Set();
+  let revogTarget = []; // array de {id, name}
+
+  function toggleItem(cbBox) {
+    const item = cbBox.closest('.consent-item');
+    if (item.classList.contains('is-resp')) return; // Responsabilidade: nao selecionavel
+    const id = item.dataset.id;
+    if (selectedItems.has(id)) {
+      selectedItems.delete(id);
+      item.classList.remove('selected');
+      cbBox.classList.remove('checked');
+    } else {
+      selectedItems.add(id);
+      item.classList.add('selected');
+      cbBox.classList.add('checked');
+    }
+    updateActionBar();
+    updateSelectAllState();
+  }
+
+  function toggleSelectAll() {
+    // Apenas itens de consentimento visiveis
+    const consentItems = [...document.querySelectorAll('.consent-item:not(.is-resp)')]
+      .filter(i => i.style.display !== 'none');
+    const allSelected = consentItems.every(i => selectedItems.has(i.dataset.id));
+    consentItems.forEach(item => {
+      const cb = item.querySelector('.item-cb');
+      if (allSelected) {
+        selectedItems.delete(item.dataset.id);
+        item.classList.remove('selected');
+        cb.classList.remove('checked');
+      } else {
+        selectedItems.add(item.dataset.id);
+        item.classList.add('selected');
+        cb.classList.add('checked');
+      }
+    });
+    updateActionBar();
+    updateSelectAllState();
+  }
+
+  function updateSelectAllState() {
+    const consentItems = [...document.querySelectorAll('.consent-item:not(.is-resp)')]
+      .filter(i => i.style.display !== 'none');
+    const total = consentItems.length;
+    const sel = consentItems.filter(i => selectedItems.has(i.dataset.id)).length;
+    const cbBox = document.getElementById('cb-all-box');
+    const lbl = document.getElementById('cb-all-label');
+    lbl.textContent = 'Selecionar todos os consentimentos (' + total + ')';
+    if (sel === total && total > 0) {
+      cbBox.classList.add('checked');
+    } else {
+      cbBox.classList.remove('checked');
+    }
+  }
+
+  function updateActionBar() {
+    const bar = document.getElementById('consent-action-bar');
+    const lbl = document.getElementById('action-count-label');
+    const count = selectedItems.size;
+    if (count > 0) {
+      bar.classList.add('visible');
+      lbl.textContent = count + (count === 1 ? ' selecionado' : ' selecionados');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+
+  function clearSelection() {
+    selectedItems.clear();
+    document.querySelectorAll('.consent-item').forEach(item => {
+      item.classList.remove('selected');
+      item.querySelector('.item-cb').classList.remove('checked');
+    });
+    document.getElementById('cb-all-box').classList.remove('checked');
+    updateActionBar();
+  }
+
+  let currentFilter = 'todos';
+  let currentSearch = '';
+
+  function filterConsent(tipo, tabEl) {
+    currentFilter = tipo;
+    document.querySelectorAll('.consent-tab-pill').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    applyConsentFilter();
+    // Oculta select-all se aba for responsabilidade (nao ha o que selecionar)
+    const saRow = document.getElementById('consent-select-all-row');
+    saRow.style.display = (tipo === 'responsabilidade') ? 'none' : '';
+    updateActionBar();
+    updateSelectAllState();
+  }
+
+  function searchConsent(val) {
+    currentSearch = val.toLowerCase().trim();
+    applyConsentFilter();
+    updateSelectAllState();
+  }
+
+  function applyConsentFilter() {
+    document.querySelectorAll('.consent-item').forEach(item => {
+      const matchTipo = (currentFilter === 'todos' || item.dataset.tipo === currentFilter);
+      const matchSearch = (currentSearch === '' || item.dataset.name.toLowerCase().includes(currentSearch));
+      const visible = matchTipo && matchSearch;
+      item.style.display = visible ? '' : 'none';
+      // Remove selecao de itens ocultos ou de responsabilidade
+      if (!visible || item.classList.contains('is-resp')) {
+        if (selectedItems.has(item.dataset.id)) {
+          selectedItems.delete(item.dataset.id);
+          item.classList.remove('selected');
+          item.querySelector('.item-cb').classList.remove('checked');
+        }
+      }
+    });
+    updateActionBar();
+  }
+
+  // ── Modal de revogacao ──
+  function openRevogModal() {
+    // Monta lista dos selecionados
+    revogTarget = [];
+    selectedItems.forEach(id => {
+      const item = document.querySelector('.consent-item[data-id="' + id + '"]');
+      if (item) revogTarget.push({ id, name: item.dataset.name });
+    });
+    renderRevogModal();
+  }
+
+  function openRevogModalItem(id, name) {
+    revogTarget = [{ id, name }];
+    renderRevogModal();
+  }
+
+  function renderRevogModal() {
+    const count = revogTarget.length;
+    const titulo = count === 1
+      ? 'Revogar consentimento'
+      : 'Revogar ' + count + ' consentimentos';
+
+    const listaHtml = revogTarget.map(p => `
+      <li class="revog-plat-item">
+        <div class="plat-icon" style="width:28px;height:28px;font-size:15px">&bull;</div>
+        <span>${p.name}</span>
+      </li>`).join('');
+
+    const aviso = count === 1
+      ? 'Ao revogar, voce interrompe o compartilhamento de dados com <strong>' + revogTarget[0].name + '</strong>. Para restaurar o acesso, sera necessario entrar nessa plataforma e autorizar novamente.'
+      : 'Para restaurar o acesso, sera necessario entrar em cada uma dessas plataformas e autorizar um novo consentimento.';
+
+    const existing = document.getElementById('overlay-revog');
+    if (existing) existing.remove();
+
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="overlay open" id="overlay-revog" onclick="if(event.target===this)closeRevogModal()">
+        <div class="modal modal-revog">
+          <div class="modal-header">
+            <div class="modal-header-text">
+              <div class="modal-title" style="display:flex;align-items:center;gap:8px">
+                <span class="material-icons" style="color:#f9a825;font-size:22px">warning_amber</span>
+                ${titulo}
+              </div>
+              <div class="modal-subtitle">
+                Voce esta prestes a revogar o consentimento de compartilhamento de dados com as seguintes plataformas:
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeRevogModal()"><span class="material-icons">close</span></button>
+          </div>
+          <div class="modal-body" style="padding-top:16px">
+            <ul class="revog-plat-list">${listaHtml}</ul>
+            <div class="revog-aviso">
+              <span class="material-icons">info</span>
+              <div>
+                <div class="revog-aviso-title">Consequencias da revogacao:</div>
+                <ul class="revog-aviso-list">
+                  <li>Seus dados pessoais deixarao de ser compartilhados com ${count === 1 ? 'esta plataforma' : count + ' plataformas'}</li>
+                  <li>Funcionalidades dessas plataformas podem ficar indisponiveis</li>
+                  <li>${aviso}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-ghost" onclick="closeRevogModal()">Cancelar</button>
+            <button class="btn-primary" onclick="confirmarRevogacao()" style="background:#c0392b">
+              <span class="material-icons">remove_circle_outline</span>
+              ${titulo}
+            </button>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  function closeRevogModal() {
+    const el = document.getElementById('overlay-revog');
+    if (el) el.remove();
+  }
+
+  function confirmarRevogacao() {
+    const names = revogTarget.map(p => p.name);
+    revogTarget.forEach(p => {
+      const item = document.querySelector('.consent-item[data-id="' + p.id + '"]');
+      if (item) item.remove();
+    });
+    clearSelection();
+    closeRevogModal();
+    // Atualiza contagem do select-all
+    updateSelectAllState();
+    // Toast
+    const toastDesc = document.querySelector('.toast-desc');
+    const toastTitle = document.querySelector('.toast-title');
+    toastTitle.textContent = names.length === 1 ? 'Consentimento revogado' : names.length + ' consentimentos revogados';
+    toastDesc.textContent = names.length === 1
+      ? 'O compartilhamento de dados com ' + names[0] + ' foi encerrado.'
+      : 'O compartilhamento de dados com ' + names.join(', ') + ' foi encerrado.';
+    showToast();
+  }
+</script>
+</body>
+</html>
+

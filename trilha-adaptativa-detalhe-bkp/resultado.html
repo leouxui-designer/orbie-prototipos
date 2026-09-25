@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Resultado da Trilha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --surface-dark: #10203D;
+      --border: #224476;
+      --brand: #0059E7;
+      --text: #FFFFFF;
+      --text-secondary: #99C0FF;
+      --green: #12B76A;
+      --yellow: #FFEA24;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+
+    /* CELEBRATION HEADER */
+    .result-hero {
+      position: relative;
+      text-align: center;
+      padding: 48px 24px 36px;
+      overflow: hidden;
+    }
+    .result-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(18,183,106,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .result-badge {
+      position: relative;
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0E511F, #12B76A);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 40px rgba(18,183,106,0.4);
+      animation: pop-in 500ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.4); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .result-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 38px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .result-subtitle {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 28px;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      max-width: 480px;
+      margin: 0 auto 32px;
+      padding: 0 24px;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-value.green  { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.blue   { color: #3F84F3; }
+    .stat-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* RECOMPENSA (RF10) */
+    .reward-section {
+      max-width: 480px;
+      margin: 0 auto 28px;
+      padding: 0 24px;
+    }
+    .reward-card {
+      background: linear-gradient(135deg, rgba(0,89,231,0.12), rgba(58,0,168,0.15));
+      border: 1px solid rgba(63,132,243,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .reward-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3A00A8, #0059E7);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(0,89,231,0.3);
+      animation: pop-in 600ms 200ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .reward-body { flex: 1; }
+    .reward-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .reward-value {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .reward-note {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 2px;
+    }
+
+    /* ISOLAMENTO (RF10) */
+    .isolation-section {
+      max-width: 480px;
+      margin: 0 auto 28px;
+      padding: 0 24px;
+    }
+    .isolation-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+    .isolation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .isolation-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .isolation-icon {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .isolation-icon.no  { background: rgba(240,68,56,0.12); }
+    .isolation-icon.yes { background: rgba(18,183,106,0.12); }
+    .isolation-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      line-height: 19px;
+    }
+    .isolation-text strong { color: var(--text); font-weight: 600; }
+
+    /* ANOTAÇÕES */
+    .req-annotation {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      max-width: 480px;
+      margin: 0 auto 8px;
+      padding: 10px 14px;
+      background: rgba(0,89,231,0.07);
+      border: 1px dashed rgba(63,132,243,0.35);
+      border-radius: 10px;
+    }
+    .req-annotation { margin-left: max(24px, calc(50% - 216px)); margin-right: max(24px, calc(50% - 216px)); }
+    .req-annotation.warn { background: rgba(247,144,9,0.07); border-color: rgba(247,144,9,0.35); }
+    .req-annotation.success { background: rgba(18,183,106,0.07); border-color: rgba(18,183,106,0.35); }
+    .req-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px; border-radius: 100px;
+      white-space: nowrap; flex-shrink: 0;
+      background: rgba(63,132,243,0.18); color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3); margin-top: 1px;
+    }
+    .req-annotation.warn .req-tag    { background: rgba(247,144,9,0.15); color: #F79009; border-color: rgba(247,144,9,0.3); }
+    .req-annotation.success .req-tag { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .req-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; line-height: 16px;
+      color: rgba(153,192,255,0.85);
+    }
+    .req-text strong { color: #fff; font-weight: 600; }
+
+    /* BOTTOM ACTIONS */
+    .result-actions {
+      max-width: 480px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      height: 52px;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-primary:hover { background: #0040A7; }
+    .btn-link {
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 8px;
+      transition: color 150ms;
+    }
+    .btn-link:hover { color: #fff; }
+
+    /* STARS ANIMATION */
+    .stars-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .star-anim {
+      animation: star-pop 400ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .star-anim:nth-child(2) { animation-delay: 100ms; }
+    .star-anim:nth-child(3) { animation-delay: 200ms; }
+    @keyframes star-pop {
+      from { transform: scale(0) rotate(-30deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- RESULT HERO -->
+  <div class="result-hero">
+    <div class="result-badge">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M5 12L10 17L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="result-title">Revisão Concluída!</div>
+    <div class="result-subtitle">Você completou todos os blocos desta revisão.</div>
+    <div class="stars-row">
+      <svg class="star-anim" width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L19.4 11.2L28.4 11.8L21.8 17.6L24 26.4L16 21.6L8 26.4L10.2 17.6L3.6 11.8L12.6 11.2L16 3Z" fill="#FFEA24" stroke="#E5B400" stroke-width="1"/>
+      </svg>
+      <svg class="star-anim" width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L19.4 11.2L28.4 11.8L21.8 17.6L24 26.4L16 21.6L8 26.4L10.2 17.6L3.6 11.8L12.6 11.2L16 3Z" fill="#FFEA24" stroke="#E5B400" stroke-width="1"/>
+      </svg>
+      <svg class="star-anim" width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L19.4 11.2L28.4 11.8L21.8 17.6L24 26.4L16 21.6L8 26.4L10.2 17.6L3.6 11.8L12.6 11.2L16 3Z" fill="#FFEA24" stroke="#E5B400" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value green">8</div>
+      <div class="stat-label">Acertos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value blue">67%</div>
+      <div class="stat-label">de aproveit.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value yellow">12</div>
+      <div class="stat-label">Fases feitas</div>
+    </div>
+  </div>
+
+  <!-- ANOTAÇÃO RF09 -->
+  <div class="req-annotation">
+    <span class="req-tag">RF09</span>
+    <span class="req-text"><strong>Tela de resultado</strong> — Exibe total de acertos, percentual e recompensa. Botão "Voltar ao início" remove o container da home imediatamente (RF08).</span>
+  </div>
+
+  <!-- RECOMPENSA (RF10) -->
+  <div class="reward-section" style="margin-top:16px;">
+    <div class="reward-card">
+      <div class="reward-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="white" stroke-width="1.5"/>
+          <path d="M12 7v5l3 3" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 12h1M15 12h1M12 8v1M12 15v1" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="reward-body">
+        <div class="reward-label">Recompensa recebida · RF10</div>
+        <div class="reward-value">+120 XP</div>
+        <div class="reward-note">Creditado uma única vez, independente do % de acertos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANOTAÇÕES RF10 -->
+  <div class="req-annotation success" style="margin-top:8px;">
+    <span class="req-tag">RF10</span>
+    <span class="req-text"><strong>Recompensa por esforço</strong> — Trilha com 20% de acerto recebe o mesmo XP que trilha com 100%. O objetivo é premiar a recomposição, não a nota.</span>
+  </div>
+
+  <!-- ISOLAMENTO RF10 -->
+  <div class="isolation-section" style="margin-top:20px;">
+    <div class="isolation-title">O que esta revisão NÃO afeta · RF10</div>
+    <div class="isolation-list">
+      <div class="isolation-item">
+        <div class="isolation-icon no">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>Ranking</strong> — Nenhum ponto adicionado ao ranking geral ou por planeta</div>
+      </div>
+      <div class="isolation-item">
+        <div class="isolation-icon no">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>Progresso da temporada</strong> — Planetas, trilhas e fases não são alterados</div>
+      </div>
+      <div class="isolation-item">
+        <div class="isolation-icon no">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>Performance_jogador</strong> — Não entra no Dashboard de Desempenho</div>
+      </div>
+      <div class="isolation-item">
+        <div class="isolation-icon no">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>Questões dos planetas</strong> — Itens respondidos aqui <strong>não</strong> ficam marcados nos planetas</div>
+      </div>
+      <div class="isolation-item">
+        <div class="isolation-icon yes">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17L20 7" stroke="#12B76A" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>D9 (tendência)</strong> — Sinal de recuperação de habilidade para o diagnóstico do ciclo seguinte</div>
+      </div>
+      <div class="isolation-item">
+        <div class="isolation-icon yes">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17L20 7" stroke="#12B76A" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="isolation-text"><strong>Revisões anteriores</strong> — Ficará disponível em "Revisões anteriores" para modo leitura</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="req-annotation warn" style="margin-top:8px;">
+    <span class="req-tag">RF10</span>
+    <span class="req-text"><strong>Armazenamento isolado</strong> — Respostas gravadas em tabelas próprias, separadas das tabelas de progresso da temporada. Sem impacto em queries de ranking e performance.</span>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="result-actions">
+    <button class="btn-primary" onclick="voltarInicio()">Voltar ao início</button>
+    <button class="btn-link" onclick="window.location.href='revisoes-anteriores.html'">Ver revisões anteriores</button>
+  </div>
+
+<script>
+function voltarInicio() {
+  // RF08: container some da home ao voltar
+  window.location.href = '../home-orbie-app/index.html';
+}
+</script>
+</body>
+</html>

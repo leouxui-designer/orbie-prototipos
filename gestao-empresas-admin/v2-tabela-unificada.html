@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Empresas v2 - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    :root {
+      --color-primary: #2CA942;
+      --color-dark: #141414;
+      --color-text-default: #000000;
+      --color-text-secondary: rgba(0,0,0,0.8);
+      --color-text-tertiary: #454545;
+      --color-text-muted: #6B7280;
+      --color-text-invert: #FFFFFF;
+      --color-bg-white: #FFFFFF;
+      --color-bg-light: #F8F9FB;
+      --font-header: 'Montserrat', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+      --transition-fast: 150ms ease;
+    }
+
+    body { font-family: var(--font-body); background: var(--color-bg-light); color: var(--color-text-default); padding-top: 80px; }
+
+    /* NAVBAR */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1100; height: 80px; background: var(--color-bg-white); border-bottom: 1px solid rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.04); display: flex; align-items: center; }
+    .navbar__inner { width: 100%; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+    .navbar__brand { font-family: var(--font-header); font-weight: 800; font-size: 20px; color: var(--color-primary); }
+    .navbar__right { display: flex; align-items: center; gap: 16px; }
+    .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #1a1a1a; color: white; }
+    .navbar__company { font-size: 14px; color: var(--color-text-muted); }
+    .navbar__avatar { width: 38px; height: 38px; border-radius: 50%; background: #303030; color: white; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+    /* LAYOUT */
+    .painel { display: flex; min-height: calc(100vh - 80px); }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; background: #1a1a1a; color: white; padding: 32px 0; display: flex; flex-direction: column; flex-shrink: 0; position: fixed; top: 80px; left: 0; height: calc(100vh - 80px); overflow-y: auto; z-index: 100; }
+    .sidebar__header { padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .sidebar__company { font-family: var(--font-header); font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .sidebar__plan { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .sidebar__nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; flex: 1; }
+    .sidebar__link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-size: 14px; color: rgba(255,255,255,0.7); transition: all var(--transition-fast); }
+    .sidebar__link:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar__link--active { background: rgba(44,169,66,0.15); color: var(--color-primary); font-weight: 500; }
+    .sidebar__link svg { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
+    .sidebar__link--active svg { opacity: 1; }
+    .sidebar__badge { margin-left: auto; background: #f57f17; color: white; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+    .sidebar__footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; }
+    .sidebar__logout { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.5); cursor: pointer; }
+    .sidebar__logout:hover { color: white; }
+
+    /* MAIN */
+    .painel__main { flex: 1; padding: 32px 40px; background: var(--color-bg-light); margin-left: 260px; }
+    .painel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .painel__title { font-family: var(--font-header); font-size: 28px; font-weight: 700; }
+    .painel__subtitle { font-size: 14px; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* BTNS */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; transition: all var(--transition-fast); }
+    .btn--primary { background: var(--color-primary); color: white; }
+    .btn--primary:hover { background: #249136; }
+    .btn--ghost { background: none; color: var(--color-text-secondary); border: 1px solid rgba(0,0,0,0.15); }
+    .btn--ghost:hover { background: rgba(0,0,0,0.04); }
+    .btn--sm { padding: 6px 14px; font-size: 13px; }
+    .btn--danger { background: #FFEBEE; color: #C62828; border: 1px solid rgba(198,40,40,0.15); }
+    .btn--danger:hover { background: #FFCDD2; }
+    .btn--approve { background: rgba(44,169,66,0.1); color: #1B5E20; border: 1px solid rgba(44,169,66,0.2); }
+    .btn--approve:hover { background: rgba(44,169,66,0.18); }
+
+    /* SUMMARY CARDS */
+    .summary-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .summary-card {
+      flex: 1; min-width: 160px;
+      background: var(--color-bg-white);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px; padding: 16px 20px;
+      cursor: pointer; transition: all var(--transition-fast);
+      position: relative; overflow: hidden;
+    }
+    .summary-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.1); }
+    .summary-card--active-filter { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(44,169,66,0.15); }
+    .summary-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); margin-bottom: 6px; }
+    .summary-card__value { font-family: var(--font-header); font-size: 26px; font-weight: 700; }
+    .summary-card__sub { font-size: 12px; color: var(--color-text-muted); margin-top: 3px; }
+    .summary-card--pending .summary-card__value { color: #E65100; }
+    .summary-card--pending { border-left: 3px solid #FF9800; }
+    .summary-card--active .summary-card__value { color: #2e7d32; }
+    .summary-card--active { border-left: 3px solid var(--color-primary); }
+    .summary-card--dup .summary-card__value { color: #E65100; }
+    .summary-card--dup { border-left: 3px solid #FF9800; }
+    .summary-card__hint { position: absolute; bottom: 10px; right: 14px; font-size: 11px; color: var(--color-text-muted); opacity: 0; transition: opacity var(--transition-fast); }
+    .summary-card:hover .summary-card__hint { opacity: 1; }
+
+    /* FILTERS ROW */
+    .filters-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-search {
+      padding: 8px 14px 8px 38px;
+      border: 1px solid rgba(0,0,0,0.12); border-radius: 8px;
+      font-size: 14px; color: var(--color-text-default);
+      background: var(--color-bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center;
+      min-width: 240px; font-family: var(--font-body);
+    }
+    .filter-search:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(44,169,66,0.1); }
+    .filter-search::placeholder { color: var(--color-text-muted); }
+
+    /* Status filter chips */
+    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: var(--color-bg-white);
+      color: var(--color-text-muted);
+      cursor: pointer; transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: rgba(0,0,0,0.2); color: var(--color-text-secondary); }
+    .chip--active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+    .chip--warn.chip--active { background: #E65100; border-color: #E65100; }
+    .chip__dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .chip__dot--active { background: var(--color-primary); }
+    .chip__dot--pending { background: #FF9800; }
+    .chip__dot--inactive { background: #aaa; }
+
+    /* Filter divider */
+    .filters-divider { width: 1px; height: 28px; background: rgba(0,0,0,0.1); margin: 0 4px; }
+
+    /* Segment select */
+    .filter-select {
+      padding: 7px 32px 7px 12px;
+      border: 1px solid rgba(0,0,0,0.12); border-radius: 8px;
+      font-size: 13px; color: var(--color-text-secondary);
+      background: var(--color-bg-white);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center; cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--color-primary); }
+
+    /* Results count */
+    .results-meta { font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .results-meta strong { color: var(--color-text-secondary); }
+    .results-meta .clear-filter { font-size: 12px; color: var(--color-primary); cursor: pointer; text-decoration: underline; display: none; }
+    .results-meta .clear-filter.visible { display: inline; }
+
+    /* ALERT BANNER */
+    .alert-banner {
+      display: flex; align-items: center; gap: 12px;
+      background: #FFF8E1; border: 1px solid #FFD54F;
+      border-radius: 10px; padding: 12px 18px;
+      margin-bottom: 16px; font-size: 13px;
+    }
+    .alert-banner__icon { font-size: 18px; flex-shrink: 0; }
+    .alert-banner strong { color: #BF360C; }
+    .alert-banner span { color: var(--color-text-secondary); }
+    .alert-banner__btn {
+      margin-left: auto; padding: 5px 12px;
+      border-radius: 6px; background: #FFE082; color: #BF360C;
+      border: none; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .alert-banner__btn:hover { background: #FFD54F; }
+    .alert-banner--hidden { display: none; }
+
+    /* TABLE */
+    .panel-table { background: var(--color-bg-white); border-radius: 12px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 24px; }
+    .panel-table table { width: 100%; border-collapse: collapse; }
+    .panel-table th { text-align: left; padding: 11px 20px; font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: var(--color-bg-light); border-bottom: 1px solid rgba(0,0,0,0.06); white-space: nowrap; }
+    .panel-table td { padding: 0; font-size: 14px; color: var(--color-text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
+    .panel-table tr:last-child > td { border-bottom: none; }
+
+    /* Cell inner para padding uniforme */
+    .td-inner { padding: 14px 20px; display: flex; flex-direction: column; justify-content: center; min-height: 60px; }
+
+    /* Row states */
+    .row-normal td { background: transparent; transition: background var(--transition-fast); }
+    .row-normal:hover td { background: rgba(0,0,0,0.01); }
+    .row-pending td { background: rgba(255,152,0,0.03); }
+    .row-pending:hover td { background: rgba(255,152,0,0.06); }
+    .row-dup-header td { background: #FFFBF0; cursor: pointer; }
+    .row-dup-header:hover td { background: #FFF8E1; }
+    .row-dup-child td { background: rgba(255,152,0,0.02); }
+    .row-dup-child:hover td { background: rgba(255,152,0,0.05); }
+    .row-hidden { display: none; }
+
+    /* Indicador de grupo */
+    .dup-indicator {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 10px;
+      background: #FFF3E0; color: #E65100;
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* Expand icon */
+    .expand-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; color: var(--color-text-muted); transition: transform var(--transition-fast); }
+    .expand-icon svg { width: 16px; height: 16px; }
+    .row-dup-header.expanded .expand-icon { transform: rotate(180deg); }
+
+    /* Indent nos filhos */
+    .dup-child-indent { display: flex; align-items: flex-start; gap: 0; }
+    .dup-child-line { width: 20px; flex-shrink: 0; display: flex; justify-content: center; padding-top: 4px; }
+    .dup-child-line::before { content: ''; width: 1px; height: 100%; background: rgba(255,152,0,0.3); }
+    .dup-child-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,152,0,0.4); flex-shrink: 0; margin-top: 6px; margin-right: 10px; }
+
+    /* Radio para seleção dentro de grupo */
+    .req-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.2);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; margin-right: 8px;
+      transition: all var(--transition-fast);
+    }
+    .req-radio:hover { border-color: var(--color-primary); }
+    .req-radio.selected { border-color: var(--color-primary); background: var(--color-primary); }
+    .req-radio.selected::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; }
+    .dup-child-row-selected td { background: rgba(44,169,66,0.04) !important; }
+    .dup-child-row-selected .req-name { color: var(--color-primary); font-weight: 600; }
+
+    /* Ações grupo na linha de ações */
+    .row-dup-actions td { background: var(--color-bg-light); border-top: 1px solid rgba(255,152,0,0.1); }
+    .dup-action-bar { display: flex; align-items: center; gap: 10px; padding: 10px 20px; }
+    .dup-action-hint { font-size: 12px; color: var(--color-text-muted); font-style: italic; flex: 1; }
+
+    /* Status badges */
+    .status { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status--active { background: rgba(44,169,66,0.1); color: #2e7d32; }
+    .status--pending { background: rgba(255,152,0,0.12); color: #E65100; }
+    .status--inactive { background: rgba(0,0,0,0.05); color: var(--color-text-muted); }
+
+    /* Action icons */
+    .action-group { display: flex; align-items: center; gap: 6px; }
+    .action-icon { width: 30px; height: 30px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--transition-fast); color: var(--color-text-muted); border: none; background: none; }
+    .action-icon:hover { background: rgba(0,0,0,0.06); color: var(--color-text-default); }
+    .action-icon svg { width: 16px; height: 16px; }
+    .toggle { position: relative; width: 34px; height: 18px; display: inline-block; cursor: pointer; vertical-align: middle; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle__slider { position: absolute; inset: 0; background: #ccc; border-radius: 20px; transition: background var(--transition-fast); }
+    .toggle__slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: transform var(--transition-fast); }
+    .toggle input:checked + .toggle__slider { background: var(--color-primary); }
+    .toggle input:checked + .toggle__slider::before { transform: translateX(16px); }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--color-text-muted); }
+    .empty-state__icon { font-size: 36px; margin-bottom: 10px; }
+    .empty-state__text { font-size: 14px; }
+
+    /* PAGINATION */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 16px 24px; }
+    .pagination__btn { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); background: none; border: 1px solid transparent; cursor: pointer; transition: all var(--transition-fast); }
+    .pagination__btn:hover { background: var(--color-bg-light); border-color: rgba(0,0,0,0.08); }
+    .pagination__btn--active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .pagination__btn svg { width: 16px; height: 16px; }
+    .pagination__info { font-size: 12px; color: var(--color-text-muted); margin: 0 10px; }
+
+    /* MODAL */
+    .modal { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; }
+    .modal--open { display: flex; }
+    .modal__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); cursor: pointer; }
+    .modal__content { position: relative; background: var(--color-bg-white); border-radius: 16px; padding: 30px; width: 100%; max-width: 520px; box-shadow: 0 16px 48px rgba(0,0,0,0.2); margin: 24px; }
+    .modal__header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 12px; }
+    .modal__title { font-family: var(--font-header); font-size: 19px; font-weight: 700; }
+    .modal__subtitle { font-size: 13px; color: var(--color-text-muted); margin-top: 4px; line-height: 1.5; }
+    .modal__close { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--color-text-muted); cursor: pointer; border: none; background: none; flex-shrink: 0; }
+    .modal__close:hover { background: var(--color-bg-light); }
+    .modal__recipients { margin-bottom: 14px; padding: 12px 14px; background: #FFF3E0; border-radius: 8px; border: 1px solid rgba(230,81,0,0.15); }
+    .modal__recipients-title { font-size: 11px; font-weight: 600; color: #BF360C; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .modal__recipient { font-size: 13px; color: var(--color-text-secondary); padding: 2px 0; }
+    .modal__label { font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 6px; display: block; }
+    .modal__textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,0,0,0.15); border-radius: 8px; font-size: 13px; font-family: var(--font-body); color: var(--color-text-default); resize: vertical; min-height: 90px; }
+    .modal__textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(44,169,66,0.1); }
+    .modal__footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--color-dark); color: white; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; z-index: 9999; opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .toast--visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a href="#" class="navbar__brand">SCTEC</a>
+      <div class="navbar__right">
+        <span class="badge">ADMIN</span>
+        <span class="navbar__company">Equipe SCTEC</span>
+        <div class="navbar__avatar">AD</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="#" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas
+          <span class="sidebar__badge">4</span>
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="#" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Gestão de Empresas</h1>
+          <p class="painel__subtitle">Gerencie empresas parceiras, aprove cadastros pendentes e cadastre novas empresas</p>
+        </div>
+        <button class="btn btn--primary" onclick="showToast('Abrindo cadastro...')">+ Cadastrar Empresa</button>
+      </div>
+
+      <!-- Summary cards (clicáveis para filtrar) -->
+      <div class="summary-row">
+        <div class="summary-card" onclick="setChipFilter('all')" id="card-all">
+          <div class="summary-card__label">Total</div>
+          <div class="summary-card__value">11</div>
+          <div class="summary-card__sub">empresas cadastradas</div>
+          <span class="summary-card__hint">Clique para ver todas</span>
+        </div>
+        <div class="summary-card summary-card--active" onclick="setChipFilter('ativa')" id="card-ativa">
+          <div class="summary-card__label">Ativas</div>
+          <div class="summary-card__value">5</div>
+          <div class="summary-card__sub">com acesso liberado</div>
+          <span class="summary-card__hint">Clique para filtrar</span>
+        </div>
+        <div class="summary-card summary-card--pending" onclick="setChipFilter('pendente')" id="card-pendente">
+          <div class="summary-card__label">Aguardando avaliação</div>
+          <div class="summary-card__value" id="pending-count">4</div>
+          <div class="summary-card__sub">solicitações novas</div>
+          <span class="summary-card__hint">Clique para filtrar</span>
+        </div>
+        <div class="summary-card summary-card--dup" onclick="setChipFilter('duplicata')" id="card-dup">
+          <div class="summary-card__label">Com duplicatas</div>
+          <div class="summary-card__value" id="dup-count">2</div>
+          <div class="summary-card__sub">empresas, múltiplos cadastros</div>
+          <span class="summary-card__hint">Clique para filtrar</span>
+        </div>
+        <div class="summary-card" onclick="setChipFilter('inativa')" id="card-inativa">
+          <div class="summary-card__label">Inativas</div>
+          <div class="summary-card__value">1</div>
+          <div class="summary-card__sub">acesso suspenso</div>
+          <span class="summary-card__hint">Clique para filtrar</span>
+        </div>
+      </div>
+
+      <!-- Alert de duplicatas (aparece quando filtro = pendente ou all) -->
+      <div class="alert-banner" id="alert-dup">
+        <span class="alert-banner__icon">⚠️</span>
+        <strong>2 empresas com múltiplas solicitações&nbsp;</strong>
+        <span>— diferentes pessoas cadastraram o mesmo CNPJ. Expanda o grupo para escolher quem aprovar.</span>
+        <button class="alert-banner__btn" onclick="setChipFilter('duplicata')">Ver só duplicatas</button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filters-row">
+        <input type="text" class="filter-search" id="search-input" placeholder="Buscar por nome, CNPJ ou responsável..." oninput="applyFilters()">
+        <div class="filters-divider"></div>
+        <div class="filter-chips">
+          <button class="chip chip--active" id="chip-all"    onclick="setChipFilter('all')">Todos</button>
+          <button class="chip" id="chip-ativa"      onclick="setChipFilter('ativa')">
+            <span class="chip__dot chip__dot--active"></span> Ativas
+          </button>
+          <button class="chip chip--warn" id="chip-pendente" onclick="setChipFilter('pendente')">
+            <span class="chip__dot chip__dot--pending"></span> Aguardando avaliação
+          </button>
+          <button class="chip" id="chip-inativa"   onclick="setChipFilter('inativa')">
+            <span class="chip__dot chip__dot--inactive"></span> Inativas
+          </button>
+          <button class="chip" id="chip-duplicata" onclick="setChipFilter('duplicata')">
+            ⚠️ Com duplicatas
+          </button>
+        </div>
+        <div class="filters-divider"></div>
+        <select class="filter-select" id="segment-select" onchange="applyFilters()">
+          <option value="">Todos os segmentos</option>
+          <option>Tecnologia / IoT</option>
+          <option>E-commerce / Marketplace</option>
+          <option>Inteligência Artificial</option>
+          <option>Health Tech</option>
+          <option>Tecnologia / SaaS</option>
+          <option>Análise de Dados</option>
+          <option>Cloud / Infraestrutura</option>
+          <option>Fintech</option>
+          <option>ERP / Consultoria</option>
+        </select>
+      </div>
+
+      <!-- Meta de resultados -->
+      <div class="results-meta" id="results-meta">
+        Exibindo <strong id="results-count">11</strong> empresas
+        <span class="clear-filter" id="clear-filter" onclick="clearFilters()">Limpar filtro</span>
+      </div>
+
+      <!-- Tabela unificada -->
+      <div class="panel-table">
+        <table id="main-table">
+          <thead>
+            <tr>
+              <th style="width:28px;"></th>
+              <th>Empresa</th>
+              <th>CNPJ</th>
+              <th>Responsável</th>
+              <th>Segmento</th>
+              <th>Vagas</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+
+            <!-- =================== GRUPO INOVATECH (duplicata, pendente) =================== -->
+            <tr class="row-dup-header" data-status="pendente" data-dup="true" data-group="inovatech" data-segment="Tecnologia / IoT" id="hrow-inovatech" onclick="toggleDupGroup('inovatech')">
+              <td><div class="td-inner" style="padding-right:0;">
+                <span class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div></td>
+              <td><div class="td-inner">
+                <strong>InovaTech SC</strong>
+                <small style="color:var(--color-text-muted); margin-top:2px;">Tecnologia / IoT</small>
+              </div></td>
+              <td><div class="td-inner">44.555.666/0001-33</div></td>
+              <td><div class="td-inner">
+                <span style="color:var(--color-text-muted); font-size:13px; font-style:italic;">Múltiplos responsáveis</span>
+              </div></td>
+              <td><div class="td-inner">Tecnologia / IoT</div></td>
+              <td><div class="td-inner">—</div></td>
+              <td><div class="td-inner">
+                <span class="status status--pending">Aguardando</span>
+                <span class="dup-indicator" style="margin-top:5px;">⚠️ 2 cadastros</span>
+              </div></td>
+              <td><div class="td-inner">
+                <span style="font-size:12px; color:var(--color-text-muted);">Expanda para avaliar</span>
+              </div></td>
+            </tr>
+
+            <!-- Filho 1 InovaTech -->
+            <tr class="row-dup-child row-hidden" data-group="inovatech" id="crow-it-1">
+              <td style="padding:0;"></td>
+              <td colspan="6"><div class="td-inner" style="padding-left:16px;">
+                <div style="display:flex; align-items:center; gap:0;">
+                  <div class="dup-child-dot"></div>
+                  <span class="req-radio" id="radio-it-1" onclick="event.stopPropagation(); selectReq('inovatech', 'it-1', ['it-2'])"></span>
+                  <div>
+                    <span class="req-name" style="font-weight:600; font-size:14px;">André Luiz Pereira</span>
+                    <span style="font-size:12px; color:var(--color-text-muted); margin-left:8px;">andre@inovatech.sc · Gerente de TI · (48) 99123-4567</span>
+                    <span style="font-size:11px; color:var(--color-text-muted); margin-left:8px;">Enviado em 08/01/2025</span>
+                  </div>
+                </div>
+              </div></td>
+              <td><div class="td-inner">
+                <button class="btn btn--ghost btn--sm" onclick="showToast('Detalhes de André Luiz Pereira')">Detalhes</button>
+              </div></td>
+            </tr>
+
+            <!-- Filho 2 InovaTech -->
+            <tr class="row-dup-child row-hidden" data-group="inovatech" id="crow-it-2">
+              <td style="padding:0;"></td>
+              <td colspan="6"><div class="td-inner" style="padding-left:16px;">
+                <div style="display:flex; align-items:center; gap:0;">
+                  <div class="dup-child-dot"></div>
+                  <span class="req-radio" id="radio-it-2" onclick="event.stopPropagation(); selectReq('inovatech', 'it-2', ['it-1'])"></span>
+                  <div>
+                    <span class="req-name" style="font-weight:600; font-size:14px;">Maria Clara Santos</span>
+                    <span style="font-size:12px; color:var(--color-text-muted); margin-left:8px;">maria.santos@inovatech.sc · Diretora Comercial · (48) 99765-1234</span>
+                    <span style="font-size:11px; color:var(--color-text-muted); margin-left:8px;">Enviado em 09/01/2025</span>
+                  </div>
+                </div>
+              </div></td>
+              <td><div class="td-inner">
+                <button class="btn btn--ghost btn--sm" onclick="showToast('Detalhes de Maria Clara Santos')">Detalhes</button>
+              </div></td>
+            </tr>
+
+            <!-- Barra de ações InovaTech -->
+            <tr class="row-dup-actions row-hidden" data-group="inovatech" id="arow-inovatech">
+              <td></td>
+              <td colspan="7">
+                <div class="dup-action-bar">
+                  <span class="dup-action-hint" id="hint-inovatech">Selecione um responsável para habilitar aprovação</span>
+                  <button class="btn btn--sm btn--danger" onclick="openRejectModal('InovaTech SC', ['André Luiz Pereira (andre@inovatech.sc)', 'Maria Clara Santos (maria.santos@inovatech.sc)'], 'inovatech')">Rejeitar todos</button>
+                  <button class="btn btn--sm btn--approve" id="btn-approve-inovatech" disabled style="opacity:.4;cursor:not-allowed;" onclick="approveGroup('inovatech', 'InovaTech SC')">✓ Aprovar selecionado</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- =================== GRUPO SC DIGITAL (duplicata, pendente) =================== -->
+            <tr class="row-dup-header" data-status="pendente" data-dup="true" data-group="scdigital" data-segment="E-commerce / Marketplace" id="hrow-scdigital" onclick="toggleDupGroup('scdigital')">
+              <td><div class="td-inner" style="padding-right:0;">
+                <span class="expand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div></td>
+              <td><div class="td-inner">
+                <strong>SC Digital Solutions</strong>
+                <small style="color:var(--color-text-muted); margin-top:2px;">E-commerce / Marketplace</small>
+              </div></td>
+              <td><div class="td-inner">77.888.999/0001-55</div></td>
+              <td><div class="td-inner">
+                <span style="color:var(--color-text-muted); font-size:13px; font-style:italic;">Múltiplos responsáveis</span>
+              </div></td>
+              <td><div class="td-inner">E-commerce / Marketplace</div></td>
+              <td><div class="td-inner">—</div></td>
+              <td><div class="td-inner">
+                <span class="status status--pending">Aguardando</span>
+                <span class="dup-indicator" style="margin-top:5px;">⚠️ 3 cadastros</span>
+              </div></td>
+              <td><div class="td-inner">
+                <span style="font-size:12px; color:var(--color-text-muted);">Expanda para avaliar</span>
+              </div></td>
+            </tr>
+
+            <!-- Filhos SC Digital -->
+            <tr class="row-dup-child row-hidden" data-group="scdigital" id="crow-sd-1">
+              <td style="padding:0;"></td>
+              <td colspan="6"><div class="td-inner" style="padding-left:16px;">
+                <div style="display:flex; align-items:center;">
+                  <div class="dup-child-dot"></div>
+                  <span class="req-radio" id="radio-sd-1" onclick="event.stopPropagation(); selectReq('scdigital', 'sd-1', ['sd-2','sd-3'])"></span>
+                  <div>
+                    <span class="req-name" style="font-weight:600; font-size:14px;">Patrícia Mendes</span>
+                    <span style="font-size:12px; color:var(--color-text-muted); margin-left:8px;">patricia@scdigital.com.br · CEO · (47) 99100-2200</span>
+                    <span style="font-size:11px; color:var(--color-text-muted); margin-left:8px;">Enviado em 07/01/2025</span>
+                  </div>
+                </div>
+              </div></td>
+              <td><div class="td-inner"><button class="btn btn--ghost btn--sm" onclick="showToast('Detalhes de Patrícia Mendes')">Detalhes</button></div></td>
+            </tr>
+            <tr class="row-dup-child row-hidden" data-group="scdigital" id="crow-sd-2">
+              <td style="padding:0;"></td>
+              <td colspan="6"><div class="td-inner" style="padding-left:16px;">
+                <div style="display:flex; align-items:center;">
+                  <div class="dup-child-dot"></div>
+                  <span class="req-radio" id="radio-sd-2" onclick="event.stopPropagation(); selectReq('scdigital', 'sd-2', ['sd-1','sd-3'])"></span>
+                  <div>
+                    <span class="req-name" style="font-weight:600; font-size:14px;">Rodrigo Faria</span>
+                    <span style="font-size:12px; color:var(--color-text-muted); margin-left:8px;">rodrigo.faria@scdigital.com.br · Head de Parcerias · (47) 99300-8890</span>
+                    <span style="font-size:11px; color:var(--color-text-muted); margin-left:8px;">Enviado em 08/01/2025</span>
+                  </div>
+                </div>
+              </div></td>
+              <td><div class="td-inner"><button class="btn btn--ghost btn--sm" onclick="showToast('Detalhes de Rodrigo Faria')">Detalhes</button></div></td>
+            </tr>
+            <tr class="row-dup-child row-hidden" data-group="scdigital" id="crow-sd-3">
+              <td style="padding:0;"></td>
+              <td colspan="6"><div class="td-inner" style="padding-left:16px;">
+                <div style="display:flex; align-items:center;">
+                  <div class="dup-child-dot"></div>
+                  <span class="req-radio" id="radio-sd-3" onclick="event.stopPropagation(); selectReq('scdigital', 'sd-3', ['sd-1','sd-2'])"></span>
+                  <div>
+                    <span class="req-name" style="font-weight:600; font-size:14px;">Ana Paula Vieira</span>
+                    <span style="font-size:12px; color:var(--color-text-muted); margin-left:8px;">apaula@scdigital.com.br · Gerente Operacional · (47) 99400-5533</span>
+                    <span style="font-size:11px; color:var(--color-text-muted); margin-left:8px;">Enviado em 09/01/2025</span>
+                  </div>
+                </div>
+              </div></td>
+              <td><div class="td-inner"><button class="btn btn--ghost btn--sm" onclick="showToast('Detalhes de Ana Paula Vieira')">Detalhes</button></div></td>
+            </tr>
+
+            <!-- Barra de ações SC Digital -->
+            <tr class="row-dup-actions row-hidden" data-group="scdigital" id="arow-scdigital">
+              <td></td>
+              <td colspan="7">
+                <div class="dup-action-bar">
+                  <span class="dup-action-hint" id="hint-scdigital">Selecione um responsável para habilitar aprovação</span>
+                  <button class="btn btn--sm btn--danger" onclick="openRejectModal('SC Digital Solutions', ['Patrícia Mendes (patricia@scdigital.com.br)', 'Rodrigo Faria (rodrigo.faria@scdigital.com.br)', 'Ana Paula Vieira (apaula@scdigital.com.br)'], 'scdigital')">Rejeitar todos</button>
+                  <button class="btn btn--sm btn--approve" id="btn-approve-scdigital" disabled style="opacity:.4;cursor:not-allowed;" onclick="approveGroup('scdigital', 'SC Digital Solutions')">✓ Aprovar selecionado</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- =================== PENDENTES SIMPLES =================== -->
+            <tr class="row-pending" data-status="pendente" data-dup="false" data-segment="Inteligência Artificial">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>NovaMind Tech</strong><br><small style="color:var(--color-text-muted)">Inteligência Artificial</small></div></td>
+              <td><div class="td-inner">22.333.444/0001-11</div></td>
+              <td><div class="td-inner">Felipe Augusto<br><small style="color:var(--color-text-muted)">felipe@novamind.tech</small></div></td>
+              <td><div class="td-inner">Inteligência Artificial</div></td>
+              <td><div class="td-inner">—</div></td>
+              <td><div class="td-inner"><span class="status status--pending">Aguardando</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="btn btn--sm btn--approve" onclick="approveSingle(this, 'NovaMind Tech', 'Felipe Augusto')">Aprovar</button>
+                  <button class="btn btn--sm btn--danger" onclick="openRejectModal('NovaMind Tech', ['Felipe Augusto (felipe@novamind.tech)'], null)">Rejeitar</button>
+                </div>
+              </div></td>
+            </tr>
+
+            <tr class="row-pending" data-status="pendente" data-dup="false" data-segment="Health Tech">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>HealthData SC</strong><br><small style="color:var(--color-text-muted)">Health Tech</small></div></td>
+              <td><div class="td-inner">55.666.777/0001-99</div></td>
+              <td><div class="td-inner">Camila Rocha<br><small style="color:var(--color-text-muted)">camila@healthdata.sc</small></div></td>
+              <td><div class="td-inner">Health Tech</div></td>
+              <td><div class="td-inner">—</div></td>
+              <td><div class="td-inner"><span class="status status--pending">Aguardando</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="btn btn--sm btn--approve" onclick="approveSingle(this, 'HealthData SC', 'Camila Rocha')">Aprovar</button>
+                  <button class="btn btn--sm btn--danger" onclick="openRejectModal('HealthData SC', ['Camila Rocha (camila@healthdata.sc)'], null)">Rejeitar</button>
+                </div>
+              </div></td>
+            </tr>
+
+            <!-- =================== ATIVAS =================== -->
+            <tr class="row-normal" data-status="ativa" data-dup="false" data-segment="Tecnologia / SaaS">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>TechCorp Soluções</strong><br><small style="color:var(--color-text-muted)">Tecnologia / SaaS</small></div></td>
+              <td><div class="td-inner">12.345.678/0001-90</div></td>
+              <td><div class="td-inner">Carlos Eduardo<br><small style="color:var(--color-text-muted)">carlos@techcorp.com.br</small></div></td>
+              <td><div class="td-inner">Tecnologia / SaaS</div></td>
+              <td><div class="td-inner">3</div></td>
+              <td><div class="td-inner"><span class="status status--active">Ativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando TechCorp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+            <tr class="row-normal" data-status="ativa" data-dup="false" data-segment="Análise de Dados">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>DataSoft Ltda.</strong><br><small style="color:var(--color-text-muted)">Análise de Dados</small></div></td>
+              <td><div class="td-inner">98.765.432/0001-10</div></td>
+              <td><div class="td-inner">Fernanda Lima<br><small style="color:var(--color-text-muted)">fernanda@datasoft.com.br</small></div></td>
+              <td><div class="td-inner">Análise de Dados</div></td>
+              <td><div class="td-inner">2</div></td>
+              <td><div class="td-inner"><span class="status status--active">Ativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando DataSoft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+            <tr class="row-normal" data-status="ativa" data-dup="false" data-segment="Cloud / Infraestrutura">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>CloudSC Tecnologia</strong><br><small style="color:var(--color-text-muted)">Cloud / Infraestrutura</small></div></td>
+              <td><div class="td-inner">11.222.333/0001-44</div></td>
+              <td><div class="td-inner">Roberto Alves<br><small style="color:var(--color-text-muted)">roberto@cloudsc.com.br</small></div></td>
+              <td><div class="td-inner">Cloud / Infraestrutura</div></td>
+              <td><div class="td-inner">1</div></td>
+              <td><div class="td-inner"><span class="status status--active">Ativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando CloudSC')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+            <tr class="row-normal" data-status="ativa" data-dup="false" data-segment="Fintech">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>FinanSC</strong><br><small style="color:var(--color-text-muted)">Fintech</small></div></td>
+              <td><div class="td-inner">33.444.555/0001-22</div></td>
+              <td><div class="td-inner">Juliana Martins<br><small style="color:var(--color-text-muted)">juliana@finansc.com.br</small></div></td>
+              <td><div class="td-inner">Fintech</div></td>
+              <td><div class="td-inner">4</div></td>
+              <td><div class="td-inner"><span class="status status--active">Ativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando FinanSC')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+            <tr class="row-normal" data-status="ativa" data-dup="false" data-segment="Fintech">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>Nexus Pagamentos</strong><br><small style="color:var(--color-text-muted)">Fintech</small></div></td>
+              <td><div class="td-inner">66.777.888/0001-12</div></td>
+              <td><div class="td-inner">Bruno Cavalcanti<br><small style="color:var(--color-text-muted)">bruno@nexuspag.com.br</small></div></td>
+              <td><div class="td-inner">Fintech</div></td>
+              <td><div class="td-inner">2</div></td>
+              <td><div class="td-inner"><span class="status status--active">Ativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando Nexus')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+            <!-- =================== INATIVA =================== -->
+            <tr class="row-normal" data-status="inativa" data-dup="false" data-segment="ERP / Consultoria">
+              <td><div class="td-inner"></div></td>
+              <td><div class="td-inner"><strong>OldTech Sistemas</strong><br><small style="color:var(--color-text-muted)">ERP / Consultoria</small></div></td>
+              <td><div class="td-inner">55.666.777/0001-88</div></td>
+              <td><div class="td-inner">Marcos Souza<br><small style="color:var(--color-text-muted)">marcos@oldtech.com.br</small></div></td>
+              <td><div class="td-inner">ERP / Consultoria</div></td>
+              <td><div class="td-inner">0</div></td>
+              <td><div class="td-inner"><span class="status status--inactive">Inativa</span></div></td>
+              <td><div class="td-inner">
+                <div class="action-group">
+                  <button class="action-icon" title="Editar" onclick="showToast('Editando OldTech')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle"><input type="checkbox" onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </div></td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <!-- Empty state (oculto por padrão) -->
+        <div class="empty-state" id="empty-state" style="display:none;">
+          <div class="empty-state__icon">🔍</div>
+          <div class="empty-state__text">Nenhuma empresa encontrada com os filtros aplicados</div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <button class="pagination__btn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="pagination__btn pagination__btn--active">1</button>
+        <button class="pagination__btn">2</button>
+        <span class="pagination__info">de 2</span>
+        <button class="pagination__btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal rejeitar -->
+  <div class="modal" id="modal-reject">
+    <div class="modal__overlay" onclick="closeModal()"></div>
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <div class="modal__title">Rejeitar solicitação</div>
+          <div class="modal__subtitle" id="modal-subtitle">Um e-mail será enviado para os responsáveis.</div>
+        </div>
+        <button class="modal__close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal__recipients" id="modal-recipients">
+        <div class="modal__recipients-title">Será enviado para</div>
+      </div>
+      <label class="modal__label">Mensagem</label>
+      <textarea class="modal__textarea" id="modal-msg">Olá,
+
+Agradecemos o interesse em fazer parte da rede SCTEC. Após análise, não será possível prosseguir com a parceria no momento.
+
+Atenciosamente,
+Equipe SCTEC</textarea>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn--danger" onclick="confirmReject()">Enviar e rejeitar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ====== ESTADO ======
+    let activeFilter = 'all';
+    let rejectCallback = null;
+    const groupState = {}; // { inovatech: { open, selected } }
+    const resolvedGroups = new Set();
+
+    // ====== FILTROS POR CHIP ======
+    function setChipFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('chip--active'));
+      const chip = document.getElementById('chip-' + filter);
+      if (chip) chip.classList.add('chip--active');
+
+      // Destaque no summary card
+      document.querySelectorAll('.summary-card').forEach(c => c.classList.remove('summary-card--active-filter'));
+      const card = document.getElementById('card-' + filter);
+      if (card) card.classList.add('summary-card--active-filter');
+
+      // Mostrar/ocultar alert de duplicatas
+      const alert = document.getElementById('alert-dup');
+      alert.classList.toggle('alert-banner--hidden', filter === 'ativa' || filter === 'inativa');
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const segment = document.getElementById('segment-select').value;
+      let visible = 0;
+
+      // Linhas principais (não filhos, não ações)
+      const primaryRows = document.querySelectorAll(
+        '#table-body tr:not(.row-dup-child):not(.row-dup-actions)'
+      );
+
+      primaryRows.forEach(row => {
+        const status  = row.dataset.status  || '';
+        const isDup   = row.dataset.dup === 'true';
+        const seg     = row.dataset.segment || '';
+        const text    = row.textContent.toLowerCase();
+        const group   = row.dataset.group;
+
+        // Filtro status
+        let statusMatch = true;
+        if (activeFilter === 'ativa')      statusMatch = status === 'ativa';
+        else if (activeFilter === 'pendente') statusMatch = status === 'pendente';
+        else if (activeFilter === 'inativa')  statusMatch = status === 'inativa';
+        else if (activeFilter === 'duplicata') statusMatch = isDup;
+
+        // Filtro segmento
+        const segMatch = !segment || seg === segment;
+
+        // Filtro busca
+        const searchMatch = !search || text.includes(search);
+
+        const show = statusMatch && segMatch && searchMatch;
+
+        if (row.classList.contains('row-dup-header')) {
+          row.style.display = show ? '' : 'none';
+          // Filhos e ações do grupo seguem a visibilidade do cabeçalho
+          const children = document.querySelectorAll(`[data-group="${group}"]:not(.row-dup-header)`);
+          children.forEach(child => {
+            if (!show) {
+              child.style.display = 'none';
+            } else {
+              // Respeita estado open/collapsed
+              const isOpen = document.getElementById('hrow-' + group)?.classList.contains('expanded');
+              child.style.display = isOpen ? '' : 'none';
+            }
+          });
+        } else {
+          row.style.display = show ? '' : 'none';
+        }
+
+        if (show) visible++;
+      });
+
+      // Atualizar meta
+      document.getElementById('results-count').textContent = visible;
+      document.getElementById('empty-state').style.display = visible === 0 ? 'block' : 'none';
+      document.getElementById('clear-filter').classList.toggle('visible', activeFilter !== 'all' || !!search || !!segment);
+    }
+
+    function clearFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('segment-select').value = '';
+      setChipFilter('all');
+    }
+
+    // ====== EXPANDIR GRUPO DUPLICATA ======
+    function toggleDupGroup(group) {
+      const header = document.getElementById('hrow-' + group);
+      if (!header) return;
+      const isOpen = header.classList.contains('expanded');
+
+      header.classList.toggle('expanded', !isOpen);
+
+      const children = document.querySelectorAll(`[data-group="${group}"]:not(.row-dup-header)`);
+      children.forEach(c => {
+        c.style.display = isOpen ? 'none' : '';
+        c.classList.remove('row-hidden');
+      });
+    }
+
+    // ====== SELECIONAR RESPONSÁVEL ======
+    const selections = {};
+
+    function selectReq(group, selectedId, otherIds) {
+      // Reset todos do grupo
+      const allIds = [selectedId, ...otherIds];
+      allIds.forEach(id => {
+        const radio = document.getElementById('radio-' + id);
+        if (radio) radio.classList.remove('selected');
+        // Remove highlight da linha
+        const rowId = 'crow-' + id;
+        const row = document.getElementById(rowId);
+        if (row) row.classList.remove('dup-child-row-selected');
+      });
+
+      // Seleciona o clicado
+      const radio = document.getElementById('radio-' + selectedId);
+      if (radio) radio.classList.add('selected');
+      const row = document.getElementById('crow-' + selectedId);
+      if (row) row.classList.add('dup-child-row-selected');
+
+      selections[group] = { selectedId, otherIds };
+
+      // Habilita botão
+      const btn = document.getElementById('btn-approve-' + group);
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+
+      // Nomes para hint
+      const names = {
+        'it-1': 'André Luiz Pereira', 'it-2': 'Maria Clara Santos',
+        'sd-1': 'Patrícia Mendes', 'sd-2': 'Rodrigo Faria', 'sd-3': 'Ana Paula Vieira'
+      };
+      const hint = document.getElementById('hint-' + group);
+      if (hint) hint.textContent = 'Selecionado: ' + (names[selectedId] || selectedId);
+    }
+
+    // ====== APROVAR GRUPO ======
+    function approveGroup(group, companyName) {
+      const sel = selections[group];
+      if (!sel) return;
+
+      const names = {
+        'it-1': 'André Luiz Pereira', 'it-2': 'Maria Clara Santos',
+        'sd-1': 'Patrícia Mendes', 'sd-2': 'Rodrigo Faria', 'sd-3': 'Ana Paula Vieira'
+      };
+
+      const approvedName = names[sel.selectedId];
+      const rejectedCount = sel.otherIds.length;
+
+      // Transformar a linha cabeçalho
+      const header = document.getElementById('hrow-' + group);
+      if (header) {
+        header.classList.remove('row-dup-header');
+        header.classList.add('row-normal');
+        header.dataset.status = 'ativa';
+        header.onclick = null;
+        header.style.cursor = 'default';
+
+        // Atualiza células
+        const cells = header.querySelectorAll('.td-inner');
+        if (cells[3]) cells[3].innerHTML = `<strong>${approvedName}</strong>`;
+        if (cells[6]) cells[6].innerHTML = `<span class="status status--active">Ativa</span>`;
+        if (cells[7]) cells[7].innerHTML = `
+          <div class="action-group">
+            <button class="action-icon" onclick="showToast('Editando ${companyName}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+          </div>`;
+        // Remove expand icon
+        if (cells[0]) cells[0].innerHTML = '';
+      }
+
+      // Ocultar filhos e barra de ações
+      document.querySelectorAll(`[data-group="${group}"]:not(.row-dup-header)`).forEach(r => r.style.display = 'none');
+
+      resolvedGroups.add(group);
+
+      // Atualiza contadores
+      const dupCount = document.getElementById('dup-count');
+      const pendCount = document.getElementById('pending-count');
+      if (dupCount) dupCount.textContent = Math.max(0, parseInt(dupCount.textContent) - 1);
+      if (pendCount) pendCount.textContent = Math.max(0, parseInt(pendCount.textContent) - 1);
+
+      showToast(`✓ ${companyName} aprovada com ${approvedName} como responsável. ${rejectedCount} e-mail(s) de comunicação enviado(s).`);
+
+      applyFilters();
+    }
+
+    // ====== APROVAR SIMPLES ======
+    function approveSingle(btn, company, responsible) {
+      const row = btn.closest('tr');
+      if (!row) return;
+      row.dataset.status = 'ativa';
+      row.classList.remove('row-pending');
+      row.classList.add('row-normal');
+
+      const cells = row.querySelectorAll('.td-inner');
+      if (cells[6]) cells[6].innerHTML = `<span class="status status--active">Ativa</span>`;
+      if (cells[7]) cells[7].innerHTML = `
+        <div class="action-group">
+          <button class="action-icon" onclick="showToast('Editando ${company}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+        </div>`;
+
+      const pendCount = document.getElementById('pending-count');
+      if (pendCount) pendCount.textContent = Math.max(0, parseInt(pendCount.textContent) - 1);
+
+      showToast(`✓ ${company} aprovada! Acesso liberado para ${responsible}.`);
+      applyFilters();
+    }
+
+    // ====== MODAL REJEITAR ======
+    function openRejectModal(company, recipients, group) {
+      const recipientsEl = document.getElementById('modal-recipients');
+      recipientsEl.innerHTML = `<div class="modal__recipients-title">Será enviado para</div>`;
+      recipients.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'modal__recipient';
+        div.textContent = '· ' + r;
+        recipientsEl.appendChild(div);
+      });
+
+      document.getElementById('modal-subtitle').textContent =
+        `Rejeitar todas as solicitações de "${company}". Um e-mail será enviado para cada responsável.`;
+
+      rejectCallback = () => {
+        showToast(`Solicitações de "${company}" rejeitadas. E-mails enviados.`);
+        const pendCount = document.getElementById('pending-count');
+        if (pendCount) pendCount.textContent = Math.max(0, parseInt(pendCount.textContent) - 1);
+        if (group) {
+          document.querySelectorAll(`[data-group="${group}"]`).forEach(r => r.style.display = 'none');
+          const dupCount = document.getElementById('dup-count');
+          if (dupCount) dupCount.textContent = Math.max(0, parseInt(dupCount.textContent) - 1);
+        }
+        applyFilters();
+      };
+
+      document.getElementById('modal-reject').classList.add('modal--open');
+    }
+
+    function closeModal() { document.getElementById('modal-reject').classList.remove('modal--open'); }
+    function confirmReject() { closeModal(); if (rejectCallback) rejectCallback(); }
+
+    // ====== TOAST ======
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3500);
+    }
+  </script>
+</body>
+</html>

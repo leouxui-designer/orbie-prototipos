@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Empresas - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/painel.css">
+</head>
+<body style="padding-top: 80px;">
+
+  <!-- Navbar Admin -->
+  <nav class="navbar navbar--painel navbar--admin">
+    <div class="navbar__inner">
+      <a href="../index.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="badge badge--dark" style="font-size: 11px; padding: 4px 10px;">ADMIN</span>
+        <span class="navbar-painel__company-name">Equipe SCTEC</span>
+        <div class="navbar-painel__avatar" id="avatar-toggle" onclick="toggleAvatarMenu()" style="background: #303030;">AD</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header"><strong>Administrador</strong><span>Equipe SCTEC</span></div>
+          <a href="admin-alunos.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Banco de Talentos</a>
+          <a href="admin-empresas.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Gestão de Empresas</a>
+          <a href="admin-usuarios.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Usuários</a>
+          <div class="avatar-menu__divider"></div>
+          <a href="login.html" class="avatar-menu__link avatar-menu__link--logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar sidebar--admin">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="admin-alunos.html" class="sidebar__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Banco de Talentos</a>
+        <a href="admin-empresas.html" class="sidebar__link sidebar__link--active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Gestão de Empresas</a>
+        <a href="admin-usuarios.html" class="sidebar__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Usuários</a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Gestão de Empresas</h1>
+          <p class="painel__subtitle">Gerencie empresas parceiras, aprove cadastros pendentes e cadastre novas empresas</p>
+        </div>
+        <a href="admin-empresa-cadastro.html" class="btn btn--primary">+ Cadastrar Empresa</a>
+      </div>
+
+      <!-- Filtros -->
+      <div class="painel-filters">
+        <input type="text" class="painel-filter__search" placeholder="Buscar por nome, CNPJ ou responsável...">
+        <select class="painel-filter__select">
+          <option>Todos os status</option>
+          <option>Ativa</option>
+          <option>Inativa</option>
+          <option>Aguardando avaliação</option>
+        </select>
+        <select class="painel-filter__select">
+          <option>Todos os segmentos</option>
+          <option>Tecnologia</option>
+          <option>Fintech</option>
+          <option>SaaS</option>
+          <option>E-commerce</option>
+          <option>Consultoria</option>
+        </select>
+      </div>
+
+      <!-- Tabela unificada (inclui pendentes) -->
+      <div class="panel-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>CNPJ</th>
+              <th>Responsável</th>
+              <th>Vagas</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Pendentes primeiro -->
+            <tr style="background: rgba(255, 193, 7, 0.03);">
+              <td><strong>InovaTech SC</strong><br><small style="color: var(--color-text-muted);">Tecnologia / IoT</small></td>
+              <td>44.555.666/0001-33</td>
+              <td>André Luiz Pereira<br><small style="color: var(--color-text-muted);">andre@inovatech.sc</small></td>
+              <td>—</td>
+              <td><span class="status status--closed">Aguardando avaliação</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="action-icon" title="Aprovar" onclick="showToast('Empresa aprovada!')" style="color: var(--color-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></button>
+                  <button class="action-icon" title="Rejeitar" onclick="showToast('Empresa rejeitada.')" style="color: #E53935;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></button>
+                </div>
+              </td>
+            </tr>
+            <tr style="background: rgba(255, 193, 7, 0.03);">
+              <td><strong>SC Digital Solutions</strong><br><small style="color: var(--color-text-muted);">E-commerce / Marketplace</small></td>
+              <td>77.888.999/0001-55</td>
+              <td>Patrícia Mendes<br><small style="color: var(--color-text-muted);">patricia@scdigital.com.br</small></td>
+              <td>—</td>
+              <td><span class="status status--closed">Aguardando avaliação</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="action-icon" title="Aprovar" onclick="showToast('Empresa aprovada!')" style="color: var(--color-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></button>
+                  <button class="action-icon" title="Rejeitar" onclick="showToast('Empresa rejeitada.')" style="color: #E53935;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></button>
+                </div>
+              </td>
+            </tr>
+            <!-- Ativas -->
+            <tr>
+              <td><strong>TechCorp Soluções</strong><br><small style="color: var(--color-text-muted);">Tecnologia / SaaS</small></td>
+              <td>12.345.678/0001-90</td>
+              <td>Carlos Eduardo<br><small style="color: var(--color-text-muted);">carlos@techcorp.com.br</small></td>
+              <td>3</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td>
+                <div class="action-group">
+                  <a href="admin-empresa-editar.html" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>DataSoft Ltda.</strong><br><small style="color: var(--color-text-muted);">Análise de Dados</small></td>
+              <td>98.765.432/0001-10</td>
+              <td>Fernanda Lima<br><small style="color: var(--color-text-muted);">fernanda@datasoft.com.br</small></td>
+              <td>2</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td>
+                <div class="action-group">
+                  <a href="admin-empresa-editar.html" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>CloudSC Tecnologia</strong><br><small style="color: var(--color-text-muted);">Cloud / Infraestrutura</small></td>
+              <td>11.222.333/0001-44</td>
+              <td>Roberto Alves<br><small style="color: var(--color-text-muted);">roberto@cloudsc.com.br</small></td>
+              <td>1</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td>
+                <div class="action-group">
+                  <a href="admin-empresa-editar.html" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>FinanSC</strong><br><small style="color: var(--color-text-muted);">Fintech</small></td>
+              <td>33.444.555/0001-22</td>
+              <td>Juliana Martins<br><small style="color: var(--color-text-muted);">juliana@finansc.com.br</small></td>
+              <td>4</td>
+              <td><span class="status status--active">Ativa</span></td>
+              <td>
+                <div class="action-group">
+                  <a href="admin-empresa-editar.html" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </td>
+            </tr>
+            <!-- Inativa -->
+            <tr>
+              <td><strong>OldTech Sistemas</strong><br><small style="color: var(--color-text-muted);">ERP / Consultoria</small></td>
+              <td>55.666.777/0001-88</td>
+              <td>Marcos Souza<br><small style="color: var(--color-text-muted);">marcos@oldtech.com.br</small></td>
+              <td>0</td>
+              <td><span class="status status--closed">Inativa</span></td>
+              <td>
+                <div class="action-group">
+                  <a href="admin-empresa-editar.html" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                  <label class="toggle" title="Ativar"><input type="checkbox" onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pagination__btn pagination__btn--arrow" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="pagination__btn pagination__btn--active">1</button>
+        <button class="pagination__btn">2</button>
+        <button class="pagination__btn">3</button>
+        <span class="pagination__info">de 5</span>
+        <button class="pagination__btn pagination__btn--arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+        function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+    function toggleAvatarMenu() {
+      document.getElementById('avatar-menu').classList.toggle('avatar-menu--open');
+    }
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('avatar-menu');
+      const toggle = document.getElementById('avatar-toggle');
+      if (menu && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.classList.remove('avatar-menu--open');
+      }
+    });
+  </script>
+
+  <div class="toast" id="toast"></div>
+</body>
+</html>

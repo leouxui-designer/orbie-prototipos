@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Missão de Revisão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --bg2: #080f20;
+      --surface: #142A51;
+      --surface-dark: #0e1e40;
+      --border: #1e3a6e;
+      --brand: #0059E7;
+      --brand2: #3F84F3;
+      --cyan: #00C1FE;
+      --text: #FFFFFF;
+      --text-2: #99C0FF;
+      --locked: #3d5680;
+      --green: #12B76A;
+      --green2: #37EC65;
+      --red: #F04438;
+      --yellow: #FFEA24;
+      --orange: #F79009;
+      --purple: #8455DD;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 120px;
+    }
+
+    /* ─── STARFIELD BG ─── */
+    .bg-stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* ─── TOP BAR ─── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,15,32,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 20px; height: 56px;
+    }
+    .back-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 150ms;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.08); }
+    .top-bar-title {
+      flex: 1;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 13px;
+      color: var(--text); letter-spacing: 0.04em;
+    }
+    .top-bar-exit {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--locked);
+      cursor: pointer; padding: 6px 10px;
+      border-radius: 8px; border: 1px solid transparent;
+      transition: all 150ms;
+    }
+    .top-bar-exit:hover { border-color: rgba(240,68,56,0.3); color: #F97066; }
+
+    /* ─── HERO BANNER ─── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 28px 24px 0;
+      max-width: 640px; margin: 0 auto;
+      text-align: center;
+    }
+    .mission-icon {
+      width: 80px; height: 80px;
+      margin: 0 auto 16px;
+      position: relative;
+    }
+    .mission-ring {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(63,132,243,0.35);
+      animation: spin-slow 12s linear infinite;
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .mission-ring2 {
+      position: absolute; inset: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(63,132,243,0.2);
+      animation: spin-slow 8s linear reverse infinite;
+    }
+    .mission-core {
+      position: absolute; inset: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0D2B6B, #3A00A8);
+      border: 1.5px solid rgba(63,132,243,0.4);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 24px rgba(0,89,231,0.4);
+    }
+
+    .hero-eyebrow {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--brand2); margin-bottom: 6px;
+    }
+    .hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900; font-size: 22px; line-height: 30px;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .hero-justificativa {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px; line-height: 20px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 20px;
+      padding: 10px 14px;
+      background: rgba(63,132,243,0.06);
+      border: 1px solid rgba(63,132,243,0.15);
+      border-radius: 10px;
+      text-align: left;
+    }
+    .hero-justificativa strong { color: var(--text-2); }
+
+    /* ─── PROGRESSO GERAL ─── */
+    .progress-banner {
+      max-width: 640px; margin: 0 auto;
+      padding: 0 24px 24px;
+      position: relative; z-index: 1;
+    }
+    .prog-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 10px;
+    }
+    .prog-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--text-2);
+    }
+    .prog-count {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px; font-weight: 700; color: var(--text);
+    }
+    .prog-track {
+      width: 100%; height: 6px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 100px; overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .prog-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--brand), var(--cyan));
+      box-shadow: 0 0 10px rgba(0,193,254,0.4);
+      transition: width 700ms cubic-bezier(0.34,1.2,0.64,1);
+    }
+
+    /* ─── CTA ÁREA ─── */
+    .cta-area {
+      max-width: 640px; margin: 0 auto;
+      padding: 0 24px 32px;
+      position: relative; z-index: 1;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .btn-launch {
+      flex: 1;
+      height: 54px;
+      background: linear-gradient(135deg, var(--brand), #3A00A8);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 13px;
+      letter-spacing: 0.08em;
+      border: none; border-radius: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 6px 24px rgba(0,89,231,0.4);
+      transition: transform 150ms, box-shadow 150ms;
+    }
+    .btn-launch:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,89,231,0.55); }
+    .btn-launch:active { transform: scale(0.97); }
+    .btn-secondary-small {
+      background: none; border: 1px solid var(--border);
+      color: var(--locked); font-family: 'Outfit', sans-serif;
+      font-size: 12px; border-radius: 10px;
+      padding: 8px 14px; cursor: pointer; white-space: nowrap;
+      transition: all 150ms;
+    }
+    .btn-secondary-small:hover { border-color: rgba(240,68,56,0.3); color: #F97066; }
+
+    /* ─── BLOCOS ─── */
+    .blocks-section {
+      max-width: 640px; margin: 0 auto;
+      padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .blocks-section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--locked); margin-bottom: 14px;
+    }
+
+    /* ─── BLOCK CARD ─── */
+    .block-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 200ms;
+    }
+    .block-card.active { border-color: rgba(63,132,243,0.4); }
+    .block-card.done   { border-color: rgba(18,183,106,0.3); }
+
+    /* cabeçalho do bloco */
+    .block-head {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 150ms;
+    }
+    .block-head:hover { background: rgba(255,255,255,0.02); }
+
+    /* emblema do bloco */
+    .block-emblem {
+      width: 48px; height: 48px; flex-shrink: 0;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .block-emblem.done   { background: rgba(18,183,106,0.12); border: 1.5px solid rgba(18,183,106,0.35); }
+    .block-emblem.active { background: rgba(0,89,231,0.12);   border: 1.5px solid rgba(63,132,243,0.35); }
+    .block-emblem.locked { background: rgba(40,55,90,0.5);    border: 1.5px solid rgba(60,86,128,0.3); }
+
+    .block-emblem-num {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700; font-size: 16px;
+    }
+    .block-emblem.done   .block-emblem-num { color: var(--green2); }
+    .block-emblem.active .block-emblem-num { color: var(--brand2); }
+    .block-emblem.locked .block-emblem-num { color: var(--locked); }
+
+    .block-head-info { flex: 1; }
+    .block-head-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 15px; color: var(--text);
+      margin-bottom: 2px;
+    }
+    .block-head-meta {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--text-2);
+    }
+
+    /* mini barra de bloco */
+    .block-mini-prog {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    }
+    .block-mini-frac {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px; font-weight: 700;
+    }
+    .block-emblem.done   ~ .block-head-info + .block-mini-prog .block-mini-frac { color: var(--green2); }
+    .block-emblem.active ~ .block-head-info + .block-mini-prog .block-mini-frac { color: var(--brand2); }
+    .block-emblem.locked ~ .block-head-info + .block-mini-prog .block-mini-frac { color: var(--locked); }
+
+    .block-mini-bar {
+      width: 52px; height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 100px; overflow: hidden;
+    }
+    .block-mini-fill {
+      height: 100%; border-radius: 100px;
+    }
+    .done-fill   { background: var(--green); }
+    .active-fill { background: linear-gradient(90deg,var(--brand),var(--cyan)); }
+    .locked-fill { background: var(--locked); }
+
+    .block-chevron {
+      transition: transform 250ms cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .block-card.open .block-chevron { transform: rotate(180deg); }
+
+    /* ─── ROTA DE FASES (island-map style) ─── */
+    .phases-route {
+      padding: 0 18px 18px 18px;
+      display: none;
+      position: relative;
+    }
+    .block-card.open .phases-route { display: block; }
+
+    /* linha vertical conectora */
+    .route-line {
+      position: absolute;
+      left: 42px; /* alinha com centro dos nós */
+      top: 0; bottom: 18px;
+      width: 2px;
+      background: linear-gradient(to bottom, rgba(63,132,243,0.3), rgba(63,132,243,0.05));
+      border-radius: 1px;
+    }
+
+    .phase-node {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0;
+      position: relative;
+      cursor: pointer;
+      transition: opacity 150ms;
+    }
+    .phase-node.locked-phase { cursor: default; opacity: 0.5; }
+
+    /* nó do mapa */
+    .node-circle {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 1;
+      transition: transform 200ms, box-shadow 200ms;
+    }
+    .phase-node:not(.locked-phase):hover .node-circle { transform: scale(1.12); }
+    .nc-available { background: var(--brand); box-shadow: 0 0 16px rgba(0,89,231,0.5); }
+    .nc-available:hover { box-shadow: 0 0 24px rgba(0,89,231,0.7); }
+    .nc-correct  { background: rgba(18,183,106,0.18); border: 2px solid var(--green); }
+    .nc-wrong    { background: rgba(240,68,56,0.15);  border: 2px solid var(--red); }
+    .nc-locked   { background: rgba(40,55,90,0.6);    border: 1.5px solid rgba(60,86,128,0.4); }
+    .nc-info     {
+      background: rgba(132,85,221,0.15);
+      border: 1.5px dashed rgba(132,85,221,0.5);
+      box-shadow: 0 0 10px rgba(132,85,221,0.2);
+    }
+
+    /* pulse no nó disponível */
+    @keyframes node-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(0,89,231,0.5), 0 0 16px rgba(0,89,231,0.5); }
+      70%  { box-shadow: 0 0 0 10px rgba(0,89,231,0), 0 0 16px rgba(0,89,231,0.5); }
+      100% { box-shadow: 0 0 0 0 rgba(0,89,231,0),   0 0 16px rgba(0,89,231,0.5); }
+    }
+    .nc-available { animation: node-pulse 2.2s ease-out infinite; }
+
+    /* XP badge no nó correto */
+    .xp-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--yellow);
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 7px; font-weight: 900;
+      border-radius: 100px;
+      padding: 1px 4px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+
+    .node-info { flex: 1; }
+    .node-type {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .nt-info     { color: rgba(132,85,221,0.9); }
+    .nt-pratica  { color: var(--text-2); }
+    .nt-correct  { color: var(--green); }
+    .nt-wrong    { color: var(--red); }
+    .nt-locked   { color: var(--locked); }
+
+    .node-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 14px; color: var(--text);
+    }
+    .node-locked-text { color: var(--locked); }
+
+    .node-play {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,89,231,0.15); border: 1px solid rgba(63,132,243,0.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 150ms;
+    }
+    .phase-node:hover:not(.locked-phase) .node-play { background: rgba(0,89,231,0.3); }
+
+    /* ─── ANOTAÇÕES (painel lateral recolhível) ─── */
+    .annot-toggle {
+      position: fixed;
+      bottom: 90px; right: 14px;
+      z-index: 300;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(0,89,231,0.2);
+      border: 1px solid rgba(63,132,243,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 150ms;
+    }
+    .annot-toggle:hover { background: rgba(0,89,231,0.4); transform: scale(1.08); }
+    .annot-panel {
+      position: fixed;
+      bottom: 140px; right: 14px;
+      z-index: 299;
+      width: 280px;
+      background: rgba(10,18,40,0.96);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .annot-panel.open { display: flex; }
+    .annot-panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; color: var(--brand2);
+      margin-bottom: 4px;
+    }
+    .annot-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px;
+      background: rgba(0,89,231,0.06);
+      border: 1px solid rgba(63,132,243,0.2);
+      border-radius: 8px;
+    }
+    .annot-item.warn    { background: rgba(247,144,9,0.06);  border-color: rgba(247,144,9,0.2); }
+    .annot-item.success { background: rgba(18,183,106,0.06); border-color: rgba(18,183,106,0.2); }
+    .annot-rf {
+      font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+      padding: 2px 5px; border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+      background: rgba(63,132,243,0.18); color: var(--brand2);
+      border: 1px solid rgba(63,132,243,0.3); margin-top: 1px;
+    }
+    .annot-item.warn    .annot-rf { background: rgba(247,144,9,0.15); color: #F79009; border-color: rgba(247,144,9,0.3); }
+    .annot-item.success .annot-rf { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .annot-txt {
+      font-family: 'Outfit', sans-serif; font-size: 11px; line-height: 15px;
+      color: rgba(153,192,255,0.8);
+    }
+    .annot-txt strong { color: #fff; }
+
+    /* ─── MODO SWITCHER ─── */
+    .mode-sw {
+      position: fixed; bottom: 20px; right: 14px; z-index: 301;
+      background: rgba(8,15,32,0.96); backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px; display: flex; gap: 6px;
+    }
+    .msw-btn {
+      font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600;
+      color: var(--text-2); background: transparent;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 5px 10px; cursor: pointer; transition: all 150ms;
+    }
+    .msw-btn:hover  { background: rgba(0,89,231,0.15); color: #fff; border-color: var(--brand); }
+    .msw-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+    /* ─── MODAL SAÍDA ─── */
+    .exit-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 250ms;
+    }
+    .exit-overlay.show { opacity: 1; pointer-events: all; }
+    .exit-sheet {
+      background: #0e1e40; border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0; padding: 24px 24px 40px;
+      width: 100%; max-width: 480px;
+      transform: translateY(50px);
+      transition: transform 280ms cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .exit-overlay.show .exit-sheet { transform: translateY(0); }
+    .exit-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+    .exit-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 8px; text-align: center; }
+    .exit-body { font-family: 'Outfit', sans-serif; font-size: 14px; line-height: 22px; color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 24px; }
+    .exit-btns { display: flex; flex-direction: column; gap: 10px; }
+    .btn-exit-confirm {
+      background: rgba(240,68,56,0.1); color: #F97066;
+      border: 1px solid rgba(240,68,56,0.3);
+      font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px;
+      border-radius: 12px; height: 50px; cursor: pointer; transition: background 150ms;
+    }
+    .btn-exit-confirm:hover { background: rgba(240,68,56,0.2); }
+    .btn-keep-going {
+      background: var(--brand); color: #fff;
+      border: none; font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 15px;
+      border-radius: 12px; height: 50px; cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-keep-going:hover { background: #0040A7; }
+  </style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<canvas class="bg-stars" id="bgStars"></canvas>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="back-btn" onclick="history.back()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="top-bar-title">MISSÃO · REVISÃO DE CONTEÚDOS</div>
+  <div class="top-bar-exit" onclick="showExit()">Sair</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="mission-icon">
+    <div class="mission-ring"></div>
+    <div class="mission-ring2"></div>
+    <div class="mission-core" id="missionCore">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 4L19.4 11.2L28.4 11.8L21.8 17.6L24 26.4L16 21.6L8 26.4L10.2 17.6L3.6 11.8L12.6 11.2L16 4Z" fill="none" stroke="#3F84F3" stroke-width="1.5"/>
+        <path d="M16 8L18.6 13.8L25 14.2L20.4 18.4L22 24.8L16 21.2L10 24.8L11.6 18.4L7 14.2L13.4 13.8L16 8Z" fill="rgba(63,132,243,0.3)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-eyebrow">Trilha Adaptativa · Ciclo 3</div>
+  <div class="hero-title">REVISÃO DE<br>CONTEÚDOS</div>
+  <div class="hero-justificativa">
+    <strong>Por que esta missão?</strong><br>
+    Detectamos dificuldades em <strong>Frações</strong> e <strong>Geometria Plana</strong>. Esta revisão foi gerada especialmente para você — sem comparação com a turma.
+  </div>
+</div>
+
+<!-- PROGRESSO -->
+<div class="progress-banner">
+  <div class="prog-row">
+    <span class="prog-label">Progresso da missão</span>
+    <span class="prog-count" id="progCount">4 / 12 fases</span>
+  </div>
+  <div class="prog-track">
+    <div class="prog-fill" id="progFill" style="width:33%"></div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-area">
+  <button class="btn-launch" id="btnLaunch" onclick="launchMission()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C6 8 6 16 12 22C18 16 18 8 12 2Z" stroke="white" stroke-width="1.8" fill="none"/>
+      <circle cx="12" cy="12" r="3" fill="white"/>
+    </svg>
+    CONTINUAR MISSÃO
+  </button>
+  <button class="btn-secondary-small" onclick="showExit()">Abandonar</button>
+</div>
+
+<!-- BLOCOS -->
+<div class="blocks-section">
+  <div class="blocks-section-title">Setores da missão</div>
+  <div id="blocksArea"></div>
+</div>
+
+<!-- MODAL SAÍDA -->
+<div class="exit-overlay" id="exitOverlay" onclick="if(event.target===this)hideExit()">
+  <div class="exit-sheet">
+    <div class="exit-handle"></div>
+    <div class="exit-title">Abandonar a missão?</div>
+    <div class="exit-body">Seu progresso fica salvo. Você pode retomar a revisão quando quiser — até o fim da vigência do ciclo.</div>
+    <div class="exit-btns">
+      <button class="btn-keep-going" onclick="hideExit()">Continuar revisando</button>
+      <button class="btn-exit-confirm" onclick="doExit()">Sair e retomar depois</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANOTAÇÕES (painel flutuante) -->
+<div class="annot-toggle" onclick="toggleAnnotations()" title="Requisitos">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M9 12H15M9 8H15M9 16H12M5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3Z" stroke="#3F84F3" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+</div>
+<div class="annot-panel" id="annotPanel">
+  <div class="annot-panel-title">REQUISITOS COBERTOS</div>
+  <div class="annot-item">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Desbloqueio sequencial</strong> — Fase 1 disponível; N+1 desbloqueia ao concluir N.</span>
+  </div>
+  <div class="annot-item">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Questão informativa</strong> — Ícone roxo com borda pontilhada. Sem pontuação.</span>
+  </div>
+  <div class="annot-item warn">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Sem Chance Extra</strong> — Fase errada registra erro, fluxo continua.</span>
+  </div>
+  <div class="annot-item success">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Modal de saída</strong> — "Abandonar" abre confirmação. Trilha fica Em Andamento.</span>
+  </div>
+  <div class="annot-item">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Justificativa positiva</strong> — Sem índices de turma nem percentuais comparativos.</span>
+  </div>
+  <div class="annot-item warn">
+    <span class="annot-rf">RF09</span>
+    <span class="annot-txt"><strong>Blocos não puláveis</strong> — A questão informativa do bloco é sempre a primeira fase.</span>
+  </div>
+</div>
+
+<!-- MODO SWITCHER -->
+<div class="mode-sw">
+  <button class="msw-btn active" id="ms-andamento"   onclick="setMode(this,'andamento')">Em andamento</button>
+  <button class="msw-btn"        id="ms-nao-iniciada" onclick="setMode(this,'nao-iniciada')">Início</button>
+  <button class="msw-btn"        id="ms-concluida"    onclick="setMode(this,'concluida')">Concluída</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   STARFIELD
+════════════════════════════════════════════ */
+(function() {
+  const c = document.getElementById('bgStars');
+  const ctx = c.getContext('2d');
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; draw(); }
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    for (let i = 0; i < 120; i++) {
+      const x = Math.random()*c.width, y = Math.random()*c.height;
+      const r = Math.random()*1.2+0.3;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${0.2+Math.random()*0.6})`; ctx.fill();
+    }
+  }
+  window.addEventListener('resize', resize); resize();
+})();
+
+/* ════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════ */
+const BLOCKS = [
+  {
+    id:1, title:'Setor 1 — Frações', meta:'4 fases · Matemática', state:'done', frac:'4/4', fill:100,
+    phases:[
+      {type:'info',   label:'Informativa', name:'Entendendo Frações',      state:'correct'},
+      {type:'pratica',label:'Prática 1',   name:'Frações equivalentes',    state:'correct'},
+      {type:'pratica',label:'Prática 2',   name:'Soma de frações',         state:'wrong'},
+      {type:'pratica',label:'Prática 3',   name:'Divisão de frações',      state:'correct'},
+    ]
+  },
+  {
+    id:2, title:'Setor 2 — Geometria Plana', meta:'4 fases · Matemática', state:'active', frac:'0/4', fill:0,
+    phases:[
+      {type:'info',   label:'Informativa', name:'Intro à Geometria',       state:'available'},
+      {type:'pratica',label:'Prática 1',   name:'Perímetro de figuras',    state:'locked'},
+      {type:'pratica',label:'Prática 2',   name:'Área de triângulos',      state:'locked'},
+      {type:'pratica',label:'Prática 3',   name:'Área de quadriláteros',   state:'locked'},
+    ]
+  },
+  {
+    id:3, title:'Setor 3 — Porcentagem', meta:'4 fases · Matemática', state:'locked', frac:'0/4', fill:0,
+    phases:[
+      {type:'info',   label:'Informativa', name:'O que é porcentagem?',    state:'locked'},
+      {type:'pratica',label:'Prática 1',   name:'Calcular % de um valor',  state:'locked'},
+      {type:'pratica',label:'Prática 2',   name:'Desconto e acréscimo',    state:'locked'},
+      {type:'pratica',label:'Prática 3',   name:'Problemas com %',         state:'locked'},
+    ]
+  }
+];
+
+/* ════════════════════════════════════════════
+   RENDER
+════════════════════════════════════════════ */
+let currentMode = 'andamento';
+
+function stateToBlocks(mode) {
+  const b = JSON.parse(JSON.stringify(BLOCKS));
+  if (mode === 'nao-iniciada') {
+    b.forEach((blk, bi) => {
+      blk.state = bi === 0 ? 'active' : 'locked';
+      blk.frac = '0/4'; blk.fill = 0;
+      blk.phases.forEach((ph,pi) => { ph.state = bi === 0 && pi === 0 ? 'available' : 'locked'; });
+    });
+  } else if (mode === 'concluida') {
+    b.forEach(blk => {
+      blk.state = 'done'; blk.frac = '4/4'; blk.fill = 100;
+      blk.phases.forEach(ph => { ph.state = Math.random() > 0.3 ? 'correct' : 'wrong'; });
+    });
+  }
+  return b;
+}
+
+function nodeIcon(ph) {
+  if (ph.type === 'info' && ph.state === 'available') return {cls:'nc-info', icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 8v1M12 11v5" stroke="#8455DD" stroke-width="2.5" stroke-linecap="round"/></svg>`, typeStr:'Informativa · sem pts', typeCls:'nt-info'};
+  if (ph.type === 'info' && ph.state === 'correct')   return {cls:'nc-correct', icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#12B76A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`, typeStr:'Informativa · lida', typeCls:'nt-correct'};
+  if (ph.state === 'available') return {cls:'nc-available', icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 5L19 12L8 19V5Z" fill="white"/></svg>`, typeStr:ph.label, typeCls:'nt-pratica'};
+  if (ph.state === 'correct')   return {cls:'nc-correct', icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#12B76A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`, typeStr:`${ph.label} · acerto`, typeCls:'nt-correct'};
+  if (ph.state === 'wrong')     return {cls:'nc-wrong', icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.5" stroke-linecap="round"/></svg>`, typeStr:`${ph.label} · erro`, typeCls:'nt-wrong'};
+  return {cls:'nc-locked', icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 11H7C5.9 11 5 11.9 5 13V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V13C19 11.9 18.1 11 17 11Z" fill="#3d5680"/><path d="M8 11V7C8 4.79 9.79 3 12 3C14.21 3 16 4.79 16 7V11" stroke="#3d5680" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`, typeStr:ph.label+' · bloqueada', typeCls:'nt-locked'};
+}
+
+function renderBlocks(mode) {
+  const blocks = stateToBlocks(mode);
+  const area = document.getElementById('blocksArea');
+  // primeiros dois abertos por default
+  area.innerHTML = blocks.map((blk, bi) => {
+    const isOpen = blk.state !== 'locked';
+    const fillCls = blk.state === 'done' ? 'done-fill' : blk.state === 'active' ? 'active-fill' : 'locked-fill';
+    const fracColor = blk.state === 'done' ? 'color:#37EC65' : blk.state === 'active' ? 'color:#3F84F3' : 'color:#3d5680';
+
+    const phasesHTML = blk.phases.map(ph => {
+      const ni = nodeIcon(ph);
+      const isLocked = ph.state === 'locked';
+      const xp = ph.state === 'correct' ? `<div class="xp-badge">XP</div>` : '';
+      const playBtn = (!isLocked && ph.state !== 'correct' && ph.state !== 'wrong')
+        ? `<div class="node-play"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M8 5L19 12L8 19V5Z" fill="#3F84F3"/></svg></div>`
+        : '';
+      const clickAttr = isLocked ? '' : `onclick="goPhase('${ph.type}','${ph.state}')"`;
+      return `
+        <div class="phase-node ${isLocked ? 'locked-phase' : ''}" ${clickAttr}>
+          <div class="node-circle ${ni.cls}">
+            ${ni.icon}${xp}
+          </div>
+          <div class="node-info">
+            <div class="node-type ${ni.typeCls}">${ni.typeStr}</div>
+            <div class="node-name ${isLocked ? 'node-locked-text' : ''}">${ph.name}</div>
+          </div>
+          ${playBtn}
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="block-card ${blk.state} ${isOpen ? 'open' : ''}" id="block-${blk.id}">
+        <div class="block-head" onclick="toggleBlock('block-${blk.id}')">
+          <div class="block-emblem ${blk.state}">
+            <div class="block-emblem-num">${blk.id}</div>
+          </div>
+          <div class="block-head-info">
+            <div class="block-head-title">${blk.title}</div>
+            <div class="block-head-meta">${blk.meta}</div>
+          </div>
+          <div class="block-mini-prog">
+            <div class="block-mini-frac" style="${fracColor}">${blk.frac}</div>
+            <div class="block-mini-bar">
+              <div class="${fillCls}" style="height:100%;width:${blk.fill}%;border-radius:100px;transition:width 600ms ease"></div>
+            </div>
+          </div>
+          <svg class="block-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-left:6px;flex-shrink:0">
+            <path d="M6 9L12 15L18 9" stroke="#526D98" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="phases-route">
+          <div class="route-line"></div>
+          ${phasesHTML}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleBlock(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function setMode(btn, mode) {
+  document.querySelectorAll('.msw-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = mode;
+  renderBlocks(mode);
+  // atualiza HUD hero
+  const progFill  = document.getElementById('progFill');
+  const progCount = document.getElementById('progCount');
+  const btnLaunch = document.getElementById('btnLaunch');
+  if (mode === 'nao-iniciada') {
+    progFill.style.width = '0%'; progCount.textContent = '0 / 12 fases';
+    btnLaunch.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6 8 6 16 12 22C18 16 18 8 12 2Z" stroke="white" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" fill="white"/></svg> INICIAR MISSÃO`;
+  } else if (mode === 'andamento') {
+    progFill.style.width = '33%'; progCount.textContent = '4 / 12 fases';
+    btnLaunch.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6 8 6 16 12 22C18 16 18 8 12 2Z" stroke="white" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" fill="white"/></svg> CONTINUAR MISSÃO`;
+  } else if (mode === 'concluida') {
+    progFill.style.width = '100%'; progCount.textContent = '12 / 12 fases';
+    btnLaunch.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg> VER RESULTADO`;
+    btnLaunch.onclick = () => { window.location.href = 'resultado.html'; };
+  }
+}
+
+function launchMission() {
+  window.location.href = 'fase-informativa.html';
+}
+
+function goPhase(type, state) {
+  if (state === 'correct' || state === 'wrong') {
+    toast('Fase já respondida — modo leitura [RF09]'); return;
+  }
+  window.location.href = type === 'info' ? 'fase-informativa.html' : 'fase-pratica.html';
+}
+
+function showExit()  { document.getElementById('exitOverlay').classList.add('show'); }
+function hideExit()  { document.getElementById('exitOverlay').classList.remove('show'); }
+function doExit()    { window.location.href = 'home.html'; }
+
+function toggleAnnotations() {
+  document.getElementById('annotPanel').classList.toggle('open');
+}
+
+function toast(msg) {
+  let t = document.getElementById('t');
+  if (!t) { t = document.createElement('div'); t.id='t'; t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#142A51;border:1px solid #224476;border-radius:10px;padding:10px 18px;font-family:Outfit,sans-serif;font-size:13px;color:#99C0FF;z-index:999;white-space:nowrap;opacity:0;transition:opacity 200ms;pointer-events:none;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t = setTimeout(()=>{t.style.opacity='0';},2500);
+}
+
+/* init */
+renderBlocks('andamento');
+</script>
+</body>
+</html>

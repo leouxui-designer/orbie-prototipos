@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCTEC — Complete seu Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fb;
+      color: #171717;
+      min-height: 100vh;
+    }
+
+    /* ─── Tokens ─── */
+    :root {
+      --green-primary: #7ab934;
+      --green-dark: #2ca942;
+      --green-gradient: linear-gradient(135deg, #2ca942 0%, #55b13a 55%, #52b934 100%);
+      --green-gradient-light: linear-gradient(135deg, rgba(122,185,52,0.12) 0%, rgba(82,185,52,0.06) 100%);
+      --sidebar-bg: #262626;
+      --sidebar-fg: #fafafa;
+      --card-radius: 22px;
+      --shadow-card: 0 1px 4px rgba(0,0,0,0.06);
+      --shadow-glow: 0 0 0 3px rgba(122,185,52,0.25);
+
+      /* XP levels */
+      --xp-color-0: #e0e0e0;
+      --xp-color-filled: #7ab934;
+    }
+
+    /* ─── Navbar ─── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 80px;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      box-shadow: 0 1.2px 15px rgba(69,42,124,0.08);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+    }
+    .navbar-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #0a0a0a;
+      letter-spacing: -0.5px;
+    }
+    .navbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .badge-admin {
+      background: #7ab934;
+      color: #466822;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 10px;
+      border-radius: 26px;
+    }
+    .navbar-user {
+      font-size: 14px;
+      color: #454545;
+    }
+    .navbar-avatar {
+      width: 32px; height: 32px;
+      background: #e8f5e0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #466822;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      position: fixed;
+      top: 80px; left: 0;
+      width: 256px;
+      height: calc(100vh - 80px);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      z-index: 90;
+    }
+    .sidebar-header {
+      padding: 16px 8px;
+      border-bottom: 1px solid rgba(161,161,161,0.3);
+    }
+    .sidebar-team {
+      padding: 0 8px;
+    }
+    .sidebar-team-name {
+      font-size: 16px; font-weight: 700;
+      color: #fafafa;
+      line-height: 1.5;
+    }
+    .sidebar-team-sub {
+      font-size: 12px; color: #737373;
+      line-height: 1.4;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fafafa;
+      text-decoration: none;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .sidebar-item.active {
+      background: #7ab934;
+      color: #7ab934;
+    }
+    .sidebar-item.active span { color: #7ab934; }
+    .sidebar-item svg { flex-shrink: 0; opacity: 0.9; }
+    .sidebar-item.active svg { opacity: 1; }
+    .sidebar-footer {
+      padding: 8px 8px 24px;
+      border-top: 1px solid rgba(161,161,161,0.3);
+    }
+
+    /* ─── Main ─── */
+    .main {
+      margin-left: 256px;
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+    .main-inner {
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 1200px;
+    }
+
+    /* ─── Breadcrumb ─── */
+    .breadcrumb {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2ca942;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    /* ─── Page Header ─── */
+    .page-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #737373;
+      margin-bottom: 24px;
+    }
+
+    /* ══════════════════════════════════════════
+       🎮 GAMIFICATION — XP Banner
+    ══════════════════════════════════════════ */
+    .xp-banner {
+      background: var(--green-gradient);
+      border-radius: var(--card-radius);
+      padding: 20px 28px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: white;
+      box-shadow: 0 4px 20px rgba(122,185,52,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .xp-banner::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .xp-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: 80px;
+      width: 150px; height: 150px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .xp-icon {
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .xp-info { flex: 1; }
+    .xp-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .xp-desc {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 10px;
+    }
+    .xp-bar-wrap {
+      background: rgba(255,255,255,0.25);
+      border-radius: 99px;
+      height: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .xp-bar-fill {
+      height: 100%;
+      background: white;
+      border-radius: 99px;
+      width: 15%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .xp-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+    .xp-right {
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .xp-points {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .xp-points-label {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    .xp-level-badge {
+      background: rgba(255,255,255,0.25);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    /* ══════════════════════════════════════════
+       🎮 GAMIFICATION — Missions Track
+    ══════════════════════════════════════════ */
+    .missions-track {
+      background: white;
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 20px 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .missions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .missions-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #171717;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .missions-count {
+      font-size: 13px;
+      color: #737373;
+    }
+    .missions-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .mission-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #e4e4e7;
+      font-size: 13px;
+      font-weight: 500;
+      color: #737373;
+      background: #fafafa;
+      transition: all 0.2s;
+      cursor: default;
+      position: relative;
+    }
+    .mission-chip.done {
+      border-color: var(--green-primary);
+      background: rgba(122,185,52,0.08);
+      color: #466822;
+    }
+    .mission-chip.done .mission-check {
+      background: var(--green-primary);
+      color: white;
+    }
+    .mission-chip.active-mission {
+      border-color: #f59e0b;
+      background: rgba(245,158,11,0.08);
+      color: #92400e;
+      animation: pulse-border 2s infinite;
+    }
+    .mission-chip.active-mission .mission-check {
+      background: #f59e0b;
+      color: white;
+    }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+      50% { box-shadow: 0 0 0 4px rgba(245,158,11,0.15); }
+    }
+    .mission-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #e4e4e7;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .mission-xp {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-dark);
+      background: rgba(44,169,66,0.1);
+      border-radius: 99px;
+      padding: 2px 6px;
+    }
+    .mission-chip.done .mission-xp {
+      background: rgba(122,185,52,0.15);
+    }
+
+    /* ─── Grid layout for form + sidebar gamif ─── */
+    .form-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+    .form-col { display: flex; flex-direction: column; gap: 16px; }
+    .gamif-col { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 104px; }
+
+    /* ─── Card ─── */
+    .card {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--card-radius);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-card);
+      transition: box-shadow 0.2s;
+    }
+    .card.section-active {
+      border-color: rgba(122,185,52,0.4);
+      box-shadow: 0 0 0 3px rgba(122,185,52,0.1), var(--shadow-card);
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 4px;
+    }
+    .card-subtitle {
+      font-size: 14px;
+      color: #737373;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* ─── Section XP tag ─── */
+    .section-xp-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-dark);
+      background: rgba(44,169,66,0.08);
+      border-radius: 99px;
+      padding: 3px 10px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(44,169,66,0.2);
+    }
+    .section-xp-tag.earned {
+      background: var(--green-gradient);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* ─── Foto de perfil ─── */
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .photo-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: 12px;
+    }
+    .photo-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: #e8f5e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px;
+      border: 3px solid transparent;
+      transition: border-color 0.3s;
+    }
+    .photo-avatar.uploaded {
+      border-color: var(--green-primary);
+      box-shadow: 0 0 0 4px rgba(122,185,52,0.15);
+    }
+    .photo-btn {
+      position: absolute;
+      bottom: 2px; right: 2px;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--green-gradient);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(44,169,66,0.4);
+      transition: transform 0.15s;
+    }
+    .photo-btn:hover { transform: scale(1.1); }
+    .photo-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #737373;
+    }
+    .photo-xp-popup {
+      display: none;
+      position: absolute;
+      top: -12px; right: -70px;
+      background: var(--green-gradient);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+      animation: float-up 0.5s ease-out forwards;
+    }
+    @keyframes float-up {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Form grid ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(0,0,0,0.8);
+    }
+    .form-label span { color: #d5271a; margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      height: 48px;
+      border: 1px solid #bfbfbf;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 16px;
+      font-family: 'Roboto', sans-serif;
+      color: #0a0a0a;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: white;
+    }
+    .form-input::placeholder, .form-select::placeholder { color: rgba(0,0,0,0.4); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--green-primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .form-input.filled, .form-select.filled {
+      border-color: var(--green-primary);
+      background: rgba(122,185,52,0.04);
+    }
+    .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%23737373' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px; }
+    .form-textarea {
+      height: 96px;
+      padding: 12px 16px;
+      resize: vertical;
+      border-radius: 6px;
+    }
+
+    /* ─── Field micro XP reward ─── */
+    .field-xp {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--green-dark);
+      font-weight: 600;
+      margin-top: 2px;
+      animation: fade-in 0.3s ease;
+    }
+    .field-xp.show { display: flex; }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Habilidades chips ─── */
+    .skills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .skill-chip {
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1.5px solid #e4e4e7;
+      font-size: 13px;
+      font-weight: 500;
+      color: #737373;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    .skill-chip:hover { border-color: var(--green-primary); color: #466822; background: rgba(122,185,52,0.06); }
+    .skill-chip.selected { border-color: var(--green-primary); background: var(--green-gradient); color: white; }
+
+    /* ─── Add button ─── */
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--green-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.15s;
+    }
+    .btn-add:hover { color: var(--green-dark); }
+    .section-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ─── CTA buttons ─── */
+    .actions-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .btn-primary {
+      background: var(--green-gradient);
+      color: white;
+      border: none;
+      border-radius: 80px;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(44,169,66,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary {
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      color: #454545;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      padding: 10px 16px;
+    }
+
+    /* ══════════════════════════════════════════
+       🎮 GAMIFICATION — Sticky sidebar right
+    ══════════════════════════════════════════ */
+
+    /* Achievements card */
+    .achiev-card {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--card-radius);
+      padding: 20px 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .achiev-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .achiev-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .achiev-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1.5px solid #e4e4e7;
+      transition: all 0.3s;
+    }
+    .achiev-item.unlocked {
+      border-color: var(--green-primary);
+      background: rgba(122,185,52,0.06);
+    }
+    .achiev-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      background: #f4f4f5;
+      filter: grayscale(1);
+      opacity: 0.5;
+      transition: all 0.4s;
+    }
+    .achiev-item.unlocked .achiev-icon {
+      filter: none;
+      opacity: 1;
+      background: rgba(122,185,52,0.12);
+    }
+    .achiev-info { flex: 1; min-width: 0; }
+    .achiev-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #171717;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .achiev-item:not(.unlocked) .achiev-name { color: #a1a1aa; }
+    .achiev-desc {
+      font-size: 11px;
+      color: #a1a1aa;
+      line-height: 1.4;
+    }
+    .achiev-pts {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-dark);
+      background: rgba(44,169,66,0.1);
+      border-radius: 99px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+    .achiev-item:not(.unlocked) .achiev-pts { color: #a1a1aa; background: #f4f4f5; }
+
+    /* Streak card */
+    .streak-card {
+      background: var(--green-gradient);
+      border-radius: var(--card-radius);
+      padding: 18px 20px;
+      color: white;
+      text-align: center;
+    }
+    .streak-emoji { font-size: 32px; margin-bottom: 4px; }
+    .streak-number {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+    }
+    .streak-label { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+    .streak-days {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 12px;
+    }
+    .streak-day {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .streak-day.done { background: white; color: var(--green-dark); }
+
+    /* Progress ring */
+    .progress-card {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--card-radius);
+      padding: 20px 20px;
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+    .progress-title {
+      font-size: 14px; font-weight: 700; color: #171717;
+      margin-bottom: 14px;
+      text-align: left;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ring-wrap {
+      position: relative;
+      width: 100px; height: 100px;
+      margin: 0 auto 12px;
+    }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: #e4e4e7; stroke-width: 8; }
+    .ring-fill {
+      fill: none;
+      stroke: var(--green-primary);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251.2;
+      stroke-dashoffset: 213.5; /* 15% filled */
+      transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ring-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+    }
+    .ring-pct {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #171717;
+    }
+    .ring-sub { font-size: 10px; color: #737373; }
+    .progress-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .progress-section-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ps-label { font-size: 12px; color: #737373; flex: 1; text-align: left; }
+    .ps-bar {
+      width: 80px; height: 5px;
+      background: #e4e4e7;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .ps-bar-fill {
+      height: 100%;
+      background: var(--green-primary);
+      border-radius: 99px;
+      transition: width 0.8s ease;
+    }
+    .ps-check { font-size: 12px; width: 16px; }
+
+    /* ─── Toast notification ─── */
+    .toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--green-gradient);
+      color: white;
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(44,169,66,0.35);
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { font-size: 24px; flex-shrink: 0; }
+    .toast-text { line-height: 1.4; }
+    .toast-points {
+      font-size: 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* ─── Confetti ─── */
+    .confetti-piece {
+      position: fixed;
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9998;
+      animation: confetti-fall 1.2s ease-out forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120px) rotate(540deg); opacity: 0; }
+    }
+
+    /* ─── Responsive tweak ─── */
+    @media (max-width: 1100px) {
+      .form-layout { grid-template-columns: 1fr; }
+      .gamif-col { position: static; flex-direction: row; flex-wrap: wrap; }
+      .achiev-card, .streak-card, .progress-card { flex: 1; min-width: 220px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ░░░ NAVBAR ░░░ -->
+  <nav class="navbar">
+    <div class="navbar-brand">SCTEC</div>
+    <div class="navbar-right">
+      <span class="badge-admin">TALENT</span>
+      <span class="navbar-user">João da Silva</span>
+      <div class="navbar-avatar">JS</div>
+    </div>
+  </nav>
+
+  <!-- ░░░ SIDEBAR ░░░ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-team">
+        <div class="sidebar-team-name">Portal de Talentos</div>
+        <div class="sidebar-team-sub">Complete seu perfil</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="sidebar-item active">
+        <svg width="20" height="20" fill="none" stroke="#7ab934" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span style="color:#7ab934">Meu Perfil</span>
+      </a>
+      <a class="sidebar-item">
+        <svg width="20" height="20" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+        <span>Banco de Talentos</span>
+      </a>
+      <a class="sidebar-item">
+        <svg width="20" height="20" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span>Minhas Candidaturas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-item">
+        <svg width="20" height="20" fill="none" stroke="#fafafa" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ░░░ MAIN ░░░ -->
+  <main class="main">
+    <div class="main-inner">
+
+      <div class="breadcrumb">← Voltar para Banco de Talentos</div>
+      <h1 class="page-title">Complete seu Perfil</h1>
+      <p class="page-subtitle">Quanto mais completo seu perfil, mais visibilidade você ganha para as empresas parceiras.</p>
+
+      <!-- 🎮 XP BANNER -->
+      <div class="xp-banner" id="xpBanner">
+        <div class="xp-icon">🚀</div>
+        <div class="xp-info">
+          <div class="xp-title">Comece sua jornada!</div>
+          <div class="xp-desc">Preencha cada seção para ganhar XP e desbloquear conquistas.</div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-fill" id="xpBarFill"></div>
+          </div>
+          <div class="xp-numbers">
+            <span id="xpCurrent">0 XP</span>
+            <span>500 XP para Nível 2</span>
+          </div>
+        </div>
+        <div class="xp-right">
+          <div class="xp-points" id="xpPoints">0</div>
+          <div class="xp-points-label">pontos XP</div>
+          <div class="xp-level-badge" id="xpLevel">⭐ Nível 1</div>
+        </div>
+      </div>
+
+      <!-- 🎮 MISSIONS TRACK -->
+      <div class="missions-track">
+        <div class="missions-header">
+          <div class="missions-title">🎯 Missões do Perfil</div>
+          <div class="missions-count" id="missionCount">0 / 7 concluídas</div>
+        </div>
+        <div class="missions-list">
+          <div class="mission-chip active-mission" id="m-photo">
+            <div class="mission-check">📷</div>
+            <span>Foto de perfil</span>
+            <span class="mission-xp">+50 XP</span>
+          </div>
+          <div class="mission-chip" id="m-dados">
+            <div class="mission-check">👤</div>
+            <span>Dados pessoais</span>
+            <span class="mission-xp">+80 XP</span>
+          </div>
+          <div class="mission-chip" id="m-sobre">
+            <div class="mission-check">✍️</div>
+            <span>Sobre mim</span>
+            <span class="mission-xp">+60 XP</span>
+          </div>
+          <div class="mission-chip" id="m-links">
+            <div class="mission-check">🔗</div>
+            <span>Links</span>
+            <span class="mission-xp">+70 XP</span>
+          </div>
+          <div class="mission-chip" id="m-skills">
+            <div class="mission-check">⚡</div>
+            <span>Habilidades</span>
+            <span class="mission-xp">+60 XP</span>
+          </div>
+          <div class="mission-chip" id="m-exp">
+            <div class="mission-check">💼</div>
+            <span>Experiência</span>
+            <span class="mission-xp">+100 XP</span>
+          </div>
+          <div class="mission-chip" id="m-cert">
+            <div class="mission-check">🏆</div>
+            <span>Certificados</span>
+            <span class="mission-xp">+80 XP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ░░░ FORM + GAMIF LAYOUT ░░░ -->
+      <div class="form-layout">
+
+        <!-- FORM COLUMN -->
+        <div class="form-col">
+
+          <!-- FOTO DE PERFIL -->
+          <div class="card section-active" id="card-photo">
+            <div class="card-title">Foto de perfil</div>
+            <span class="section-xp-tag" id="tag-photo">📷 +50 XP</span>
+            <div class="photo-section">
+              <div class="photo-wrap">
+                <div class="photo-avatar" id="photoAvatar">👤</div>
+                <button class="photo-btn" onclick="uploadPhoto()" title="Enviar foto">
+                  <svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </button>
+                <div class="photo-xp-popup" id="photoXpPopup">+50 XP 🎉</div>
+              </div>
+              <p class="photo-hint">Clique na câmera para enviar sua foto</p>
+            </div>
+          </div>
+
+          <!-- DADOS PESSOAIS -->
+          <div class="card" id="card-dados">
+            <div class="card-title">Dados pessoais</div>
+            <span class="section-xp-tag" id="tag-dados">👤 +80 XP ao completar</span>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Nome completo <span>*</span></label>
+                <input class="form-input" id="f-nome" placeholder="Nome do aluno" oninput="checkField('f-nome','xp-nome','dados')" />
+                <div class="field-xp" id="xp-nome">✅ +16 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">CPF <span>*</span></label>
+                <input class="form-input" id="f-cpf" placeholder="000.000.000-00" oninput="maskCPF(this); checkField('f-cpf','xp-cpf','dados')" maxlength="14" />
+                <div class="field-xp" id="xp-cpf">✅ +16 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Telefone <span>*</span></label>
+                <input class="form-input" id="f-tel" placeholder="(00) 00000-0000" oninput="maskPhone(this); checkField('f-tel','xp-tel','dados')" maxlength="15" />
+                <div class="field-xp" id="xp-tel">✅ +16 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">E-mail <span>*</span></label>
+                <input class="form-input" id="f-email" type="email" placeholder="email@exemplo.com" oninput="checkField('f-email','xp-email','dados')" />
+                <div class="field-xp" id="xp-email">✅ +16 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Data de nascimento</label>
+                <input class="form-input" id="f-nasc" type="date" oninput="checkField('f-nasc','xp-nasc','dados')" />
+                <div class="field-xp" id="xp-nasc">✅ +16 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cidade <span>*</span></label>
+                <select class="form-select" id="f-cidade" onchange="checkField('f-cidade','xp-cidade','dados')">
+                  <option value="">Selecione</option>
+                  <option>São Paulo</option>
+                  <option>Rio de Janeiro</option>
+                  <option>Belo Horizonte</option>
+                  <option>Curitiba</option>
+                  <option>Porto Alegre</option>
+                  <option>Florianópolis</option>
+                  <option>Brasília</option>
+                  <option>Fortaleza</option>
+                  <option>Recife</option>
+                  <option>Salvador</option>
+                </select>
+                <div class="field-xp" id="xp-cidade">✅ +16 XP</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SOBRE MIM -->
+          <div class="card" id="card-sobre">
+            <div class="card-title">Sobre mim</div>
+            <p class="card-subtitle">Compartilhe sua formação, interesses e o que te motiva.</p>
+            <span class="section-xp-tag" id="tag-sobre">✍️ +60 XP ao completar</span>
+            <div class="form-group">
+              <textarea class="form-textarea" id="f-sobre" placeholder="Descreva sua trajetória, interesses profissionais e o que você busca…" style="height:120px" oninput="checkTextarea('f-sobre','xp-sobre','sobre')"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                <div class="field-xp" id="xp-sobre">✅ +60 XP</div>
+                <div style="font-size:12px;color:#a1a1aa" id="sobreCount">0 / 50 caracteres mínimos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LINKS -->
+          <div class="card" id="card-links">
+            <div class="card-title">Links</div>
+            <span class="section-xp-tag" id="tag-links">🔗 +70 XP ao completar</span>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">LinkedIn</label>
+                <input class="form-input" id="f-linkedin" placeholder="https://linkedin.com/in/perfil" oninput="checkField('f-linkedin','xp-linkedin','links')" />
+                <div class="field-xp" id="xp-linkedin">✅ +18 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub</label>
+                <input class="form-input" id="f-github" placeholder="https://github.com/usuario" oninput="checkField('f-github','xp-github','links')" />
+                <div class="field-xp" id="xp-github">✅ +18 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Portfólio</label>
+                <input class="form-input" id="f-portfolio" placeholder="https://meuportfolio.com" oninput="checkField('f-portfolio','xp-portfolio','links')" />
+                <div class="field-xp" id="xp-portfolio">✅ +17 XP</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vídeo de apresentação</label>
+                <input class="form-input" id="f-video" placeholder="Link do vídeo (YouTube ou Vimeo)" oninput="checkField('f-video','xp-video','links')" />
+                <div class="field-xp" id="xp-video">✅ +17 XP</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HABILIDADES -->
+          <div class="card" id="card-skills">
+            <div class="section-actions">
+              <div>
+                <div class="card-title">Habilidades</div>
+                <p class="card-subtitle" style="margin-bottom:0">Selecione as habilidades que melhor representam você.</p>
+              </div>
+            </div>
+            <span class="section-xp-tag" id="tag-skills" style="margin-top:12px;">⚡ +60 XP ao selecionar 3+</span>
+            <div class="skills-wrap" id="skillsWrap" style="margin-top:12px;">
+              <span class="skill-chip" onclick="toggleSkill(this)">JavaScript</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Python</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">React</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Node.js</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">SQL</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Machine Learning</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Design UI/UX</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Comunicação</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Trabalho em equipe</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Liderança</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Resolução de problemas</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Figma</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">Git</span>
+              <span class="skill-chip" onclick="toggleSkill(this)">DevOps</span>
+            </div>
+          </div>
+
+          <!-- EXPERIÊNCIA -->
+          <div class="card" id="card-exp">
+            <div class="section-actions">
+              <div>
+                <div class="card-title">Experiência profissional</div>
+                <p class="card-subtitle" style="margin-bottom:0">Projetos pessoais e de cursos também são válidos.</p>
+              </div>
+              <button class="btn-add" onclick="addExperience()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar
+              </button>
+            </div>
+            <span class="section-xp-tag" id="tag-exp" style="margin-top:12px;">💼 +100 XP ao adicionar</span>
+            <div id="expList" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;"></div>
+            <div id="expEmpty" style="text-align:center;padding:28px;color:#a1a1aa;font-size:14px;margin-top:4px;">
+              <div style="font-size:32px;margin-bottom:8px;">💼</div>
+              <div>Nenhuma experiência adicionada ainda.</div>
+              <div style="font-size:12px;margin-top:4px;">Clique em "Adicionar" para começar!</div>
+            </div>
+          </div>
+
+          <!-- CERTIFICADOS -->
+          <div class="card" id="card-cert">
+            <div class="section-actions">
+              <div>
+                <div class="card-title">Certificados</div>
+              </div>
+              <button class="btn-add" onclick="addCertificate()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar
+              </button>
+            </div>
+            <span class="section-xp-tag" id="tag-cert" style="margin-top:12px;">🏆 +80 XP ao adicionar</span>
+            <div id="certList" style="margin-top:12px;display:flex;flex-direction:column;gap:10px;"></div>
+            <div id="certEmpty" style="text-align:center;padding:28px;color:#a1a1aa;font-size:14px;margin-top:4px;">
+              <div style="font-size:32px;margin-bottom:8px;">🏆</div>
+              <div>Nenhum certificado adicionado ainda.</div>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="actions-row">
+            <button class="btn-primary" onclick="saveProfile()">Salvar Perfil</button>
+            <button class="btn-secondary">Cancelar</button>
+          </div>
+
+        </div><!-- /form-col -->
+
+        <!-- GAMIFICATION COLUMN -->
+        <div class="gamif-col">
+
+          <!-- Progress Ring -->
+          <div class="progress-card">
+            <div class="progress-title">📊 Completude do Perfil</div>
+            <div class="ring-wrap">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="40"/>
+              </svg>
+              <div class="ring-text">
+                <div class="ring-pct" id="ringPct">0%</div>
+                <div class="ring-sub">completo</div>
+              </div>
+            </div>
+            <div class="progress-sections" id="progressSections">
+              <div class="progress-section-row">
+                <span class="ps-label">Foto</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-photo" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-photo">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Dados</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-dados" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-dados">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Sobre mim</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-sobre" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-sobre">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Links</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-links" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-links">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Habilidades</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-skills" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-skills">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Experiência</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-exp" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-exp">○</span>
+              </div>
+              <div class="progress-section-row">
+                <span class="ps-label">Certificados</span>
+                <div class="ps-bar"><div class="ps-bar-fill" id="ps-cert" style="width:0%"></div></div>
+                <span class="ps-check" id="psc-cert">○</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Achievements -->
+          <div class="achiev-card">
+            <div class="achiev-title">🏅 Conquistas</div>
+            <div class="achiev-list">
+              <div class="achiev-item" id="ach-first-step">
+                <div class="achiev-icon">👣</div>
+                <div class="achiev-info">
+                  <div class="achiev-name">Primeiro passo</div>
+                  <div class="achiev-desc">Preencha qualquer campo</div>
+                </div>
+                <span class="achiev-pts">+10 XP</span>
+              </div>
+              <div class="achiev-item" id="ach-foto">
+                <div class="achiev-icon">📸</div>
+                <div class="achiev-info">
+                  <div class="achiev-name">Rosto conhecido</div>
+                  <div class="achiev-desc">Adicione sua foto</div>
+                </div>
+                <span class="achiev-pts">+50 XP</span>
+              </div>
+              <div class="achiev-item" id="ach-links">
+                <div class="achiev-icon">🌐</div>
+                <div class="achiev-info">
+                  <div class="achiev-name">Presença digital</div>
+                  <div class="achiev-desc">Adicione 2 links</div>
+                </div>
+                <span class="achiev-pts">+40 XP</span>
+              </div>
+              <div class="achiev-item" id="ach-skills">
+                <div class="achiev-icon">⚡</div>
+                <div class="achiev-info">
+                  <div class="achiev-name">Multiskilled</div>
+                  <div class="achiev-desc">Selecione 5 habilidades</div>
+                </div>
+                <span class="achiev-pts">+60 XP</span>
+              </div>
+              <div class="achiev-item" id="ach-complete">
+                <div class="achiev-icon">🌟</div>
+                <div class="achiev-info">
+                  <div class="achiev-name">Perfil Completo</div>
+                  <div class="achiev-desc">Preencha tudo</div>
+                </div>
+                <span class="achiev-pts">+200 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Streak -->
+          <div class="streak-card">
+            <div class="streak-emoji">🔥</div>
+            <div class="streak-number">1</div>
+            <div class="streak-label">dia de progresso</div>
+            <div class="streak-days">
+              <div class="streak-day done">Hj</div>
+              <div class="streak-day">2</div>
+              <div class="streak-day">3</div>
+              <div class="streak-day">4</div>
+              <div class="streak-day">5</div>
+              <div class="streak-day">6</div>
+              <div class="streak-day">7</div>
+            </div>
+          </div>
+
+        </div><!-- /gamif-col -->
+      </div><!-- /form-layout -->
+
+    </div>
+  </main>
+
+  <!-- ░░░ TOAST ░░░ -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon">🎉</div>
+    <div class="toast-text" id="toastText">Você ganhou pontos!</div>
+    <div class="toast-points" id="toastPoints">+50</div>
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────
+    // Estado global
+    // ─────────────────────────────────────────
+    const state = {
+      xp: 0,
+      completedMissions: new Set(),
+      unlockedAchievements: new Set(),
+      filledFields: new Set(),
+      photoUploaded: false,
+      selectedSkills: 0,
+      experienceCount: 0,
+      certificateCount: 0,
+      sectionProgress: { photo:0, dados:0, sobre:0, links:0, skills:0, exp:0, cert:0 },
+      firstFieldDone: false,
+    };
+
+    const MISSION_XP = { photo:50, dados:80, sobre:60, links:70, skills:60, exp:100, cert:80 };
+    const SECTION_WEIGHT = { photo:1, dados:4, sobre:1, links:2, skills:1, exp:1, cert:1 }; // total 11
+    const TOTAL_WEIGHT = 11;
+
+    // ─────────────────────────────────────────
+    // Toast
+    // ─────────────────────────────────────────
+    let toastTimer = null;
+    function showToast(icon, text, pts) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastText').textContent = text;
+      document.getElementById('toastPoints').textContent = '+' + pts + ' XP';
+      t.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ─────────────────────────────────────────
+    // Confetti
+    // ─────────────────────────────────────────
+    function fireConfetti(x, y) {
+      const colors = ['#7ab934','#2ca942','#fbbf24','#f472b6','#60a5fa','#a78bfa'];
+      for (let i = 0; i < 18; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `
+          left: ${x + (Math.random()-0.5)*120}px;
+          top: ${y}px;
+          background: ${colors[Math.floor(Math.random()*colors.length)]};
+          transform: rotate(${Math.random()*360}deg);
+          animation-delay: ${Math.random()*0.3}s;
+          animation-duration: ${0.8 + Math.random()*0.6}s;
+          border-radius: ${Math.random()>0.5?'50%':'2px'};
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1400);
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // XP & UI Update
+    // ─────────────────────────────────────────
+    function addXP(amount) {
+      state.xp += amount;
+      updateXPUI();
+    }
+
+    function updateXPUI() {
+      const xp = state.xp;
+      document.getElementById('xpPoints').textContent = xp;
+      document.getElementById('xpCurrent').textContent = xp + ' XP';
+
+      // Level
+      let level = 1, levelName = '⭐ Nível 1', nextXP = 500;
+      if (xp >= 500) { level = 2; levelName = '🌿 Nível 2'; nextXP = 1000; }
+      if (xp >= 1000) { level = 3; levelName = '🔥 Nível 3'; nextXP = 1500; }
+      document.getElementById('xpLevel').textContent = levelName;
+
+      const pct = Math.min((xp / nextXP) * 100, 100);
+      document.getElementById('xpBarFill').style.width = pct + '%';
+
+      // Ring
+      const sections = Object.values(state.sectionProgress);
+      const totalCompleted = sections.reduce((a,b)=>a+b,0);
+      const ringPct = Math.round((totalCompleted / TOTAL_WEIGHT) * 100);
+      document.getElementById('ringPct').textContent = ringPct + '%';
+      const circumference = 251.2;
+      const offset = circumference - (ringPct / 100) * circumference;
+      document.getElementById('ringFill').style.strokeDashoffset = offset;
+
+      // Banner title
+      const banner = document.getElementById('xpBanner');
+      if (xp === 0) {
+        banner.querySelector('.xp-title').textContent = 'Comece sua jornada!';
+      } else if (ringPct < 50) {
+        banner.querySelector('.xp-title').textContent = 'Bom progresso! Continue assim 💪';
+      } else if (ringPct < 100) {
+        banner.querySelector('.xp-title').textContent = 'Quase lá! Perfil quase completo 🚀';
+      } else {
+        banner.querySelector('.xp-title').textContent = 'Perfil 100% completo! 🌟';
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Mission complete
+    // ─────────────────────────────────────────
+    function completeMission(key) {
+      if (state.completedMissions.has(key)) return;
+      state.completedMissions.add(key);
+
+      const chip = document.getElementById('m-' + key);
+      if (chip) {
+        chip.classList.remove('active-mission');
+        chip.classList.add('done');
+        chip.querySelector('.mission-check').textContent = '✓';
+      }
+
+      // Update count
+      document.getElementById('missionCount').textContent =
+        state.completedMissions.size + ' / 7 concluídas';
+
+      // XP tag
+      const tag = document.getElementById('tag-' + key);
+      if (tag) tag.classList.add('earned');
+
+      // Section bar
+      const w = SECTION_WEIGHT[key] || 1;
+      state.sectionProgress[key] = w;
+      document.getElementById('ps-' + key).style.width = '100%';
+      document.getElementById('psc-' + key).textContent = '✅';
+
+      // Card highlight off
+      const card = document.getElementById('card-' + key);
+      if (card) card.classList.remove('section-active');
+
+      addXP(MISSION_XP[key]);
+      showToast('🎯', 'Missão concluída: ' + key, MISSION_XP[key]);
+
+      // Achievements check
+      checkAchievements();
+      // Confetti in mission chip
+      if (chip) {
+        const r = chip.getBoundingClientRect();
+        fireConfetti(r.left + r.width/2, r.top + r.height/2);
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Field check
+    // ─────────────────────────────────────────
+    const sectionFields = {
+      dados: ['f-nome','f-cpf','f-tel','f-email','f-nasc','f-cidade'],
+      links: ['f-linkedin','f-github','f-portfolio','f-video'],
+    };
+
+    function checkField(id, xpId, section) {
+      const input = document.getElementById(id);
+      const val = input.value.trim();
+      const xpEl = document.getElementById(xpId);
+      const wasEmpty = !state.filledFields.has(id);
+
+      if (val.length > 0) {
+        input.classList.add('filled');
+        if (wasEmpty) {
+          state.filledFields.add(id);
+          xpEl.classList.add('show');
+          firstFieldCheck();
+        }
+      } else {
+        input.classList.remove('filled');
+        state.filledFields.delete(id);
+        xpEl.classList.remove('show');
+      }
+
+      // Check if whole section is done
+      checkSectionCompletion(section);
+    }
+
+    function checkTextarea(id, xpId, section) {
+      const ta = document.getElementById(id);
+      const len = ta.value.trim().length;
+      document.getElementById('sobreCount').textContent = len + ' / 50 caracteres mínimos';
+      const xpEl = document.getElementById(xpId);
+
+      if (len >= 50) {
+        ta.classList.add('filled');
+        xpEl.classList.add('show');
+        state.filledFields.add(id);
+        checkSectionCompletion(section);
+        firstFieldCheck();
+      } else {
+        ta.classList.remove('filled');
+        xpEl.classList.remove('show');
+        state.filledFields.delete(id);
+      }
+    }
+
+    function checkSectionCompletion(section) {
+      if (section === 'dados') {
+        const required = ['f-nome','f-cpf','f-tel','f-email','f-cidade'];
+        const filled = required.filter(id => state.filledFields.has(id)).length;
+        const pct = (filled / required.length) * 100;
+        document.getElementById('ps-dados').style.width = pct + '%';
+        if (filled === required.length) completeMission('dados');
+      } else if (section === 'sobre') {
+        if (state.filledFields.has('f-sobre')) completeMission('sobre');
+      } else if (section === 'links') {
+        const fields = ['f-linkedin','f-github','f-portfolio','f-video'];
+        const filled = fields.filter(id => state.filledFields.has(id)).length;
+        const pct = (filled / 2) * 100; // 2 is "enough"
+        document.getElementById('ps-links').style.width = Math.min(pct,100) + '%';
+        if (filled >= 2) {
+          completeMission('links');
+          checkAchievements();
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Photo
+    // ─────────────────────────────────────────
+    function uploadPhoto() {
+      if (state.photoUploaded) return;
+      state.photoUploaded = true;
+      const av = document.getElementById('photoAvatar');
+      av.textContent = '😊';
+      av.classList.add('uploaded');
+      const popup = document.getElementById('photoXpPopup');
+      popup.style.display = 'flex';
+      state.filledFields.add('photo');
+      state.sectionProgress.photo = 1;
+      completeMission('photo');
+      firstFieldCheck();
+      setTimeout(() => { popup.style.display = 'none'; }, 2500);
+    }
+
+    // ─────────────────────────────────────────
+    // Skills
+    // ─────────────────────────────────────────
+    function toggleSkill(el) {
+      el.classList.toggle('selected');
+      state.selectedSkills = document.querySelectorAll('.skill-chip.selected').length;
+      const pct = Math.min((state.selectedSkills / 3) * 100, 100);
+      document.getElementById('ps-skills').style.width = pct + '%';
+      if (state.selectedSkills >= 3 && !state.completedMissions.has('skills')) {
+        completeMission('skills');
+      }
+      if (state.selectedSkills >= 5) {
+        unlockAchievement('ach-skills','⚡','Multiskilled desbloqueada!',60);
+      }
+      firstFieldCheck();
+      updateXPUI();
+    }
+
+    // ─────────────────────────────────────────
+    // Experience
+    // ─────────────────────────────────────────
+    function addExperience() {
+      state.experienceCount++;
+      const list = document.getElementById('expList');
+      document.getElementById('expEmpty').style.display = 'none';
+      const item = document.createElement('div');
+      item.style.cssText = 'border:1.5px solid #e4e4e7;border-radius:12px;padding:14px 16px;background:#fafafa;';
+      item.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Cargo / Projeto</label>
+            <input class="form-input" placeholder="Ex: Desenvolvedor Frontend" style="font-size:14px;height:40px;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Empresa / Curso</label>
+            <input class="form-input" placeholder="Ex: SCTEC" style="font-size:14px;height:40px;" />
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:#7ab934;font-weight:600;">✅ +100 XP ao salvar</div>
+      `;
+      list.appendChild(item);
+      if (!state.completedMissions.has('exp')) {
+        completeMission('exp');
+        document.getElementById('ps-exp').style.width = '100%';
+      }
+      updateXPUI();
+    }
+
+    // ─────────────────────────────────────────
+    // Certificates
+    // ─────────────────────────────────────────
+    function addCertificate() {
+      state.certificateCount++;
+      const list = document.getElementById('certList');
+      document.getElementById('certEmpty').style.display = 'none';
+      const item = document.createElement('div');
+      item.style.cssText = 'border:1.5px solid #e4e4e7;border-radius:12px;padding:14px 16px;background:#fafafa;';
+      item.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Nome do certificado</label>
+            <input class="form-input" placeholder="Ex: AWS Cloud Practitioner" style="font-size:14px;height:40px;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instituição</label>
+            <input class="form-input" placeholder="Ex: Amazon" style="font-size:14px;height:40px;" />
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:#7ab934;font-weight:600;">✅ +80 XP ao salvar</div>
+      `;
+      list.appendChild(item);
+      if (!state.completedMissions.has('cert')) {
+        completeMission('cert');
+        document.getElementById('ps-cert').style.width = '100%';
+      }
+      updateXPUI();
+    }
+
+    // ─────────────────────────────────────────
+    // Achievements
+    // ─────────────────────────────────────────
+    function unlockAchievement(id, icon, msg, xpBonus) {
+      if (state.unlockedAchievements.has(id)) return;
+      state.unlockedAchievements.add(id);
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('unlocked');
+        const achIcon = el.querySelector('.achiev-icon');
+        if (achIcon) {
+          achIcon.style.transform = 'scale(1.2)';
+          setTimeout(() => achIcon.style.transform = 'scale(1)', 400);
+        }
+        const r = el.getBoundingClientRect();
+        fireConfetti(r.left + r.width/2, r.top);
+      }
+      addXP(xpBonus);
+      showToast(icon, msg, xpBonus);
+    }
+
+    function checkAchievements() {
+      // First step
+      if (!state.unlockedAchievements.has('ach-first-step') && state.filledFields.size > 0) {
+        unlockAchievement('ach-first-step','👣','Primeiro passo dado!', 10);
+      }
+      // Foto
+      if (state.photoUploaded) {
+        unlockAchievement('ach-foto','📸','Rosto conhecido desbloqueada!', 0);
+      }
+      // Links
+      const linksCount = ['f-linkedin','f-github','f-portfolio','f-video'].filter(id => state.filledFields.has(id)).length;
+      if (linksCount >= 2) {
+        unlockAchievement('ach-links','🌐','Presença digital desbloqueada!', 0);
+      }
+      // Perfil completo
+      if (state.completedMissions.size === 7) {
+        unlockAchievement('ach-complete','🌟','Perfil 100% completo!', 200);
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // First field bonus
+    // ─────────────────────────────────────────
+    function firstFieldCheck() {
+      if (!state.firstFieldDone && state.filledFields.size > 0) {
+        state.firstFieldDone = true;
+        checkAchievements();
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Save
+    // ─────────────────────────────────────────
+    function saveProfile() {
+      const incomplete = 7 - state.completedMissions.size;
+      if (incomplete > 0) {
+        showToast('💡', 'Complete mais ' + incomplete + ' seção(ões) para 100%!', 0);
+        document.getElementById('toastPoints').textContent = incomplete + ' faltam';
+      } else {
+        showToast('🌟', 'Perfil salvo com sucesso!', state.xp);
+        fireConfetti(window.innerWidth/2, window.innerHeight/2);
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Masks
+    // ─────────────────────────────────────────
+    function maskCPF(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,11);
+      v = v.replace(/(\d{3})(\d)/,'$1.$2');
+      v = v.replace(/(\d{3})(\d)/,'$1.$2');
+      v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+      el.value = v;
+    }
+    function maskPhone(el) {
+      let v = el.value.replace(/\D/g,'').slice(0,11);
+      v = v.replace(/(\d{2})(\d)/,'($1) $2');
+      v = v.replace(/(\d{5})(\d)/,'$1-$2');
+      el.value = v;
+    }
+
+    // init
+    updateXPUI();
+  </script>
+</body>
+</html>

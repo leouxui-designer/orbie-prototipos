@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCTEC — Portal de Talentos · Banco de Talentos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ══════════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="navbar-brand">
+      <span class="navbar-brand-title">SCTEC</span>
+      <span class="navbar-brand-sub">Portal de Talentos</span>
+    </div>
+    <div class="navbar-spacer"></div>
+    <span class="navbar-company">TechCorp Soluções Ltda.</span>
+    <div class="navbar-avatar" aria-label="Avatar da empresa TC">TC</div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR NAV
+  ══════════════════════════════════════════ -->
+  <nav class="sidebar" aria-label="Menu principal">
+    <div class="sidebar-header">
+      <div class="sidebar-company">TechCorp Soluções Ltda.</div>
+      <div class="sidebar-company-sub">Parceiro ativo</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li>
+        <a class="sidebar-item ativo" href="#" aria-current="page">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Buscar Talentos
+        </a>
+      </li>
+      <li>
+        <a class="sidebar-item" href="#">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          Perfil da Empresa
+        </a>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <a class="sidebar-item" href="#">
+        <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        Sair
+      </a>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       CONTEÚDO PRINCIPAL (3 colunas)
+  ══════════════════════════════════════════ -->
+  <div id="layout-main" role="main">
+
+    <!-- ── PAINEL DE FILTROS LATERAL ───────────── -->
+    <aside class="filters-panel" aria-label="Filtros de busca">
+
+      <div class="filters-panel-header">
+        <span class="filters-panel-title">Filtros</span>
+        <button id="btn-limpar-filtros" class="btn-limpar" type="button" aria-label="Limpar todos os filtros">Limpar todos</button>
+      </div>
+
+      <div class="filters-panel-body">
+
+        <!-- LOCALIZAÇÃO -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            LOCALIZAÇÃO
+          </div>
+          <select id="filtro-regiao" class="filter-select-block" aria-label="Filtrar por região">
+            <option value="">Região</option>
+            <option value="Sul">Sul</option>
+            <option value="Sudeste">Sudeste</option>
+            <option value="Centro-Oeste">Centro-Oeste</option>
+            <option value="Nordeste">Nordeste</option>
+            <option value="Norte">Norte</option>
+          </select>
+          <select id="filtro-cidade" class="filter-select-block" aria-label="Filtrar por cidade">
+            <option value="">Cidade</option>
+            <option value="Florianópolis">Florianópolis</option>
+            <option value="Tubarão">Tubarão</option>
+            <option value="Criciúma">Criciúma</option>
+            <option value="Araranguá">Araranguá</option>
+            <option value="Laguna">Laguna</option>
+            <option value="Jaguaruna">Jaguaruna</option>
+            <option value="Içara">Içara</option>
+            <option value="Imbituba">Imbituba</option>
+            <option value="São José">São José</option>
+            <option value="Palhoça">Palhoça</option>
+          </select>
+        </div>
+
+        <!-- ESPECIALIDADE -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            ESPECIALIDADE
+          </div>
+          <div class="filter-chips" role="group" aria-label="Filtrar por especialidade">
+            <button class="filter-chip" data-filter="especialidade" data-value="Front-end" type="button">Front-end</button>
+            <button class="filter-chip" data-filter="especialidade" data-value="Back-end" type="button">Back-end</button>
+            <button class="filter-chip" data-filter="especialidade" data-value="Mobile" type="button">Mobile</button>
+            <button class="filter-chip" data-filter="especialidade" data-value="Data/BI" type="button">Data/BI</button>
+            <button class="filter-chip" data-filter="especialidade" data-value="DevOps" type="button">DevOps</button>
+          </div>
+          <select id="filtro-tecnologia" class="filter-select-block" aria-label="Filtrar por tecnologia">
+            <option value="">Tecnologias</option>
+            <option value="React">React</option>
+            <option value="TypeScript">TypeScript</option>
+            <option value="Node.js">Node.js</option>
+            <option value="Python">Python</option>
+            <option value="Java">Java</option>
+            <option value="Kotlin">Kotlin</option>
+            <option value="Swift">Swift</option>
+            <option value="Flutter">Flutter</option>
+            <option value="React Native">React Native</option>
+            <option value="Docker">Docker</option>
+            <option value="Kubernetes">Kubernetes</option>
+            <option value="AWS">AWS</option>
+            <option value="SQL">SQL</option>
+            <option value="Go">Go</option>
+            <option value="Rust">Rust</option>
+          </select>
+        </div>
+
+        <!-- FAIXA ETÁRIA -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            FAIXA ETÁRIA
+          </div>
+          <select id="filtro-faixa-etaria" class="filter-select-block" aria-label="Filtrar por faixa etária">
+            <option value="">Qualquer idade</option>
+            <option value="18-24">18 – 24 anos</option>
+            <option value="25-30">25 – 30 anos</option>
+            <option value="31-40">31 – 40 anos</option>
+            <option value="41+">Acima de 40</option>
+          </select>
+        </div>
+
+        <!-- FORMAÇÕES SCTEC -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8.56 2.9A7 7 0 0 1 19 9v4l2 1-10 5L1 14l2-1V9A7 7 0 0 1 8 2.9"/><path d="M12 22v-5"/></svg>
+            FORMAÇÕES SCTEC
+          </div>
+          <label class="filter-checkbox">
+            <input type="checkbox" id="chk-carreira-tech" value="Carreira Tech" data-filter="formacao" />
+            <span class="checkmark"></span>
+            Carreira Tech
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" id="chk-ia-devs" value="IA para DEVs" data-filter="formacao" />
+            <span class="checkmark"></span>
+            IA para DEVs
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" id="chk-ia-pratica" value="IA na Prática" data-filter="formacao" />
+            <span class="checkmark"></span>
+            IA na Prática
+          </label>
+        </div>
+
+        <!-- SOFT SKILLS E METODOLOGIAS -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+            SOFT SKILLS E METODOLOGIAS
+          </div>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Vivência em Scrum / Kanban" data-filter="softskill" />
+            <span class="checkmark"></span>
+            Vivência em Scrum / Kanban
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Projetos em equipe (GitHub colaborativo)" data-filter="softskill" />
+            <span class="checkmark"></span>
+            Projetos em equipe (GitHub)
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Participação em hackathons" data-filter="softskill" />
+            <span class="checkmark"></span>
+            Participação em hackathons
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Boa comunicação" data-filter="softskill" />
+            <span class="checkmark"></span>
+            Boa comunicação
+          </label>
+        </div>
+
+        <!-- VÍDEO DE APRESENTAÇÃO -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+            VÍDEO DE APRESENTAÇÃO
+          </div>
+          <label class="filter-toggle">
+            <input type="checkbox" id="toggle-video" data-filter="video" role="switch" aria-checked="false" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            Possui vídeo de apresentação
+          </label>
+        </div>
+
+        <!-- GÊNERO -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+            GÊNERO
+          </div>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Feminino" data-filter="genero" />
+            <span class="checkmark"></span>
+            Feminino
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Masculino" data-filter="genero" />
+            <span class="checkmark"></span>
+            Masculino
+          </label>
+          <label class="filter-checkbox">
+            <input type="checkbox" value="Não-binário / Outro" data-filter="genero" />
+            <span class="checkmark"></span>
+            Não-binário / Outro
+          </label>
+        </div>
+
+        <!-- DIVERSIDADE & INCLUSÃO -->
+        <div class="filter-group-block">
+          <div class="filter-group-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            DIVERSIDADE &amp; INCLUSÃO
+          </div>
+          <label class="filter-toggle">
+            <input type="checkbox" id="toggle-pcd" data-filter="pcd" role="switch" aria-checked="false" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            Pessoa com Deficiência (PCD)
+          </label>
+          <label class="filter-toggle">
+            <input type="checkbox" id="toggle-div-genero" data-filter="divgenero" role="switch" aria-checked="false" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            Diversidade de gênero prioritária
+          </label>
+        </div>
+
+      </div><!-- /filters-panel-body -->
+    </aside>
+
+    <!-- ── ÁREA DE RESULTADOS ─────────────────── -->
+    <div id="results-area">
+
+      <!-- Cabeçalho da página -->
+      <div class="page-header">
+        <h1 class="page-title">Banco de Talentos</h1>
+        <p class="page-subtitle">Filtre e explore perfis de alunos formados pelo programa SCTEC</p>
+      </div>
+
+      <!-- Barra de busca -->
+      <section class="search-bar-section" aria-label="Busca e ordenação">
+        <div class="search-input-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input
+            id="busca-input"
+            class="search-input"
+            type="search"
+            placeholder="Buscar por nome, cidade, cargo ou tecnologia..."
+            aria-label="Buscar candidatos"
+            autocomplete="off"
+          />
+        </div>
+        <div class="filter-group">
+          <span class="sort-label">Ordenar:</span>
+          <select id="filtro-ordenacao" class="filter-select" aria-label="Ordenar resultados">
+            <option value="relevancia">Relevância</option>
+            <option value="nome">Nome A–Z</option>
+            <option value="disponibilidade">Disponibilidade</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Chips de filtros ativos -->
+      <div id="active-filters-bar" class="active-filters-bar" aria-label="Filtros ativos" style="display:none"></div>
+
+      <!-- Toolbar de resultados -->
+      <div class="results-toolbar">
+        <p id="total-label" class="total-label" aria-live="polite" aria-atomic="true">
+          Exibindo <strong>48</strong> talentos
+        </p>
+        <div class="toolbar-hint" aria-label="Dicas de navegação">
+          <span>Clique num candidato para o perfil rápido</span>
+          <span class="kbd">←</span><span class="kbd">→</span><span>navegar</span>
+          <span class="kbd">Esc</span><span>fechar</span>
+        </div>
+      </div>
+
+      <!-- Lista de candidatos -->
+      <div id="lista-candidatos" class="candidates-list" role="list" aria-label="Lista de candidatos"></div>
+
+      <!-- Paginação -->
+      <nav id="paginacao" class="pagination-section" role="navigation" aria-label="Paginação de candidatos"></nav>
+
+    </div><!-- /results-area -->
+
+    <!-- ── PAINEL DE PERFIL RÁPIDO ────────────── -->
+    <aside id="quick-panel" role="complementary" aria-label="Perfil rápido do candidato" aria-live="polite">
+
+      <div class="panel-nav">
+        <div class="panel-nav-left">
+          <button id="btn-nav-anterior" class="panel-nav-btn" type="button" aria-label="Candidato anterior" title="Anterior (←)">‹</button>
+          <button id="btn-nav-proximo" class="panel-nav-btn" type="button" aria-label="Próximo candidato" title="Próximo (→)">›</button>
+          <div class="panel-nav-counters">
+            <span id="nav-contador-global" class="nav-global">1 de 48 candidatos</span>
+            <span id="nav-contador-pagina" class="nav-page">Página 1/5 · 1 de 10</span>
+          </div>
+        </div>
+        <div class="panel-nav-right">
+          <button id="btn-fechar-painel" class="btn-fechar" type="button" aria-label="Fechar painel (Esc)" title="Fechar (Esc)">✕</button>
+        </div>
+      </div>
+
+      <div id="prox-pag-hint" aria-live="polite" aria-atomic="true"><span class="hint-pagina"></span></div>
+
+      <div class="progress-section" aria-label="Progresso de revisão">
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <div id="progress-bar-fill" class="progress-fill" style="width:2%"></div>
+        </div>
+        <span id="progress-text" class="progress-text">2% revisados</span>
+      </div>
+
+      <div class="panel-body">
+        <div class="painel-header">
+          <div id="painel-avatar" class="painel-avatar" aria-hidden="true">JS</div>
+          <div class="painel-header-info">
+            <div id="painel-nome" class="painel-nome">—</div>
+            <div id="painel-cargo" class="painel-cargo">—</div>
+            <div id="painel-local" class="painel-local">—</div>
+            <div id="painel-attr-badges" class="painel-badges"></div>
+          </div>
+        </div>
+
+        <div class="painel-quick-grid">
+          <div class="quick-item">
+            <div class="quick-label">Senioridade</div>
+            <div id="painel-senioridade" class="quick-value">—</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-label">Experiência</div>
+            <div id="painel-experiencia" class="quick-value">—</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-label">Disponibilidade</div>
+            <div id="painel-disponibilidade" class="painel-disp">—</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-label">Pretensão salarial</div>
+            <div id="painel-pretensao" class="quick-value">—</div>
+          </div>
+          <div class="quick-item" style="grid-column: 1 / -1;">
+            <div class="quick-label">Status atual</div>
+            <div id="painel-status-atual" class="painel-status-val">Não avaliado</div>
+          </div>
+        </div>
+
+        <div class="painel-section">
+          <div class="painel-section-title">Resumo profissional</div>
+          <p id="painel-resumo" class="painel-resumo">—</p>
+        </div>
+        <div class="painel-section">
+          <div class="painel-section-title">Tecnologias</div>
+          <div id="painel-tecnologias" class="painel-tags"></div>
+        </div>
+        <div class="painel-section">
+          <div class="painel-section-title">Competências técnicas</div>
+          <div id="painel-competencias" class="painel-tags"></div>
+        </div>
+        <div class="painel-section">
+          <div class="painel-section-title">Formações SCTEC</div>
+          <div id="painel-formacoes" class="painel-tags"></div>
+        </div>
+        <div class="painel-section">
+          <div class="painel-section-title">Soft skills e metodologias</div>
+          <div id="painel-softskills" class="painel-tags"></div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <div class="actions-label">Avaliar candidato</div>
+        <div class="actions-row" role="group" aria-label="Ações de avaliação">
+          <button class="action-btn-status" data-status="favorito" type="button" title="Favorito (F)">⭐ Favorito</button>
+          <button class="action-btn-status" data-status="selecionado" type="button" title="Selecionado (S)">✅ Selecionar</button>
+          <button class="action-btn-status" data-status="descartado" type="button" title="Descartar (D)">✕ Descartar</button>
+        </div>
+        <button class="btn-perfil-completo" type="button" onclick="alert('Abriria o perfil completo em nova página.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          Ver perfil completo
+        </button>
+        <div class="actions-keyboard-hint">
+          <span class="keyboard-hint-item"><span class="kbd">F</span> Favorito</span>
+          <span class="keyboard-hint-item"><span class="kbd">S</span> Selecionar</span>
+          <span class="keyboard-hint-item"><span class="kbd">D</span> Descartar</span>
+          <span class="keyboard-hint-item"><span class="kbd">Esc</span> Fechar</span>
+        </div>
+      </div>
+
+    </aside>
+
+  </div><!-- /layout-main -->
+</div><!-- /app-shell -->
+
+<script src="script.js"></script>
+</body>
+</html>

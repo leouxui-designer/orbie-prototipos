@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Empresas - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ RESET & VARIABLES ============ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    :root {
+      --color-primary: #2CA942;
+      --color-primary-light: #55B13A;
+      --color-dark: #141414;
+      --color-text-default: #000000;
+      --color-text-secondary: rgba(0,0,0,0.8);
+      --color-text-tertiary: #454545;
+      --color-text-muted: #6B7280;
+      --color-text-invert: #FFFFFF;
+      --color-bg-white: #FFFFFF;
+      --color-bg-light: #F8F9FB;
+      --font-header: 'Montserrat', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+      --transition-fast: 150ms ease;
+      --transition-default: 250ms ease;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg-light);
+      color: var(--color-text-default);
+      padding-top: 80px;
+    }
+
+    /* ============ NAVBAR ============ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1100;
+      height: 80px;
+      background: var(--color-bg-white);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+    }
+    .navbar__inner {
+      width: 100%;
+      max-width: 100%;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar__brand {
+      font-family: var(--font-header);
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--color-primary);
+      letter-spacing: -0.5px;
+    }
+    .navbar__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #1a1a1a;
+      color: white;
+    }
+    .navbar__company {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+    .navbar__avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: #303030;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow var(--transition-fast);
+    }
+    .navbar__avatar:hover { box-shadow: 0 0 0 3px rgba(44,169,66,0.2); }
+
+    /* ============ LAYOUT ============ */
+    .painel { display: flex; min-height: calc(100vh - 80px); }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      width: 260px;
+      background: #1a1a1a;
+      color: white;
+      padding: 32px 0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 80px; left: 0;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar__header {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+    .sidebar__company { font-family: var(--font-header); font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .sidebar__plan { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .sidebar__nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; flex: 1; }
+    .sidebar__link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 8px;
+      font-size: 14px; color: rgba(255,255,255,0.7);
+      transition: all var(--transition-fast);
+    }
+    .sidebar__link:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar__link--active { background: rgba(44,169,66,0.15); color: var(--color-primary); font-weight: 500; }
+    .sidebar__link svg { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
+    .sidebar__link--active svg { opacity: 1; }
+    .sidebar__badge {
+      margin-left: auto;
+      background: #f57f17; color: white;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+    }
+    .sidebar__footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: auto;
+    }
+    .sidebar__logout {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; color: rgba(255,255,255,0.5);
+      cursor: pointer; transition: color var(--transition-fast);
+    }
+    .sidebar__logout:hover { color: white; }
+
+    /* ============ MAIN ============ */
+    .painel__main {
+      flex: 1;
+      padding: 32px 40px;
+      background: var(--color-bg-light);
+      margin-left: 260px;
+    }
+    .painel__header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .painel__title { font-family: var(--font-header); font-size: 28px; font-weight: 700; }
+    .painel__subtitle { font-size: 14px; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* ============ TABS ============ */
+    .page-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid rgba(0,0,0,0.06);
+      margin-bottom: 28px;
+    }
+    .page-tab {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-tab:hover { color: var(--color-text-default); }
+    .page-tab--active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+    .tab-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 20px; height: 20px; padding: 0 6px;
+      border-radius: 10px; font-size: 11px; font-weight: 700;
+    }
+    .tab-count--warn { background: #FFF3E0; color: #E65100; }
+    .tab-count--neutral { background: rgba(0,0,0,0.06); color: var(--color-text-muted); }
+
+    /* ============ FILTERS ============ */
+    .painel-filters {
+      display: flex; gap: 12px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .painel-filter__search {
+      padding: 8px 16px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 8px; font-size: 14px;
+      color: var(--color-text-default);
+      background: var(--color-bg-white);
+      min-width: 260px;
+      font-family: var(--font-body);
+    }
+    .painel-filter__search:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(44,169,66,0.1); }
+    .painel-filter__search::placeholder { color: var(--color-text-muted); }
+    .painel-filter__select {
+      padding: 8px 36px 8px 16px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 8px; font-size: 14px;
+      color: var(--color-text-secondary);
+      background: var(--color-bg-white);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+    .painel-filter__select:focus { outline: none; border-color: var(--color-primary); }
+
+    /* ============ BTN ============ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      border: none; transition: all var(--transition-fast);
+    }
+    .btn--primary { background: var(--color-primary); color: white; }
+    .btn--primary:hover { background: var(--color-primary-light); }
+    .btn--ghost {
+      background: none; color: var(--color-text-secondary);
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+    .btn--ghost:hover { background: rgba(0,0,0,0.04); }
+    .btn--sm { padding: 7px 14px; font-size: 13px; }
+    .btn--danger { background: #FFEBEE; color: #C62828; border: 1px solid rgba(198,40,40,0.15); }
+    .btn--danger:hover { background: #FFCDD2; }
+    .btn--approve { background: rgba(44,169,66,0.1); color: #1B5E20; border: 1px solid rgba(44,169,66,0.2); }
+    .btn--approve:hover { background: rgba(44,169,66,0.18); }
+
+    /* ============ STATUS BADGE ============ */
+    .status {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+    }
+    .status--active { background: rgba(44,169,66,0.1); color: #2e7d32; }
+    .status--pending { background: rgba(255,152,0,0.12); color: #E65100; }
+    .status--inactive { background: rgba(0,0,0,0.05); color: var(--color-text-muted); }
+
+    /* ============ ACTION ICONS ============ */
+    .action-group { display: flex; align-items: center; gap: 8px; }
+    .action-icon {
+      width: 32px; height: 32px; border-radius: 6px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background var(--transition-fast);
+      color: var(--color-text-muted); border: none; background: none;
+    }
+    .action-icon:hover { background: rgba(0,0,0,0.06); color: var(--color-text-default); }
+    .action-icon svg { width: 18px; height: 18px; }
+    .toggle { position: relative; width: 36px; height: 20px; display: inline-block; cursor: pointer; vertical-align: middle; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle__slider { position: absolute; inset: 0; background: #ccc; border-radius: 20px; transition: background var(--transition-fast); }
+    .toggle__slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: transform var(--transition-fast); }
+    .toggle input:checked + .toggle__slider { background: var(--color-primary); }
+    .toggle input:checked + .toggle__slider::before { transform: translateX(16px); }
+
+    /* ============ STANDARD TABLE ============ */
+    .panel-table {
+      background: var(--color-bg-white);
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .panel-table table { width: 100%; border-collapse: collapse; }
+    .panel-table th {
+      text-align: left; padding: 12px 24px;
+      font-size: 12px; font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      background: var(--color-bg-light);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .panel-table td {
+      padding: 16px 24px; font-size: 14px;
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .panel-table tr:last-child td { border-bottom: none; }
+    .panel-table tr:hover td { background: rgba(0,0,0,0.01); }
+
+    /* ============ TOAST ============ */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-dark); color: white;
+      padding: 12px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      z-index: 9999; opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .toast--visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ============ PAGINATION ============ */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 20px 24px; }
+    .pagination__btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 500; color: var(--color-text-secondary);
+      background: none; border: 1px solid transparent; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .pagination__btn:hover { background: var(--color-bg-light); border-color: rgba(0,0,0,0.08); }
+    .pagination__btn--active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .pagination__btn--active:hover { background: var(--color-primary); }
+    .pagination__btn svg { width: 18px; height: 18px; }
+    .pagination__info { font-size: 13px; color: var(--color-text-muted); margin: 0 12px; }
+
+    /* ============ EMPTY STATE ============ */
+    .empty-state {
+      text-align: center; padding: 64px 24px;
+      color: var(--color-text-muted);
+    }
+    .empty-state__icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state__text { font-size: 14px; }
+
+    /* =========================================
+       AGRUPAMENTO DE SOLICITAÇÕES DUPLICADAS
+    ========================================= */
+
+    /* Bloco de alerta no topo quando há duplicatas */
+    .alert-banner {
+      display: flex; align-items: center; gap: 14px;
+      background: #FFF8E1; border: 1px solid #FFD54F;
+      border-radius: 10px; padding: 14px 20px;
+      margin-bottom: 20px; font-size: 14px;
+    }
+    .alert-banner__icon { font-size: 20px; flex-shrink: 0; }
+    .alert-banner__text strong { display: block; color: #E65100; font-weight: 600; margin-bottom: 2px; }
+    .alert-banner__text span { color: var(--color-text-secondary); }
+    .alert-banner__action {
+      margin-left: auto;
+      padding: 6px 14px; border-radius: 6px;
+      background: #FFE082; color: #BF360C;
+      border: none; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: background var(--transition-fast);
+    }
+    .alert-banner__action:hover { background: #FFD54F; }
+
+    /* Contêiner de grupos de empresas duplicadas */
+    .duplicates-section { margin-bottom: 32px; }
+    .duplicates-section__title {
+      font-family: var(--font-header);
+      font-size: 15px; font-weight: 700;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .duplicates-section__title::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: rgba(0,0,0,0.08);
+    }
+
+    /* Card de grupo duplicado */
+    .dup-group {
+      background: var(--color-bg-white);
+      border: 1px solid rgba(255,152,0,0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.06);
+    }
+
+    /* Cabeçalho do grupo */
+    .dup-group__header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px;
+      background: #FFFBF0;
+      border-bottom: 1px solid rgba(255,152,0,0.15);
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-fast);
+    }
+    .dup-group__header:hover { background: #FFF8E1; }
+
+    .dup-group__logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--color-primary);
+      color: white;
+      font-family: var(--font-header);
+      font-weight: 700; font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dup-group__info { flex: 1; min-width: 0; }
+    .dup-group__name {
+      font-family: var(--font-header);
+      font-weight: 700; font-size: 16px;
+      color: var(--color-text-default);
+    }
+    .dup-group__meta {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 3px;
+    }
+    .dup-group__cnpj { font-size: 13px; color: var(--color-text-muted); }
+    .dup-group__segment { font-size: 12px; color: var(--color-text-muted); }
+
+    .dup-group__pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 20px;
+      background: #FFF3E0; color: #E65100;
+      font-size: 12px; font-weight: 600;
+      white-space: nowrap;
+    }
+    .dup-group__pill svg { width: 14px; height: 14px; }
+
+    .dup-group__chevron {
+      color: var(--color-text-muted);
+      transition: transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .dup-group__chevron svg { width: 20px; height: 20px; }
+    .dup-group--open .dup-group__chevron { transform: rotate(180deg); }
+
+    /* Corpo do grupo (colapsável) */
+    .dup-group__body {
+      display: none;
+      padding: 0;
+    }
+    .dup-group--open .dup-group__body { display: block; }
+
+    /* Instrução dentro do grupo */
+    .dup-group__instruction {
+      padding: 14px 20px 10px;
+      font-size: 13px; color: #795548;
+      background: #FAF6F0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dup-group__instruction svg { width: 16px; height: 16px; color: #E65100; flex-shrink: 0; }
+
+    /* Grid de solicitações dentro do grupo */
+    .dup-requests { display: flex; flex-direction: column; }
+
+    .dup-request {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: start;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      transition: background var(--transition-fast);
+    }
+    .dup-request:last-child { border-bottom: none; }
+    .dup-request:hover { background: rgba(0,0,0,0.01); }
+
+    /* Radio do candidato a responsável */
+    .dup-request__radio {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.2);
+      cursor: pointer; margin-top: 2px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition-fast);
+      background: white;
+    }
+    .dup-request__radio:hover { border-color: var(--color-primary); }
+    .dup-request--selected .dup-request__radio {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+    }
+    .dup-request--selected .dup-request__radio::after {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: white;
+    }
+
+    /* Info do solicitante */
+    .dup-request__info { min-width: 0; }
+    .dup-request__name {
+      font-weight: 600; font-size: 14px;
+      color: var(--color-text-default);
+      margin-bottom: 2px;
+    }
+    .dup-request__email { font-size: 13px; color: var(--color-text-muted); margin-bottom: 6px; }
+    .dup-request__tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .dup-request__tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 4px;
+      font-size: 11px; color: var(--color-text-muted);
+      background: rgba(0,0,0,0.04);
+    }
+    .dup-request__tag svg { width: 12px; height: 12px; }
+    .dup-request__date { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* Estado "selecionado" do request */
+    .dup-request--selected { background: rgba(44,169,66,0.03); }
+    .dup-request--selected .dup-request__name { color: var(--color-primary); }
+
+    /* Ações do grupo */
+    .dup-group__actions {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      background: var(--color-bg-light);
+      flex-wrap: wrap;
+    }
+    .dup-group__actions-hint {
+      flex: 1; font-size: 12px; color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    /* Rejeitar todos sem aprovar */
+    .dup-group--rejected { opacity: 0.55; pointer-events: none; }
+    .dup-group--resolved .dup-group__header { background: #F1F8E9; border-bottom-color: rgba(44,169,66,0.15); }
+    .dup-group--resolved { border-color: rgba(44,169,66,0.3); }
+    .dup-group--resolved .dup-group__pill {
+      background: rgba(44,169,66,0.1); color: #2e7d32;
+    }
+
+    /* ============ SECTION DIVIDER ============ */
+    .section-divider {
+      font-family: var(--font-header); font-size: 13px;
+      font-weight: 700; color: var(--color-text-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px; margin-top: 8px;
+    }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.07); }
+
+    /* ============ MODAL REJEITAR ============ */
+    .modal {
+      display: none; position: fixed; inset: 0;
+      z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal--open { display: flex; }
+    .modal__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); cursor: pointer; }
+    .modal__content {
+      position: relative; background: var(--color-bg-white);
+      border-radius: 16px; padding: 32px;
+      width: 100%; max-width: 520px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+      margin: 24px;
+    }
+    .modal__header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+    .modal__title { font-family: var(--font-header); font-size: 20px; font-weight: 700; }
+    .modal__subtitle { font-size: 13px; color: var(--color-text-muted); margin-top: 4px; line-height: 1.5; }
+    .modal__close {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: var(--color-text-muted);
+      cursor: pointer; transition: background var(--transition-fast);
+      border: none; background: none; flex-shrink: 0;
+    }
+    .modal__close:hover { background: var(--color-bg-light); }
+    .modal__body { margin-bottom: 24px; }
+    .modal__label { font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 8px; display: block; }
+    .modal__textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
+      font-size: 14px; font-family: var(--font-body);
+      color: var(--color-text-default); resize: vertical; min-height: 100px;
+    }
+    .modal__textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(44,169,66,0.1); }
+    .modal__recipients {
+      margin-bottom: 16px; padding: 12px 14px;
+      background: #FFF3E0; border-radius: 8px;
+      border: 1px solid rgba(230,81,0,0.15);
+    }
+    .modal__recipients-title { font-size: 12px; font-weight: 600; color: #BF360C; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .modal__recipient { font-size: 13px; color: var(--color-text-secondary); padding: 2px 0; }
+    .modal__footer { display: flex; gap: 10px; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a href="#" class="navbar__brand">SCTEC</a>
+      <div class="navbar__right">
+        <span class="badge">ADMIN</span>
+        <span class="navbar__company">Equipe SCTEC</span>
+        <div class="navbar__avatar">AD</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="#" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas
+          <span class="sidebar__badge">2</span>
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="#" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Gestão de Empresas</h1>
+          <p class="painel__subtitle">Gerencie empresas parceiras, aprove cadastros pendentes e cadastre novas empresas</p>
+        </div>
+        <button class="btn btn--primary" onclick="showToast('Redirecionando para cadastro...')">+ Cadastrar Empresa</button>
+      </div>
+
+      <!-- Tabs de navegação -->
+      <div class="page-tabs">
+        <button class="page-tab" onclick="switchTab('ativas', this)">
+          Empresas Ativas
+          <span class="tab-count tab-count--neutral">7</span>
+        </button>
+        <button class="page-tab page-tab--active" onclick="switchTab('pendentes', this)">
+          Aguardando avaliação
+          <span class="tab-count tab-count--warn" id="tab-pendentes-count">4</span>
+        </button>
+      </div>
+
+      <!-- ====== ABA: PENDENTES ====== -->
+      <div id="tab-pendentes" class="tab-panel">
+
+        <!-- Alerta de duplicatas -->
+        <div class="alert-banner" id="alert-duplicatas">
+          <span class="alert-banner__icon">⚠️</span>
+          <div class="alert-banner__text">
+            <strong>2 empresas com múltiplas solicitações</strong>
+            <span>Diferentes pessoas cadastraram a mesma empresa. Avalie os grupos abaixo e escolha quem aprovar.</span>
+          </div>
+          <button class="alert-banner__action" onclick="scrollToDuplicates()">Ver grupos ↓</button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="painel-filters">
+          <input type="text" class="painel-filter__search" placeholder="Buscar por nome, CNPJ ou responsável...">
+          <select class="painel-filter__select">
+            <option>Todos os segmentos</option>
+            <option>Tecnologia</option>
+            <option>Fintech</option>
+            <option>E-commerce</option>
+            <option>Consultoria</option>
+          </select>
+        </div>
+
+        <!-- Seção: Empresas com múltiplas solicitações -->
+        <div id="duplicates-anchor"></div>
+        <p class="section-divider">Empresas com múltiplas solicitações</p>
+
+        <div class="duplicates-section">
+
+          <!-- GRUPO 1: InovaTech SC - 2 solicitações -->
+          <div class="dup-group dup-group--open" id="group-inovatech">
+            <div class="dup-group__header" onclick="toggleGroup('group-inovatech')">
+              <div class="dup-group__logo" style="background: #1565C0;">IT</div>
+              <div class="dup-group__info">
+                <div class="dup-group__name">InovaTech SC</div>
+                <div class="dup-group__meta">
+                  <span class="dup-group__cnpj">44.555.666/0001-33</span>
+                  <span class="dup-group__segment">· Tecnologia / IoT</span>
+                </div>
+              </div>
+              <div class="dup-group__pill" id="group-inovatech-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                2 solicitações
+              </div>
+              <div class="dup-group__chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <div class="dup-group__body">
+              <div class="dup-group__instruction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Selecione qual responsável vai representar esta empresa. Os demais receberão um e-mail de comunicação.
+              </div>
+
+              <div class="dup-requests">
+                <!-- Solicitante 1 -->
+                <div class="dup-request" id="req-it-1" onclick="selectRequest('inovatech', 'req-it-1', 'req-it-2')">
+                  <div class="dup-request__radio" id="radio-req-it-1"></div>
+                  <div class="dup-request__info">
+                    <div class="dup-request__name">André Luiz Pereira</div>
+                    <div class="dup-request__email">andre@inovatech.sc</div>
+                    <div class="dup-request__tags">
+                      <span class="dup-request__tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+                        Cargo: Gerente de TI
+                      </span>
+                      <span class="dup-request__tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                        (48) 99123-4567
+                      </span>
+                      <span class="dup-request__tag" style="background: rgba(44,169,66,0.08); color: #2e7d32;">
+                        LinkedIn verificado
+                      </span>
+                    </div>
+                    <div class="dup-request__date">Enviado em 08/01/2025 · 14:22</div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0;">
+                    <button class="btn btn--ghost btn--sm" onclick="event.stopPropagation(); viewDetail('André Luiz Pereira', 'InovaTech SC')">Ver detalhes</button>
+                  </div>
+                </div>
+
+                <!-- Solicitante 2 -->
+                <div class="dup-request" id="req-it-2" onclick="selectRequest('inovatech', 'req-it-2', 'req-it-1')">
+                  <div class="dup-request__radio" id="radio-req-it-2"></div>
+                  <div class="dup-request__info">
+                    <div class="dup-request__name">Maria Clara Santos</div>
+                    <div class="dup-request__email">maria.santos@inovatech.sc</div>
+                    <div class="dup-request__tags">
+                      <span class="dup-request__tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+                        Cargo: Diretora Comercial
+                      </span>
+                      <span class="dup-request__tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                        (48) 99765-1234
+                      </span>
+                    </div>
+                    <div class="dup-request__date">Enviado em 09/01/2025 · 09:05</div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0;">
+                    <button class="btn btn--ghost btn--sm" onclick="event.stopPropagation(); viewDetail('Maria Clara Santos', 'InovaTech SC')">Ver detalhes</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dup-group__actions" id="actions-inovatech">
+                <span class="dup-group__actions-hint" id="hint-inovatech">Selecione um responsável para habilitar aprovação</span>
+                <button class="btn btn--sm btn--danger" onclick="openRejectAllModal('InovaTech SC', ['André Luiz Pereira (andre@inovatech.sc)', 'Maria Clara Santos (maria.santos@inovatech.sc)'])">
+                  Rejeitar todos
+                </button>
+                <button class="btn btn--sm btn--approve" id="btn-approve-inovatech" disabled style="opacity:0.4; cursor:not-allowed;"
+                  onclick="approveSelected('inovatech', 'group-inovatech')">
+                  ✓ Aprovar selecionado
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- GRUPO 2: SC Digital Solutions - 3 solicitações -->
+          <div class="dup-group" id="group-scdigital">
+            <div class="dup-group__header" onclick="toggleGroup('group-scdigital')">
+              <div class="dup-group__logo" style="background: #6A1B9A;">SD</div>
+              <div class="dup-group__info">
+                <div class="dup-group__name">SC Digital Solutions</div>
+                <div class="dup-group__meta">
+                  <span class="dup-group__cnpj">77.888.999/0001-55</span>
+                  <span class="dup-group__segment">· E-commerce / Marketplace</span>
+                </div>
+              </div>
+              <div class="dup-group__pill" id="group-scdigital-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                3 solicitações
+              </div>
+              <div class="dup-group__chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <div class="dup-group__body">
+              <div class="dup-group__instruction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Selecione qual responsável vai representar esta empresa. Os demais receberão um e-mail de comunicação.
+              </div>
+
+              <div class="dup-requests">
+                <div class="dup-request" id="req-sd-1" onclick="selectRequest('scdigital', 'req-sd-1', 'req-sd-2', 'req-sd-3')">
+                  <div class="dup-request__radio" id="radio-req-sd-1"></div>
+                  <div class="dup-request__info">
+                    <div class="dup-request__name">Patrícia Mendes</div>
+                    <div class="dup-request__email">patricia@scdigital.com.br</div>
+                    <div class="dup-request__tags">
+                      <span class="dup-request__tag">Cargo: CEO</span>
+                      <span class="dup-request__tag">(47) 99100-2200</span>
+                    </div>
+                    <div class="dup-request__date">Enviado em 07/01/2025 · 10:15</div>
+                  </div>
+                  <div style="flex-shrink:0;">
+                    <button class="btn btn--ghost btn--sm" onclick="event.stopPropagation(); viewDetail('Patrícia Mendes', 'SC Digital Solutions')">Ver detalhes</button>
+                  </div>
+                </div>
+
+                <div class="dup-request" id="req-sd-2" onclick="selectRequest('scdigital', 'req-sd-2', 'req-sd-1', 'req-sd-3')">
+                  <div class="dup-request__radio" id="radio-req-sd-2"></div>
+                  <div class="dup-request__info">
+                    <div class="dup-request__name">Rodrigo Faria</div>
+                    <div class="dup-request__email">rodrigo.faria@scdigital.com.br</div>
+                    <div class="dup-request__tags">
+                      <span class="dup-request__tag">Cargo: Head de Parcerias</span>
+                      <span class="dup-request__tag">(47) 99300-8890</span>
+                    </div>
+                    <div class="dup-request__date">Enviado em 08/01/2025 · 08:44</div>
+                  </div>
+                  <div style="flex-shrink:0;">
+                    <button class="btn btn--ghost btn--sm" onclick="event.stopPropagation(); viewDetail('Rodrigo Faria', 'SC Digital Solutions')">Ver detalhes</button>
+                  </div>
+                </div>
+
+                <div class="dup-request" id="req-sd-3" onclick="selectRequest('scdigital', 'req-sd-3', 'req-sd-1', 'req-sd-2')">
+                  <div class="dup-request__radio" id="radio-req-sd-3"></div>
+                  <div class="dup-request__info">
+                    <div class="dup-request__name">Ana Paula Vieira</div>
+                    <div class="dup-request__email">apaula@scdigital.com.br</div>
+                    <div class="dup-request__tags">
+                      <span class="dup-request__tag">Cargo: Gerente Operacional</span>
+                      <span class="dup-request__tag">(47) 99400-5533</span>
+                      <span class="dup-request__tag" style="background: rgba(44,169,66,0.08); color: #2e7d32;">LinkedIn verificado</span>
+                    </div>
+                    <div class="dup-request__date">Enviado em 09/01/2025 · 16:30</div>
+                  </div>
+                  <div style="flex-shrink:0;">
+                    <button class="btn btn--ghost btn--sm" onclick="event.stopPropagation(); viewDetail('Ana Paula Vieira', 'SC Digital Solutions')">Ver detalhes</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dup-group__actions" id="actions-scdigital">
+                <span class="dup-group__actions-hint" id="hint-scdigital">Selecione um responsável para habilitar aprovação</span>
+                <button class="btn btn--sm btn--danger" onclick="openRejectAllModal('SC Digital Solutions', ['Patrícia Mendes (patricia@scdigital.com.br)', 'Rodrigo Faria (rodrigo.faria@scdigital.com.br)', 'Ana Paula Vieira (apaula@scdigital.com.br)'])">
+                  Rejeitar todos
+                </button>
+                <button class="btn btn--sm btn--approve" id="btn-approve-scdigital" disabled style="opacity:0.4; cursor:not-allowed;"
+                  onclick="approveSelected('scdigital', 'group-scdigital')">
+                  ✓ Aprovar selecionado
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /duplicates-section -->
+
+        <!-- Seção: Solicitações únicas -->
+        <p class="section-divider">Solicitações individuais</p>
+
+        <div class="panel-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>CNPJ</th>
+                <th>Responsável</th>
+                <th>Segmento</th>
+                <th>Enviado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>NovaMind Tech</strong></td>
+                <td>22.333.444/0001-11</td>
+                <td>Felipe Augusto<br><small style="color: var(--color-text-muted);">felipe@novamind.tech</small></td>
+                <td>Inteligência Artificial</td>
+                <td>10/01/2025</td>
+                <td>
+                  <div class="action-group">
+                    <button class="btn btn--sm btn--approve" onclick="showToast('NovaMind Tech aprovada! E-mail enviado.')">Aprovar</button>
+                    <button class="btn btn--sm btn--danger" onclick="openRejectAllModal('NovaMind Tech', ['Felipe Augusto (felipe@novamind.tech)'])">Rejeitar</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HealthData SC</strong></td>
+                <td>55.666.777/0001-99</td>
+                <td>Camila Rocha<br><small style="color: var(--color-text-muted);">camila@healthdata.sc</small></td>
+                <td>Health Tech</td>
+                <td>10/01/2025</td>
+                <td>
+                  <div class="action-group">
+                    <button class="btn btn--sm btn--approve" onclick="showToast('HealthData SC aprovada! E-mail enviado.')">Aprovar</button>
+                    <button class="btn btn--sm btn--danger" onclick="openRejectAllModal('HealthData SC', ['Camila Rocha (camila@healthdata.sc)'])">Rejeitar</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /tab-pendentes -->
+
+      <!-- ====== ABA: ATIVAS ====== -->
+      <div id="tab-ativas" class="tab-panel" style="display:none;">
+
+        <!-- Filtros -->
+        <div class="painel-filters">
+          <input type="text" class="painel-filter__search" placeholder="Buscar por nome, CNPJ ou responsável...">
+          <select class="painel-filter__select">
+            <option>Todos os segmentos</option>
+            <option>Tecnologia</option>
+            <option>Fintech</option>
+            <option>E-commerce</option>
+          </select>
+          <select class="painel-filter__select">
+            <option>Todos os status</option>
+            <option>Ativa</option>
+            <option>Inativa</option>
+          </select>
+        </div>
+
+        <div class="panel-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>CNPJ</th>
+                <th>Responsável</th>
+                <th>Vagas</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>TechCorp Soluções</strong><br><small style="color:var(--color-text-muted)">Tecnologia / SaaS</small></td>
+                <td>12.345.678/0001-90</td>
+                <td>Carlos Eduardo<br><small style="color:var(--color-text-muted)">carlos@techcorp.com.br</small></td>
+                <td>3</td>
+                <td><span class="status status--active">Ativa</span></td>
+                <td>
+                  <div class="action-group">
+                    <button class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                    <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>DataSoft Ltda.</strong><br><small style="color:var(--color-text-muted)">Análise de Dados</small></td>
+                <td>98.765.432/0001-10</td>
+                <td>Fernanda Lima<br><small style="color:var(--color-text-muted)">fernanda@datasoft.com.br</small></td>
+                <td>2</td>
+                <td><span class="status status--active">Ativa</span></td>
+                <td>
+                  <div class="action-group">
+                    <button class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                    <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>CloudSC Tecnologia</strong><br><small style="color:var(--color-text-muted)">Cloud / Infraestrutura</small></td>
+                <td>11.222.333/0001-44</td>
+                <td>Roberto Alves<br><small style="color:var(--color-text-muted)">roberto@cloudsc.com.br</small></td>
+                <td>1</td>
+                <td><span class="status status--active">Ativa</span></td>
+                <td>
+                  <div class="action-group">
+                    <button class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                    <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>FinanSC</strong><br><small style="color:var(--color-text-muted)">Fintech</small></td>
+                <td>33.444.555/0001-22</td>
+                <td>Juliana Martins<br><small style="color:var(--color-text-muted)">juliana@finansc.com.br</small></td>
+                <td>4</td>
+                <td><span class="status status--active">Ativa</span></td>
+                <td>
+                  <div class="action-group">
+                    <button class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                    <label class="toggle" title="Inativar"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>OldTech Sistemas</strong><br><small style="color:var(--color-text-muted)">ERP / Consultoria</small></td>
+                <td>55.666.777/0001-88</td>
+                <td>Marcos Souza<br><small style="color:var(--color-text-muted)">marcos@oldtech.com.br</small></td>
+                <td>0</td>
+                <td><span class="status status--inactive">Inativa</span></td>
+                <td>
+                  <div class="action-group">
+                    <button class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="action-icon" title="Resetar senha" onclick="showToast('Senha resetada. E-mail enviado.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+                    <label class="toggle" title="Ativar"><input type="checkbox" onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <button class="pagination__btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="pagination__btn pagination__btn--active">1</button>
+          <button class="pagination__btn">2</button>
+          <span class="pagination__info">de 2</span>
+          <button class="pagination__btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+      </div><!-- /tab-ativas -->
+
+    </main>
+  </div>
+
+  <!-- Modal: Rejeitar e comunicar -->
+  <div class="modal" id="modal-reject">
+    <div class="modal__overlay" onclick="closeModal('modal-reject')"></div>
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <div class="modal__title">Rejeitar solicitação</div>
+          <div class="modal__subtitle" id="modal-reject-subtitle">O e-mail abaixo será enviado para os responsáveis não aprovados.</div>
+        </div>
+        <button class="modal__close" onclick="closeModal('modal-reject')">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal__recipients" id="modal-recipients-list">
+          <div class="modal__recipients-title">Será enviado para</div>
+        </div>
+        <label class="modal__label">Mensagem para o(s) responsável(eis)</label>
+        <textarea class="modal__textarea" id="modal-reject-message" placeholder="Explique o motivo da rejeição...">Olá,
+
+Agradecemos o interesse em fazer parte da rede de parceiros SCTEC. Após análise do seu cadastro, informamos que não será possível prosseguir com a parceria no momento.
+
+Caso tenha dúvidas, entre em contato com nossa equipe.
+
+Atenciosamente,
+Equipe SCTEC</textarea>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" onclick="closeModal('modal-reject')">Cancelar</button>
+        <button class="btn btn--danger" onclick="confirmReject()">Enviar e rejeitar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // =========== TABS ===========
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('page-tab--active'));
+      document.getElementById('tab-' + tab).style.display = 'block';
+      el.classList.add('page-tab--active');
+    }
+
+    // =========== GRUPOS DUPLOS ===========
+    function toggleGroup(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('dup-group--open');
+    }
+
+    // Estado de seleção por grupo
+    const selections = {};
+
+    function selectRequest(group, selectedId, ...othersIds) {
+      // Deselecionar todos
+      const allIds = [selectedId, ...othersIds];
+      allIds.forEach(id => {
+        const row = document.getElementById(id);
+        row.classList.remove('dup-request--selected');
+        document.getElementById('radio-' + id).innerHTML = '';
+      });
+
+      // Selecionar o clicado
+      document.getElementById(selectedId).classList.add('dup-request--selected');
+      document.getElementById('radio-' + selectedId).innerHTML = '';
+
+      selections[group] = { selectedId, othersIds };
+
+      // Habilitar botão de aprovar
+      const btn = document.getElementById('btn-approve-' + group);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+
+      // Atualizar hint
+      const names = {
+        'req-it-1': 'André Luiz Pereira',
+        'req-it-2': 'Maria Clara Santos',
+        'req-sd-1': 'Patrícia Mendes',
+        'req-sd-2': 'Rodrigo Faria',
+        'req-sd-3': 'Ana Paula Vieira'
+      };
+      const hint = document.getElementById('hint-' + group);
+      if (hint) hint.textContent = 'Selecionado: ' + (names[selectedId] || selectedId);
+    }
+
+    function approveSelected(group, groupElId) {
+      const sel = selections[group];
+      if (!sel) return;
+
+      const names = {
+        'req-it-1': 'André Luiz Pereira',
+        'req-it-2': 'Maria Clara Santos',
+        'req-sd-1': 'Patrícia Mendes',
+        'req-sd-2': 'Rodrigo Faria',
+        'req-sd-3': 'Ana Paula Vieira'
+      };
+
+      const approvedName = names[sel.selectedId] || 'Responsável';
+      const rejectedNames = sel.othersIds.map(id => names[id]).filter(Boolean);
+
+      // Atualizar UI do grupo
+      const groupEl = document.getElementById(groupElId);
+      groupEl.classList.add('dup-group--resolved');
+
+      const pill = document.getElementById(groupElId + '-pill');
+      pill.innerHTML = '✓ Aprovada';
+
+      // Desativar ações
+      const actionsEl = document.getElementById('actions-' + group);
+      actionsEl.innerHTML = `
+        <span style="font-size:13px; color:#2e7d32; font-weight:500;">
+          ✓ Aprovado: ${approvedName}
+        </span>
+        <span style="font-size:12px; color:var(--color-text-muted);">
+          · E-mail de comunicação enviado para ${rejectedNames.length} responsável(is) não aprovado(s)
+        </span>
+      `;
+
+      // Atualizar contador da tab
+      updatePendingCount(-1);
+
+      const companyNames = { inovatech: 'InovaTech SC', scdigital: 'SC Digital Solutions' };
+      showToast(`✓ ${companyNames[group] || 'Empresa'} aprovada! ${rejectedNames.length > 0 ? rejectedNames.length + ' e-mail(s) de comunicação enviado(s).' : ''}`);
+    }
+
+    function updatePendingCount(delta) {
+      const el = document.getElementById('tab-pendentes-count');
+      const current = parseInt(el.textContent) || 0;
+      const next = Math.max(0, current + delta);
+      el.textContent = next;
+      if (next === 0) el.style.display = 'none';
+    }
+
+    // =========== MODAL REJEITAR ===========
+    let currentRejectCallback = null;
+
+    function openRejectAllModal(companyName, recipients) {
+      const recipientsList = document.getElementById('modal-recipients-list');
+      recipientsList.innerHTML = `<div class="modal__recipients-title">Será enviado para</div>`;
+      recipients.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'modal__recipient';
+        div.textContent = '· ' + r;
+        recipientsList.appendChild(div);
+      });
+
+      document.getElementById('modal-reject-subtitle').textContent =
+        `Rejeitar todas as solicitações de "${companyName}". Um e-mail será enviado para cada responsável abaixo.`;
+
+      currentRejectCallback = () => {
+        showToast(`Solicitações de "${companyName}" rejeitadas. E-mails enviados.`);
+        updatePendingCount(-1);
+      };
+
+      document.getElementById('modal-reject').classList.add('modal--open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('modal--open');
+    }
+
+    function confirmReject() {
+      closeModal('modal-reject');
+      if (currentRejectCallback) currentRejectCallback();
+    }
+
+    // =========== VER DETALHES ===========
+    function viewDetail(name, company) {
+      showToast(`Abrindo detalhes de ${name} — ${company}`);
+    }
+
+    // =========== SCROLL ===========
+    function scrollToDuplicates() {
+      document.getElementById('duplicates-anchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // =========== TOAST ===========
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3500);
+    }
+
+    // Inicializa na aba pendentes
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('tab-pendentes').style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>

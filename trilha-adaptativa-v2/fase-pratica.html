@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Fase Prática</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --border: #224476;
+      --brand: #0059E7;
+      --brand-hover: #0040A7;
+      --text: #FFFFFF;
+      --text-secondary: #99C0FF;
+      --green: #12B76A;
+      --red: #F04438;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* PHASE HEADER */
+    .phase-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px 14px;
+      flex-shrink: 0;
+    }
+    .phase-header-row1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .close-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 150ms;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.08); }
+    .phase-progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .phase-progress-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 100px;
+      width: 17%; /* fase 2 de 12 */
+      transition: width 600ms ease-out;
+    }
+    .phase-counter {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .phase-type-label {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* QUESTION */
+    .phase-content {
+      flex: 1;
+      padding: 24px 24px 140px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .question-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      line-height: 28px;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    /* ANSWER OPTIONS */
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .answer-opt {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms;
+      user-select: none;
+    }
+    .answer-opt:hover:not(.answered) { border-color: rgba(63,132,243,0.5); background: rgba(13,43,107,0.5); }
+    .answer-opt.selected  { background: #0D2B6B; border: 2px solid #0059E7; }
+    .answer-opt.correct   { background: rgba(18,183,106,0.15); border: 2px solid #12B76A; }
+    .answer-opt.wrong     { background: rgba(240,68,56,0.15);  border: 2px solid #F04438; }
+    .answer-opt.answered  { cursor: default; }
+
+    .opt-check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 150ms;
+    }
+    .answer-opt.selected .opt-check  { border-color: #0059E7; background: #0059E7; }
+    .answer-opt.correct  .opt-check  { border-color: #12B76A; background: #12B76A; }
+    .answer-opt.wrong    .opt-check  { border-color: #F04438; background: #F04438; }
+
+    .opt-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      flex: 1;
+      line-height: 24px;
+    }
+
+    /* FEEDBACK CARD */
+    .feedback-card {
+      display: none;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .feedback-card.show { display: flex; }
+    .feedback-card.correct { background: rgba(18,183,106,0.12); border: 1px solid rgba(18,183,106,0.35); }
+    .feedback-card.wrong   { background: rgba(240,68,56,0.10);  border: 1px solid rgba(240,68,56,0.3); }
+    .feedback-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .feedback-card.correct .feedback-icon { background: rgba(18,183,106,0.2); }
+    .feedback-card.wrong   .feedback-icon { background: rgba(240,68,56,0.15); }
+    .feedback-body { flex: 1; }
+    .feedback-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .feedback-card.correct .feedback-title { color: #12B76A; }
+    .feedback-card.wrong   .feedback-title { color: #F97066; }
+    .feedback-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      line-height: 20px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ANOTAÇÕES */
+    .req-annotation {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,89,231,0.07);
+      border: 1px dashed rgba(63,132,243,0.35);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .req-annotation.warn { background: rgba(247,144,9,0.07); border-color: rgba(247,144,9,0.35); }
+    .req-annotation.success { background: rgba(18,183,106,0.07); border-color: rgba(18,183,106,0.35); }
+    .req-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 100px;
+      white-space: nowrap; flex-shrink: 0;
+      background: rgba(63,132,243,0.18);
+      color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3);
+    }
+    .req-annotation.warn .req-tag    { background: rgba(247,144,9,0.15); color: #F79009; border-color: rgba(247,144,9,0.3); }
+    .req-annotation.success .req-tag { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .req-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; line-height: 16px;
+      color: rgba(153,192,255,0.85);
+    }
+    .req-text strong { color: #fff; font-weight: 600; }
+
+    /* CTA BOTTOM */
+    .phase-cta {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px 24px;
+    }
+    .cta-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      height: 52px;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-primary:hover { background: var(--brand-hover); }
+    .btn-primary:disabled { background: rgba(0,89,231,0.3); cursor: default; }
+    .no-chance-extra-note {
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: rgba(82,109,152,0.8);
+      display: none;
+    }
+    .no-chance-extra-note.show { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- PHASE HEADER -->
+  <div class="phase-header">
+    <div class="phase-header-row1">
+      <div class="close-btn" onclick="confirmExit()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6L18 18M18 6L6 18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="phase-progress-bar">
+        <div class="phase-progress-fill" id="progress-fill"></div>
+      </div>
+      <span class="phase-counter" id="counter">2 / 12</span>
+    </div>
+    <div class="phase-type-label">Múltipla escolha · Prática 1</div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="phase-content">
+    <div class="question-text" id="question-text">
+      Qual é o perímetro de um retângulo com 6 cm de comprimento e 4 cm de largura?
+    </div>
+
+    <!-- ANSWER OPTIONS -->
+    <div class="answers" id="answers">
+      <div class="answer-opt" data-value="A" onclick="selectOpt(this)">
+        <div class="opt-check" id="check-A"></div>
+        <div class="opt-text">10 cm</div>
+      </div>
+      <div class="answer-opt" data-value="B" onclick="selectOpt(this)">
+        <div class="opt-check" id="check-B"></div>
+        <div class="opt-text">20 cm</div>
+      </div>
+      <div class="answer-opt" data-value="C" onclick="selectOpt(this)">
+        <div class="opt-check" id="check-C"></div>
+        <div class="opt-text">24 cm</div>
+      </div>
+      <div class="answer-opt" data-value="D" onclick="selectOpt(this)">
+        <div class="opt-check" id="check-D"></div>
+        <div class="opt-text">12 cm</div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK CARD (aparece após responder) -->
+    <div class="feedback-card" id="feedback-card">
+      <div class="feedback-icon" id="feedback-icon"></div>
+      <div class="feedback-body">
+        <div class="feedback-title" id="feedback-title"></div>
+        <div class="feedback-text" id="feedback-text"></div>
+      </div>
+    </div>
+
+    <!-- ANOTAÇÕES -->
+    <div class="req-annotation" id="annot-feedback" style="display:none;">
+      <span class="req-tag">RF09</span>
+      <span class="req-text"><strong>Feedback imediato</strong> — Exibido após o envio. Inclui resultado (acerto/erro) e texto de feedback da questão quando cadastrado.</span>
+    </div>
+    <div class="req-annotation warn" id="annot-no-chance" style="display:none;">
+      <span class="req-tag">RF09</span>
+      <span class="req-text"><strong>Sem Chance Extra</strong> — Ao errar na trilha adaptativa, nenhuma chance extra é oferecida. A fase é registrada como erro e o fluxo continua.</span>
+    </div>
+    <div class="req-annotation">
+      <span class="req-tag">RF09</span>
+      <span class="req-text"><strong>Resposta única por fase</strong> — Cada fase pode ser respondida uma única vez por trilha. Ao retornar, a fase fica em modo leitura (não respondível novamente).</span>
+    </div>
+  </div>
+
+  <!-- CTA BOTTOM -->
+  <div class="phase-cta">
+    <div class="cta-inner">
+      <button class="btn-primary" id="cta-btn" onclick="onCTA()" disabled>Responder</button>
+      <div class="no-chance-extra-note" id="no-chance-note">
+        ⚠ Trilha Adaptativa: sem Chance Extra [RF09]
+      </div>
+    </div>
+  </div>
+
+<script>
+const CORRECT_ANSWER = 'B'; // 20 cm (2 × (6+4))
+let selectedValue = null;
+let answered = false;
+
+function selectOpt(el) {
+  if (answered) return;
+  // limpa seleção anterior
+  document.querySelectorAll('.answer-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedValue = el.dataset.value;
+  document.getElementById('cta-btn').disabled = false;
+  document.getElementById('cta-btn').textContent = 'Responder';
+}
+
+function onCTA() {
+  if (!answered) {
+    if (!selectedValue) return;
+    submitAnswer();
+  } else {
+    // Continuar → próxima fase / detalhe
+    window.location.href = 'detalhe.html';
+  }
+}
+
+function submitAnswer() {
+  answered = true;
+  const isCorrect = selectedValue === CORRECT_ANSWER;
+
+  // bloqueia todas as opções
+  document.querySelectorAll('.answer-opt').forEach(o => {
+    o.classList.add('answered');
+    o.classList.remove('selected');
+    if (o.dataset.value === CORRECT_ANSWER) o.classList.add('correct');
+    if (o.dataset.value === selectedValue && !isCorrect) o.classList.add('wrong');
+  });
+
+  // feedback card
+  const card  = document.getElementById('feedback-card');
+  const icon  = document.getElementById('feedback-icon');
+  const title = document.getElementById('feedback-title');
+  const text  = document.getElementById('feedback-text');
+
+  if (isCorrect) {
+    card.className = 'feedback-card correct show';
+    icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#12B76A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    title.textContent = 'Correto!';
+    text.textContent = 'O perímetro é 2 × (6 + 4) = 20 cm. Ótimo trabalho!';
+  } else {
+    card.className = 'feedback-card wrong show';
+    icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+    title.textContent = 'Não foi dessa vez';
+    text.textContent = 'A resposta correta era 20 cm: perímetro = 2 × (comprimento + largura) = 2 × (6 + 4).';
+    document.getElementById('no-chance-note').classList.add('show');
+    document.getElementById('annot-no-chance').style.display = 'flex';
+  }
+
+  document.getElementById('annot-feedback').style.display = 'flex';
+
+  // progresso no header
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = isCorrect ? '25%' : '17%'; // simula progresso
+
+  // atualiza botão
+  const btn = document.getElementById('cta-btn');
+  btn.textContent = 'Continuar';
+  btn.disabled = false;
+}
+
+function confirmExit() {
+  const ok = confirm('Você pode continuar esta revisão depois. Deseja sair?');
+  if (ok) window.location.href = 'detalhe.html';
+}
+</script>
+</body>
+</html>

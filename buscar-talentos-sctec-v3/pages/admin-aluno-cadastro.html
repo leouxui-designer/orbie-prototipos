@@ -1,0 +1,1034 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Aluno - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/painel.css">
+  <style>
+    /* ── Layout com painel lateral ─────────────────────────────────────── */
+    .cadastro-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── Painel de progresso ────────────────────────────────────────────── */
+    .prog-panel {
+      background: var(--color-bg-white);
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 18px;
+      position: sticky;
+      top: 96px;
+    }
+    .prog-panel__title { font-size: 13px; font-weight: 700; color: var(--color-text-default); margin-bottom: 3px; }
+    .prog-panel__sub   { font-size: 11px; color: var(--color-text-muted); margin-bottom: 14px; line-height: 1.5; }
+    .prog-bar-wrap { background: rgba(0,0,0,0.06); border-radius: 20px; height: 5px; margin-bottom: 4px; overflow: hidden; }
+    .prog-bar-fill { height: 100%; border-radius: 20px; background: var(--color-primary-gradient); transition: width .4s ease; }
+    .prog-percent  { font-size: 11px; font-weight: 700; color: var(--color-primary); text-align: right; margin-bottom: 14px; }
+
+    .prog-group { margin-bottom: 12px; }
+    .prog-group__label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .6px; color: var(--color-text-muted); margin-bottom: 5px;
+    }
+    .prog-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      padding: 3px 0; cursor: pointer;
+    }
+    .prog-item:hover .prog-item__name { color: var(--color-primary); }
+    .prog-item__icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1.5px solid var(--color-text-muted);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px; transition: all var(--transition-fast);
+    }
+    .prog-item--done .prog-item__icon { background: var(--color-primary); border-color: var(--color-primary); }
+    .prog-item--done .prog-item__icon svg { display: block; }
+    .prog-item__icon svg { display: none; width: 8px; height: 8px; }
+    .prog-item__name { font-size: 12px; font-weight: 500; color: var(--color-text-default); line-height: 1.3; }
+    .prog-item--done .prog-item__name { color: var(--color-text-muted); text-decoration: line-through; }
+    .prog-item__hint { font-size: 10px; color: var(--color-text-muted); }
+    .prog-badge {
+      font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 20px; display: inline-block; margin-left: 3px;
+    }
+    .prog-badge--obrig { background: rgba(44,169,66,.12); color: #1a7a32; }
+    .prog-badge--recom { background: rgba(245,158,11,.12); color: #b45309; }
+    .prog-badge--opt   { background: rgba(0,0,0,.06); color: var(--color-text-muted); }
+
+
+    /* ── Hint de seção ──────────────────────────────────────────────────── */
+    .section-hint {
+      font-size: 12px; color: var(--color-text-muted);
+      line-height: 1.6; margin-bottom: 16px;
+    }
+    .field-hint {
+      font-size: 11px; color: var(--color-text-muted); font-weight: 400; margin-left: 4px;
+    }
+
+    /* ── Trilha blocks ──────────────────────────────────────────────────── */
+    .trilha-block {
+      border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
+      overflow: hidden; margin-bottom: 10px;
+      transition: border-color var(--transition-fast);
+    }
+    .trilha-block--active { border-color: var(--color-primary); }
+    .trilha-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; background: var(--color-bg-white);
+      cursor: pointer; user-select: none;
+    }
+    .trilha-header:hover { background: var(--color-bg-light); }
+    .trilha-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .trilha-icon--dev   { background: rgba(44,169,66,.12); color: #1a7a32; }
+    .trilha-icon--dados { background: rgba(37,99,235,.1);  color: #1d4ed8; }
+    .trilha-icon--ia    { background: rgba(139,92,246,.1); color: #6d28d9; }
+    .trilha-header__info { flex: 1; }
+    .trilha-header__name  { font-size: 14px; font-weight: 700; color: var(--color-text-default); }
+    .trilha-header__count { font-size: 11px; color: var(--color-text-muted); margin-top: 1px; }
+    .trilha-header__badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 20px; background: rgba(44,169,66,.12); color: #1a7a32; display: none;
+    }
+    .trilha-block--active .trilha-header__badge { display: inline; }
+    .trilha-toggle-icon { width: 16px; height: 16px; color: var(--color-text-muted); transition: transform var(--transition-fast); }
+    .trilha-block--open .trilha-toggle-icon { transform: rotate(180deg); }
+    .trilha-cursos {
+      display: none; padding: 4px 18px 16px;
+      background: var(--color-bg-light); border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .trilha-block--open .trilha-cursos { display: block; }
+    .cursos-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; padding-top: 12px; }
+    .curso-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--color-bg-white); border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .curso-item:hover { border-color: var(--color-primary); background: rgba(44,169,66,.03); }
+    .curso-item--selected { border-color: var(--color-primary); background: rgba(44,169,66,.06); }
+    .curso-item input[type="checkbox"] { width:14px; height:14px; accent-color: var(--color-primary); flex-shrink:0; cursor:pointer; }
+    .curso-item__label { font-size: 12px; color: var(--color-text-secondary); line-height: 1.3; cursor:pointer; }
+    .curso-item--selected .curso-item__label { color: var(--color-text-default); font-weight: 500; }
+
+    /* ── Tags de interesse (hierarquia) ─────────────────────────────────── */
+    .interesse-slot {
+      border: 1px solid rgba(0,0,0,0.08); border-radius: 10px;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .interesse-slot--filled { border-color: var(--color-primary); }
+    .interesse-slot__hd {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 16px; background: var(--color-bg-light);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .interesse-slot__num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--color-dark); color: white;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .interesse-slot--filled .interesse-slot__num { background: var(--color-primary); }
+    .interesse-slot__label { font-size: 13px; font-weight: 600; }
+    .interesse-slot__resumo { font-size: 11px; color: var(--color-text-muted); margin-left: auto; }
+    .interesse-slot__body { padding: 14px 18px; }
+
+    .interesse-nivel { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+    .interesse-nivel:last-child { border-bottom: none; padding-bottom: 0; }
+    .interesse-nivel--hidden { display: none; }
+    .interesse-nivel__q {
+      font-size: 12px; font-weight: 600; color: var(--color-text-tertiary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nivel-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .nivel-dot--1 { background: var(--color-primary); }
+    .nivel-dot--2 { background: #3b82f6; }
+    .nivel-dot--3 { background: #8b5cf6; }
+    .nivel-limpar {
+      font-size: 10px; color: var(--color-text-muted); background: none;
+      border: none; cursor: pointer; margin-left: auto; padding: 2px 6px; border-radius: 4px;
+    }
+    .nivel-limpar:hover { background: rgba(0,0,0,0.05); }
+
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-opt {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 12px; border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 20px; font-size: 12px; color: var(--color-text-secondary);
+      background: var(--color-bg-white); cursor: pointer;
+      transition: all var(--transition-fast); user-select: none;
+    }
+    .tag-opt:hover { border-color: var(--color-primary); background: rgba(44,169,66,.04); }
+    .tag-opt--selected { border-color: var(--color-primary); background: rgba(44,169,66,.1); color: #1a7a32; font-weight: 500; }
+    .tag-opt--disabled { opacity: .35; pointer-events: none; }
+
+    .outra-trigger {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 12px; border: 1px dashed rgba(0,0,0,0.18);
+      border-radius: 20px; font-size: 12px; color: var(--color-text-muted);
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .outra-trigger:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .outra-input-wrap { display: none; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .outra-input-wrap--open { display: flex; }
+    .outra-input {
+      padding: 5px 11px; border: 1px solid var(--color-primary);
+      border-radius: 20px; font-size: 12px; font-family: var(--font-body);
+      outline: none; width: 180px;
+    }
+    .outra-confirm {
+      padding: 5px 12px; border-radius: 20px; background: var(--color-primary);
+      color: white; font-size: 12px; font-weight: 500; border: none; cursor: pointer;
+    }
+
+    /* ── Skill tags (soft skills) ────────────────────────────────────────── */
+    .skill-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .skill-tag {
+      display: flex; align-items: center; gap: 7px; padding: 8px 12px;
+      border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      cursor: pointer; font-size: 13px; color: var(--color-text-secondary);
+      transition: all var(--transition-fast); user-select: none;
+    }
+    .skill-tag input { accent-color: var(--color-primary); flex-shrink: 0; }
+    .skill-tag:hover { border-color: var(--color-primary); background: rgba(44,169,66,.03); }
+    .skill-tag--sel { border-color: var(--color-primary); background: rgba(44,169,66,.08); color: #1a7a32; font-weight: 500; }
+
+    /* ── Nível idioma ─────────────────────────────────────────────────────── */
+    .nivel-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nivel-pill {
+      padding: 6px 14px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      font-size: 13px; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .nivel-pill:hover { border-color: var(--color-primary); background: rgba(44,169,66,.04); }
+    .nivel-pill--sel { border-color: var(--color-primary); background: rgba(44,169,66,.1); color: #1a7a32; font-weight: 500; }
+
+    /* ── Radio ─────────────────────────────────────────────────────────────── */
+    .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 7px; padding: 7px 14px;
+      border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      cursor: pointer; font-size: 13px; color: var(--color-text-secondary);
+      transition: all var(--transition-fast); user-select: none;
+    }
+    .radio-opt input { accent-color: var(--color-primary); }
+    .radio-opt:hover { border-color: var(--color-primary); background: rgba(44,169,66,.03); }
+    .radio-opt--sel { border-color: var(--color-primary); background: rgba(44,169,66,.08); color: #1a7a32; font-weight: 500; }
+
+    /* ── Upload area ──────────────────────────────────────────────────────── */
+    .upload-area {
+      border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 8px; padding: 16px;
+      text-align: center; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .upload-area:hover { border-color: var(--color-primary); background: rgba(44,169,66,.03); }
+    .upload-area__text { font-size: 13px; color: var(--color-text-muted); margin-top: 6px; }
+    .upload-area__hint { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
+
+    /* ── Char count ───────────────────────────────────────────────────────── */
+    .char-count { font-size: 11px; color: var(--color-text-muted); text-align: right; margin-top: 4px; }
+  </style>
+</head>
+<body style="padding-top: 80px;">
+
+  <!-- Navbar Admin -->
+  <nav class="navbar navbar--painel navbar--admin">
+    <div class="navbar__inner">
+      <a href="../index.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="badge badge--dark" style="font-size:11px;padding:4px 10px;">ADMIN</span>
+        <span class="navbar-painel__company-name">Equipe SCTEC</span>
+        <div class="navbar-painel__avatar" id="avatar-toggle" onclick="toggleAvatarMenu()" style="background:#303030;">AD</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header"><strong>Administrador</strong><span>Equipe SCTEC</span></div>
+          <a href="admin-alunos.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Banco de Talentos</a>
+          <a href="admin-empresas.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Gestão de Empresas</a>
+          <div class="avatar-menu__divider"></div>
+          <a href="login.html" class="avatar-menu__link avatar-menu__link--logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar sidebar--admin">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="admin-alunos.html" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="admin-empresas.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas <span class="sidebar__badge">4</span>
+        </a>
+        <a href="admin-usuarios.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+
+      <!-- Breadcrumb -->
+      <div style="margin-bottom:20px;">
+        <a href="admin-alunos.html" style="font-size:13px;color:var(--color-primary);font-weight:500;display:inline-flex;align-items:center;gap:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Banco de Talentos
+        </a>
+      </div>
+
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Cadastrar Aluno</h1>
+          <p class="painel__subtitle">Os campos marcados com <span style="color:#E53935">*</span> são obrigatórios para ativar o perfil.</p>
+        </div>
+      </div>
+
+      <!-- Layout 2 colunas -->
+      <div class="cadastro-layout">
+
+        <!-- ── Painel de progresso ── -->
+        <div class="prog-panel" id="prog-panel">
+          <div class="prog-panel__title">Progresso do cadastro</div>
+          <div class="prog-panel__sub">Complete as seções para aumentar a visibilidade do perfil.</div>
+          <div class="prog-bar-wrap"><div class="prog-bar-fill" id="prog-fill" style="width:0%"></div></div>
+          <div class="prog-percent" id="prog-percent">0%</div>
+
+          <div class="prog-group">
+            <div class="prog-group__label">Obrigatório <span class="prog-badge prog-badge--obrig">Camada 1</span></div>
+            <div class="prog-item" id="pi-nome"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Dados pessoais</div><div class="prog-item__hint">Nome, e-mail, CPF, cidade</div></div></div>
+            <div class="prog-item" id="pi-trilha"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Trilha e cursos</div><div class="prog-item__hint">Ao menos 1 curso</div></div></div>
+          </div>
+
+          <div class="prog-group">
+            <div class="prog-group__label">Recomendado <span class="prog-badge prog-badge--recom">Camada 2</span></div>
+            <div class="prog-item" id="pi-formacao"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Formação acadêmica</div></div></div>
+            <div class="prog-item" id="pi-situacao"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Situação profissional</div></div></div>
+            <div class="prog-item" id="pi-interesse"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Área de interesse</div></div></div>
+            <div class="prog-item" id="pi-skills"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Soft skills</div><div class="prog-item__hint">Até 5</div></div></div>
+            <div class="prog-item" id="pi-ingles"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Idiomas</div></div></div>
+          </div>
+
+          <div class="prog-group">
+            <div class="prog-group__label">Opcional <span class="prog-badge prog-badge--opt">Camada 3</span></div>
+            <div class="prog-item" id="pi-resumo"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Resumo profissional</div><div class="prog-item__hint">Mín. 50 chars</div></div></div>
+            <div class="prog-item" id="pi-links"><div class="prog-item__icon"><svg viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><polyline points="1 4 3.5 7 9 1"/></svg></div><div><div class="prog-item__name">Links</div><div class="prog-item__hint">LinkedIn, GitHub…</div></div></div>
+          </div>
+        </div>
+
+        <!-- ── Formulário ── -->
+        <form id="form-cadastro" onsubmit="handleSubmit(event)">
+
+          <!-- ══ CAMADA 1 ══════════════════════════════════════════════════ -->
+
+          <!-- 1. Dados pessoais -->
+          <div class="perfil-section">
+            <div class="perfil-section__header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+              <div>
+                <h2 class="perfil-section__title">Dados pessoais</h2>
+              </div>
+            </div>
+            <p class="section-hint">Preencha as informações básicas. CPF, data de nascimento e CEP são dados sigilosos e não serão exibidos para as empresas.</p>
+            <div class="perfil-form__grid">
+              <div class="form-group">
+                <label class="form-group__label">Nome completo <span style="color:#E53935">*</span></label>
+                <input type="text" class="form-group__input" id="f-nome" placeholder="Nome do aluno" oninput="checkNome()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">E-mail pessoal <span style="color:#E53935">*</span></label>
+                <input type="email" class="form-group__input" id="f-email" placeholder="email@exemplo.com" oninput="checkNome()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">CPF <span style="color:#E53935">*</span><span class="field-hint">— não visível às empresas</span></label>
+                <input type="text" class="form-group__input" id="f-cpf" placeholder="000.000.000-00" oninput="checkNome()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Data de nascimento <span style="color:#E53935">*</span><span class="field-hint">— não visível às empresas</span></label>
+                <input type="date" class="form-group__input" id="f-nasc" onchange="checkNome()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Telefone/WhatsApp</label>
+                <input type="tel" class="form-group__input" placeholder="(00) 00000-0000">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">CEP<span class="field-hint">— não visível às empresas</span></label>
+                <input type="text" class="form-group__input" id="f-cep" placeholder="00000-000" oninput="buscarCep(this.value)">
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-group__label">Cidade <span style="color:#E53935">*</span></label>
+                <input type="text" class="form-group__input" id="f-cidade" placeholder="Preenchida automaticamente pelo CEP" oninput="checkNome()">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Trilha e cursos -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Trilha e cursos concluídos no SCTEC <span style="color:#E53935">*</span></h2>
+            </div>
+            <p class="section-hint">Selecione a trilha do aluno e marque os cursos concluídos. Abra o bloco da trilha correspondente para ver os cursos disponíveis.</p>
+
+            <!-- Dev -->
+            <div class="trilha-block" id="block-dev">
+              <div class="trilha-header" onclick="toggleTrilha('dev')">
+                <div class="trilha-icon trilha-icon--dev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <div class="trilha-header__info">
+                  <div class="trilha-header__name">Desenvolvimento de Software</div>
+                  <div class="trilha-header__count" id="count-dev">Nenhum curso selecionado</div>
+                </div>
+                <span class="trilha-header__badge" id="badge-dev">0 cursos</span>
+                <svg class="trilha-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="trilha-cursos">
+                <div class="cursos-grid" id="cursos-dev">
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Back-End Node"><span class="curso-item__label">Desenvolvedor Back-End Node</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Back-End Spring"><span class="curso-item__label">Desenvolvedor Back-End Spring</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Back-End .NET"><span class="curso-item__label">Desenvolvedor Back-End .NET</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Front-End React"><span class="curso-item__label">Desenvolvedor Front-End React</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Front-End Angular"><span class="curso-item__label">Desenvolvedor Front-End Angular</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Front-End Vue"><span class="curso-item__label">Desenvolvedor Front-End Vue</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Mobile React Native"><span class="curso-item__label">Desenvolvedor Mobile React Native</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Mobile Flutter"><span class="curso-item__label">Desenvolvedor Mobile Flutter</span></label>
+                </div>
+              </div>
+            </div>
+            <!-- Dados -->
+            <div class="trilha-block" id="block-dados">
+              <div class="trilha-header" onclick="toggleTrilha('dados')">
+                <div class="trilha-icon trilha-icon--dados"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+                <div class="trilha-header__info">
+                  <div class="trilha-header__name">Análise de Dados</div>
+                  <div class="trilha-header__count" id="count-dados">Nenhum curso selecionado</div>
+                </div>
+                <span class="trilha-header__badge" id="badge-dados">0 cursos</span>
+                <svg class="trilha-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="trilha-cursos">
+                <div class="cursos-grid" id="cursos-dados">
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Análise de Dados com Python"><span class="curso-item__label">Análise de Dados com Python</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Visualização e BI"><span class="curso-item__label">Visualização de Dados e Business Intelligence</span></label>
+                </div>
+              </div>
+            </div>
+            <!-- IA -->
+            <div class="trilha-block" id="block-ia">
+              <div class="trilha-header" onclick="toggleTrilha('ia')">
+                <div class="trilha-icon trilha-icon--ia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5v1h-4v-1c-1.2-.7-2-2-2-3.5a4 4 0 014-4z"/><path d="M10 14h4v6h-4z"/><path d="M8 20h8"/></svg></div>
+                <div class="trilha-header__info">
+                  <div class="trilha-header__name">Inteligência Artificial</div>
+                  <div class="trilha-header__count" id="count-ia">Nenhum curso selecionado</div>
+                </div>
+                <span class="trilha-header__badge" id="badge-ia">0 cursos</span>
+                <svg class="trilha-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="trilha-cursos">
+                <div class="cursos-grid" id="cursos-ia">
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="Machine Learning e Visão Computacional"><span class="curso-item__label">Machine Learning e Visão Computacional</span></label>
+                  <label class="curso-item" onclick="toggleCurso(this)"><input type="checkbox" name="cursos" value="IA para Análise Preditiva"><span class="curso-item__label">Desenvolvimento de IA para Análise Preditiva</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ CAMADA 2 ══════════════════════════════════════════════════ -->
+
+          <!-- 4. Formação & Carreira -->
+          <div class="perfil-section">
+            <div class="perfil-section__header" style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+              <div>
+                <h2 class="perfil-section__title">Formação e situação profissional</h2>
+              </div>
+            </div>
+            <p class="section-hint">Informações sobre formação e carreira. Preencha o que souber — o próprio aluno poderá completar o restante depois do cadastro.</p>
+            <div class="perfil-form__grid">
+              <div class="form-group">
+                <label class="form-group__label">Formação acadêmica</label>
+                <p style="font-size:11px;color:var(--color-text-muted);margin-bottom:6px;">Selecione o nível mais alto concluído ou em andamento.</p>
+                <select class="form-group__input" id="f-formacao" onchange="markDone('pi-formacao')">
+                  <option value="">Selecione</option>
+                  <option>Ensino médio incompleto</option>
+                  <option>Ensino médio completo</option>
+                  <option>Ensino técnico incompleto</option>
+                  <option>Ensino técnico completo</option>
+                  <option>Ensino superior incompleto</option>
+                  <option>Ensino superior completo</option>
+                  <option>Pós-graduação (especialização/MBA) incompleta</option>
+                  <option>Pós-graduação (especialização/MBA) completa</option>
+                  <option>Mestrado incompleto</option>
+                  <option>Mestrado completo</option>
+                  <option>Doutorado ou pós-doutorado</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Situação profissional atual</label>
+                <p style="font-size:11px;color:var(--color-text-muted);margin-bottom:6px;">Situação profissional atual.</p>
+                <select class="form-group__input" id="f-situacao" onchange="markDone('pi-situacao')">
+                  <option value="">Selecione</option>
+                  <option>Estou procurando meu primeiro emprego</option>
+                  <option>Estou desempregado(a) e procurando emprego</option>
+                  <option>Estou trabalhando na área de Tecnologia</option>
+                  <option>Estou trabalhando em outra área</option>
+                  <option>Sou Autônomo/Freelancer/Empreendedor na Tecnologia</option>
+                  <option>Sou Autônomo/Freelancer/Empreendedor em outra área</option>
+                  <option>Estou fazendo estágio em tecnologia</option>
+                  <option>Estou fazendo estágio em outra área</option>
+                  <option>Sou jovem aprendiz na área de tecnologia</option>
+                  <option>Sou jovem aprendiz em outra área</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Cargo atual <span class="field-hint">— opcional</span></label>
+                <input type="text" class="form-group__input" placeholder="Ex: Auxiliar Administrativo">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Área de atuação <span class="field-hint">— opcional</span></label>
+                <select class="form-group__input">
+                  <option value="">Selecione</option>
+                  <option>Tecnologia</option>
+                  <option>Administrativo</option>
+                  <option>Atendimento</option>
+                  <option>Indústria</option>
+                  <option>Comércio</option>
+                  <option>Educação</option>
+                  <option>Financeiro</option>
+                  <option>Saúde</option>
+                  <option>Não possuo experiência em outra área</option>
+                  <option>Outra</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Interesses -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">
+                <svg style="display:inline;vertical-align:-3px;margin-right:5px;color:var(--color-primary)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                Áreas de interesse profissional
+              </h2>
+            </div>
+            <p class="section-hint">Selecione até 2 áreas de interesse profissional — uma principal e uma secundária. Siga a hierarquia: Área → Especialidade → Tecnologia.</p>
+
+            <!-- Slot principal -->
+            <div class="interesse-slot" id="slot-principal">
+              <div class="interesse-slot__hd">
+                <div class="interesse-slot__num">1</div>
+                <span class="interesse-slot__label">Interesse principal</span>
+                <span class="interesse-slot__resumo" id="resumo-principal">Nenhuma área selecionada</span>
+              </div>
+              <div class="interesse-slot__body">
+                <div class="interesse-nivel" id="nivel1-p">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--1"></span>Qual é a área que mais lhe atrai?</div>
+                  <div class="tags-wrap">
+                    <span class="tag-opt" data-slot="p" data-nivel="1" data-val="Desenvolvimento de Software" onclick="selecionarNivel1(this)">Desenvolvimento de Software</span>
+                    <span class="tag-opt" data-slot="p" data-nivel="1" data-val="Análise de Dados" onclick="selecionarNivel1(this)">Análise de Dados</span>
+                    <span class="tag-opt" data-slot="p" data-nivel="1" data-val="Inteligência Artificial" onclick="selecionarNivel1(this)">Inteligência Artificial</span>
+                  </div>
+                </div>
+                <div class="interesse-nivel interesse-nivel--hidden" id="nivel2-p">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--2"></span>Qual é a especialidade?<button type="button" class="nivel-limpar" onclick="limparNivel(2,'p')">Limpar</button></div>
+                  <div class="tags-wrap" id="tags-espec-p"></div>
+                </div>
+                <div class="interesse-nivel interesse-nivel--hidden" id="nivel3-p">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--3"></span>Em qual tecnologia?<button type="button" class="nivel-limpar" onclick="limparNivel(3,'p')">Limpar</button></div>
+                  <div class="tags-wrap" id="tags-tech-p"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slot secundário -->
+            <div class="interesse-slot" id="slot-secundario" style="opacity:.4;pointer-events:none;">
+              <div class="interesse-slot__hd">
+                <div class="interesse-slot__num" style="background:var(--color-text-muted);">2</div>
+                <span class="interesse-slot__label">Interesse secundário</span>
+                <span class="interesse-slot__resumo" id="resumo-secundario">Selecione o interesse principal primeiro</span>
+              </div>
+              <div class="interesse-slot__body">
+                <div class="interesse-nivel" id="nivel1-s">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--1"></span>Qual é a área?</div>
+                  <div class="tags-wrap" id="tags-area-s">
+                    <span class="tag-opt" data-slot="s" data-nivel="1" data-val="Desenvolvimento de Software" onclick="selecionarNivel1(this)">Desenvolvimento de Software</span>
+                    <span class="tag-opt" data-slot="s" data-nivel="1" data-val="Análise de Dados" onclick="selecionarNivel1(this)">Análise de Dados</span>
+                    <span class="tag-opt" data-slot="s" data-nivel="1" data-val="Inteligência Artificial" onclick="selecionarNivel1(this)">Inteligência Artificial</span>
+                  </div>
+                </div>
+                <div class="interesse-nivel interesse-nivel--hidden" id="nivel2-s">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--2"></span>Especialidade?<button type="button" class="nivel-limpar" onclick="limparNivel(2,'s')">Limpar</button></div>
+                  <div class="tags-wrap" id="tags-espec-s"></div>
+                </div>
+                <div class="interesse-nivel interesse-nivel--hidden" id="nivel3-s">
+                  <div class="interesse-nivel__q"><span class="nivel-dot nivel-dot--3"></span>Tecnologia?<button type="button" class="nivel-limpar" onclick="limparNivel(3,'s')">Limpar</button></div>
+                  <div class="tags-wrap" id="tags-tech-s"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preferências -->
+            <div style="margin-top:16px;">
+              <div class="form-group__label" style="font-size:13px;font-weight:600;margin-bottom:8px;">Que tipo de oportunidade busca?</div>
+              <p style="font-size:11px;color:var(--color-text-muted);margin-bottom:8px;">Pode marcar mais de uma opção.</p>
+              <div class="tags-wrap" id="tags-pref">
+                <span class="tag-opt" onclick="this.classList.toggle('tag-opt--selected')">Jovem Aprendiz</span>
+                <span class="tag-opt" onclick="this.classList.toggle('tag-opt--selected')">Estágio</span>
+                <span class="tag-opt" onclick="this.classList.toggle('tag-opt--selected')">Trainee</span>
+                <span class="tag-opt" onclick="this.classList.toggle('tag-opt--selected')">Emprego CLT</span>
+                <span class="tag-opt" onclick="this.classList.toggle('tag-opt--selected')">Autônomo/Freelancer</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <div class="form-group__label" style="font-size:13px;font-weight:600;margin-bottom:8px;">Modalidade de preferência</div>
+              <div class="tags-wrap" id="tags-modal">
+                <span class="tag-opt" onclick="toggleSingle(this,'tags-modal')">Remoto</span>
+                <span class="tag-opt" onclick="toggleSingle(this,'tags-modal')">Híbrido</span>
+                <span class="tag-opt" onclick="toggleSingle(this,'tags-modal')">Presencial</span>
+                <span class="tag-opt" onclick="toggleSingle(this,'tags-modal')">Indiferente</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Soft skills -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Competências comportamentais — Soft Skills</h2>
+            </div>
+            <p class="section-hint">Selecione até <strong>5 competências</strong> comportamentais.</p>
+            <div class="skill-grid" id="skill-grid">
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Comunicação</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Colaboração</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Criatividade</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Resolução de problemas</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Pensamento crítico</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Adaptabilidade</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Aprendizado contínuo</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Organização</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Proatividade</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Inteligência emocional</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Autonomia</label>
+              <label class="skill-tag" onclick="toggleSkill(this)"><input type="checkbox" style="pointer-events:none;accent-color:var(--color-primary)"> Negociação</label>
+            </div>
+            <div style="font-size:11px;color:var(--color-text-muted);margin-top:8px;" id="skill-hint">0 de 5 selecionadas</div>
+          </div>
+
+          <!-- 7. Idiomas -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Idiomas</h2>
+            </div>
+            <p class="section-hint">Nível de inglês e outros idiomas.</p>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-group__label" style="margin-bottom:8px;">Inglês</label>
+              <div class="nivel-row" id="ingles-row">
+                <div class="nivel-pill" onclick="toggleNivel(this,'ingles-row')">Não possuo</div>
+                <div class="nivel-pill" onclick="toggleNivel(this,'ingles-row')">Básico</div>
+                <div class="nivel-pill" onclick="toggleNivel(this,'ingles-row')">Intermediário</div>
+                <div class="nivel-pill" onclick="toggleNivel(this,'ingles-row')">Avançado</div>
+                <div class="nivel-pill" onclick="toggleNivel(this,'ingles-row')">Fluente</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">Outros idiomas <span class="field-hint">— opcional</span></label>
+              <input type="text" class="form-group__input" placeholder="Ex: Espanhol - Intermediário, Alemão - Básico">
+            </div>
+          </div>
+
+          <!-- ══ CAMADA 3 ══════════════════════════════════════════════════ -->
+
+          <!-- 8. Perfil público -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Resumo profissional</h2>
+            </div>
+            <p class="section-hint">Escreva um resumo de 3 a 6 linhas — formação, principais conhecimentos e tipo de oportunidade buscada.<br>
+              <em style="color:var(--color-text-muted);">"Estudante de Desenvolvimento de Software pelo SCTEC, com conhecimentos em JavaScript e Angular. Busco minha primeira oportunidade na área de tecnologia."</em>
+            </p>
+            <textarea class="form-group__input" id="f-resumo" rows="4" maxlength="800"
+              style="resize:vertical;font-family:var(--font-body);line-height:1.6;"
+              placeholder="Resumo profissional..."
+              oninput="updateChar(this,'char-resumo',800);checkResumo()"></textarea>
+            <div class="char-count" id="char-resumo">0 / 800</div>
+          </div>
+
+          <!-- 9. Links -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Links e documentos</h2>
+            </div>
+            <p class="section-hint">Esses links aparecem no cartão público exibido às empresas.</p>
+            <div class="perfil-form__grid" style="margin-bottom:14px;">
+              <div class="form-group">
+                <label class="form-group__label">LinkedIn</label>
+                <input type="url" class="form-group__input" id="f-linkedin" placeholder="https://linkedin.com/in/..." oninput="checkLinks()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">GitHub</label>
+                <input type="url" class="form-group__input" id="f-github" placeholder="https://github.com/..." oninput="checkLinks()">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Portfólio <span class="field-hint">— opcional</span></label>
+                <input type="url" class="form-group__input" placeholder="https://meuportfolio.com">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Projeto SCTEC <span class="field-hint">— opcional</span></label>
+                <input type="url" class="form-group__input" placeholder="Link do projeto desenvolvido">
+              </div>
+            </div>
+            <!-- Currículo -->
+            <div class="perfil-form__grid">
+              <div class="form-group">
+                <label class="form-group__label">Currículo — PDF</label>
+                <div class="upload-area" onclick="document.getElementById('f-pdf').click()">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5"><path d="M20 16.58A5 5 0 0018 7h-1.26A8 8 0 103 16.29"/><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
+                  <div class="upload-area__text" id="pdf-label">Clique ou arraste o PDF aqui</div>
+                  <div class="upload-area__hint">PDF, máx. 5 MB</div>
+                  <input type="file" id="f-pdf" accept=".pdf" style="display:none;" onchange="handlePdf(this)">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Ou link do currículo</label>
+                <input type="url" class="form-group__input" placeholder="https://drive.google.com/..." style="margin-bottom:10px;">
+                <label class="form-group__label" style="margin-top:8px;">Vídeo de apresentação <span class="field-hint">— opcional</span></label>
+                <input type="url" class="form-group__input" placeholder="YouTube ou Vimeo">
+              </div>
+            </div>
+          </div>
+
+          <!-- 10. PCD -->
+          <div class="perfil-section">
+            <div class="perfil-section__header">
+              <h2 class="perfil-section__title">Pessoa com deficiência (PCD)</h2>
+            </div>
+            <p class="section-hint">Informação sigilosa, utilizada apenas para garantir inclusão nos processos seletivos.</p>
+            <div class="radio-row" id="pcd-row">
+              <label class="radio-opt" onclick="toggleRadio(this,'pcd-row');togglePcdSub(this)"><input type="radio" name="pcd" style="pointer-events:none"> Prefiro não informar</label>
+              <label class="radio-opt" onclick="toggleRadio(this,'pcd-row');togglePcdSub(this)"><input type="radio" name="pcd" style="pointer-events:none"> Não</label>
+              <label class="radio-opt" onclick="toggleRadio(this,'pcd-row');togglePcdSub(this)"><input type="radio" name="pcd" style="pointer-events:none"> Sim</label>
+            </div>
+            <div id="pcd-sub" style="display:none;margin-top:14px;padding:14px;background:var(--color-bg-light);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Necessita de adaptação ou recursos de acessibilidade para participar de processos seletivos?</div>
+              <div class="radio-row" id="pcd-acesso-row">
+                <label class="radio-opt" onclick="toggleRadio(this,'pcd-acesso-row')"><input type="radio" name="pcd-acesso" style="pointer-events:none"> Sim</label>
+                <label class="radio-opt" onclick="toggleRadio(this,'pcd-acesso-row')"><input type="radio" name="pcd-acesso" style="pointer-events:none"> Não</label>
+                <label class="radio-opt" onclick="toggleRadio(this,'pcd-acesso-row')"><input type="radio" name="pcd-acesso" style="pointer-events:none"> Prefiro informar posteriormente</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ações finais -->
+          <div class="perfil-actions">
+            <button type="submit" class="btn btn--primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><path d="M20 6L9 17l-5-5"/></svg>
+              Cadastrar aluno
+            </button>
+            <a href="admin-alunos.html" class="btn btn--ghost">Cancelar</a>
+          </div>
+
+        </form>
+      </div><!-- /cadastro-layout -->
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ── Progresso ──────────────────────────────────────────────────────────── */
+  const PROG_IDS = ['pi-nome','pi-trilha','pi-formacao','pi-situacao','pi-interesse','pi-skills','pi-ingles','pi-resumo','pi-links'];
+
+  function markDone(id) {
+    document.getElementById(id)?.classList.add('prog-item--done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const done = PROG_IDS.filter(id => document.getElementById(id)?.classList.contains('prog-item--done')).length;
+    const pct = Math.round((done / PROG_IDS.length) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-percent').textContent = pct + '%';
+  }
+
+  /* ── Validação campos obrigatórios ──────────────────────────────────────── */
+  function checkNome() {
+    const ok = ['f-nome','f-email','f-cpf','f-nasc','f-cidade'].every(id => document.getElementById(id)?.value.trim());
+    document.getElementById('pi-nome').classList.toggle('prog-item--done', ok);
+    updateProgress();
+  }
+
+  function checkAcesso() {
+    const s = document.getElementById('f-senha')?.value;
+    const s2 = document.getElementById('f-senha2')?.value;
+    const ok = s?.length >= 8 && s === s2;
+    document.getElementById('pi-acesso').classList.toggle('prog-item--done', ok);
+    updateProgress();
+  }
+
+  function checkResumo() {
+    const ok = document.getElementById('f-resumo')?.value.trim().length >= 50;
+    document.getElementById('pi-resumo').classList.toggle('prog-item--done', ok);
+    updateProgress();
+  }
+
+  function checkLinks() {
+    const li = document.getElementById('f-linkedin')?.value.trim();
+    const gh = document.getElementById('f-github')?.value.trim();
+    document.getElementById('pi-links').classList.toggle('prog-item--done', !!(li || gh));
+    updateProgress();
+  }
+
+  /* ── CEP autocomplete ───────────────────────────────────────────────────── */
+  function buscarCep(cep) {
+    const c = cep.replace(/\D/g,'');
+    if (c.length === 8) {
+      fetch('https://viacep.com.br/ws/'+c+'/json/')
+        .then(r=>r.json())
+        .then(d=>{ if(!d.erro) { document.getElementById('f-cidade').value = d.localidade+', '+d.uf; checkNome(); }})
+        .catch(()=>{});
+    }
+  }
+
+  /* ── Trilhas ────────────────────────────────────────────────────────────── */
+  function toggleTrilha(id) {
+    document.getElementById('block-'+id).classList.toggle('trilha-block--open');
+  }
+
+  function toggleCurso(label) {
+    const cb = label.querySelector('input');
+    setTimeout(() => {
+      cb.checked ? label.classList.add('curso-item--selected') : label.classList.remove('curso-item--selected');
+      updateTrilhaCounts();
+    }, 0);
+  }
+
+  function updateTrilhaCounts() {
+    ['dev','dados','ia'].forEach(id => {
+      const n = document.getElementById('cursos-'+id).querySelectorAll(':checked').length;
+      document.getElementById('count-'+id).textContent = n ? n+(n===1?' curso selecionado':' cursos selecionados') : 'Nenhum curso selecionado';
+      document.getElementById('block-'+id).classList.toggle('trilha-block--active', n>0);
+      document.getElementById('badge-'+id).textContent = n+(n===1?' curso':' cursos');
+    });
+    const total = document.querySelectorAll('input[name="cursos"]:checked').length;
+    document.getElementById('pi-trilha').classList.toggle('prog-item--done', total>0);
+    updateProgress();
+  }
+
+  /* ── Hierarquia de interesse ────────────────────────────────────────────── */
+  const HIERARQUIA = {
+    'Desenvolvimento de Software': {
+      'Front-End':['React','Angular','Vue.js','Next.js','TypeScript'],
+      'Back-End':['Node.js','Spring Boot','.NET','Python/Django','Go','PHP'],
+      'Full-Stack':['React + Node.js','Vue + Laravel','Next.js + NestJS'],
+      'Mobile':['React Native','Flutter','Swift','Kotlin'],
+      'DevOps':['Docker','Kubernetes','GitHub Actions','Terraform'],
+      'Qualidade e Testes (QA)':['Cypress','Selenium','Jest','Playwright'],
+      'Computação em Nuvem':['AWS','Azure','Google Cloud (GCP)'],
+      'Cibersegurança':['Pentest','SIEM','Análise de Vulnerabilidades'],
+      'UX/UI Design':['Figma','Adobe XD','Design System'],
+      'Automação':['RPA','Power Automate','Python Scripts'],
+      'Outra':null,
+    },
+    'Análise de Dados': {
+      'Business Intelligence':['Power BI','Tableau','Looker','Metabase'],
+      'Análise de Dados':['Python','R','SQL','Excel Avançado'],
+      'Ciência de Dados':['Pandas','Spark','dbt'],
+      'Automação':['Airflow','ETL/ELT'],
+      'Outra':null,
+    },
+    'Inteligência Artificial': {
+      'Machine Learning':['TensorFlow','PyTorch','Scikit-learn','XGBoost'],
+      'Visão Computacional':['OpenCV','YOLO','MediaPipe'],
+      'Análise Preditiva':['AutoML','Prophet'],
+      'Automação (IA)':['LangChain','CrewAI','LLMs'],
+      'Outra':null,
+    },
+  };
+  const SEL = { p:{area:null,espec:null,tech:null}, s:{area:null,espec:null,tech:null} };
+
+  function selecionarNivel1(el) {
+    const slot=el.dataset.slot, val=el.dataset.val;
+    if (SEL[slot].area===val) {
+      SEL[slot]={area:null,espec:null,tech:null};
+      el.classList.remove('tag-opt--selected');
+      esconderNivel(2,slot); esconderNivel(3,slot);
+    } else {
+      document.querySelectorAll('[data-slot="'+slot+'"][data-nivel="1"]').forEach(t=>t.classList.remove('tag-opt--selected'));
+      SEL[slot]={area:val,espec:null,tech:null};
+      el.classList.add('tag-opt--selected');
+      renderEspec(slot,val); esconderNivel(3,slot);
+    }
+    atualizarResumo(slot); sincronizarSecundario();
+    if(SEL.p.area) markDone('pi-interesse'); else { document.getElementById('pi-interesse').classList.remove('prog-item--done'); updateProgress(); }
+  }
+
+  function selecionarNivel2(el) {
+    const slot=el.dataset.slot, val=el.dataset.val;
+    if(val==='Outra'){toggleOutra(slot,'espec');return;}
+    if(SEL[slot].espec===val){SEL[slot].espec=null;SEL[slot].tech=null;el.classList.remove('tag-opt--selected');esconderNivel(3,slot);}
+    else{document.querySelectorAll('#tags-espec-'+slot+' .tag-opt').forEach(t=>t.classList.remove('tag-opt--selected'));SEL[slot].espec=val;SEL[slot].tech=null;el.classList.add('tag-opt--selected');renderTech(slot,SEL[slot].area,val);}
+    atualizarResumo(slot);
+  }
+
+  function selecionarNivel3(el) {
+    const slot=el.dataset.slot, val=el.dataset.val;
+    if(val==='Outra'){toggleOutra(slot,'tech');return;}
+    if(SEL[slot].tech===val){SEL[slot].tech=null;el.classList.remove('tag-opt--selected');}
+    else{document.querySelectorAll('#tags-tech-'+slot+' .tag-opt').forEach(t=>t.classList.remove('tag-opt--selected'));SEL[slot].tech=val;el.classList.add('tag-opt--selected');}
+    atualizarResumo(slot);
+  }
+
+  function renderEspec(slot,area) {
+    const wrap=document.getElementById('tags-espec-'+slot); wrap.innerHTML='';
+    Object.keys(HIERARQUIA[area]||{}).forEach(esp=>{
+      if(esp==='Outra'){wrap.insertAdjacentHTML('beforeend',outraHTML(slot,'espec'));return;}
+      wrap.appendChild(criarTag(esp,slot,'2','selecionarNivel2'));
+    });
+    document.getElementById('nivel2-'+slot).classList.remove('interesse-nivel--hidden');
+  }
+
+  function renderTech(slot,area,espec) {
+    const wrap=document.getElementById('tags-tech-'+slot); wrap.innerHTML='';
+    const techs=HIERARQUIA[area]?.[espec];
+    if(!techs?.length){esconderNivel(3,slot);return;}
+    techs.forEach(t=>wrap.appendChild(criarTag(t,slot,'3','selecionarNivel3')));
+    wrap.insertAdjacentHTML('beforeend',outraHTML(slot,'tech'));
+    document.getElementById('nivel3-'+slot).classList.remove('interesse-nivel--hidden');
+  }
+
+  function criarTag(label,slot,nivel,fn){const t=document.createElement('span');t.className='tag-opt';t.dataset.slot=slot;t.dataset.nivel=nivel;t.dataset.val=label;t.textContent=label;t.setAttribute('onclick',fn+'(this)');return t;}
+
+  function esconderNivel(n,slot){
+    document.getElementById('nivel'+n+'-'+slot).classList.add('interesse-nivel--hidden');
+    if(n===2){SEL[slot].espec=null;SEL[slot].tech=null;} if(n===3){SEL[slot].tech=null;}
+  }
+
+  function limparNivel(n,slot){
+    if(n===2){SEL[slot].espec=null;SEL[slot].tech=null;document.querySelectorAll('#tags-espec-'+slot+' .tag-opt').forEach(t=>t.classList.remove('tag-opt--selected'));esconderNivel(3,slot);}
+    else{SEL[slot].tech=null;document.querySelectorAll('#tags-tech-'+slot+' .tag-opt').forEach(t=>t.classList.remove('tag-opt--selected'));}
+    atualizarResumo(slot);
+  }
+
+  function atualizarResumo(slot){
+    const {area,espec,tech}=SEL[slot];
+    const el=document.getElementById('resumo-'+(slot==='p'?'principal':'secundario'));
+    if(!area){el.textContent=slot==='p'?'Nenhuma área selecionada':'Selecione o interesse principal primeiro';}
+    else{let r=area;if(espec)r+=' → '+espec;if(tech)r+=' → '+tech;el.textContent=r;}
+    document.getElementById('slot-'+(slot==='p'?'principal':'secundario')).classList.toggle('interesse-slot--filled',!!area);
+  }
+
+  function sincronizarSecundario(){
+    const s=document.getElementById('slot-secundario');
+    if(SEL.p.area){s.style.opacity='1';s.style.pointerEvents='auto';document.querySelectorAll('#tags-area-s .tag-opt').forEach(t=>t.classList.toggle('tag-opt--disabled',t.dataset.val===SEL.p.area));}
+    else{s.style.opacity='.4';s.style.pointerEvents='none';}
+  }
+
+  function outraHTML(slot,tipo){return `<span class="outra-trigger" onclick="toggleOutra('${slot}','${tipo}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Outra</span><div class="outra-input-wrap" id="outra-wrap-${slot}-${tipo}"><input class="outra-input" placeholder="Especifique…" maxlength="60" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarOutra('${slot}','${tipo}');}"><button class="outra-confirm" onclick="confirmarOutra('${slot}','${tipo}')">OK</button></div>`;}
+
+  function toggleOutra(slot,tipo){document.getElementById('outra-wrap-'+slot+'-'+tipo)?.classList.toggle('outra-input-wrap--open');}
+
+  function confirmarOutra(slot,tipo){
+    const inp=document.querySelector('#outra-wrap-'+slot+'-'+tipo+' input');
+    const val=inp?.value.trim(); if(!val)return;
+    if(tipo==='espec')SEL[slot].espec=val; else SEL[slot].tech=val;
+    atualizarResumo(slot);
+    document.getElementById('outra-wrap-'+slot+'-'+tipo)?.classList.remove('outra-input-wrap--open');
+    if(inp)inp.value='';
+  }
+
+  /* ── Soft skills ────────────────────────────────────────────────────────── */
+  function toggleSkill(label){
+    const sel=document.querySelectorAll('#skill-grid .skill-tag--sel').length;
+    const isOn=label.classList.contains('skill-tag--sel');
+    if(!isOn&&sel>=5){showToast('Selecione no máximo 5 competências.');return;}
+    label.classList.toggle('skill-tag--sel');
+    label.querySelector('input').checked=!isOn;
+    const n=document.querySelectorAll('#skill-grid .skill-tag--sel').length;
+    document.getElementById('skill-hint').textContent=n+' de 5 selecionadas';
+    document.getElementById('pi-skills').classList.toggle('prog-item--done',n>=1);
+    updateProgress();
+  }
+
+  /* ── Nível idioma ────────────────────────────────────────────────────────── */
+  function toggleNivel(el,rowId){
+    document.querySelectorAll('#'+rowId+' .nivel-pill').forEach(p=>p.classList.remove('nivel-pill--sel'));
+    el.classList.add('nivel-pill--sel');
+    markDone('pi-ingles');
+  }
+
+  /* ── Preferência única ───────────────────────────────────────────────────── */
+  function toggleSingle(el,wrapId){
+    document.querySelectorAll('#'+wrapId+' .tag-opt').forEach(t=>t.classList.remove('tag-opt--selected'));
+    el.classList.add('tag-opt--selected');
+  }
+
+  /* ── Radio ───────────────────────────────────────────────────────────────── */
+  function toggleRadio(el,groupId){
+    document.querySelectorAll('#'+groupId+' .radio-opt').forEach(r=>r.classList.remove('radio-opt--sel'));
+    el.classList.add('radio-opt--sel');
+  }
+
+  function togglePcdSub(el){
+    document.getElementById('pcd-sub').style.display=el.textContent.trim()==='Sim'?'block':'none';
+  }
+
+  /* ── Char count ──────────────────────────────────────────────────────────── */
+  function updateChar(el,countId,max){
+    document.getElementById(countId).textContent=el.value.length+' / '+max;
+  }
+
+  /* ── PDF ─────────────────────────────────────────────────────────────────── */
+  function handlePdf(input){
+    if(input.files?.[0]) document.getElementById('pdf-label').textContent=input.files[0].name;
+  }
+
+  /* ── Submit ──────────────────────────────────────────────────────────────── */
+  function handleSubmit(e){
+    e.preventDefault();
+    const nome=document.getElementById('f-nome').value.trim();
+    const email=document.getElementById('f-email').value.trim();
+    const cpf=document.getElementById('f-cpf').value.trim();
+    const nasc=document.getElementById('f-nasc').value;
+    const cidade=document.getElementById('f-cidade').value.trim();
+    if(!nome||!email||!cpf||!nasc||!cidade){showToast('Preencha todos os campos obrigatórios (Camada 1).');return;}
+
+    if(!document.querySelectorAll('input[name="cursos"]:checked').length){showToast('Selecione ao menos um curso SCTEC.');return;}
+    showToast('Aluno cadastrado com sucesso!');
+    setTimeout(()=>window.location.href='admin-alunos.html',1800);
+  }
+
+  /* ── Toast & avatar ──────────────────────────────────────────────────────── */
+  function showToast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('toast--visible');
+    setTimeout(()=>t.classList.remove('toast--visible'),3000);
+  }
+
+  function toggleAvatarMenu(){document.getElementById('avatar-menu').classList.toggle('avatar-menu--open');}
+  document.addEventListener('click',e=>{
+    const m=document.getElementById('avatar-menu'),tog=document.getElementById('avatar-toggle');
+    if(m&&!m.contains(e.target)&&!tog.contains(e.target)) m.classList.remove('avatar-menu--open');
+  });
+
+  updateProgress();
+  </script>
+</body>
+</html>
+
+
+

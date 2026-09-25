@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Perfil — Portal de Talentos SCTEC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f8f9fb;
+      color: #171717;
+      min-height: 100vh;
+    }
+
+    /* ─── Design Tokens ─── */
+    :root {
+      --primary: #7ab934;
+      --primary-dark: #568328;
+      --primary-gradient: linear-gradient(150deg, #2ca942 15%, #55b13a 54%, #52b934 87%);
+      --outline: #d4d4d4;
+      --bg: #ffffff;
+      --bg-light: #f8f9fb;
+      --on-bg: #171717;
+      --on-bg-variant: #737373;
+      --error: #e62c2d;
+      --warning: #e59a17;
+      --shadow-card: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1);
+      --radius-card: 22px;
+      --radius-input: 10px;
+      --radius-badge: 26px;
+    }
+
+    /* ─── Navbar ─── */
+    .navbar {
+      height: 80px;
+      background: #fff;
+      border-bottom: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-card);
+    }
+    .navbar-logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .navbar-logo span { color: var(--primary); }
+    .navbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-btn {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 10px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* ─── Page Layout ─── */
+    .page-header {
+      background: #fff;
+      padding: 28px 328px 24px;
+      border-bottom: 1px solid var(--outline);
+    }
+    .page-header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--on-bg);
+    }
+    .page-header p { font-size: 14px; color: var(--on-bg-variant); margin-top: 4px; }
+
+    .layout {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 40px;
+      display: grid;
+      grid-template-columns: 256px 1fr 296px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: sticky;
+      top: 96px;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--on-bg-variant);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      text-decoration: none;
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      background: rgba(122,185,52,.08);
+      color: var(--primary-dark);
+    }
+    .sidebar-item svg { flex-shrink: 0; }
+
+    /* ─── Checklist Card ─── */
+    .checklist-card {
+      background: #fff;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+      position: sticky;
+      top: 96px;
+    }
+    .checklist-card h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .profile-pct {
+      font-size: 13px;
+      color: var(--on-bg-variant);
+      margin-bottom: 12px;
+    }
+    .pct-bar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .pct-bar-fill {
+      height: 100%;
+      background: var(--primary-gradient);
+      border-radius: 99px;
+      width: 35%;
+      transition: width .4s;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      padding: 5px 0;
+      color: var(--on-bg-variant);
+    }
+    .checklist-item.done { color: var(--on-bg); }
+    .checklist-item .ci-icon {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--outline);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .checklist-item.done .ci-icon {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      font-size: 11px;
+    }
+    .layer-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 10px 0 4px;
+      color: var(--on-bg-variant);
+    }
+
+    /* ─── Main Form ─── */
+    .form-area { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+    }
+    .card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--on-bg-variant);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .card-header-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* ─── Form Grid ─── */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px 24px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--on-bg);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .field-label .req { color: var(--error); }
+    .field-label .opt {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--on-bg-variant);
+      margin-left: 4px;
+    }
+    .input, .select-input, .textarea-input {
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-input);
+      padding: 10px 12px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      color: var(--on-bg);
+      background: var(--bg);
+      width: 100%;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+    .input:focus, .select-input:focus, .textarea-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(122,185,52,.15);
+    }
+    .input::placeholder, .textarea-input::placeholder {
+      color: var(--on-bg-variant);
+    }
+    .input.disabled, .select-input:disabled {
+      background: var(--bg-light);
+      color: var(--on-bg-variant);
+      cursor: not-allowed;
+    }
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--on-bg-variant);
+      pointer-events: none;
+    }
+    .textarea-input {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.5;
+    }
+    .char-count {
+      font-size: 12px;
+      color: var(--on-bg-variant);
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    /* ─── Avatar ─── */
+    .header-container {
+      display: flex;
+      gap: 14px;
+    }
+    .avatar-section {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      width: 214px;
+    }
+    .avatar-section .card-title { font-size: 16px; text-align: center; }
+    .avatar-circle {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: var(--bg-light);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      border: 2px solid var(--outline);
+    }
+    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-circle svg { color: var(--on-bg-variant); }
+    .btn-avatar {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+    .avatar-hint { font-size: 11px; color: var(--on-bg-variant); text-align: center; }
+    .personal-section { flex: 1; }
+
+    /* ─── Accordion ─── */
+    .accordion { border: 1px solid var(--outline); border-radius: 10px; overflow: hidden; }
+    .accordion + .accordion { margin-top: 8px; }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg);
+    }
+    .accordion-header:hover { background: var(--bg-light); }
+    .acc-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+    .acc-icon.blue { background: rgba(59,130,246,.07); }
+    .acc-icon.yellow { background: rgba(229,154,23,.07); }
+    .acc-icon.orange { background: rgba(249,115,22,.07); }
+    .acc-title {
+      flex: 1;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .acc-chevron {
+      transition: transform .25s;
+      color: var(--on-bg-variant);
+    }
+    .accordion.open .acc-chevron { transform: rotate(180deg); }
+    .accordion-body {
+      display: none;
+      padding: 16px;
+      border-top: 1px solid var(--bg-light);
+      background: var(--bg-light);
+    }
+    .accordion.open .accordion-body { display: block; }
+    .course-list { display: flex; flex-direction: column; gap: 10px; }
+    .course-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .course-item input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ─── Badges ─── */
+    .badges-group { display: flex; flex-direction: column; gap: 16px; }
+    .badges-section-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--on-bg);
+      margin-bottom: 8px;
+    }
+    .badges-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: var(--radius-badge);
+      border: 1px solid var(--outline);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+      color: var(--on-bg);
+      background: var(--bg);
+    }
+    .badge:hover { border-color: var(--primary); color: var(--primary-dark); }
+    .badge.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .badge.dashed {
+      border-style: dashed;
+      color: var(--on-bg-variant);
+    }
+
+    /* ─── Experience / Certificate Cards ─── */
+    .exp-card {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-card);
+      padding: 14px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .exp-card + .exp-card { margin-top: 12px; }
+    .exp-icon { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; }
+    .exp-info { flex: 1; }
+    .exp-title { font-size: 16px; font-weight: 600; }
+    .exp-meta { font-size: 13px; color: var(--on-bg-variant); margin-top: 2px; }
+    .exp-desc { font-size: 13px; color: var(--on-bg); margin-top: 4px; line-height: 1.4; }
+    .exp-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--outline);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--on-bg-variant);
+      font-family: 'Roboto', sans-serif;
+    }
+    .btn-icon:hover { border-color: var(--primary); color: var(--primary-dark); }
+    .btn-icon.danger:hover { border-color: var(--error); color: var(--error); }
+    .exp-empty {
+      border: 2px dashed var(--outline);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      color: var(--on-bg-variant);
+      font-size: 14px;
+    }
+
+    /* ─── Dropzone ─── */
+    .dropzone {
+      border: 2px dashed var(--outline);
+      border-radius: 14px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .dropzone:hover { border-color: var(--primary); background: rgba(122,185,52,.04); }
+    .dropzone-icon { font-size: 28px; margin-bottom: 8px; }
+    .dropzone-label { font-size: 14px; font-weight: 600; color: var(--on-bg); }
+    .dropzone-hint { font-size: 12px; color: var(--on-bg-variant); margin-top: 4px; }
+
+    /* ─── Buttons ─── */
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--primary-dark);
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+    }
+    .btn-add:hover { background: rgba(122,185,52,.08); }
+    .btn-save {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      box-shadow: 0 2px 8px rgba(122,185,52,.3);
+      transition: opacity .15s;
+    }
+    .btn-save:hover { opacity: .9; }
+
+    /* ─── Modal ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+    .modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn-cancel {
+      background: none;
+      border: 1px solid var(--outline);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* ─── Tags input (hard skills) ─── */
+    .tags-input-wrap {
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-input);
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 44px;
+      cursor: text;
+      background: var(--bg);
+      transition: border-color .15s;
+    }
+    .tags-input-wrap:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(122,185,52,.15); }
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(122,185,52,.12);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--primary-dark);
+    }
+    .tag-chip .remove-tag {
+      cursor: pointer;
+      color: var(--primary-dark);
+      font-size: 14px;
+      line-height: 1;
+      opacity: .7;
+    }
+    .tag-chip .remove-tag:hover { opacity: 1; }
+    .tag-chip.main-tag { background: var(--primary); color: #fff; }
+    .tag-chip.main-tag .remove-tag { color: #fff; }
+    .tags-input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-family: 'Roboto', sans-serif;
+      min-width: 120px;
+      background: transparent;
+    }
+    .tags-hint { font-size: 12px; color: var(--on-bg-variant); margin-top: 4px; }
+
+    /* ─── Radio / Checkbox groups ─── */
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .radio-option, .checkbox-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--outline);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all .15s;
+    }
+    .radio-option input, .checkbox-option input { accent-color: var(--primary); }
+    .radio-option:has(input:checked),
+    .checkbox-option:has(input:checked) {
+      border-color: var(--primary);
+      background: rgba(122,185,52,.06);
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+
+    /* ─── PCD Section ─── */
+    .pcd-follow-up {
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--bg-light);
+      border-radius: 10px;
+      border: 1px solid var(--outline);
+      display: none;
+    }
+    .pcd-follow-up.visible { display: block; }
+
+    /* ─── LGPD Banner ─── */
+    .lgpd-banner {
+      background: rgba(122,185,52,.06);
+      border: 1px solid rgba(122,185,52,.3);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: #3d6018;
+      line-height: 1.6;
+    }
+    .lgpd-banner strong { font-weight: 700; }
+    .lgpd-check { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; font-size: 13px; }
+    .lgpd-check input { margin-top: 2px; accent-color: var(--primary); flex-shrink: 0; }
+
+    /* ─── Visibility notice ─── */
+    .visibility-row {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--on-bg-variant);
+      margin-top: 4px;
+    }
+    .visibility-row .lock { color: var(--error); }
+    .visibility-row .public { color: var(--primary-dark); }
+
+    /* ─── Footer ─── */
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all .3s;
+      z-index: 300;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ─── New: campo que está no doc mas não no Figma ─── */
+    .new-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(229,154,23,.12);
+      color: #7c4a00;
+      border: 1px solid rgba(229,154,23,.35);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+      letter-spacing: .3px;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 220px 1fr; }
+      .checklist-card { display: none; }
+    }
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; padding: 16px; }
+      .sidebar { display: none; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      .header-container { flex-direction: column; }
+      .avatar-section { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="#7ab934"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    SC<span>TEC</span> &nbsp;·&nbsp; Portal de Talentos
+  </div>
+  <div class="navbar-actions">
+    <span style="font-size:14px;color:#737373">João da Silva</span>
+    <button class="nav-btn" onclick="saveForm()">Salvar perfil</button>
+  </div>
+</nav>
+
+<!-- Page header -->
+<div class="page-header">
+  <h1>Meu Perfil</h1>
+  <p>Preencha suas informações para aparecer no banco de talentos e ser encontrado por empresas parceiras.</p>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar nav -->
+  <aside class="sidebar">
+    <a href="#dados-pessoais" class="sidebar-item active">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Dados pessoais
+    </a>
+    <a href="#links" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Links
+    </a>
+    <a href="#resumo" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Resumo profissional
+    </a>
+    <a href="#trilha" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Trilha SCTEC
+    </a>
+    <a href="#formacao" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Formação
+    </a>
+    <a href="#experiencia" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      Experiência
+    </a>
+    <a href="#competencias" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Competências
+    </a>
+    <a href="#interesses" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Interesses
+    </a>
+    <a href="#idiomas" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Idiomas
+    </a>
+    <a href="#curriculo" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Currículo
+    </a>
+    <a href="#diversidade" class="sidebar-item">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Diversidade
+    </a>
+  </aside>
+
+  <!-- Form area -->
+  <main class="form-area">
+
+    <!-- ── LGPD Banner ── -->
+    <div class="lgpd-banner">
+      <strong>🔒 Seus dados estão protegidos pela LGPD.</strong><br>
+      Suas informações serão compartilhadas com empresas parceiras exclusivamente para fins de recrutamento. Perfis completos têm maior visibilidade — mas isso não garante participação em processos seletivos ou contratação.
+      <div class="lgpd-check">
+        <input type="checkbox" id="lgpd-consent" />
+        <label for="lgpd-consent">Concordo com o <a href="#" style="color:var(--primary-dark)">uso dos meus dados</a> para fins de recrutamento e seleção pelas empresas parceiras do SCTEC.</label>
+      </div>
+    </div>
+
+    <!-- ── 1. Dados Pessoais ── -->
+    <div id="dados-pessoais">
+      <div class="header-container">
+        <!-- Foto -->
+        <div class="avatar-section">
+          <p class="card-title">Foto de perfil</p>
+          <div class="avatar-circle" id="avatar-preview">
+            <svg width="56" height="56" fill="none" stroke="#d4d4d4" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <label class="btn-avatar" for="avatar-upload">Alterar foto</label>
+          <input type="file" id="avatar-upload" accept="image/jpg,image/png,image/jpeg" style="display:none" onchange="previewAvatar(this)"/>
+          <span class="avatar-hint">JPG ou PNG, até 5 MB</span>
+        </div>
+
+        <!-- Dados pessoais -->
+        <div class="card personal-section">
+          <p class="card-title">Dados pessoais</p>
+          <div class="form-grid-2" style="margin-top:12px">
+            <div class="field">
+              <label class="field-label">Nome completo <span class="req">*</span></label>
+              <input class="input" type="text" placeholder="Seu nome completo" id="nome" />
+            </div>
+            <div class="field">
+              <label class="field-label">CPF <span class="req">*</span> <span class="lock" style="font-size:11px;color:var(--error)">🔒 não visível para empresas</span></label>
+              <input class="input" type="text" placeholder="000.000.000-00" id="cpf" maxlength="14" oninput="maskCPF(this)"/>
+            </div>
+            <div class="field">
+              <label class="field-label">Data de nascimento <span class="req">*</span> <span class="lock" style="font-size:11px;color:var(--error)">🔒</span></label>
+              <input class="input" type="date" id="nascimento" />
+            </div>
+            <div class="field">
+              <label class="field-label">E-mail pessoal <span class="req">*</span></label>
+              <input class="input" type="email" placeholder="seu@email.com" id="email" />
+              <span style="font-size:11px;color:var(--on-bg-variant)">Use um e-mail pessoal (não o @aluno.senai)</span>
+            </div>
+            <div class="field">
+              <label class="field-label">Telefone / WhatsApp <span class="req">*</span></label>
+              <input class="input" type="tel" placeholder="(00) 00000-0000" id="telefone" maxlength="15" oninput="maskPhone(this)"/>
+            </div>
+            <div class="field">
+              <label class="field-label">CEP <span class="req">*</span> <span class="lock" style="font-size:11px;color:var(--error)">🔒</span></label>
+              <input class="input" type="text" placeholder="00000-000" id="cep" maxlength="9" oninput="maskCEP(this)" onblur="fetchCEP(this.value)" />
+            </div>
+            <div class="field">
+              <label class="field-label">Cidade <span class="req">*</span></label>
+              <input class="input disabled" type="text" placeholder="Preenchida automaticamente pelo CEP" id="cidade" readonly />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. Links ── -->
+    <div class="card" id="links">
+      <p class="card-title">Links</p>
+      <p class="card-subtitle">Adicione seus perfis profissionais para aumentar a visibilidade.</p>
+      <div class="form-grid-2">
+        <div class="field">
+          <label class="field-label">LinkedIn <span class="req">*</span></label>
+          <input class="input" type="url" placeholder="https://linkedin.com/in/seu-perfil" id="linkedin" />
+        </div>
+        <div class="field">
+          <label class="field-label">GitHub <span class="req">*</span></label>
+          <input class="input" type="url" placeholder="https://github.com/seu-usuario" id="github" />
+        </div>
+        <div class="field">
+          <label class="field-label">Portfólio <span class="opt">(opcional)</span></label>
+          <input class="input" type="url" placeholder="https://meuportfolio.com" id="portfolio" />
+        </div>
+        <div class="field">
+          <label class="field-label">Projeto SCTEC <span class="opt">(opcional)</span> <span class="new-badge">+ DOC</span></label>
+          <input class="input" type="url" placeholder="Link do seu projeto desenvolvido no SCTEC" id="projeto-sctec" />
+        </div>
+        <div class="field">
+          <label class="field-label">Vídeo de apresentação <span class="opt">(opcional)</span></label>
+          <input class="input" type="url" placeholder="YouTube ou Vimeo" id="video" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. Resumo Profissional ── -->
+    <div class="card" id="resumo">
+      <p class="card-title">Resumo profissional</p>
+      <p class="card-subtitle">Conte brevemente sobre você: formação, conhecimentos, experiências e o tipo de oportunidade que busca. Escreva 3 a 6 linhas.</p>
+      <div class="field">
+        <textarea class="textarea-input" id="resumo-text" placeholder='Ex: "Estudante de Desenvolvimento de Software pelo SCTEC, com conhecimentos em JavaScript, TypeScript e Angular. Busco minha primeira oportunidade na área de tecnologia."' maxlength="800" oninput="updateCharCount(this, 'resumo-count')"></textarea>
+        <span class="char-count"><span id="resumo-count">0</span>/800 caracteres</span>
+      </div>
+    </div>
+
+    <!-- ── 4. Trilha e Cursos SCTEC ── -->
+    <div class="card" id="trilha">
+      <p class="card-title">Trilha e cursos concluídos no SCTEC <span class="req">*</span></p>
+      <p class="card-subtitle">Selecione sua trilha e marque os cursos que você concluiu no programa.</p>
+
+      <div class="accordion open" id="acc-dev">
+        <div class="accordion-header" onclick="toggleAcc('acc-dev')">
+          <div class="acc-icon blue">💻</div>
+          <span class="acc-title">Desenvolvimento de Software</span>
+          <svg class="acc-chevron" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body">
+          <div class="course-list">
+            <label class="course-item"><input type="checkbox" name="curso" value="backend-node" /> Desenvolvimento Back-End [Node]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="backend-net" /> Desenvolvimento Back-End [.Net]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="backend-spring" /> Desenvolvimento Back-End [Spring]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="frontend-react" /> Desenvolvimento Front-End [React]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="frontend-angular" /> Desenvolvimento Front-End [Angular]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="frontend-vue" /> Desenvolvimento Front-End [Vue]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="mobile-rn" /> Desenvolvimento Mobile [React Native]</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="mobile-flutter" /> Desenvolvimento Mobile [Flutter]</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion" id="acc-dados" style="margin-top:8px">
+        <div class="accordion-header" onclick="toggleAcc('acc-dados')">
+          <div class="acc-icon yellow">📊</div>
+          <span class="acc-title">Análise de Dados</span>
+          <svg class="acc-chevron" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body">
+          <div class="course-list">
+            <label class="course-item"><input type="checkbox" name="curso" value="dados-python" /> Análise de Dados com Python</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="dados-bi" /> Visualização de Dados e Business Intelligence</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion" id="acc-ia" style="margin-top:8px">
+        <div class="accordion-header" onclick="toggleAcc('acc-ia')">
+          <div class="acc-icon orange">🤖</div>
+          <span class="acc-title">Inteligência Artificial</span>
+          <svg class="acc-chevron" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body">
+          <div class="course-list">
+            <label class="course-item"><input type="checkbox" name="curso" value="ia-ml" /> Machine Learning e Visão Computacional</label>
+            <label class="course-item"><input type="checkbox" name="curso" value="ia-preditiva" /> Desenvolvimento de IA para Análise Preditiva</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. Formação e Situação ── -->
+    <div class="card" id="formacao">
+      <p class="card-title">Formação e situação profissional</p>
+      <div class="form-grid-2" style="margin-top:12px">
+        <div class="field">
+          <label class="field-label">Formação acadêmica</label>
+          <div class="select-wrapper">
+            <select class="select-input" id="formacao-select">
+              <option value="">Selecione sua formação mais recente</option>
+              <option>Ensino médio incompleto</option>
+              <option>Ensino médio completo</option>
+              <option>Ensino técnico incompleto</option>
+              <option>Ensino técnico completo</option>
+              <option>Ensino superior incompleto</option>
+              <option>Ensino superior completo</option>
+              <option>Pós-graduação (especialização/MBA) incompleta</option>
+              <option>Pós-graduação (especialização/MBA) completa</option>
+              <option>Mestrado incompleto</option>
+              <option>Mestrado completo</option>
+              <option>Doutorado ou pós-doutorado</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Situação profissional atual</label>
+          <div class="select-wrapper">
+            <select class="select-input" id="situacao-select">
+              <option value="">Selecione</option>
+              <option>Estou procurando meu primeiro emprego</option>
+              <option>Estou desempregado(a) e procurando emprego</option>
+              <option>Estou trabalhando na área de Tecnologia</option>
+              <option>Estou trabalhando em outra área</option>
+              <option>Sou Autônomo/Freelancer/Empreendedor na Tecnologia</option>
+              <option>Sou Autônomo/Freelancer/Empreendedor em outra área</option>
+              <option>Estou fazendo estágio em tecnologia</option>
+              <option>Estou fazendo estágio em outra área</option>
+              <option>Sou jovem aprendiz na área de tecnologia</option>
+              <option>Sou jovem aprendiz em outra área</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. Preferências Profissionais ── -->
+    <div class="card" id="preferencias">
+      <p class="card-title">Preferências profissionais <span class="new-badge">+ DOC</span></p>
+      <p class="card-subtitle">Indique o tipo de oportunidade e a modalidade de trabalho que você busca.</p>
+      <div class="form-grid-2" style="gap:20px">
+        <div class="field">
+          <label class="field-label">Tipo de oportunidade</label>
+          <div class="checkbox-group" style="flex-direction:column">
+            <label class="checkbox-option"><input type="checkbox" name="tipo-vaga" value="jovem-aprendiz" /> Jovem Aprendiz <span style="font-size:12px;color:var(--on-bg-variant)">(menores de idade)</span></label>
+            <label class="checkbox-option"><input type="checkbox" name="tipo-vaga" value="estagio" /> Estágio <span style="font-size:12px;color:var(--on-bg-variant)">(cursando Ensino Superior)</span></label>
+            <label class="checkbox-option"><input type="checkbox" name="tipo-vaga" value="trainee" /> Trainee</label>
+            <label class="checkbox-option"><input type="checkbox" name="tipo-vaga" value="emprego" /> Emprego CLT</label>
+            <label class="checkbox-option"><input type="checkbox" name="tipo-vaga" value="freelancer" /> Autônomo / Freelancer</label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Modalidade de trabalho preferida</label>
+          <div class="radio-group" style="flex-direction:column">
+            <label class="radio-option"><input type="radio" name="modalidade" value="remoto" /> Remoto</label>
+            <label class="radio-option"><input type="radio" name="modalidade" value="hibrido" /> Híbrido</label>
+            <label class="radio-option"><input type="radio" name="modalidade" value="presencial" /> Presencial</label>
+            <label class="radio-option"><input type="radio" name="modalidade" value="indiferente" /> Indiferente</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Experiência Profissional ── -->
+    <div class="card" id="experiencia">
+      <div class="card-header-row">
+        <div>
+          <p class="card-title">Experiência profissional</p>
+          <p style="font-size:13px;color:var(--on-bg-variant);margin-top:2px">Projetos pessoais e de cursos também são válidos. Máx. 3 experiências.</p>
+        </div>
+        <button class="btn-add" onclick="openModal('modal-exp')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar
+        </button>
+      </div>
+      <div id="exp-list">
+        <div class="exp-empty" id="exp-empty">
+          <svg width="32" height="32" fill="none" stroke="#d4d4d4" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          <p>Nenhuma experiência adicionada ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 8. Certificados ── -->
+    <div class="card" id="certificados">
+      <div class="card-header-row">
+        <p class="card-title">Outros certificados e cursos <span class="opt" style="font-size:14px;font-weight:400">(opcional)</span></p>
+        <button class="btn-add" onclick="openModal('modal-cert')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar
+        </button>
+      </div>
+      <p style="font-size:13px;color:var(--on-bg-variant);margin-bottom:12px">Máximo de 2 certificados externos ao SCTEC.</p>
+      <div id="cert-list">
+        <div class="exp-empty" id="cert-empty">
+          <svg width="32" height="32" fill="none" stroke="#d4d4d4" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          <p>Nenhum certificado adicionado.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 9. Competências Técnicas (Hard Skills) ── -->
+    <div class="card" id="competencias">
+      <p class="card-title">Competências técnicas <span style="font-size:14px;font-weight:400">(Hard Skills)</span> <span class="new-badge">+ DOC</span></p>
+      <p class="card-subtitle">Adicione até 10 competências. As 5 primeiras são consideradas suas principais — garanta que sejam pelo menos intermediárias.</p>
+      <div class="field">
+        <label class="field-label">Suas competências técnicas</label>
+        <div class="tags-input-wrap" id="hardskills-wrap" onclick="document.getElementById('hardskill-input').focus()">
+          <input class="tags-input" id="hardskill-input" placeholder="Digite e pressione Enter..." onkeydown="addTag(event, 'hardskills-wrap', 'hardskill-input', 10)" />
+        </div>
+        <span class="tags-hint" id="hardskills-count">0/10 competências adicionadas · As 5 primeiras são as principais</span>
+      </div>
+      <div style="margin-top:12px">
+        <p style="font-size:13px;color:var(--on-bg-variant);margin-bottom:8px">Sugestões rápidas:</p>
+        <div class="badges-wrap">
+          <span class="badge" onclick="quickAddTag('JavaScript','hardskills-wrap','hardskill-input',10)">JavaScript</span>
+          <span class="badge" onclick="quickAddTag('TypeScript','hardskills-wrap','hardskill-input',10)">TypeScript</span>
+          <span class="badge" onclick="quickAddTag('Python','hardskills-wrap','hardskill-input',10)">Python</span>
+          <span class="badge" onclick="quickAddTag('React','hardskills-wrap','hardskill-input',10)">React</span>
+          <span class="badge" onclick="quickAddTag('Angular','hardskills-wrap','hardskill-input',10)">Angular</span>
+          <span class="badge" onclick="quickAddTag('Node.js','hardskills-wrap','hardskill-input',10)">Node.js</span>
+          <span class="badge" onclick="quickAddTag('SQL','hardskills-wrap','hardskill-input',10)">SQL</span>
+          <span class="badge" onclick="quickAddTag('Power BI','hardskills-wrap','hardskill-input',10)">Power BI</span>
+          <span class="badge" onclick="quickAddTag('Docker','hardskills-wrap','hardskill-input',10)">Docker</span>
+          <span class="badge" onclick="quickAddTag('Git','hardskills-wrap','hardskill-input',10)">Git</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 10. Soft Skills ── -->
+    <div class="card" id="softskills">
+      <p class="card-title">Competências comportamentais <span style="font-size:14px;font-weight:400">(Soft Skills)</span> <span class="new-badge">+ DOC</span></p>
+      <p class="card-subtitle">Selecione até 5 competências comportamentais que melhor te descrevem.</p>
+      <div class="badges-wrap" id="softskills-badges">
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Comunicação</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Colaboração</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Criatividade</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Resolução de problemas</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Pensamento crítico</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Adaptabilidade</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Aprendizado contínuo</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Organização</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Proatividade</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Inteligência emocional</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Autonomia</span>
+        <span class="badge" onclick="toggleBadge(this, 'softskills-badges', 5)">Negociação</span>
+      </div>
+      <p id="softskills-counter" style="font-size:12px;color:var(--on-bg-variant);margin-top:10px">0 / 5 selecionadas</p>
+    </div>
+
+    <!-- ── 11. Áreas de Interesse Profissional ── -->
+    <div class="card" id="interesses">
+      <p class="card-title">Áreas de interesse profissional</p>
+      <p class="card-subtitle">Escolha seu interesse principal e, opcionalmente, um interesse secundário. Selecione também a especialidade e as tecnologias.</p>
+
+      <div style="border:1px solid var(--outline);border-radius:10px;overflow:hidden">
+        <!-- Interesse Principal -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--bg-light)">
+          <p class="badges-section-label">🎯 Interesse principal <span class="req">*</span></p>
+          <div class="badges-wrap" id="area-principal">
+            <span class="badge" onclick="selectSingleBadge(this,'area-principal')">Desenvolvimento de Software</span>
+            <span class="badge" onclick="selectSingleBadge(this,'area-principal')">Análise de Dados</span>
+            <span class="badge" onclick="selectSingleBadge(this,'area-principal')">Inteligência Artificial</span>
+          </div>
+        </div>
+        <!-- Interesse Secundário -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--bg-light);background:rgba(229,154,23,.03)">
+          <p class="badges-section-label">🔁 Interesse secundário <span class="opt" style="font-size:11px;font-weight:400;text-transform:none">(opcional)</span> <span class="new-badge">+ DOC</span></p>
+          <p style="font-size:12px;color:var(--on-bg-variant);margin-bottom:8px">Ex: alguém de Back-End que também queira trabalhar com ML ou Cloud.</p>
+          <div class="badges-wrap" id="area-secundaria">
+            <span class="badge" onclick="toggleBadge(this,'area-secundaria',1)">Desenvolvimento de Software</span>
+            <span class="badge" onclick="toggleBadge(this,'area-secundaria',1)">Análise de Dados</span>
+            <span class="badge" onclick="toggleBadge(this,'area-secundaria',1)">Inteligência Artificial</span>
+          </div>
+        </div>
+        <!-- Especialidade -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--bg-light)">
+          <p class="badges-section-label">Qual é sua especialidade?</p>
+          <div class="badges-wrap" id="especialidade-badges">
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Front-End</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Back-End</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Full-Stack</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Mobile</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Business Intelligence (BI)</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Ciência de Dados</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Machine Learning</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Visão Computacional</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">DevOps</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Qualidade e Testes (QA)</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Computação em Nuvem</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">UX/UI Design</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Cibersegurança</span>
+            <span class="badge" onclick="selectSingleBadge(this,'especialidade-badges')">Automação</span>
+            <span class="badge dashed" onclick="selectSingleBadge(this,'especialidade-badges')">+ Outra</span>
+          </div>
+        </div>
+        <!-- Tecnologias -->
+        <div style="padding:16px 20px">
+          <p class="badges-section-label">Em qual tecnologia?</p>
+          <div class="badges-wrap" id="tecnologia-badges">
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">React</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Angular</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Vue.js</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Next.js</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">TypeScript</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Node.js</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Python</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Java / Spring</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">.NET / C#</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">React Native</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">Flutter</span>
+            <span class="badge" onclick="toggleBadge(this,'tecnologia-badges',6)">SQL</span>
+            <span class="badge dashed" onclick="toggleBadge(this,'tecnologia-badges',6)">+ Outra</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 12. Idiomas ── -->
+    <div class="card" id="idiomas">
+      <p class="card-title">Idiomas <span class="new-badge">+ DOC</span></p>
+      <p class="card-subtitle">Informe seu nível de inglês e outros idiomas que você domina.</p>
+      <div class="form-grid-2">
+        <div class="field">
+          <label class="field-label">Inglês <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <select class="select-input" id="ingles">
+              <option value="">Selecione</option>
+              <option>Não possuo</option>
+              <option>Básico</option>
+              <option>Intermediário</option>
+              <option>Avançado</option>
+              <option>Fluente</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="align-self:end">
+          <button class="btn-add" onclick="addIdiomaRow()" style="padding:0">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar outro idioma
+          </button>
+        </div>
+      </div>
+      <div id="outros-idiomas" style="margin-top:12px;display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+
+    <!-- ── 13. Currículo ── -->
+    <div class="card" id="curriculo">
+      <div class="card-header-row">
+        <p class="card-title">Currículo (PDF)</p>
+        <button class="btn-add" onclick="document.getElementById('cv-upload').click()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar
+        </button>
+      </div>
+      <label class="dropzone" for="cv-upload" id="cv-dropzone">
+        <div class="dropzone-icon">☁️</div>
+        <p class="dropzone-label" id="cv-label">Clique ou arraste o arquivo</p>
+        <p class="dropzone-hint">Formatos aceitos: .pdf · Tamanho máximo: 10 MB</p>
+      </label>
+      <input type="file" id="cv-upload" accept=".pdf" style="display:none" onchange="updateDropzone(this)" />
+    </div>
+
+    <!-- ── 14. Diversidade (PCD) ── -->
+    <div class="card" id="diversidade">
+      <p class="card-title">Diversidade e inclusão <span class="new-badge">+ DOC</span></p>
+      <p class="card-subtitle">Essas informações são sigilosas e ajudam a promover oportunidades inclusivas. Não são visíveis para empresas.</p>
+      <div class="field">
+        <label class="field-label">Pessoa com deficiência (PCD) <span class="lock" style="font-size:11px;color:var(--error)">🔒 privado</span></label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="pcd" value="nao-informar" onchange="togglePCD(this)" /> Prefiro não informar</label>
+          <label class="radio-option"><input type="radio" name="pcd" value="nao" onchange="togglePCD(this)" /> Não</label>
+          <label class="radio-option"><input type="radio" name="pcd" value="sim" onchange="togglePCD(this)" /> Sim</label>
+        </div>
+        <div class="pcd-follow-up" id="pcd-followup">
+          <p class="field-label" style="margin-bottom:8px">Necessita de adaptação/recursos de acessibilidade para processos seletivos?</p>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="pcd-acessibilidade" value="nao" /> Não</label>
+            <label class="radio-option"><input type="radio" name="pcd-acessibilidade" value="sim" /> Sim</label>
+            <label class="radio-option"><input type="radio" name="pcd-acessibilidade" value="depois" /> Informarei posteriormente</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Footer / Salvar ── -->
+    <div class="card">
+      <p style="font-size:13px;color:var(--on-bg-variant);margin-bottom:16px;line-height:1.6">
+        <strong>⚠️ Importante:</strong> Perfis completos têm maior potencial de visibilidade. Independente do preenchimento, não há garantia de participação em processo seletivo ou contratação, pois isso depende da disponibilidade de vagas, critérios das empresas, aderência do perfil e desempenho no processo seletivo.
+      </p>
+      <div class="card-footer">
+        <button class="btn-cancel">Cancelar</button>
+        <button class="btn-save" onclick="saveForm()">💾 Salvar perfil</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Checklist sidebar -->
+  <aside class="checklist-card">
+    <h3>Completude do perfil</h3>
+    <p class="profile-pct" id="pct-label">35% completo</p>
+    <div class="pct-bar"><div class="pct-bar-fill" id="pct-bar"></div></div>
+
+    <p class="layer-label">🔵 Obrigatório</p>
+    <div class="checklist-item" id="ci-foto"><div class="ci-icon">○</div> Foto de perfil</div>
+    <div class="checklist-item" id="ci-dados"><div class="ci-icon">○</div> Dados pessoais</div>
+    <div class="checklist-item" id="ci-linkedin"><div class="ci-icon">○</div> LinkedIn</div>
+    <div class="checklist-item" id="ci-curriculo"><div class="ci-icon">○</div> Currículo</div>
+    <div class="checklist-item" id="ci-trilha"><div class="ci-icon">○</div> Trilha SCTEC</div>
+    <div class="checklist-item" id="ci-resumo"><div class="ci-icon">○</div> Resumo profissional</div>
+
+    <p class="layer-label">🟡 Recomendado</p>
+    <div class="checklist-item" id="ci-github"><div class="ci-icon">○</div> GitHub</div>
+    <div class="checklist-item" id="ci-competencias"><div class="ci-icon">○</div> Competências técnicas</div>
+    <div class="checklist-item" id="ci-soft"><div class="ci-icon">○</div> Soft Skills</div>
+    <div class="checklist-item" id="ci-interesses"><div class="ci-icon">○</div> Áreas de interesse</div>
+    <div class="checklist-item" id="ci-idiomas"><div class="ci-icon">○</div> Inglês</div>
+
+    <p class="layer-label">⚪ Opcional</p>
+    <div class="checklist-item" id="ci-video"><div class="ci-icon">○</div> Vídeo de apresentação</div>
+    <div class="checklist-item" id="ci-portfolio"><div class="ci-icon">○</div> Portfólio</div>
+    <div class="checklist-item" id="ci-projeto"><div class="ci-icon">○</div> Projeto SCTEC</div>
+    <div class="checklist-item" id="ci-exp"><div class="ci-icon">○</div> Experiência profissional</div>
+  </aside>
+
+</div>
+
+<!-- ── Modal: Adicionar Experiência ── -->
+<div class="modal-overlay" id="modal-exp">
+  <div class="modal">
+    <p class="modal-title">Adicionar experiência</p>
+    <div class="form-grid-2" style="gap:14px">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Cargo <span class="req">*</span></label>
+        <input class="input" type="text" id="exp-cargo" placeholder="Ex: Desenvolvedor Front-End" />
+      </div>
+      <div class="field">
+        <label class="field-label">Empresa</label>
+        <input class="input" type="text" id="exp-empresa" placeholder="Nome da empresa" />
+      </div>
+      <div class="field">
+        <label class="field-label">Área <span class="new-badge">+ DOC</span></label>
+        <div class="select-wrapper">
+          <select class="select-input" id="exp-area">
+            <option value="">Selecione a área</option>
+            <option>Tecnologia</option>
+            <option>Administrativo</option>
+            <option>Atendimento</option>
+            <option>Indústria</option>
+            <option>Comércio</option>
+            <option>Educação</option>
+            <option>Financeiro</option>
+            <option>Saúde</option>
+            <option>Não possuo experiência em outra área</option>
+            <option>Outra</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Início</label>
+        <input class="input" type="month" id="exp-inicio" />
+      </div>
+      <div class="field">
+        <label class="field-label">Fim <span class="opt">(deixe vazio se atual)</span></label>
+        <input class="input" type="month" id="exp-fim" />
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Descrição <span class="opt">(opcional)</span></label>
+        <textarea class="textarea-input" id="exp-desc" placeholder="Descreva brevemente suas atividades e resultados..." style="min-height:80px"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-exp')">Cancelar</button>
+      <button class="btn-save" onclick="saveExp()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Adicionar Certificado ── -->
+<div class="modal-overlay" id="modal-cert">
+  <div class="modal">
+    <p class="modal-title">Adicionar certificado</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="field">
+        <label class="field-label">Nome do curso / certificação <span class="req">*</span></label>
+        <input class="input" type="text" id="cert-nome" placeholder="Ex: Certificação AWS Solutions Architect" />
+      </div>
+      <div class="field">
+        <label class="field-label">Instituição <span class="req">*</span></label>
+        <input class="input" type="text" id="cert-inst" placeholder="Ex: Amazon Web Services" />
+      </div>
+      <div class="field">
+        <label class="field-label">Data de conclusão</label>
+        <input class="input" type="month" id="cert-data" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-cert')">Cancelar</button>
+      <button class="btn-save" onclick="saveCert()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── Accordion ───────────────────────────────────────
+  function toggleAcc(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  // ─── Avatar preview ──────────────────────────────────
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('avatar-preview').innerHTML = `<img src="${e.target.result}" alt="Foto de perfil" />`;
+        markDone('ci-foto');
+        updatePct();
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // ─── Input masks ─────────────────────────────────────
+  function maskCPF(el) {
+    let v = el.value.replace(/\D/g,'');
+    v = v.replace(/(\d{3})(\d)/,'$1.$2');
+    v = v.replace(/(\d{3})(\d)/,'$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    el.value = v;
+  }
+  function maskPhone(el) {
+    let v = el.value.replace(/\D/g,'');
+    v = v.replace(/^(\d{2})(\d)/,'($1) $2');
+    v = v.replace(/(\d{5})(\d{4})$/,'$1-$2');
+    el.value = v;
+  }
+  function maskCEP(el) {
+    let v = el.value.replace(/\D/g,'');
+    v = v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+    el.value = v;
+  }
+  function fetchCEP(cep) {
+    const clean = cep.replace(/\D/g,'');
+    if (clean.length === 8) {
+      fetch(`https://viacep.com.br/ws/${clean}/json/`)
+        .then(r => r.json())
+        .then(d => {
+          if (!d.erro) {
+            document.getElementById('cidade').value = `${d.localidade} / ${d.uf}`;
+          }
+        }).catch(()=>{});
+    }
+  }
+
+  // ─── Char count ──────────────────────────────────────
+  function updateCharCount(el, countId) {
+    document.getElementById(countId).textContent = el.value.length;
+    if (el.value.length > 20) { markDone('ci-resumo'); updatePct(); }
+  }
+
+  // ─── Badges ──────────────────────────────────────────
+  function toggleBadge(el, groupId, max) {
+    const group = document.getElementById(groupId);
+    const selected = group.querySelectorAll('.badge.selected');
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+    } else {
+      if (selected.length >= max) {
+        showToast(`Máximo de ${max} selecionado(s) neste grupo.`);
+        return;
+      }
+      el.classList.add('selected');
+    }
+    updateCounter(groupId, max);
+    if (groupId === 'softskills-badges') updateSoftCounter();
+    if (groupId === 'tecnologia-badges') { markDone('ci-interesses'); updatePct(); }
+  }
+  function selectSingleBadge(el, groupId) {
+    const group = document.getElementById(groupId);
+    group.querySelectorAll('.badge').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    if (groupId === 'area-principal') { markDone('ci-interesses'); updatePct(); }
+  }
+  function updateCounter(groupId, max) {}
+  function updateSoftCounter() {
+    const group = document.getElementById('softskills-badges');
+    const n = group.querySelectorAll('.badge.selected').length;
+    document.getElementById('softskills-counter').textContent = `${n} / 5 selecionadas`;
+    if (n >= 3) { markDone('ci-soft'); updatePct(); }
+  }
+
+  // ─── Tags input (hard skills) ─────────────────────────
+  function addTag(event, wrapId, inputId, max) {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const input = document.getElementById(inputId);
+    const wrap = document.getElementById(wrapId);
+    const val = input.value.trim();
+    if (!val) return;
+    const chips = wrap.querySelectorAll('.tag-chip');
+    if (chips.length >= max) { showToast(`Máximo de ${max} competências.`); return; }
+    const isMain = chips.length < 5;
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip' + (isMain ? ' main-tag' : '');
+    chip.innerHTML = `${val}<span class="remove-tag" onclick="this.parentElement.remove();updateHardSkillsCount('${wrapId}','${inputId}',${max})">×</span>`;
+    wrap.insertBefore(chip, input);
+    input.value = '';
+    updateHardSkillsCount(wrapId, inputId, max);
+    if (chips.length + 1 >= 3) { markDone('ci-competencias'); updatePct(); }
+  }
+  function quickAddTag(val, wrapId, inputId, max) {
+    const input = document.getElementById(inputId);
+    const wrap = document.getElementById(wrapId);
+    const chips = wrap.querySelectorAll('.tag-chip');
+    if (chips.length >= max) { showToast(`Máximo de ${max} competências.`); return; }
+    // check duplicate
+    const existing = [...chips].map(c => c.textContent.replace('×','').trim().toLowerCase());
+    if (existing.includes(val.toLowerCase())) return;
+    const isMain = chips.length < 5;
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip' + (isMain ? ' main-tag' : '');
+    chip.innerHTML = `${val}<span class="remove-tag" onclick="this.parentElement.remove();updateHardSkillsCount('${wrapId}','${inputId}',${max})">×</span>`;
+    wrap.insertBefore(chip, input);
+    updateHardSkillsCount(wrapId, inputId, max);
+    if (chips.length + 1 >= 3) { markDone('ci-competencias'); updatePct(); }
+  }
+  function updateHardSkillsCount(wrapId, inputId, max) {
+    const wrap = document.getElementById(wrapId);
+    const n = wrap.querySelectorAll('.tag-chip').length;
+    document.getElementById('hardskills-count').textContent =
+      `${n}/${max} competências adicionadas · As 5 primeiras são as principais`;
+  }
+
+  // ─── Modal ───────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+  });
+
+  // ─── Experience ──────────────────────────────────────
+  const experiences = [];
+  function saveExp() {
+    const cargo = document.getElementById('exp-cargo').value.trim();
+    if (!cargo) { showToast('Preencha o cargo.'); return; }
+    if (experiences.length >= 3) { showToast('Máximo de 3 experiências.'); return; }
+    const empresa = document.getElementById('exp-empresa').value.trim();
+    const area = document.getElementById('exp-area').value;
+    const inicio = document.getElementById('exp-inicio').value;
+    const fim = document.getElementById('exp-fim').value;
+    const desc = document.getElementById('exp-desc').value.trim();
+    const period = inicio ? `${fmtMonth(inicio)} — ${fim ? fmtMonth(fim) : 'Atual'}` : '';
+    experiences.push({ cargo, empresa, area, period, desc });
+    renderExp();
+    closeModal('modal-exp');
+    ['exp-cargo','exp-empresa','exp-desc'].forEach(id => document.getElementById(id).value = '');
+    ['exp-area'].forEach(id => document.getElementById(id).value = '');
+    ['exp-inicio','exp-fim'].forEach(id => document.getElementById(id).value = '');
+    markDone('ci-exp'); updatePct();
+    showToast('Experiência adicionada!');
+  }
+  function renderExp() {
+    const list = document.getElementById('exp-list');
+    if (experiences.length === 0) {
+      list.innerHTML = `<div class="exp-empty" id="exp-empty"><svg width="32" height="32" fill="none" stroke="#d4d4d4" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><p>Nenhuma experiência adicionada ainda.</p></div>`;
+      return;
+    }
+    list.innerHTML = experiences.map((e, i) => `
+      <div class="exp-card">
+        <svg class="exp-icon" fill="none" stroke="#737373" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        <div class="exp-info">
+          <p class="exp-title">${e.cargo}</p>
+          <p class="exp-meta">${e.empresa ? e.empresa + (e.area ? ' · ' + e.area : '') : ''}${e.period ? ' · ' + e.period : ''}</p>
+          ${e.desc ? `<p class="exp-desc">${e.desc}</p>` : ''}
+          <div class="exp-actions">
+            <button class="btn-icon danger" onclick="removeExp(${i})">Remover</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  function removeExp(i) { experiences.splice(i,1); renderExp(); }
+
+  // ─── Certificates ────────────────────────────────────
+  const certs = [];
+  function saveCert() {
+    const nome = document.getElementById('cert-nome').value.trim();
+    const inst = document.getElementById('cert-inst').value.trim();
+    if (!nome || !inst) { showToast('Preencha nome e instituição.'); return; }
+    if (certs.length >= 2) { showToast('Máximo de 2 certificados externos.'); return; }
+    const data = document.getElementById('cert-data').value;
+    certs.push({ nome, inst, data });
+    renderCerts();
+    closeModal('modal-cert');
+    ['cert-nome','cert-inst','cert-data'].forEach(id => document.getElementById(id).value = '');
+    showToast('Certificado adicionado!');
+  }
+  function renderCerts() {
+    const list = document.getElementById('cert-list');
+    if (certs.length === 0) {
+      list.innerHTML = `<div class="exp-empty" id="cert-empty"><svg width="32" height="32" fill="none" stroke="#d4d4d4" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg><p>Nenhum certificado adicionado.</p></div>`;
+      return;
+    }
+    list.innerHTML = certs.map((c, i) => `
+      <div class="exp-card">
+        <svg class="exp-icon" fill="none" stroke="#737373" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <div class="exp-info">
+          <p class="exp-title">${c.nome}</p>
+          <p class="exp-meta">${c.inst}${c.data ? ' · ' + fmtMonth(c.data) : ''}</p>
+          <div class="exp-actions">
+            <button class="btn-icon danger" onclick="removeCert(${i})">Remover</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  function removeCert(i) { certs.splice(i,1); renderCerts(); }
+
+  // ─── Idiomas ─────────────────────────────────────────
+  let idiomaCount = 0;
+  const idiomas = ['Espanhol','Francês','Alemão','Italiano','Mandarim','Japonês','Russo','Árabe'];
+  const niveis = ['Básico','Intermediário','Avançado','Fluente'];
+  function addIdiomaRow() {
+    if (idiomaCount >= 3) { showToast('Máximo de 3 outros idiomas.'); return; }
+    idiomaCount++;
+    const div = document.createElement('div');
+    div.className = 'form-grid-2';
+    div.style.gap = '14px';
+    div.id = `idioma-row-${idiomaCount}`;
+    div.innerHTML = `
+      <div class="field">
+        <label class="field-label">Idioma</label>
+        <div class="select-wrapper">
+          <select class="select-input">
+            <option value="">Selecione</option>
+            ${idiomas.map(i=>`<option>${i}</option>`).join('')}
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="display:flex;align-items:flex-end;gap:10px">
+        <div style="flex:1">
+          <label class="field-label">Nível</label>
+          <div class="select-wrapper">
+            <select class="select-input">
+              <option value="">Selecione</option>
+              ${niveis.map(n=>`<option>${n}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <button class="btn-icon danger" style="margin-bottom:2px;height:42px" onclick="this.parentElement.parentElement.remove();idiomaCount--">✕</button>
+      </div>
+    `;
+    document.getElementById('outros-idiomas').appendChild(div);
+  }
+
+  // ─── PCD ─────────────────────────────────────────────
+  function togglePCD(input) {
+    const followup = document.getElementById('pcd-followup');
+    followup.classList.toggle('visible', input.value === 'sim');
+  }
+
+  // ─── Dropzone ────────────────────────────────────────
+  function updateDropzone(input) {
+    if (input.files[0]) {
+      document.getElementById('cv-label').textContent = `📄 ${input.files[0].name}`;
+      document.getElementById('cv-dropzone').style.borderColor = 'var(--primary)';
+      document.getElementById('cv-dropzone').style.background = 'rgba(122,185,52,.04)';
+      markDone('ci-curriculo'); updatePct();
+    }
+  }
+
+  // ─── Checklist / PCT ─────────────────────────────────
+  function markDone(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('done');
+    el.querySelector('.ci-icon').innerHTML = '✓';
+  }
+  const checkItems = ['ci-foto','ci-dados','ci-linkedin','ci-curriculo','ci-trilha','ci-resumo','ci-github','ci-competencias','ci-soft','ci-interesses','ci-idiomas','ci-video','ci-portfolio','ci-projeto','ci-exp'];
+  function updatePct() {
+    const done = checkItems.filter(id => document.getElementById(id)?.classList.contains('done')).length;
+    const pct = Math.round((done / checkItems.length) * 100);
+    document.getElementById('pct-bar').style.width = pct + '%';
+    document.getElementById('pct-label').textContent = pct + '% completo';
+  }
+
+  // ─── Live field watchers ──────────────────────────────
+  document.getElementById('linkedin').addEventListener('input', function() {
+    if (this.value.length > 10) { markDone('ci-linkedin'); updatePct(); }
+  });
+  document.getElementById('github').addEventListener('input', function() {
+    if (this.value.length > 10) { markDone('ci-github'); updatePct(); }
+  });
+  document.getElementById('video').addEventListener('input', function() {
+    if (this.value.length > 10) { markDone('ci-video'); updatePct(); }
+  });
+  document.getElementById('portfolio').addEventListener('input', function() {
+    if (this.value.length > 10) { markDone('ci-portfolio'); updatePct(); }
+  });
+  document.getElementById('projeto-sctec').addEventListener('input', function() {
+    if (this.value.length > 10) { markDone('ci-projeto'); updatePct(); }
+  });
+  document.getElementById('ingles').addEventListener('change', function() {
+    if (this.value) { markDone('ci-idiomas'); updatePct(); }
+  });
+  document.getElementById('nome').addEventListener('input', function() {
+    if (this.value.length > 3) { markDone('ci-dados'); updatePct(); }
+  });
+  document.querySelectorAll('input[name="curso"]').forEach(cb => {
+    cb.addEventListener('change', () => { markDone('ci-trilha'); updatePct(); });
+  });
+
+  // ─── Toast ───────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ─── Save form ───────────────────────────────────────
+  function saveForm() {
+    showToast('✅ Perfil salvo com sucesso!');
+  }
+
+  // ─── Util ────────────────────────────────────────────
+  function fmtMonth(val) {
+    if (!val) return '';
+    const [y, m] = val.split('-');
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return `${months[parseInt(m)-1]} ${y}`;
+  }
+
+  // ─── Smooth scroll sidebar ───────────────────────────
+  document.querySelectorAll('.sidebar-item').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.sidebar-item').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

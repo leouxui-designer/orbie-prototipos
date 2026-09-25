@@ -1,0 +1,611 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Como funcionam as Trilhas Adaptativas — Orbie Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --color-primary: #2177FF;
+  --color-primary-5: rgba(33,119,255,0.05);
+  --color-primary-10: rgba(33,119,255,0.10);
+  --color-outline: #DDE4EB;
+  --color-on-bg: #344054;
+  --color-on-bg-mid: #525E76;
+  --color-on-bg-light: #8A95B2;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8F9FC;
+  --color-success: #12B76A;
+  --color-success-light: #ECFDF3;
+  --color-success-dark: #027A48;
+  --color-warning: #F79009;
+  --color-warning-light: #FFFAEB;
+  --color-warning-dark: #B54708;
+  --color-error: #F04438;
+  --color-error-light: #FEF3F2;
+  --color-info: #2E90FA;
+  --color-info-light: #EFF8FF;
+  --color-info-dark: #1849A9;
+  --font: 'Outfit', sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+body {
+  font-family: var(--font);
+  color: var(--color-on-bg);
+  background: #F8F9FC;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-size: 14px;
+}
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<header style="position:sticky;top:0;z-index:100;height:64px;background:#fff;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;">
+  <svg width="112" height="33" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+    <g clip-path="url(#clip_logo)">
+      <path d="M41.763 56C56.5366 56 67.7509 45.0144 67.7509 30.4669C67.7509 15.9194 56.5392 4.9364 41.763 4.9364C26.9868 4.9364 15.7776 15.922 15.7776 30.4669C15.7776 45.0119 26.9157 56 41.7655 56M41.7655 52.1357C29.4156 52.1357 20.0967 42.893 20.0967 30.4669C20.0967 18.0408 29.4156 8.79812 41.7655 8.79812C54.1154 8.79812 63.4344 18.0408 63.4344 30.4669C63.4344 42.893 54.1154 52.1357 41.7655 52.1357Z" fill="#1064AD"/>
+      <path d="M92.769 16.8315C91.481 16.453 90.4952 16.3005 88.981 16.3005C84.1335 16.3005 80.4954 19.0291 78.4502 23.4219V18.5718C78.4502 17.5861 77.9192 16.9814 76.936 16.9814H76.0264C75.1169 16.9814 74.5122 17.5886 74.5122 18.5718V53.4238C74.5122 54.4096 75.1194 55.0905 76.0264 55.0905H77.1621C78.0716 55.0905 78.6763 54.4096 78.6763 53.4238V33.1956C78.6763 25.5433 82.8429 20.0124 88.6024 20.0124C89.512 20.0124 90.3453 20.1648 91.4047 20.4671C92.3143 20.7695 93.1476 20.6932 93.5261 19.5576L93.6786 18.9504C94.1334 17.6623 93.5261 17.0551 92.769 16.829" fill="#1064AD"/>
+      <path d="M116.487 16.3006C110.046 16.3006 104.82 19.1028 101.408 23.5743V2.58637C101.408 1.45072 100.954 0.767295 99.6655 1.14584L98.7559 1.37196C97.694 1.67429 97.3154 2.20528 97.3154 3.0386V53.4213C97.3154 54.4071 97.8464 55.088 98.8296 55.088H99.8916C100.877 55.088 101.406 54.4071 101.406 53.4213V48.4976C104.663 53.0428 109.891 55.9975 116.484 55.9975C127.699 55.9975 135.577 47.2095 135.577 36.1478C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.2095C107.696 52.2095 101.18 46.3 101.027 36.1478C100.875 25.9955 107.77 20.0861 116.106 20.0861C125.272 20.0861 131.334 27.2836 131.334 36.1478C131.334 45.0119 125.272 52.2095 116.106 52.2095Z" fill="#1064AD"/>
+      <path d="M143.848 55.0905H144.984C145.969 55.0905 146.498 54.4096 146.498 53.4239V18.5719C146.498 17.5861 145.967 16.9814 144.984 16.9814H143.848C142.939 16.9814 142.334 17.5887 142.334 18.5719V53.4239C142.334 54.4096 142.941 55.0905 143.848 55.0905Z" fill="#1064AD"/>
+      <path d="M157.566 37.4384H188.478C189.766 37.4384 190.523 36.605 190.523 35.3932C190.523 30.6194 188.856 25.998 185.749 22.5123C182.642 18.6481 177.944 16.3005 172.111 16.3005C161.125 16.3005 153.244 24.8624 153.244 36.2265C153.244 48.6526 162.64 56 172.944 56C178.097 56 184.385 53.9548 188.704 49.4071C189.235 48.7999 189.613 47.8929 188.78 47.0596L188.325 46.6811C187.644 46.0002 186.811 45.8478 185.825 46.6811C181.961 50.5453 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.7573 157.566 37.4384ZM172.113 20.0886C176.963 20.0886 180.752 22.0575 183.099 25.3934C184.842 27.591 185.901 30.3933 186.28 33.6529H157.566C158.399 25.5458 164.083 20.0911 172.113 20.0911" fill="#1064AD"/>
+      <path d="M140.645 6.44547C141.212 8.48558 143.361 9.68982 145.442 9.13343C147.522 8.57704 148.749 6.47088 148.183 4.43077C147.616 2.39067 145.467 1.18642 143.386 1.74535C141.305 2.30175 140.078 4.40791 140.645 6.44801" fill="#29B84C"/>
+      <path d="M79.9758 3.57717C79.8513 2.26876 78.863 1.32111 78.1465 0.846021C77.547 0.447146 76.203 0 74.6812 0C70.8017 0 64.3155 1.94102 56.6276 5.38608C56.3913 5.49279 54.1327 6.6259 52.9081 7.24072C53.777 7.62689 54.618 8.05626 55.4259 8.52881L57.842 7.26359C65.5299 3.81091 71.6883 1.96897 75.4306 1.96897C76.1776 1.96897 76.9652 2.07059 77.3056 2.2027C77.6486 2.33482 78.0297 2.51266 78.0449 3.22911C78.0881 5.35559 75.4306 9.25542 70.634 14.0292C64.3688 20.2639 55.0677 27.4004 44.4428 34.1203C25.3603 46.1907 10.6528 51.5946 4.54515 51.5946C1.02132 51.5946 2.0274 49.4605 1.96643 49.9457C2.27384 47.489 5.47247 42.6466 13.9911 35.2179L15.9474 33.4979C15.8458 32.5655 15.7873 31.6178 15.7797 30.6498L12.6497 33.3937C4.4486 40.4921 0 46.2644 0 49.6815C0 50.1261 0.193086 52.2856 2.77942 53.2002C3.46031 53.4416 4.30125 53.5636 5.29717 53.5636C12.9266 53.5636 28.8232 46.6277 45.797 35.8911C56.3837 29.1966 65.6849 22.088 71.9881 15.8813C75.9616 11.9662 80.2883 6.88758 79.9758 3.57971" fill="#F79850"/>
+    </g>
+    <defs><clipPath id="clip_logo"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
+  </svg>
+  <div style="flex:1"></div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:6px 10px 6px 12px;background:white;font-family:var(--font);font-size:13px;color:var(--color-on-bg);cursor:pointer;">
+      Professor <i class="pi pi-chevron-down" style="font-size:11px;color:var(--color-on-bg-light);"></i>
+    </button>
+    <button style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:6px 10px 6px 12px;background:white;font-family:var(--font);font-size:13px;color:var(--color-on-bg);cursor:pointer;">
+      Escola SESI SC – Rio do Sul <i class="pi pi-chevron-down" style="font-size:11px;color:var(--color-on-bg-light);"></i>
+    </button>
+    <button style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;color:var(--color-on-bg-mid);font-size:18px;">
+      <i class="pi pi-bell"></i>
+      <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--color-error);border-radius:50%;border:2px solid white;"></span>
+    </button>
+    <div style="width:32px;height:32px;border-radius:50%;background:#E8F0FE;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:var(--color-primary);cursor:pointer;">A</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ APP WRAPPER ═══════════════════════════════ -->
+<div style="display:flex;flex:1;min-height:calc(100vh - 64px);">
+
+<!-- ─── SIDEBAR ─── -->
+<aside style="width:235px;flex-shrink:0;background:#fff;border-right:1px solid var(--color-outline);display:flex;flex-direction:column;padding:16px 0;">
+
+  <!-- Nav group: Relatórios -->
+  <div style="padding:0 12px;margin-bottom:4px;">
+    <div style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.06em;text-transform:uppercase;">Relatórios</div>
+  </div>
+
+  <!-- Nav item inactive -->
+  <div style="padding:0 12px;margin-bottom:2px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-md);cursor:pointer;color:var(--color-on-bg-mid);font-size:14px;">
+      <i class="pi pi-chart-bar" style="font-size:16px;width:18px;text-align:center;"></i>
+      <span>Desempenho</span>
+    </div>
+  </div>
+
+  <!-- Nav item: Trilhas Adaptativas — ACTIVE parent -->
+  <div style="padding:0 12px;margin-bottom:2px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-md);cursor:pointer;background:var(--color-primary-5);color:var(--color-primary);font-size:14px;font-weight:600;">
+      <i class="pi pi-sitemap" style="font-size:16px;width:18px;text-align:center;"></i>
+      <span>Trilhas Adaptativas</span>
+      <i class="pi pi-chevron-down" style="font-size:11px;margin-left:auto;"></i>
+    </div>
+
+    <!-- Sub-tabs -->
+    <div style="margin-top:4px;padding-left:28px;display:flex;flex-direction:column;gap:1px;">
+      <a href="index.html" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);color:var(--color-on-bg-mid);font-size:13px;text-decoration:none;">
+        <i class="pi pi-users" style="font-size:13px;"></i> Visão da turma
+      </a>
+      <a href="estudante.html" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);color:var(--color-on-bg-mid);font-size:13px;text-decoration:none;">
+        <i class="pi pi-user" style="font-size:13px;"></i> Visão do estudante
+      </a>
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);color:var(--color-on-bg-mid);font-size:13px;text-decoration:none;">
+        <i class="pi pi-history" style="font-size:13px;"></i> Histórico
+      </a>
+      <!-- Como funciona — ACTIVE -->
+      <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--color-primary-10);color:var(--color-primary);font-size:13px;font-weight:600;text-decoration:none;">
+        <i class="pi pi-info-circle" style="font-size:13px;"></i> Como funciona
+      </a>
+    </div>
+  </div>
+
+  <!-- Nav items: outros -->
+  <div style="padding:0 12px;margin-bottom:2px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-md);cursor:pointer;color:var(--color-on-bg-mid);font-size:14px;">
+      <i class="pi pi-calendar" style="font-size:16px;width:18px;text-align:center;"></i>
+      <span>Agenda</span>
+    </div>
+  </div>
+  <div style="padding:0 12px;margin-bottom:2px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-md);cursor:pointer;color:var(--color-on-bg-mid);font-size:14px;">
+      <i class="pi pi-cog" style="font-size:16px;width:18px;text-align:center;"></i>
+      <span>Configurações</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ─── MAIN CONTENT WRAPPER ─── -->
+<div style="flex:1;display:flex;overflow:hidden;">
+
+<!-- TOC STICKY -->
+<nav id="toc" style="width:220px;flex-shrink:0;padding:32px 0 32px 32px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;align-self:flex-start;">
+  <p style="font-size:11px;font-weight:600;color:var(--color-on-bg-light);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em;">Neste artigo</p>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <a href="#sec1" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">O que é uma Trilha Adaptativa?</a>
+    <a href="#sec2" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">Como o Orbie mede o desempenho</a>
+    <a href="#sec3" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">Como as trilhas são geradas pela IA</a>
+    <a href="#sec4" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">Estrutura de um bloco de revisão</a>
+    <a href="#sec5" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">Ciclos e vigências</a>
+    <a href="#sec6" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">O que você vê no painel</a>
+    <a href="#sec7" class="toc-link" style="font-size:13px;color:var(--color-on-bg-mid);padding:6px 10px;border-radius:var(--radius-sm);text-decoration:none;display:block;line-height:1.4;transition:all .15s;">Perguntas frequentes</a>
+  </div>
+</nav>
+
+<main style="flex:1;overflow-y:auto;padding:32px 48px 32px 32px;max-width:760px;">
+
+  <!-- Breadcrumb -->
+  <nav style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-on-bg-light);margin-bottom:24px;">
+    <a href="#" style="color:var(--color-on-bg-light);text-decoration:none;">Relatórios</a>
+    <i class="pi pi-chevron-right" style="font-size:10px;"></i>
+    <a href="index.html" style="color:var(--color-on-bg-light);text-decoration:none;">Trilhas Adaptativas</a>
+    <i class="pi pi-chevron-right" style="font-size:10px;"></i>
+    <span style="color:var(--color-on-bg);">Como funciona</span>
+  </nav>
+
+  <!-- Article header -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:32px;">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="display:inline-flex;align-items:center;gap:5px;background:var(--color-surface-2);border:1px solid var(--color-outline);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--color-on-bg-light);">
+          <i class="pi pi-lock" style="font-size:11px;"></i> Somente leitura
+        </span>
+        <span style="font-size:12px;color:var(--color-on-bg-light);">Atualizado em jul/2025</span>
+      </div>
+      <h1 style="font-size:24px;font-weight:700;color:var(--color-on-bg);line-height:1.3;margin-bottom:8px;">Como funcionam as Trilhas Adaptativas</h1>
+      <p style="font-size:15px;color:var(--color-on-bg-mid);line-height:1.6;max-width:620px;">Entenda como o Orbie identifica dificuldades, organiza revisões personalizadas e acompanha a evolução de cada estudante — sem que você precise fazer nada manualmente.</p>
+    </div>
+  </div>
+
+  <!-- ─── SEÇÃO 1 ─── -->
+  <section id="sec1" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">O que é uma Trilha Adaptativa?</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">Uma Trilha Adaptativa é uma sequência de questões de revisão criada automaticamente pelo Orbie para cada estudante, com base no que ele <strong style="color:var(--color-on-bg);">ainda não domina</strong>.</p>
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">Diferente de um exercício comum igual para todos, cada trilha é única: dois estudantes da mesma turma recebem revisões diferentes, focadas nas habilidades em que cada um tem mais dificuldade.</p>
+      
+      <!-- Callout: destaque -->
+      <div style="background:var(--color-info-light);border-left:3px solid var(--color-info);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;">
+        <i class="pi pi-lightbulb" style="color:var(--color-info);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <div>
+          <p style="font-size:14px;font-weight:600;color:var(--color-info-dark);margin-bottom:4px;">Para que serve</p>
+          <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">A trilha serve como uma revisão personalizada: o estudante pratica exatamente o que precisa, sem perder tempo com o que já sabe. Você acompanha quem está progredindo e quem ainda precisa de atenção.</p>
+        </div>
+      </div>
+
+      <!-- Tabela de status -->
+      <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:10px;">Uma trilha pode estar em um dos seguintes estados:</p>
+      <div style="border:1px solid var(--color-outline);border-radius:var(--radius-md);overflow:hidden;margin-bottom:0;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead><tr style="background:var(--color-surface-2);">
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Status</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">O que significa</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:#F1F4F9;color:#525E76;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Aguardando diagnóstico</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">O ciclo ainda não foi concluído para gerar a trilha.</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:var(--color-info-light);color:var(--color-info-dark);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Disponível</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">A revisão está pronta e o estudante pode acessá-la.</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:#FFF4E5;color:#92400E;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Em andamento</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">O estudante começou mas ainda não concluiu.</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:var(--color-success-light);color:var(--color-success-dark);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Concluída</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">O estudante finalizou a revisão dentro do prazo.</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;"><span style="background:var(--color-error-light);color:#B42318;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Expirada</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">O prazo encerrou sem que o estudante concluísse.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 2 ─── -->
+  <section id="sec2" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">Como o Orbie mede o desempenho</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">O Orbie analisa as respostas dos estudantes ao longo das atividades e calcula automaticamente o nível de domínio em cada habilidade. Esse processo não exige nenhuma ação da sua parte.</p>
+
+      <!-- Cards de métricas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-md);padding:16px;">
+          <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--color-primary-5);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <i class="pi pi-percentage" style="color:var(--color-primary);font-size:18px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Taxa de acerto</p>
+          <p style="font-size:12px;line-height:1.5;color:var(--color-on-bg-light);">Percentual de respostas corretas por habilidade, considerando o histórico recente.</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-md);padding:16px;">
+          <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--color-warning-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <i class="pi pi-clock" style="color:var(--color-warning);font-size:18px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Tempo de resposta</p>
+          <p style="font-size:12px;line-height:1.5;color:var(--color-on-bg-light);">Tempo médio por questão ajuda a identificar dificuldade real x desatenção.</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-md);padding:16px;">
+          <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--color-success-light);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <i class="pi pi-chart-line" style="color:var(--color-success);font-size:18px;"></i>
+          </div>
+          <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Evolução no ciclo</p>
+          <p style="font-size:12px;line-height:1.5;color:var(--color-on-bg-light);">Compara o desempenho atual com ciclos anteriores para detectar progresso.</p>
+        </div>
+      </div>
+
+      <!-- Tabela de níveis -->
+      <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:10px;">Classificação por nível de domínio:</p>
+      <div style="border:1px solid var(--color-outline);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead><tr style="background:var(--color-surface-2);">
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Nível</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Taxa de acerto</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">O que quer dizer</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:var(--color-error-light);color:#B42318;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Crítico</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">Abaixo de 40%</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">Habilidade não desenvolvida — precisa de atenção urgente.</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;"><span style="background:var(--color-warning-light);color:var(--color-warning-dark);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Moderado</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">40% – 69%</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">Em desenvolvimento — revisão ajuda a consolidar.</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;"><span style="background:var(--color-success-light);color:var(--color-success-dark);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500;">Adequado</span></td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">70% ou mais</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">Habilidade dominada — não gera trilha de revisão.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Callout: importante -->
+      <div style="background:var(--color-warning-light);border-left:3px solid var(--color-warning);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:14px 16px;display:flex;gap:12px;">
+        <i class="pi pi-exclamation-triangle" style="color:var(--color-warning);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">O Orbie usa habilidades de <strong style="color:var(--color-on-bg);">no mínimo 3 atividades diferentes</strong> para calcular o nível. Estudantes com poucas atividades registradas podem aparecer sem diagnóstico ainda.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 3 ─── -->
+  <section id="sec3" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">Como as trilhas são geradas pela IA</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:20px;">Ao final de cada ciclo, o Orbie processa os dados de todos os estudantes e cria automaticamente uma trilha para cada um. Veja como isso acontece:</p>
+
+      <!-- Steps -->
+      <div style="display:flex;flex-direction:column;gap:0;">
+
+        <div style="display:flex;gap:16px;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;z-index:1;">1</div>
+            <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
+          </div>
+          <div style="padding-bottom:24px;padding-top:6px;">
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Análise de desempenho</p>
+            <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">A IA identifica quais habilidades cada estudante não atingiu o nível adequado no ciclo.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;z-index:1;">2</div>
+            <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
+          </div>
+          <div style="padding-bottom:24px;padding-top:6px;">
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Seleção de questões</p>
+            <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">O sistema seleciona questões do banco de conteúdo cadastrado para cobrir as habilidades identificadas. As mais críticas ganham prioridade.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;z-index:1;">3</div>
+            <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
+          </div>
+          <div style="padding-bottom:24px;padding-top:6px;">
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Montagem da trilha</p>
+            <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">A trilha é montada com até 10 questões por estudante, agrupadas por habilidade, respeitando o limite configurado pela escola.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">4</div>
+          </div>
+          <div style="padding-top:6px;">
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Publicação e notificação</p>
+            <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">A trilha fica disponível no app do estudante e você recebe uma notificação informando que novos diagnósticos estão prontos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Callout: quando não gera trilha -->
+      <div style="background:var(--color-surface-2);border:1px solid var(--color-outline);border-radius:var(--radius-md);padding:14px 16px;margin-top:4px;display:flex;gap:12px;">
+        <i class="pi pi-info-circle" style="color:var(--color-on-bg-light);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <div>
+          <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Quando a trilha não é gerada</p>
+          <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">Se não houver questões suficientes no banco de conteúdo para cobrir as habilidades de um estudante, a trilha não é gerada para ele. Você será avisado com o número de estudantes afetados e as habilidades em falta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 4 ─── -->
+  <section id="sec4" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">Estrutura de um bloco de revisão</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">Cada trilha é dividida em blocos, um por habilidade. Dentro de cada bloco, o estudante responde questões e tem a chance de revisar antes de fechar o bloco.</p>
+
+      <!-- Diagrama do bloco -->
+      <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:600;color:var(--color-on-bg-light);margin-bottom:16px;text-transform:uppercase;letter-spacing:.05em;">Estrutura de um bloco</p>
+        <div style="display:flex;align-items:stretch;gap:0;">
+
+          <div style="flex:1;background:var(--color-primary-5);border-radius:var(--radius-md);padding:12px;text-align:center;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-size:13px;font-weight:700;">1</div>
+            <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Questões</p>
+            <p style="font-size:12px;color:var(--color-on-bg-light);line-height:1.4;">Até 5 questões da habilidade</p>
+          </div>
+
+          <div style="display:flex;align-items:center;padding:0 8px;color:var(--color-on-bg-light);">
+            <i class="pi pi-arrow-right" style="font-size:14px;"></i>
+          </div>
+
+          <div style="flex:1;background:var(--color-warning-light);border-radius:var(--radius-md);padding:12px;text-align:center;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-warning);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-size:13px;font-weight:700;">2</div>
+            <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Revisão</p>
+            <p style="font-size:12px;color:var(--color-on-bg-light);line-height:1.4;">Rever respostas antes de confirmar</p>
+          </div>
+
+          <div style="display:flex;align-items:center;padding:0 8px;color:var(--color-on-bg-light);">
+            <i class="pi pi-arrow-right" style="font-size:14px;"></i>
+          </div>
+
+          <div style="flex:1;background:var(--color-success-light);border-radius:var(--radius-md);padding:12px;text-align:center;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--color-success);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:#fff;font-size:13px;font-weight:700;">3</div>
+            <p style="font-size:13px;font-weight:600;color:var(--color-on-bg);margin-bottom:4px;">Resultado</p>
+            <p style="font-size:12px;color:var(--color-on-bg-light);line-height:1.4;">Feedback do desempenho no bloco</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Callout: revisão é opcional -->
+      <div style="background:var(--color-info-light);border-left:3px solid var(--color-info);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:14px 16px;display:flex;gap:12px;">
+        <i class="pi pi-check-circle" style="color:var(--color-info);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">A etapa de revisão é <strong style="color:var(--color-on-bg);">totalmente opcional</strong>. O estudante pode pular e ir direto ao resultado — isso não penaliza o desempenho registrado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 5 ─── -->
+  <section id="sec5" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">Ciclos e vigências</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">O funcionamento das trilhas segue uma lógica de ciclos — períodos regulares em que o Orbie coleta dados, gera diagnósticos e publica as trilhas para a turma.</p>
+
+      <div style="border:1px solid var(--color-outline);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead><tr style="background:var(--color-surface-2);">
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Periodicidade</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Vigência da trilha</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--color-on-bg);border-bottom:1px solid var(--color-outline);">Lembrete enviado</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--color-outline);">
+              <td style="padding:10px 14px;color:var(--color-on-bg);">Semanal</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">7 dias a partir da publicação</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">1 dia antes do vencimento</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;color:var(--color-on-bg);">Quinzenal</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">15 dias a partir da publicação</td>
+              <td style="padding:10px 14px;color:var(--color-on-bg-mid);">3 dias antes do vencimento</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:var(--color-surface-2);border:1px solid var(--color-outline);border-radius:var(--radius-md);padding:14px 16px;display:flex;gap:12px;">
+        <i class="pi pi-calendar-times" style="color:var(--color-on-bg-light);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">Após o vencimento, a trilha fica com status <strong style="color:var(--color-on-bg);">Expirada</strong>. O estudante não recebe notificação de expiração — isso é intencional para evitar reforço negativo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 6 ─── -->
+  <section id="sec6" style="margin-bottom:40px;">
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">O que você vê no painel</h2>
+    </div>
+    <div style="padding-left:40px;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-on-bg-mid);margin-bottom:16px;">O painel de Trilhas Adaptativas tem duas visões principais para você acompanhar o andamento da turma:</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+        <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:18px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <div style="width:32px;height:32px;border-radius:var(--radius-sm);background:var(--color-primary-5);display:flex;align-items:center;justify-content:center;">
+              <i class="pi pi-users" style="color:var(--color-primary);font-size:16px;"></i>
+            </div>
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);">Visão da turma</p>
+          </div>
+          <ul style="font-size:13px;line-height:1.7;color:var(--color-on-bg-mid);padding-left:16px;">
+            <li>Resumo de quantos estudantes têm trilha disponível, em andamento ou concluída</li>
+            <li>Destaques de estudantes com mais habilidades críticas</li>
+            <li>Progresso geral do ciclo atual</li>
+          </ul>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:18px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <div style="width:32px;height:32px;border-radius:var(--radius-sm);background:#F0FDF4;display:flex;align-items:center;justify-content:center;">
+              <i class="pi pi-user" style="color:var(--color-success);font-size:16px;"></i>
+            </div>
+            <p style="font-size:14px;font-weight:600;color:var(--color-on-bg);">Visão do estudante</p>
+          </div>
+          <ul style="font-size:13px;line-height:1.7;color:var(--color-on-bg-mid);padding-left:16px;">
+            <li>Detalhes da trilha individual de cada estudante</li>
+            <li>Habilidades diagnosticadas e seus níveis</li>
+            <li>Resultado por bloco concluído</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background:var(--color-info-light);border-left:3px solid var(--color-info);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:14px 16px;display:flex;gap:12px;">
+        <i class="pi pi-eye" style="color:var(--color-info);font-size:16px;margin-top:1px;flex-shrink:0;"></i>
+        <p style="font-size:14px;line-height:1.6;color:var(--color-on-bg-mid);">Você pode <strong style="color:var(--color-on-bg);">visualizar a trilha gerada</strong> para qualquer estudante, mas não pode alterá-la. Ajustes no conteúdo das revisões são feitos no banco de questões.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEÇÃO 7: FAQ ─── -->
+  <section id="sec7" style="margin-bottom:48px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--color-on-bg);">Perguntas frequentes</h2>
+    </div>
+    <div style="padding-left:40px;display:flex;flex-direction:column;gap:0;border:1px solid var(--color-outline);border-radius:var(--radius-lg);overflow:hidden;">
+
+      <details style="border-bottom:1px solid var(--color-outline);" open>
+        <summary style="padding:16px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--color-on-bg);list-style:none;display:flex;align-items:center;justify-content:space-between;background:#fff;">
+          Posso criar uma trilha manualmente para um estudante?
+          <i class="pi pi-chevron-down" style="font-size:12px;color:var(--color-on-bg-light);transition:transform .2s;"></i>
+        </summary>
+        <div style="padding:0 18px 16px;font-size:14px;line-height:1.7;color:var(--color-on-bg-mid);background:#fff;">
+          Não. As trilhas são geradas exclusivamente pelo Orbie com base nos dados de desempenho. A criação manual não está disponível pois comprometeria a personalização baseada em dados reais.
+        </div>
+      </details>
+
+      <details style="border-bottom:1px solid var(--color-outline);">
+        <summary style="padding:16px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--color-on-bg);list-style:none;display:flex;align-items:center;justify-content:space-between;background:#fff;">
+          Por que alguns estudantes não têm trilha?
+          <i class="pi pi-chevron-down" style="font-size:12px;color:var(--color-on-bg-light);"></i>
+        </summary>
+        <div style="padding:0 18px 16px;font-size:14px;line-height:1.7;color:var(--color-on-bg-mid);background:#fff;">
+          Há duas razões possíveis: o estudante atingiu nível adequado em todas as habilidades avaliadas no ciclo, ou não há questões suficientes no banco de conteúdo para cobrir as habilidades identificadas. Você recebe um alerta quando o segundo caso ocorre.
+        </div>
+      </details>
+
+      <details style="border-bottom:1px solid var(--color-outline);">
+        <summary style="padding:16px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--color-on-bg);list-style:none;display:flex;align-items:center;justify-content:space-between;background:#fff;">
+          A nota das trilhas entra no boletim?
+          <i class="pi pi-chevron-down" style="font-size:12px;color:var(--color-on-bg-light);"></i>
+        </summary>
+        <div style="padding:0 18px 16px;font-size:14px;line-height:1.7;color:var(--color-on-bg-mid);background:#fff;">
+          Não. As trilhas adaptativas são exclusivamente para revisão e diagnóstico. Os dados influenciam os diagnósticos dos próximos ciclos, mas não são exportados como nota formal.
+        </div>
+      </details>
+
+      <details style="border-bottom:1px solid var(--color-outline);">
+        <summary style="padding:16px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--color-on-bg);list-style:none;display:flex;align-items:center;justify-content:space-between;background:#fff;">
+          O estudante pode refazer a trilha depois de concluída?
+          <i class="pi pi-chevron-down" style="font-size:12px;color:var(--color-on-bg-light);"></i>
+        </summary>
+        <div style="padding:0 18px 16px;font-size:14px;line-height:1.7;color:var(--color-on-bg-mid);background:#fff;">
+          Não. Após concluída, a trilha fica bloqueada para edição. Uma nova trilha com conteúdo atualizado será gerada no próximo ciclo, caso as dificuldades persistam.
+        </div>
+      </details>
+
+      <details>
+        <summary style="padding:16px 18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--color-on-bg);list-style:none;display:flex;align-items:center;justify-content:space-between;background:#fff;">
+          Posso desativar as trilhas para uma turma específica?
+          <i class="pi pi-chevron-down" style="font-size:12px;color:var(--color-on-bg-light);"></i>
+        </summary>
+        <div style="padding:0 18px 16px;font-size:14px;line-height:1.7;color:var(--color-on-bg-mid);background:#fff;">
+          Sim. Em Configurações > Trilhas Adaptativas você pode ativar ou desativar a funcionalidade por turma. Quando desativada, nenhuma trilha é gerada e nenhuma notificação é enviada.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Footer do artigo -->
+  <div style="border-top:1px solid var(--color-outline);padding-top:24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;">
+    <div>
+      <p style="font-size:13px;color:var(--color-on-bg-light);">Este artigo foi útil?</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.style.background='var(--color-success-light)';this.style.color='var(--color-success-dark)';this.style.borderColor='var(--color-success)';" style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:20px;padding:6px 14px;background:#fff;font-family:var(--font);font-size:13px;color:var(--color-on-bg-mid);cursor:pointer;">
+        <i class="pi pi-thumbs-up" style="font-size:13px;"></i> Sim
+      </button>
+      <button onclick="this.style.background='var(--color-error-light)';this.style.color='#B42318';this.style.borderColor='var(--color-error)';" style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:20px;padding:6px 14px;background:#fff;font-family:var(--font);font-size:13px;color:var(--color-on-bg-mid);cursor:pointer;">
+        <i class="pi pi-thumbs-down" style="font-size:13px;"></i> Não
+      </button>
+    </div>
+  </div>
+
+</main>
+</div><!-- end content wrapper -->
+</div><!-- end app wrapper -->
+
+<style>
+.toc-link:hover { background: var(--color-primary-5); color: var(--color-primary) !important; }
+.toc-link.active { background: var(--color-primary-5); color: var(--color-primary) !important; font-weight: 600; border-left: 2px solid var(--color-primary); padding-left: 8px; }
+</style>
+<script>
+(function() {
+  const links = document.querySelectorAll('.toc-link');
+  const sections = ['sec1','sec2','sec3','sec4','sec5','sec6','sec7'].map(id => document.getElementById(id)).filter(Boolean);
+  const main = document.querySelector('main');
+  function onScroll() {
+    let current = sections[0];
+    sections.forEach(sec => { if (main.scrollTop + 80 >= sec.offsetTop) current = sec; });
+    links.forEach(l => { l.classList.toggle('active', l.getAttribute('href') === '#' + current.id); });
+  }
+  main.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,984 +1,750 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trilhas Adaptativas — Orbie Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --color-primary: #2177FF;
-  --color-primary-5: rgba(33,119,255,0.05);
-  --color-outline: #DDE4EB;
-  --color-on-bg: #344054;
-  --color-on-bg-mid: #525E76;
-  --color-on-bg-light: #8A95B2;
-  --color-surface: #FFFFFF;
-  --color-state-overlay: rgba(0,0,0,0.03);
-  --color-success: #12B76A;
-  --color-success-light: #ECFDF3;
-  --color-warning: #F79009;
-  --color-warning-light: #FFFAEB;
-  --color-error: #F04438;
-  --color-error-light: #FEF3F2;
-  --color-critical: #F97066;
-  --color-moderate: #FDB022;
-  --color-attention: #2E90FA;
-  --font: 'Outfit', sans-serif;
-}
-body {
-  font-family: var(--font);
-  color: var(--color-on-bg);
-  background: #FFF;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  font-size: 14px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visão do Estudante — Trilhas Adaptativas — Orbie Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2177FF;
+      --primary-hover: #0059E7;
+      --primary-bg: rgba(33,119,255,0.07);
+      --bg: #FFFFFF;
+      --surface: #FFFFFF;
+      --bg-page: #F8F9FC;
+      --outline: #E1E8EF;
+      --text: #344054;
+      --text-mid: #52607A;
+      --text-light: #8A95B2;
+      --success: #12B76A;
+      --success-bg: #ECFDF3;
+      --success-dark: #027A48;
+      --warning: #F79009;
+      --warning-bg: #FFFAEB;
+      --warning-dark: #B54708;
+      --error: #F04438;
+      --error-bg: #FEF3F2;
+      --error-dark: #B42318;
+      --info: #2E90FA;
+      --info-bg: #EFF8FF;
+      --state-overlay: rgba(0,0,0,0.03);
+      --radius-xs: 6px; --radius-sm: 8px; --radius-md: 10px; --radius-lg: 12px; --radius-full: 1000px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.10);
+      --font: 'Outfit', sans-serif;
+    }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── TOPBAR ── */
+    .topbar { height: 64px; background: var(--surface); border-bottom: 1px solid var(--outline); display: flex; align-items: center; padding: 0 16px; gap: 16px; flex-shrink: 0; position: sticky; top: 0; z-index: 100; }
+    .topbar-logo { display: flex; align-items: center; width: 167px; flex-shrink: 0; }
+    .topbar-menu-btn { width: 40px; height: 40px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; color: var(--text); }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .topbar-selector { display: flex; align-items: center; gap: 8px; border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 6px 8px 6px 12px; font-size: 14px; font-family: var(--font); color: var(--text); background: var(--surface); cursor: pointer; min-width: 180px; }
+    .topbar-selector span { flex: 1; }
+    .topbar-notif { width: 40px; height: 40px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; color: var(--text-mid); font-size: 20px; position: relative; }
+    .notif-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--error); position: absolute; top: 7px; right: 7px; border: 2px solid white; }
+    .topbar-avatar { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--primary-bg); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0; color: var(--primary); }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; flex: 1; min-height: 0; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: 235px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--outline); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; position: sticky; top: 64px; height: calc(100vh - 64px); }
+    .nav-item { display: flex; align-items: center; gap: 6px; padding: 8px 4px 8px 0; border-radius: var(--radius-xs); cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none; border: none; background: transparent; font-family: var(--font); width: 100%; }
+    .nav-item:hover { background: var(--state-overlay); }
+    .nav-indicator { width: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .nav-indicator-bar { width: 4px; height: 18px; background: var(--primary); border-radius: 99px; }
+    .nav-icon { font-size: 20px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-mid); }
+    .nav-label { flex: 1; }
+    .expand-icon { font-size: 14px; margin-left: auto; color: var(--text-light); }
+    .nav-sub { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+    .nav-sub-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 32px; border-radius: var(--radius-xs); cursor: pointer; font-size: 14px; color: var(--text); text-decoration: none; font-family: var(--font); }
+    .nav-sub-item:hover { background: var(--state-overlay); }
+    .nav-sub-item.active { padding-left: 0; background: var(--primary-bg); color: var(--primary); font-weight: 600; }
+    .nav-sub-item.active .nav-indicator { display: flex; }
+    .nav-sub-item .nav-indicator { display: none; }
+    .nav-accordion { display: flex; flex-direction: column; width: 100%; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-page); }
+    .page-content { padding: 16px 32px 40px; flex: 1; max-width: 1205px; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-mid); margin-bottom: 12px; }
+    .breadcrumb a { color: var(--text-mid); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--primary); }
+    .breadcrumb .current { color: var(--text); font-weight: 500; }
+    .breadcrumb-sep { color: var(--text-light); font-size: 12px; }
+    .breadcrumb-back { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-full); border: none; background: transparent; cursor: pointer; color: var(--text-mid); }
+    .breadcrumb-back:hover { background: var(--outline); }
+    .breadcrumb-star { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-full); border: none; background: transparent; cursor: pointer; color: var(--text-light); }
+    .breadcrumb-star:hover { color: var(--warning); }
+
+    /* ── PAGE HEADER ── */
+    .page-title { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--outline); margin-bottom: 24px; }
+    .tab-btn { padding: 10px 20px; font-size: 15px; font-weight: 500; font-family: var(--font); border: none; background: transparent; color: var(--text-mid); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+    /* ── CARDS ROW ── */
+    .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .info-card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 16px; }
+    .info-card-label { font-size: 13px; font-weight: 500; color: var(--text-mid); margin-bottom: 6px; }
+    .info-card-value { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.1; margin-bottom: 8px; }
+    .info-card-sub { font-size: 13px; color: var(--text-mid); }
+    .progress-track { width: 100%; height: 8px; background: var(--outline); border-radius: var(--radius-full); margin: 8px 0 4px; }
+    .progress-fill { height: 100%; border-radius: var(--radius-full); }
+    .ring-wrap { display: flex; align-items: center; justify-content: space-between; }
+    .ring-info { flex: 1; }
+    .ring-svg { flex-shrink: 0; }
+
+    /* ── SECTION CARD ── */
+    .section-card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 24px; }
+    .section-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .section-card-sub { font-size: 13px; color: var(--text-mid); margin-bottom: 16px; }
+
+    /* ── TABELA DIAGNÓSTICO ── */
+    .diag-table { width: 100%; border-collapse: collapse; }
+    .diag-table thead th { font-size: 13px; font-weight: 700; color: var(--text); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--outline); white-space: nowrap; }
+    .diag-table tbody td { font-size: 14px; color: var(--text-mid); padding: 0 12px; height: 64px; border-bottom: 1px solid var(--outline); vertical-align: middle; }
+    .diag-table tbody tr:last-child td { border-bottom: none; }
+    .diag-table tbody td.habilidade-cell { color: var(--text); }
+    .skill-code { font-weight: 700; font-size: 13px; display: block; color: var(--text); }
+    .skill-name { font-size: 12px; color: var(--text-mid); display: block; margin-top: 2px; }
+    .gap-tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .gap-critico { background: #FEF3F2; color: #B42318; }
+    .gap-moderado { background: #FFFAEB; color: #B54708; }
+    .gap-atencao { background: #EFF8FF; color: #1849A9; }
+    .acertos-cell { font-size: 14px; font-weight: 500; color: var(--text); }
+    .turma-cell { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { background: #12B76A; }
+    .dot-yellow { background: #F79009; }
+    .dot-red { background: #F04438; }
+    .justificativa-cell { font-size: 13px; color: var(--text-mid); max-width: 340px; line-height: 1.5; }
+    .tag-evidencia { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background: #FFFAEB; color: #B54708; margin-top: 4px; }
+
+    /* ── BARRAS DE PROGRESSO (cards) ── */
+    .bar-fill-red { background: #F04438; height: 100%; border-radius: var(--radius-full); }
+    .bar-fill-yellow { background: #F79009; height: 100%; border-radius: var(--radius-full); }
+    .bar-fill-green { background: #12B76A; height: 100%; border-radius: var(--radius-full); }
+
+    /* ── HISTÓRICO CICLOS ── */
+    .historico-table { width: 100%; border-collapse: collapse; }
+    .historico-table thead th { font-size: 13px; font-weight: 700; color: var(--text); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--outline); }
+    .historico-table tbody td { font-size: 14px; color: var(--text-mid); padding: 0 12px; height: 52px; border-bottom: 1px solid var(--outline); vertical-align: middle; }
+    .historico-table tbody tr:last-child td { border-bottom: none; }
+    .idh-val { font-weight: 700; font-size: 14px; color: var(--text); }
+    .idh-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+    .trend-up { color: #027A48; }
+    .trend-down { color: #B42318; }
+    .trend-flat { color: var(--text-light); }
+
+    /* ── ABA TRILHA ── */
+    .trilha-bloco { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-lg); margin-bottom: 16px; overflow: hidden; }
+    .trilha-bloco-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; background: #F8F9FC; border-bottom: 1px solid var(--outline); }
+    .trilha-bloco-header:hover { background: var(--outline); }
+    .bloco-num { width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--primary); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .bloco-title { flex: 1; font-size: 15px; font-weight: 600; color: var(--text); }
+    .bloco-meta { font-size: 13px; color: var(--text-mid); display: flex; gap: 12px; }
+    .bloco-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; }
+    .tag-habilidade { background: var(--primary-bg); color: var(--primary); }
+    .tag-ia { background: #F3E8FF; color: #6B21A8; }
+    .tag-banco { background: #F1F4F9; color: var(--text-mid); }
+    .questao-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--outline); }
+    .questao-row:last-child { border-bottom: none; }
+    .questao-row:hover { background: var(--bg-page); }
+    .questao-num { font-size: 13px; font-weight: 600; color: var(--text-light); min-width: 24px; }
+    .questao-info { flex: 1; }
+    .questao-enunciado { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.4; }
+    .questao-meta-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .questao-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; }
+    .qtag-tipo { background: #F1F4F9; color: var(--text-mid); }
+    .qtag-dif-facil { background: #ECFDF3; color: #027A48; }
+    .qtag-dif-medio { background: #FFFAEB; color: #B54708; }
+    .qtag-dif-dificil { background: #FEF3F2; color: #B42318; }
+    .qtag-origem-ia { background: #F3E8FF; color: #6B21A8; }
+    .qtag-origem-banco { background: #F1F4F9; color: var(--text-mid); }
+    .questao-gabarito { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #027A48; }
+    .questao-gabarito .gabarito-label { color: var(--text-light); font-weight: 400; }
+    .btn-ver-questao { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-full); border: 1px solid var(--outline); background: white; cursor: pointer; color: var(--text-mid); flex-shrink: 0; }
+    .btn-ver-questao:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── AÇÕES DE EDIÇÃO ── */
+    .acoes-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .btn-action { height: 36px; background: white; color: var(--text); border: 1px solid var(--outline); border-radius: var(--radius-lg); padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: var(--font); }
+    .btn-action:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-action-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-action-primary:hover { background: var(--primary-hover); color: white; border-color: var(--primary-hover); }
+
+    /* ── MODAL QUESTÃO ── */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal-box { background: white; border-radius: 16px; width: 600px; max-width: 95vw; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--outline); }
+    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .modal-close { width: 32px; height: 32px; border-radius: var(--radius-full); border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-mid); }
+    .modal-close:hover { background: var(--outline); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal-enunciado { font-size: 15px; color: var(--text); line-height: 1.6; margin-bottom: 20px; }
+    .modal-alternativas { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .alternativa { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--outline); font-size: 14px; color: var(--text); }
+    .alternativa.gabarito { border-color: #12B76A; background: #ECFDF3; color: #027A48; }
+    .alt-letra { font-weight: 700; min-width: 20px; flex-shrink: 0; }
+    .modal-gabarito-label { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--radius-full); background: #ECFDF3; color: #027A48; font-size: 14px; font-weight: 700; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--outline); display: flex; justify-content: flex-end; }
+    .modal-tags-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+    /* ── CENÁRIO SELETOR (topo) ── */
+    .scenario-bar { background: white; border-bottom: 1px solid var(--outline); padding: 8px 32px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-mid); }
+    .scenario-label { font-weight: 600; color: var(--text); margin-right: 4px; }
+    .scenario-btn { padding: 4px 12px; border-radius: var(--radius-full); border: 1px solid var(--outline); background: white; font-size: 12px; font-family: var(--font); cursor: pointer; color: var(--text); font-weight: 500; transition: all 0.15s; }
+    .scenario-btn:hover, .scenario-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* ── EMPTY STATES ── */
+    .empty-state { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 0; }
+    .empty-icon { font-size: 20px; color: var(--text-light); }
+    .empty-msg { font-size: 14px; color: var(--text-mid); }
+
+    /* ── MISC ── */
+    .divider { height: 1px; background: var(--outline); margin: 0 -16px 16px; }
+  </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header style="position:sticky;top:0;z-index:100;height:64px;background:#fff;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;">
-  <svg width="112" height="33" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
-    <g clip-path="url(#clip_logo)">
-      <path d="M41.763 56C56.5366 56 67.7509 45.0144 67.7509 30.4669C67.7509 15.9194 56.5392 4.9364 41.763 4.9364C26.9868 4.9364 15.7776 15.922 15.7776 30.4669C15.7776 45.0119 26.9157 56 41.7655 56M41.7655 52.1357C29.4156 52.1357 20.0967 42.893 20.0967 30.4669C20.0967 18.0408 29.4156 8.79812 41.7655 8.79812C54.1154 8.79812 63.4344 18.0408 63.4344 30.4669C63.4344 42.893 54.1154 52.1357 41.7655 52.1357Z" fill="#1064AD"/>
-      <path d="M92.769 16.8315C91.481 16.453 90.4952 16.3005 88.981 16.3005C84.1335 16.3005 80.4954 19.0291 78.4502 23.4219V18.5718C78.4502 17.5861 77.9192 16.9814 76.936 16.9814H76.0264C75.1169 16.9814 74.5122 17.5886 74.5122 18.5718V53.4238C74.5122 54.4096 75.1194 55.0905 76.0264 55.0905H77.1621C78.0716 55.0905 78.6763 54.4096 78.6763 53.4238V33.1956C78.6763 25.5433 82.8429 20.0124 88.6024 20.0124C89.512 20.0124 90.3453 20.1648 91.4047 20.4671C92.3143 20.7695 93.1476 20.6932 93.5261 19.5576L93.6786 18.9504C94.1334 17.6623 93.5261 17.0551 92.769 16.829" fill="#1064AD"/>
-      <path d="M116.487 16.3006C110.046 16.3006 104.82 19.1028 101.408 23.5743V2.58637C101.408 1.45072 100.954 0.767295 99.6655 1.14584L98.7559 1.37196C97.694 1.67429 97.3154 2.20528 97.3154 3.0386V53.4213C97.3154 54.4071 97.8464 55.088 98.8296 55.088H99.8916C100.877 55.088 101.406 54.4071 101.406 53.4213V48.4976C104.663 53.0428 109.891 55.9975 116.484 55.9975C127.699 55.9975 135.577 47.2095 135.577 36.1478C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.2095C107.696 52.2095 101.18 46.3 101.027 36.1478C100.875 25.9955 107.77 20.0861 116.106 20.0861C125.272 20.0861 131.334 27.2836 131.334 36.1478C131.334 45.0119 125.272 52.2095 116.106 52.2095Z" fill="#1064AD"/>
-      <path d="M143.848 55.0905H144.984C145.969 55.0905 146.498 54.4096 146.498 53.4239V18.5719C146.498 17.5861 145.967 16.9814 144.984 16.9814H143.848C142.939 16.9814 142.334 17.5887 142.334 18.5719V53.4239C142.334 54.4096 142.941 55.0905 143.848 55.0905Z" fill="#1064AD"/>
-      <path d="M157.566 37.4384H188.478C189.766 37.4384 190.523 36.605 190.523 35.3932C190.523 30.6194 188.856 25.998 185.749 22.5123C182.642 18.6481 177.944 16.3005 172.111 16.3005C161.125 16.3005 153.244 24.8624 153.244 36.2265C153.244 48.6526 162.64 56 172.944 56C178.097 56 184.385 53.9548 188.704 49.4071C189.235 48.7999 189.613 47.8929 188.78 47.0596L188.325 46.6811C187.644 46.0002 186.811 45.8478 185.825 46.6811C181.961 50.5453 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.7573 157.566 37.4384ZM172.113 20.0886C176.963 20.0886 180.752 22.0575 183.099 25.3934C184.842 27.591 185.901 30.3933 186.28 33.6529H157.566C158.399 25.5458 164.083 20.0911 172.113 20.0911" fill="#1064AD"/>
-      <path d="M140.645 6.44547C141.212 8.48558 143.361 9.68982 145.442 9.13343C147.522 8.57704 148.749 6.47088 148.183 4.43077C147.616 2.39067 145.467 1.18642 143.386 1.74535C141.305 2.30175 140.078 4.40791 140.645 6.44801" fill="#29B84C"/>
-      <path d="M79.9758 3.57717C79.8513 2.26876 78.863 1.32111 78.1465 0.846021C77.547 0.447146 76.203 0 74.6812 0C70.8017 0 64.3155 1.94102 56.6276 5.38608C56.3913 5.49279 54.1327 6.6259 52.9081 7.24072C53.777 7.62689 54.618 8.05626 55.4259 8.52881L57.842 7.26359C65.5299 3.81091 71.6883 1.96897 75.4306 1.96897C76.1776 1.96897 76.9652 2.07059 77.3056 2.2027C77.6486 2.33482 78.0297 2.51266 78.0449 3.22911C78.0881 5.35559 75.4306 9.25542 70.634 14.0292C64.3688 20.2639 55.0677 27.4004 44.4428 34.1203C25.3603 46.1907 10.6528 51.5946 4.54515 51.5946C1.02132 51.5946 2.0274 49.4605 1.96643 49.9457C2.27384 47.489 5.47247 42.6466 13.9911 35.2179L15.9474 33.4979C15.8458 32.5655 15.7873 31.6178 15.7797 30.6498L12.6497 33.3937C4.4486 40.4921 0 46.2644 0 49.6815C0 50.1261 0.193086 52.2856 2.77942 53.2002C3.46031 53.4416 4.30125 53.5636 5.29717 53.5636C12.9266 53.5636 28.8232 46.6277 45.797 35.8911C56.3837 29.1966 65.6849 22.088 71.9881 15.8813C75.9616 11.9662 80.2883 6.88758 79.9758 3.57971" fill="#F79850"/>
-    </g>
-    <defs><clipPath id="clip_logo"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
-  </svg>
-  <div style="flex:1"></div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <button style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:6px 10px 6px 12px;background:white;font-family:var(--font);font-size:13px;color:var(--color-on-bg);cursor:pointer;">
-      Professor <i class="pi pi-chevron-down" style="font-size:11px;color:var(--color-on-bg-light);"></i>
-    </button>
-    <button style="display:flex;align-items:center;gap:6px;border:1px solid var(--color-outline);border-radius:var(--radius-lg);padding:6px 10px 6px 12px;background:white;font-family:var(--font);font-size:13px;color:var(--color-on-bg);cursor:pointer;">
-      Escola SESI SC – Rio do Sul <i class="pi pi-chevron-down" style="font-size:11px;color:var(--color-on-bg-light);"></i>
-    </button>
-    <button style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;color:var(--color-on-bg-mid);font-size:18px;">
-      <i class="pi pi-bell"></i>
-      <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--color-error);border-radius:50%;border:2px solid white;"></span>
-    </button>
-    <div style="width:32px;height:32px;border-radius:50%;background:#E8F0FE;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:var(--color-primary);cursor:pointer;">A</div>
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <svg width="112" height="33" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+      <g clip-path="url(#clip_logo)">
+        <path d="M41.763 56C56.5366 56 67.7509 45.0144 67.7509 30.4669C67.7509 15.9194 56.5392 4.9364 41.763 4.9364C26.9868 4.9364 15.7776 15.922 15.7776 30.4669C15.7776 45.0119 26.9157 56 41.7655 56M41.7655 52.1357C29.4156 52.1357 20.0967 42.893 20.0967 30.4669C20.0967 18.0408 29.4156 8.79812 41.7655 8.79812C54.1154 8.79812 63.4344 18.0408 63.4344 30.4669C63.4344 42.893 54.1154 52.1357 41.7655 52.1357Z" fill="#1064AD"/>
+        <path d="M92.769 16.8315C91.481 16.453 90.4952 16.3005 88.981 16.3005C84.1335 16.3005 80.4954 19.0291 78.4502 23.4219V18.5718C78.4502 17.5861 77.9192 16.9814 76.936 16.9814H76.0264C75.1169 16.9814 74.5122 17.5886 74.5122 18.5718V53.4238C74.5122 54.4096 75.1194 55.0905 76.0264 55.0905H77.1621C78.0716 55.0905 78.6763 54.4096 78.6763 53.4238V33.1956C78.6763 25.5433 82.8429 20.0124 88.6024 20.0124C89.512 20.0124 90.3453 20.1648 91.4047 20.4671C92.3143 20.7695 93.1476 20.6932 93.5261 19.5576L93.6786 18.9504C94.1334 17.6623 93.5261 17.0551 92.769 16.829" fill="#1064AD"/>
+        <path d="M116.487 16.3006C110.046 16.3006 104.82 19.1028 101.408 23.5743V2.58637C101.408 1.45072 100.954 0.767295 99.6655 1.14584L98.7559 1.37196C97.694 1.67429 97.3154 2.20528 97.3154 3.0386V53.4213C97.3154 54.4071 97.8464 55.088 98.8296 55.088H99.8916C100.877 55.088 101.406 54.4071 101.406 53.4213V48.4976C104.663 53.0428 109.891 55.9975 116.484 55.9975C127.699 55.9975 135.577 47.2095 135.577 36.1478C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.2095C107.696 52.2095 101.18 46.3 101.027 36.1478C100.875 25.9955 107.77 20.0861 116.106 20.0861C125.272 20.0861 131.334 27.2836 131.334 36.1478C131.334 45.0119 125.272 52.2095 116.106 52.2095Z" fill="#1064AD"/>
+        <path d="M143.848 55.0905H144.984C145.969 55.0905 146.498 54.4096 146.498 53.4239V18.5719C146.498 17.5861 145.967 16.9814 144.984 16.9814H143.848C142.939 16.9814 142.334 17.5887 142.334 18.5719V53.4239C142.334 54.4096 142.941 55.0905 143.848 55.0905Z" fill="#1064AD"/>
+        <path d="M157.566 37.4384H188.478C189.766 37.4384 190.523 36.605 190.523 35.3932C190.523 30.6194 188.856 25.998 185.749 22.5123C182.642 18.6481 177.944 16.3005 172.111 16.3005C161.125 16.3005 153.244 24.8624 153.244 36.2265C153.244 48.6526 162.64 56 172.944 56C178.097 56 184.385 53.9548 188.704 49.4071C189.235 48.7999 189.613 47.8929 188.78 47.0596L188.325 46.6811C187.644 46.0002 186.811 45.8478 185.825 46.6811C181.961 50.5453 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.7573 157.566 37.4384ZM172.113 20.0886C176.963 20.0886 180.752 22.0575 183.099 25.3934C184.842 27.591 185.901 30.3933 186.28 33.6529H157.566C158.399 25.5458 164.083 20.0911 172.113 20.0911" fill="#1064AD"/>
+        <path d="M140.645 6.44547C141.212 8.48558 143.361 9.68982 145.442 9.13343C147.522 8.57704 148.749 6.47088 148.183 4.43077C147.616 2.39067 145.467 1.18642 143.386 1.74535C141.305 2.30175 140.078 4.40791 140.645 6.44801" fill="#29B84C"/>
+        <path d="M79.9758 3.57717C79.8513 2.26876 78.863 1.32111 78.1465 0.846021C77.547 0.447146 76.203 0 74.6812 0C70.8017 0 64.3155 1.94102 56.6276 5.38608C56.3913 5.49279 54.1327 6.6259 52.9081 7.24072C53.777 7.62689 54.618 8.05626 55.4259 8.52881L57.842 7.26359C65.5299 3.81091 71.6883 1.96897 75.4306 1.96897C76.1776 1.96897 76.9652 2.07059 77.3056 2.2027C77.6486 2.33482 78.0297 2.51266 78.0449 3.22911C78.0881 5.35559 75.4306 9.25542 70.634 14.0292C64.3688 20.2639 55.0677 27.4004 44.4428 34.1203C25.3603 46.1907 10.6528 51.5946 4.54515 51.5946C1.02132 51.5946 2.0274 49.4605 1.96643 49.9457C2.27384 47.489 5.47247 42.6466 13.9911 35.2179L15.9474 33.4979C15.8458 32.5655 15.7873 31.6178 15.7797 30.6498L12.6497 33.3937C4.4486 40.4921 0 46.2644 0 49.6815C0 50.1261 0.193086 52.2856 2.77942 53.2002C3.46031 53.4416 4.30125 53.5636 5.29717 53.5636C12.9266 53.5636 28.8232 46.6277 45.797 35.8911C56.3837 29.1966 65.6849 22.088 71.9881 15.8813C75.9616 11.9662 80.2883 6.88758 79.9758 3.57971" fill="#F79850"/>
+      </g>
+      <defs><clipPath id="clip_logo"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
+    </svg>
+  </div>
+  <button class="topbar-menu-btn"><i class="pi pi-bars" style="font-size:20px"></i></button>
+  <div class="topbar-right">
+    <button class="topbar-selector"><span>Professor</span><i class="pi pi-chevron-down" style="font-size:14px"></i></button>
+    <button class="topbar-selector"><span>Escola SESI SC – Rio do Sul</span><i class="pi pi-chevron-down" style="font-size:14px"></i></button>
+    <button class="topbar-notif"><i class="pi pi-bell"></i><span class="notif-dot"></span></button>
+    <div class="topbar-avatar">A</div>
   </div>
 </header>
 
-<!-- APP WRAPPER -->
-<div class="app" style="display:flex;flex:1;">
-
-<!-- SIDEBAR -->
-<aside style="width:235px;background:#fff;border-right:1px solid var(--color-outline);padding:16px 8px;display:flex;flex-direction:column;gap:2px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;flex-shrink:0;">
-
-  <div style="padding:0 12px 4px;margin-top:8px;"></div>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-home" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span>Início</span>
-  </a>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-users" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span>Turmas</span>
-  </a>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-copy" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span style="flex:1">Conteúdos</span>
-    <i class="pi pi-chevron-down" style="font-size:12px;"></i>
-  </a>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-pen-to-square" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span>Correção de Respostas</span>
-  </a>
-
-  <!-- Relatórios — expandido e ativo -->
-  <div style="display:flex;flex-direction:column;gap:0;">
-    <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;color:var(--color-on-bg);font-size:14px;font-weight:600;cursor:pointer;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-      <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-      <i class="pi pi-chart-line" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-      <span style="flex:1">Relatórios</span>
-      <i class="pi pi-chevron-up" style="font-size:12px;"></i>
-    </div>
-    <!-- sub-itens -->
-    <a href="#" style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 32px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:13.5px;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-      <div style="width:4px;height:16px;border-radius:99px;flex-shrink:0;"></div>
-      <span>Acompanhamento</span>
-    </a>
-    <!-- ATIVO -->
-    <a href="#" style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 32px;border-radius:6px;text-decoration:none;color:var(--color-primary);font-size:13.5px;font-weight:600;background:var(--color-primary-5);">
-      <div style="width:4px;height:16px;border-radius:99px;flex-shrink:0;background:var(--color-primary);"></div>
-      <span>Trilhas Adaptativas</span>
-    </a>
-    <a href="#" style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 32px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:13.5px;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-      <div style="width:4px;height:16px;border-radius:99px;flex-shrink:0;"></div>
-      <span>Downloads</span>
-    </a>
-    <a href="#" style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 32px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:13.5px;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-      <div style="width:4px;height:16px;border-radius:99px;flex-shrink:0;"></div>
-      <span>Feedback de Questões</span>
-    </a>
-  </div>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-question-circle" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span>Central de Ajuda</span>
-  </a>
-
-  <a href="#" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;text-decoration:none;color:var(--color-on-bg-mid);font-size:14px;font-weight:500;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-    <div style="width:4px;height:18px;border-radius:99px;flex-shrink:0;"></div>
-    <i class="pi pi-star" style="font-size:18px;width:20px;text-align:center;flex-shrink:0;"></i>
-    <span>Favoritos</span>
-  </a>
-
-</aside>
-<!-- END SIDEBAR -->
-
-<main id="main-content" style="flex:1;overflow-y:auto;background:#F8FAFC;">
-
-<div id="view-estudante" style="padding:32px 36px;max-width:1100px;">
-
-  <!-- Breadcrumb -->
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
-    <a href="index.html" style="font-size:13px;color:var(--color-on-bg-mid);text-decoration:none;">Trilhas Adaptativas</a>
-    <i class="pi pi-chevron-right" style="font-size:10px;color:var(--color-on-bg-light);"></i>
-    <span style="font-size:13px;color:var(--color-on-bg);font-weight:500;">João Pedro Santos</span>
-  </div>
-
-  <!-- Cabeçalho do estudante -->
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div style="width:48px;height:48px;border-radius:50%;background:#FEF0C7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#B54708;">JP</div>
-      <div>
-        <h1 style="font-size:20px;font-weight:700;color:var(--color-on-bg);">João Pedro Santos</h1>
-        <p style="font-size:14px;color:var(--color-on-bg-mid);">6º Ano A · MAP – Ciências da Natureza – EM1 (PI)</p>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="padding:4px 10px;background:var(--color-warning-light);color:var(--color-warning);font-size:12px;font-weight:600;border-radius:99px;">● Em andamento</span>
-      <span style="padding:4px 10px;background:#EFF8FF;color:var(--color-attention);font-size:12px;font-weight:600;border-radius:99px;">Gerado por IA</span>
-    </div>
-  </div>
-
-  <!-- CARDS RESUMO -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
-
-    <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;padding:18px 20px;">
-      <div style="font-size:12px;font-weight:600;color:var(--color-on-bg-light);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Performance na trilha</div>
-      <div style="font-size:32px;font-weight:700;color:var(--color-error);line-height:1;margin-bottom:10px;">42%</div>
-      <div style="background:#EFF2F7;border-radius:99px;height:6px;overflow:hidden;">
-        <div style="width:42%;background:var(--color-error);height:100%;border-radius:99px;"></div>
-      </div>
-      <div style="font-size:12px;color:var(--color-on-bg-light);margin-top:6px;">Abaixo da média da turma (68%)</div>
-    </div>
-
-    <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;padding:18px 20px;">
-      <div style="font-size:12px;font-weight:600;color:var(--color-on-bg-light);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Fases concluídas</div>
-      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;">
-        <span style="font-size:32px;font-weight:700;color:var(--color-on-bg);line-height:1;">8</span>
-        <span style="font-size:18px;color:var(--color-on-bg-light);">de 20</span>
-      </div>
-      <div style="background:#EFF2F7;border-radius:99px;height:6px;overflow:hidden;">
-        <div style="width:40%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-      </div>
-      <div style="font-size:12px;color:var(--color-on-bg-light);margin-top:6px;">40% do percurso concluído</div>
-    </div>
-
-    <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;padding:18px 20px;">
-      <div style="font-size:12px;font-weight:600;color:var(--color-on-bg-light);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Ciclo atual</div>
-      <div style="font-size:18px;font-weight:700;color:var(--color-on-bg);margin-bottom:4px;">Ciclo 4</div>
-      <div style="font-size:13px;color:var(--color-on-bg-mid);">01/07 – 31/07/2026</div>
-      <div style="font-size:12px;color:var(--color-on-bg-light);margin-top:4px;">29 dias restantes</div>
-    </div>
-
-  </div>
-
-    <!-- SEÇÃO: DIAGNÓSTICO DE LACUNAS -->
-  <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;overflow:hidden;margin-bottom:24px;">
-    <div style="padding:18px 24px;border-bottom:1px solid var(--color-outline);">
-      <h3 style="font-size:15px;font-weight:600;color:var(--color-on-bg);">Diagnóstico de Lacunas</h3>
-      <p style="font-size:12px;color:var(--color-on-bg-light);margin-top:2px;">Habilidades identificadas com base nas respostas do estudante nos planetas e satélites avaliativos</p>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="background:#F8FAFC;">
-          <th style="text-align:left;padding:10px 20px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Habilidade</th>
-          <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Componente</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Gap</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Aluno</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Turma</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Questões</th>
-          <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Justificativa</th>
-        </tr>
-      </thead>
-      <tbody>
-
-        <!-- EF06MA07 — Frações -->
-        <tr onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 20px;border-bottom:1px solid var(--color-outline);">
-            <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06MA07</div>
-            <div style="font-size:12px;color:var(--color-on-bg-mid);">Frações — representação e operações</div>
-          </td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);font-size:13px;color:var(--color-on-bg-mid);">Matemática</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          </td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:14px;font-weight:600;color:var(--color-error);">25%</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:14px;font-weight:500;color:var(--color-on-bg-mid);">68%</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-mid);">4 resp. / 4 erros</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);max-width:240px;">
-            <p style="font-size:12px;color:var(--color-on-bg-light);font-style:italic;line-height:1.5;">Errou 3 de 4 questões no planeta Mat. Etapa 2, entre 01/07 e 31/07. Lacuna pelo 2º ciclo consecutivo.</p>
-          </td>
-        </tr>
-
-        <!-- EF06LP03 — Interpretação de texto -->
-        <tr onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 20px;border-bottom:1px solid var(--color-outline);">
-            <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06LP03</div>
-            <div style="font-size:12px;color:var(--color-on-bg-mid);">Leitura e interpretação de textos</div>
-          </td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);font-size:13px;color:var(--color-on-bg-mid);">Língua Portuguesa</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEF0C7;color:#B54708;font-size:12px;font-weight:600;border-radius:99px;">Gap Moderado</span>
-          </td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:14px;font-weight:600;color:var(--color-warning);">40%</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:14px;font-weight:500;color:var(--color-on-bg-mid);">72%</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-mid);">5 resp. / 3 erros</td>
-          <td style="padding:14px 12px;border-bottom:1px solid var(--color-outline);max-width:240px;">
-            <p style="font-size:12px;color:var(--color-on-bg-light);font-style:italic;line-height:1.5;">Acertou 2 de 5 questões no satélite avaliativo, entre 01/07 e 31/07.</p>
-          </td>
-        </tr>
-
-        <!-- EF06MA12 — Equações -->
-        <tr onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 20px;">
-            <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06MA12</div>
-            <div style="font-size:12px;color:var(--color-on-bg-mid);">Equações do 1º grau</div>
-          </td>
-          <td style="padding:14px 12px;font-size:13px;color:var(--color-on-bg-mid);">Matemática</td>
-          <td style="padding:14px 12px;text-align:center;">
-            <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          </td>
-          <td style="padding:14px 12px;text-align:center;font-size:14px;font-weight:600;color:var(--color-error);">30%</td>
-          <td style="padding:14px 12px;text-align:center;font-size:14px;font-weight:500;color:var(--color-on-bg-mid);">61%</td>
-          <td style="padding:14px 12px;text-align:center;font-size:13px;color:var(--color-on-bg-mid);">3 resp. / 3 erros</td>
-          <td style="padding:14px 12px;max-width:240px;">
-            <p style="font-size:12px;color:var(--color-on-bg-light);font-style:italic;line-height:1.5;">Errou 3 questões de Equações no planeta Mat. Etapa 3.</p>
-          </td>
-        </tr>
-
-      </tbody>
-    </table>
-  </div>
-  <!-- END DIAGNÓSTICO -->
-
-  <!-- SEÇÃO: COMPARATIVO ANTES / DEPOIS -->
-  <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;overflow:hidden;margin-bottom:24px;">
-    <div style="padding:18px 24px;border-bottom:1px solid var(--color-outline);">
-      <h3 style="font-size:15px;font-weight:600;color:var(--color-on-bg);">Evolução por Habilidade</h3>
-      <p style="font-size:12px;color:var(--color-on-bg-light);margin-top:2px;">Comparativo de % de acerto antes e após a trilha adaptativa</p>
-    </div>
-    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
-
-      <!-- EF06MA07 -->
-      <div style="display:grid;grid-template-columns:160px 1fr 80px 1fr 80px 100px;align-items:center;gap:12px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06MA07</div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);">Frações</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Antes</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:25%;background:var(--color-error);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-error);">25%</div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Depois</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:60%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-warning);">60%</div>
-        <div style="display:flex;align-items:center;gap:5px;">
-          <span style="padding:3px 8px;background:#ECFDF3;color:#027A48;font-size:12px;font-weight:700;border-radius:99px;">▲ +35%</span>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--color-outline);"></div>
-
-      <!-- EF06LP03 -->
-      <div style="display:grid;grid-template-columns:160px 1fr 80px 1fr 80px 100px;align-items:center;gap:12px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06LP03</div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);">Interpretação de texto</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Antes</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:40%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-warning);">40%</div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Depois</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:55%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-warning);">55%</div>
-        <div style="display:flex;align-items:center;gap:5px;">
-          <span style="padding:3px 8px;background:#ECFDF3;color:#027A48;font-size:12px;font-weight:700;border-radius:99px;">▲ +15%</span>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--color-outline);"></div>
-
-      <!-- EF06MA12 -->
-      <div style="display:grid;grid-template-columns:160px 1fr 80px 1fr 80px 100px;align-items:center;gap:12px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--color-on-bg);">EF06MA12</div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);">Equações do 1º grau</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Antes</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:30%;background:var(--color-error);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-error);">30%</div>
-        <div>
-          <div style="font-size:11px;color:var(--color-on-bg-light);margin-bottom:4px;">Depois</div>
-          <div style="background:#EFF2F7;border-radius:99px;height:8px;overflow:hidden;">
-            <div style="width:30%;background:var(--color-error);height:100%;border-radius:99px;"></div>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--color-error);">30%</div>
-        <div style="display:flex;align-items:center;gap:5px;">
-          <span style="padding:3px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:12px;font-weight:700;border-radius:99px;">— Sem evolução</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- END COMPARATIVO -->
-
-  <!-- SEÇÃO: TRILHA SUGERIDA -->
-  <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;overflow:hidden;margin-bottom:24px;">
-
-    <!-- Header da seção -->
-    <div style="padding:18px 24px;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <h3 style="font-size:15px;font-weight:600;color:var(--color-on-bg);">Trilha Sugerida</h3>
-        <p style="font-size:12px;color:var(--color-on-bg-light);margin-top:2px;">Percurso de recomposição personalizado — 3 blocos · 20 fases no total</p>
-      </div>
-      <!-- Barra de ações -->
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button onclick="alert('Cancelar trilha?')" style="border:none;background:none;font-family:var(--font);font-size:13px;color:var(--color-error);cursor:pointer;font-weight:500;padding:7px 12px;">Cancelar trilha</button>
-        <button onclick="alert('Trilha regerada!')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:13px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">
-          <i class="pi pi-refresh" style="font-size:12px;"></i> Regerar trilha
-        </button>
-        <button disabled style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:none;border-radius:8px;background:#AACEFF;font-family:var(--font);font-size:13px;color:#fff;cursor:not-allowed;font-weight:500;">
-          <i class="pi pi-check" style="font-size:12px;"></i> Aprovar e publicar
-        </button>
-      </div>
-    </div>
-
-    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
-
-      <!-- BLOCO 1 — Frações -->
-      <div style="border:1px solid var(--color-outline);border-radius:10px;overflow:hidden;">
-        <div style="padding:14px 18px;background:#F8FAFC;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;gap:10px;">
-          <div style="width:28px;height:28px;border-radius:8px;background:var(--color-primary);display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:13px;font-weight:700;color:#fff;">1</span>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:var(--color-on-bg);">Revisão 1 — Frações</div>
-            <div style="font-size:12px;color:var(--color-on-bg-light);">EF06MA07 · Matemática</div>
-          </div>
-          <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">2 / 4 fases concluídas</div>
-        </div>
-        <div style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;">
-
-          <!-- Fase 1 — Concluída com acerto -->
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--color-success-light);border-radius:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="pi pi-check" style="font-size:12px;color:#fff;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:500;color:var(--color-on-bg);">Fase 1 — Material de apoio</div>
-              <div style="font-size:12px;color:var(--color-on-bg-light);">Informativa · Texto explicativo sobre frações</div>
-            </div>
-            <span style="padding:2px 8px;background:var(--color-success-light);color:var(--color-success);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #A9EFC5;">Concluída ✓</span>
-          </div>
-
-          <!-- Fase 2 — Concluída com erro -->
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#FEF3F2;border-radius:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-error);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="pi pi-times" style="font-size:12px;color:#fff;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:500;color:var(--color-on-bg);">Fase 2 — Múltipla escolha · Fácil</div>
-              <div style="font-size:12px;color:var(--color-on-bg-light);">Identificação de frações equivalentes</div>
-            </div>
-            <span style="padding:2px 8px;background:#FEE4E2;color:#B42318;font-size:11px;font-weight:600;border-radius:99px;border:1px solid #FDA29B;">Concluída c/ erro</span>
-          </div>
-
-          <!-- Fase 3 — Disponível -->
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--color-primary-5);border-radius:8px;border:1px dashed #AACEFF;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="pi pi-play" style="font-size:10px;color:#fff;margin-left:2px;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:500;color:var(--color-primary);">Fase 3 — Preencher a lacuna · Médio</div>
-              <div style="font-size:12px;color:var(--color-on-bg-light);">Completar sequências com frações</div>
-            </div>
-            <span style="padding:2px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #AACEFF;">Disponível</span>
-          </div>
-
-          <!-- Fase 4 — Bloqueada + tag IA -->
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#F8FAFC;border-radius:8px;opacity:.7;">
-            <div style="width:28px;height:28px;border-radius:50%;background:#CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="pi pi-lock" style="font-size:11px;color:#fff;"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:13px;font-weight:500;color:var(--color-on-bg-mid);">Fase 4 — Múltipla escolha · Médio</span>
-                <span style="padding:2px 6px;background:#EFF8FF;color:var(--color-attention);font-size:11px;font-weight:600;border-radius:99px;">Gerado por IA</span>
-              </div>
-              <div style="font-size:12px;color:var(--color-on-bg-light);">Resolução de problemas com frações</div>
-            </div>
-            <span style="padding:2px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Bloqueada</span>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- BLOCO 2 — Interpretação -->
-      <div style="border:1px solid var(--color-outline);border-radius:10px;overflow:hidden;">
-        <div style="padding:14px 18px;background:#F8FAFC;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;gap:10px;">
-          <div style="width:28px;height:28px;border-radius:8px;background:#6941C6;display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:13px;font-weight:700;color:#fff;">2</span>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:var(--color-on-bg);">Revisão 2 — Interpretação de texto</div>
-            <div style="font-size:12px;color:var(--color-on-bg-light);">EF06LP03 · Língua Portuguesa</div>
-          </div>
-          <span style="padding:3px 8px;background:#FEF0C7;color:#B54708;font-size:12px;font-weight:600;border-radius:99px;">Gap Moderado</span>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">0 / 4 fases concluídas</div>
-        </div>
-        <div style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-primary-5);border-radius:8px;border:1px dashed #AACEFF;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-play" style="font-size:10px;color:#fff;margin-left:2px;"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--color-primary);">Fase 1 — Material de apoio · Vídeo</div><div style="font-size:12px;color:var(--color-on-bg-light);">Estratégias de leitura e inferência</div></div>
-            <span style="padding:2px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #AACEFF;">Disponível</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-primary-5);border-radius:8px;border:1px dashed #AACEFF;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-play" style="font-size:10px;color:#fff;margin-left:2px;"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--color-primary);">Fase 2 — Múltipla escolha · Fácil</div><div style="font-size:12px;color:var(--color-on-bg-light);">Identificar ideia principal do texto</div></div>
-            <span style="padding:2px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #AACEFF;">Disponível</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-primary-5);border-radius:8px;border:1px dashed #AACEFF;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-play" style="font-size:10px;color:#fff;margin-left:2px;"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--color-primary);">Fase 3 — Verdadeiro ou falso · Médio</div><div style="font-size:12px;color:var(--color-on-bg-light);">Inferência e interpretação de detalhes</div></div>
-            <span style="padding:2px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #AACEFF;">Disponível</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-primary-5);border-radius:8px;border:1px dashed #AACEFF;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-play" style="font-size:10px;color:#fff;margin-left:2px;"></i></div>
-            <div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--color-primary);">Fase 4 — Dissertativa curta · Difícil</div><div style="font-size:12px;color:var(--color-on-bg-light);">Produção de resumo com base no texto</div></div>
-            <span style="padding:2px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;border:1px solid #AACEFF;">Disponível</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- BLOCO 3 — Equações (Bloqueado) -->
-      <div style="border:1px solid var(--color-outline);border-radius:10px;overflow:hidden;opacity:.65;">
-        <div style="padding:14px 18px;background:#F8FAFC;border-bottom:1px solid var(--color-outline);display:flex;align-items:center;gap:10px;">
-          <div style="width:28px;height:28px;border-radius:8px;background:#CBD5E1;display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:13px;font-weight:700;color:#fff;">3</span>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:600;color:var(--color-on-bg-mid);">Revisão 3 — Equações do 1º grau</div>
-            <div style="font-size:12px;color:var(--color-on-bg-light);">EF06MA12 · Matemática</div>
-          </div>
-          <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-on-bg-light);">
-            <i class="pi pi-lock" style="font-size:12px;"></i> Disponível após Bloco 2
-          </div>
-        </div>
-        <div style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;"><div style="width:28px;height:28px;border-radius:50%;background:#CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-lock" style="font-size:11px;color:#fff;"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--color-on-bg-mid);">Fase 1 — Material de apoio</div><div style="font-size:12px;color:var(--color-on-bg-light);">Introdução a equações de 1º grau</div></div><span style="margin-left:auto;padding:2px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Bloqueada</span></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;"><div style="width:28px;height:28px;border-radius:50%;background:#CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-lock" style="font-size:11px;color:#fff;"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--color-on-bg-mid);">Fase 2 — Múltipla escolha · Fácil</div><div style="font-size:12px;color:var(--color-on-bg-light);">Resolução básica de equações</div></div><span style="margin-left:auto;padding:2px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Bloqueada</span></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;"><div style="width:28px;height:28px;border-radius:50%;background:#CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-lock" style="font-size:11px;color:#fff;"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--color-on-bg-mid);">Fase 3 — Preencher a lacuna · Médio</div><div style="font-size:12px;color:var(--color-on-bg-light);">Completar equações com incógnita</div></div><span style="margin-left:auto;padding:2px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Bloqueada</span></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;"><div style="width:28px;height:28px;border-radius:50%;background:#CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="pi pi-lock" style="font-size:11px;color:#fff;"></i></div><div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:500;color:var(--color-on-bg-mid);">Fase 4 — Problema contextualizado · Difícil</span><span style="padding:2px 6px;background:#EFF8FF;color:var(--color-attention);font-size:11px;font-weight:600;border-radius:99px;">Gerado por IA</span></div><div style="font-size:12px;color:var(--color-on-bg-light);">Situação-problema com equação</div></div><span style="margin-left:auto;padding:2px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Bloqueada</span></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- END TRILHA SUGERIDA -->
-
-  <!-- LINHA DO TEMPO -->
-  <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;overflow:hidden;margin-bottom:24px;">
-    <div style="padding:18px 24px;border-bottom:1px solid var(--color-outline);">
-      <h3 style="font-size:15px;font-weight:600;color:var(--color-on-bg);">Linha do tempo</h3>
-      <p style="font-size:12px;color:var(--color-on-bg-light);margin-top:2px;">Atividades concluídas em ordem cronológica</p>
-    </div>
-    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:0;">
-
-      <!-- Item 1 -->
-      <div style="display:flex;gap:16px;padding-bottom:20px;position:relative;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;width:32px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--color-success);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;">
-            <i class="pi pi-check" style="font-size:11px;color:#fff;"></i>
-          </div>
-          <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
-        </div>
-        <div style="flex:1;padding-top:4px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;color:var(--color-on-bg);">Fase 1 — Frações — Material de apoio</span>
-            <span style="padding:1px 7px;background:var(--color-success-light);color:var(--color-success);font-size:11px;font-weight:600;border-radius:99px;">Acerto</span>
-          </div>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">02/07/2026 · Bloco 1 · EF06MA07</div>
-        </div>
-      </div>
-
-      <!-- Item 2 -->
-      <div style="display:flex;gap:16px;padding-bottom:20px;position:relative;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;width:32px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--color-error);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;">
-            <i class="pi pi-times" style="font-size:11px;color:#fff;"></i>
-          </div>
-          <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
-        </div>
-        <div style="flex:1;padding-top:4px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;color:var(--color-on-bg);">Fase 2 — Frações — Múltipla escolha</span>
-            <span style="padding:1px 7px;background:#FEE4E2;color:#B42318;font-size:11px;font-weight:600;border-radius:99px;">Erro</span>
-          </div>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">03/07/2026 · Bloco 1 · EF06MA07</div>
-        </div>
-      </div>
-
-      <!-- Item 3 -->
-      <div style="display:flex;gap:16px;padding-bottom:20px;position:relative;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;width:32px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--color-success);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;">
-            <i class="pi pi-check" style="font-size:11px;color:#fff;"></i>
-          </div>
-          <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
-        </div>
-        <div style="flex:1;padding-top:4px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;color:var(--color-on-bg);">Fase 1 — Interpretação — Material de apoio</span>
-            <span style="padding:1px 7px;background:var(--color-success-light);color:var(--color-success);font-size:11px;font-weight:600;border-radius:99px;">Acerto</span>
-          </div>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">05/07/2026 · Bloco 2 · EF06LP03</div>
-        </div>
-      </div>
-
-      <!-- Item 4 -->
-      <div style="display:flex;gap:16px;padding-bottom:20px;position:relative;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;width:32px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--color-success);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;">
-            <i class="pi pi-check" style="font-size:11px;color:#fff;"></i>
-          </div>
-          <div style="width:2px;flex:1;background:var(--color-outline);margin-top:4px;"></div>
-        </div>
-        <div style="flex:1;padding-top:4px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;color:var(--color-on-bg);">Fase 3 — Frações — Preencher a lacuna</span>
-            <span style="padding:1px 7px;background:var(--color-success-light);color:var(--color-success);font-size:11px;font-weight:600;border-radius:99px;">Acerto</span>
-          </div>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">07/07/2026 · Bloco 1 · EF06MA07</div>
-        </div>
-      </div>
-
-      <!-- Item 5 — mais recente, sem linha abaixo -->
-      <div style="display:flex;gap:16px;">
-        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px;">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--color-warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <i class="pi pi-clock" style="font-size:11px;color:#fff;"></i>
-          </div>
-        </div>
-        <div style="flex:1;padding-top:4px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:13px;font-weight:600;color:var(--color-on-bg-mid);">Fase 4 — Frações — Múltipla escolha · Médio</span>
-            <span style="padding:1px 7px;background:var(--color-primary-5);color:var(--color-primary);font-size:11px;font-weight:600;border-radius:99px;">Disponível</span>
-          </div>
-          <div style="font-size:12px;color:var(--color-on-bg-light);">Aguardando o estudante · Bloco 1 · EF06MA07</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- END LINHA DO TEMPO -->
-
-  <!-- HISTÓRICO DE CICLOS -->
-  <div style="background:#fff;border:1px solid var(--color-outline);border-radius:12px;overflow:hidden;margin-bottom:40px;">
-    <div style="padding:16px 24px;border-bottom:1px solid var(--color-outline);">
-      <h3 style="font-size:15px;font-weight:600;color:var(--color-on-bg);">Histórico de ciclos anteriores</h3>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="background:#F8FAFC;">
-          <th style="text-align:left;padding:10px 24px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Ciclo</th>
-          <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Período</th>
-          <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Habilidades trabalhadas</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">% Acerto</th>
-          <th style="text-align:center;padding:10px 12px;font-size:11px;font-weight:600;color:var(--color-on-bg-light);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--color-outline);">Status</th>
-        </tr>
-      </thead>
-                  <tbody>
-
-        <!-- Linha 1 - João Pedro Santos -->
-        <tr class="table-row" style="cursor:pointer;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#FEF0C7;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#B54708;flex-shrink:0;">JP</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">João Pedro Santos</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano A</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Frações</span>
-            <span style="font-size:12px;color:var(--color-on-bg-light);"> (+2 outras)</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:var(--color-warning-light);color:var(--color-warning);font-size:12px;font-weight:600;border-radius:99px;">Em andamento</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="font-size:12px;color:var(--color-on-bg-mid);margin-bottom:4px;">8 / 20 fases</div>
-            <div style="background:#EFF2F7;border-radius:99px;height:5px;width:100px;margin:0 auto;overflow:hidden;">
-              <div style="width:40%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver e Editar</button>
-          </td>
-        </tr>
-
-        <!-- Linha 2 - Maria Clara Oliveira -->
-        <tr class="table-row" style="cursor:pointer;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#FEE4E2;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#B42318;flex-shrink:0;">MC</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Maria Clara Oliveira</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano A</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Frações</span>
-            <span style="margin-left:6px;padding:2px 6px;background:#EFF8FF;color:var(--color-attention);font-size:11px;font-weight:600;border-radius:99px;">Gerado por IA</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:12px;font-weight:600;border-radius:99px;">Disponível</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="font-size:12px;color:var(--color-on-bg-mid);margin-bottom:4px;">0 / 20 fases</div>
-            <div style="background:#EFF2F7;border-radius:99px;height:5px;width:100px;margin:0 auto;overflow:hidden;">
-              <div style="width:0%;background:var(--color-primary);height:100%;border-radius:99px;"></div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver e Editar</button>
-          </td>
-        </tr>
-
-        <!-- Linha 3 - Lucas Fernandes -->
-        <tr class="table-row" style="cursor:pointer;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--color-success-light);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--color-success);flex-shrink:0;">LF</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Lucas Fernandes</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano B</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Interpretação de texto</span>
-            <span style="font-size:12px;color:var(--color-on-bg-light);"> (+1 outra)</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEF0C7;color:#B54708;font-size:12px;font-weight:600;border-radius:99px;">Gap Moderado</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:var(--color-success-light);color:var(--color-success);font-size:12px;font-weight:600;border-radius:99px;">Concluída</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="font-size:12px;color:var(--color-on-bg-mid);margin-bottom:4px;">20 / 20 fases</div>
-            <div style="background:#EFF2F7;border-radius:99px;height:5px;width:100px;margin:0 auto;overflow:hidden;">
-              <div style="width:100%;background:var(--color-success);height:100%;border-radius:99px;"></div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;font-weight:600;color:var(--color-success);">72%</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver e Editar</button>
-          </td>
-        </tr>
-
-        <!-- Linha 4 - Ana Beatriz Costa -->
-        <tr class="table-row" style="cursor:pointer;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#FEE4E2;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#B42318;flex-shrink:0;">AB</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Ana Beatriz Costa</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano A</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Equações</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEE4E2;color:#B42318;font-size:12px;font-weight:600;border-radius:99px;">Gap Crítico</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:var(--color-primary-5);color:var(--color-primary);font-size:12px;font-weight:600;border-radius:99px;">Disponível</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="font-size:12px;color:var(--color-on-bg-mid);margin-bottom:4px;">0 / 20 fases</div>
-            <div style="background:#EFF2F7;border-radius:99px;height:5px;width:100px;margin:0 auto;overflow:hidden;">
-              <div style="width:0%;background:var(--color-primary);height:100%;border-radius:99px;"></div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver e Editar</button>
-          </td>
-        </tr>
-
-        <!-- Linha 5 - Pedro Henrique Lima -->
-        <tr class="table-row" style="cursor:pointer;transition:background .12s;" onmouseover="this.style.background='var(--color-state-overlay)'" onmouseout="this.style.background=''">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--color-warning-light);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--color-warning);flex-shrink:0;">PH</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Pedro Henrique Lima</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano B</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Ecossistemas</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#FEF0C7;color:#B54708;font-size:12px;font-weight:600;border-radius:99px;">Gap Moderado</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:var(--color-warning-light);color:var(--color-warning);font-size:12px;font-weight:600;border-radius:99px;">Em andamento</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="font-size:12px;color:var(--color-on-bg-mid);margin-bottom:4px;">12 / 20 fases</div>
-            <div style="background:#EFF2F7;border-radius:99px;height:5px;width:100px;margin:0 auto;overflow:hidden;">
-              <div style="width:60%;background:var(--color-warning);height:100%;border-radius:99px;"></div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver e Editar</button>
-          </td>
-        </tr>
-
-        <!-- Linha 6 - Gabriela Santos - Sem lacunas -->
-        <tr style="background:#F8FFFB;">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--color-success-light);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--color-success);flex-shrink:0;">GS</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Gabriela Santos</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano A</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);" colspan="5">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <i class="pi pi-check-circle" style="color:var(--color-success);font-size:15px;"></i>
-              <span style="font-size:13px;color:var(--color-success);font-weight:500;">Sem lacunas relevantes identificadas neste ciclo</span>
-              <span style="font-size:12px;color:var(--color-on-bg-light);">— Nenhuma trilha de recomposição necessária</span>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);"></td>
-        </tr>
-
-        <!-- Linha 7 - Rafaela Mendes - Não gerada / conteúdo insuficiente -->
-        <tr style="background:#FFFBF2;">
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#FEF0C7;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#B54708;flex-shrink:0;">RM</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Rafaela Mendes</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano B</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);">
-            <span style="font-size:13px;color:var(--color-on-bg);">Cartografia</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#EFF8FF;color:#1570EF;font-size:12px;font-weight:600;border-radius:99px;">Atenção</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <span style="padding:3px 8px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:12px;font-weight:600;border-radius:99px;">Não gerada</span>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;">
-            <div style="display:flex;align-items:center;justify-content:center;gap:5px;">
-              <i class="pi pi-exclamation-triangle" style="color:var(--color-warning);font-size:13px;"></i>
-              <span style="font-size:12px;color:var(--color-warning);font-weight:500;">Conteúdo insuficiente</span>
-            </div>
-          </td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;border-bottom:1px solid var(--color-outline);text-align:right;">
-            <button style="padding:6px 14px;border:1.5px solid var(--color-primary);border-radius:8px;background:#fff;font-family:var(--font);font-size:12px;color:var(--color-primary);cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.background='var(--color-primary-5)'" onmouseout="this.style.background='#fff'">Ver detalhes</button>
-          </td>
-        </tr>
-
-        <!-- Linha 8 - Carlos Eduardo - Sem evidências -->
-        <tr style="background:#FAFAFA;">
-          <td style="padding:14px 16px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#F2F4F7;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--color-on-bg-light);flex-shrink:0;">CE</div>
-              <div>
-                <div style="font-size:13.5px;font-weight:500;color:var(--color-on-bg);">Carlos Eduardo Rocha</div>
-                <div style="font-size:12px;color:var(--color-on-bg-light);">6º Ano A</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:14px 16px;" colspan="4">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <i class="pi pi-minus-circle" style="color:var(--color-on-bg-light);font-size:15px;"></i>
-              <span style="font-size:13px;color:var(--color-on-bg-light);">Sem evidências neste ciclo</span>
-              <span style="font-size:12px;color:var(--color-on-bg-light);">— Estudante não realizou atividades avaliativas</span>
-              <span style="padding:2px 6px;background:#F2F4F7;color:var(--color-on-bg-light);font-size:11px;font-weight:600;border-radius:99px;">Baixa evidência</span>
-            </div>
-          </td>
-          <td style="padding:14px 16px;text-align:center;font-size:13px;color:var(--color-on-bg-light);">—</td>
-          <td style="padding:14px 16px;"></td>
-        </tr>
-
-      </tbody>
-    </table>
-  </div>
-
+<!-- ── BARRA DE CENÁRIOS ── -->
+<div class="scenario-bar">
+  <span class="scenario-label">Cenário:</span>
+  <button class="scenario-btn active" onclick="setScenario('padrao', this)">Com lacunas (padrão)</button>
+  <button class="scenario-btn" onclick="setScenario('baixa-evidencia', this)">Diagnóstico baixa evidência</button>
+  <button class="scenario-btn" onclick="setScenario('historico', this)">Histórico de ciclos</button>
 </div>
 
-</main>
+<!-- ── LAYOUT ── -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <a class="nav-item" href="index.html">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-home nav-icon"></i>
+      <span class="nav-label">Início</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-users nav-icon"></i>
+      <span class="nav-label">Turmas</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-book nav-icon"></i>
+      <span class="nav-label">Conteúdos</span>
+      <i class="pi pi-chevron-down expand-icon"></i>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-pen-to-square nav-icon"></i>
+      <span class="nav-label">Correção de Respostas</span>
+    </a>
+    <div class="nav-accordion">
+      <button class="nav-item">
+        <div class="nav-indicator"><div class="nav-indicator-bar"></div></div>
+        <i class="pi pi-chart-line nav-icon" style="color:var(--primary)"></i>
+        <span class="nav-label" style="color:var(--text)">Relatórios</span>
+        <i class="pi pi-chevron-up expand-icon"></i>
+      </button>
+      <div class="nav-sub">
+        <a class="nav-sub-item" href="#">
+          <div class="nav-indicator"></div>
+          <span class="nav-sub-label" style="padding-left:32px">Acompanhamento</span>
+        </a>
+        <a class="nav-sub-item active" href="index.html">
+          <div class="nav-indicator"><div class="nav-indicator-bar"></div></div>
+          <span class="nav-sub-label">Trilhas Adaptativas</span>
+        </a>
+        <a class="nav-sub-item" href="#">
+          <div class="nav-indicator"></div>
+          <span class="nav-sub-label" style="padding-left:32px">Downloads</span>
+        </a>
+        <a class="nav-sub-item" href="#">
+          <div class="nav-indicator"></div>
+          <span class="nav-sub-label" style="padding-left:32px">Feedback de Questões</span>
+        </a>
+      </div>
+    </div>
+    <a class="nav-item" href="#">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-question-circle nav-icon"></i>
+      <span class="nav-label">Central de Ajuda</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-indicator"></div>
+      <i class="pi pi-star nav-icon"></i>
+      <span class="nav-label">Favoritos</span>
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-content">
+
+      <!-- BREADCRUMB -->
+      <div class="breadcrumb">
+        <button class="breadcrumb-back" onclick="history.back()"><i class="pi pi-arrow-left" style="font-size:14px"></i></button>
+        <a href="#">Relatórios</a>
+        <span class="breadcrumb-sep"><i class="pi pi-chevron-right" style="font-size:11px"></i></span>
+        <a href="index.html">Trilhas Adaptativas</a>
+        <span class="breadcrumb-sep"><i class="pi pi-chevron-right" style="font-size:11px"></i></span>
+        <span class="current" id="breadcrumb-nome">Carlos de Oliveira</span>
+        <button class="breadcrumb-star"><i class="pi pi-star" style="font-size:14px"></i></button>
+      </div>
+
+      <!-- TÍTULO -->
+      <h1 class="page-title" id="page-student-name">Carlos de Oliveira</h1>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-diagnostico" onclick="switchTab('diagnostico')">Diagnóstico</button>
+        <button class="tab-btn" id="tab-trilha" onclick="switchTab('trilha')">Trilha</button>
+      </div>
+
+      <!-- ═══════════════════════════════════ -->
+      <!-- ABA: DIAGNÓSTICO -->
+      <!-- ═══════════════════════════════════ -->
+      <div id="panel-diagnostico">
+
+        <!-- Cards indicadores -->
+        <div class="cards-row">
+          <!-- Card 1: Performance na Trilha -->
+          <div class="info-card">
+            <div class="info-card-label">Performance na Trilha</div>
+            <div class="info-card-value" id="card-performance">42%</div>
+            <div class="progress-track"><div class="progress-fill bar-fill-red" id="bar-performance" style="width:42%"></div></div>
+            <div class="info-card-sub" id="card-performance-sub">Abaixo da média da turma (68%)</div>
+          </div>
+          <!-- Card 2: Fases Concluídas -->
+          <div class="info-card">
+            <div class="info-card-label">Fases Concluídas</div>
+            <div class="info-card-value" id="card-fases">10/20</div>
+            <div class="progress-track"><div class="progress-fill bar-fill-yellow" id="bar-fases" style="width:50%"></div></div>
+            <div class="info-card-sub" id="card-fases-sub">50% do percurso concluído</div>
+          </div>
+          <!-- Card 3: Ciclo Atual -->
+          <div class="info-card">
+            <div class="ring-wrap">
+              <div class="ring-info">
+                <div class="info-card-label">Ciclo Atual</div>
+                <div class="info-card-value" id="card-ciclo-nome" style="font-size:20px">Ciclo 4</div>
+                <div class="info-card-sub" id="card-ciclo-periodo">01/07 – 31/07/2026</div>
+                <div class="info-card-sub" id="card-ciclo-dias" style="margin-top:4px">10 dias restantes</div>
+              </div>
+              <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#E1E8EF" stroke-width="8"/>
+                <circle id="ring-progress" cx="40" cy="40" r="32" fill="none" stroke="#12B76A" stroke-width="8"
+                  stroke-dasharray="201" stroke-dashoffset="50" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                <text x="40" y="46" text-anchor="middle" font-size="14" font-weight="700" fill="#344054" id="ring-pct">75%</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção: Diagnóstico de Lacunas -->
+        <div class="section-card" id="section-diagnostico-lacunas">
+          <div class="section-card-title">Diagnóstico de Lacunas</div>
+          <div class="section-card-sub">Habilidades identificadas com base nas respostas do estudante nos planetas e satélites avaliativos</div>
+          <table class="diag-table" id="tabela-diagnostico">
+            <thead>
+              <tr>
+                <th>Habilidade</th>
+                <th>Componente</th>
+                <th>Nível de Gap</th>
+                <th>Questões respondidas/erradas</th>
+                <th>Performance na habilidade</th>
+                <th>Performance da turma</th>
+                <th>Justificativa</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-diagnostico">
+              <!-- populado via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Seção: Histórico de Ciclos Anteriores -->
+        <div class="section-card" id="section-historico">
+          <div class="section-card-title">Histórico de Ciclos Anteriores</div>
+          <div class="section-card-sub">Evolução do IDH por habilidade ao longo dos ciclos</div>
+          <table class="historico-table">
+            <thead>
+              <tr>
+                <th style="width:180px">Habilidade</th>
+                <th>Ciclo 1</th>
+                <th>Ciclo 2</th>
+                <th>Ciclo 3</th>
+                <th>Ciclo 4 (atual)</th>
+                <th>Tendência</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-historico">
+              <!-- populado via JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /#panel-diagnostico -->
+
+      <!-- ═══════════════════════════════════ -->
+      <!-- ABA: TRILHA -->
+      <!-- ═══════════════════════════════════ -->
+      <div id="panel-trilha" style="display:none">
+
+        <!-- Ações de edição [RF13] -->
+        <div class="acoes-bar">
+          <button class="btn-action btn-action-primary"><i class="pi pi-save" style="font-size:15px"></i> Salvar trilha</button>
+          <button class="btn-action"><i class="pi pi-plus" style="font-size:15px"></i> Adicionar questão</button>
+          <button class="btn-action"><i class="pi pi-trash" style="font-size:15px"></i> Remover bloco</button>
+          <button class="btn-action"><i class="pi pi-refresh" style="font-size:15px"></i> Substituir questão</button>
+        </div>
+
+        <!-- Blocos da trilha -->
+        <div id="blocos-trilha">
+          <!-- populado via JS -->
+        </div>
+
+      </div><!-- /#panel-trilha -->
+
+    </div><!-- /.page-content -->
+  </main>
+</div><!-- /.app -->
+
+<!-- ── MODAL: VISUALIZAÇÃO DE QUESTÃO ── -->
+<div class="modal-backdrop" id="modal-questao">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Visualizar Questão</div>
+      <button class="modal-close" onclick="closeModal()"><i class="pi pi-times" style="font-size:16px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tags-row" id="modal-tags"></div>
+      <div class="modal-enunciado" id="modal-enunciado"></div>
+      <div class="modal-alternativas" id="modal-alternativas"></div>
+      <div id="modal-gabarito-wrap"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" onclick="closeModal()">Fechar</button>
+    </div>
+  </div>
 </div>
-<!-- END APP WRAPPER -->
 
 <script>
-// ===== CHART.JS: Gráfico de linha — Evolução por ciclo =====
-document.addEventListener('DOMContentLoaded', function () {
-  const ctx = document.getElementById('chartCiclos');
-  if (!ctx) return;
+// ══════════════════════════════════════════════
+// DADOS
+// ══════════════════════════════════════════════
+const CENARIOS = {
+  'padrao': {
+    nome: 'Carlos de Oliveira',
+    performance: 42, performanceTurma: 68, fases: '10/20', fasesPct: 50,
+    ciclo: 'Ciclo 4', cicloPeriodo: '01/07 – 31/07/2026', cicloDias: '10 dias restantes', cicloPct: 75,
+    diagnostico: [
+      { codigo: 'EF06MA07', descricao: 'Frações', componente: 'Matemática', gap: 'Crítico', questoes: '4 respondidas / 3 erradas', performanceAluno: 25, turma: 68, turmaColor: 'green', justificativa: 'Errou 3 de 4 questões no planeta Mat. Etapa 2, entre 01/07 e 31/07. Lacuna pelo 2º ciclo consecutivo.', baixaEvidencia: false },
+      { codigo: 'EF06LP03', descricao: 'Interpretação de texto', componente: 'Língua Portuguesa', gap: 'Crítico', questoes: '5 respondidas / 3 erradas', performanceAluno: 40, turma: 20, turmaColor: 'red', justificativa: 'Acertou 2 de 5 questões no satélite avaliativo, entre 01/07 e 31/07.', baixaEvidencia: false },
+      { codigo: 'EF06GE02', descricao: 'Equações', componente: 'Matemática', gap: 'Moderado', questoes: '3 respondidas / 3 erradas', performanceAluno: 0, turma: 40, turmaColor: 'yellow', justificativa: 'Errou 3 questões de Equações no planeta Mat. Etapa 3.', baixaEvidencia: false }
+    ],
+    evolucao: []
+  },
+  'baixa-evidencia': {
+    nome: 'Mariana Souza',
+    performance: 30, performanceTurma: 68, fases: '4/20', fasesPct: 20,
+    ciclo: 'Ciclo 4', cicloPeriodo: '01/07 – 31/07/2026', cicloDias: '10 dias restantes', cicloPct: 20,
+    diagnostico: [
+      { codigo: 'EF05MA04', descricao: 'Números decimais', componente: 'Matemática', gap: 'Crítico', questoes: '2 respondidas / 2 erradas', performanceAluno: 0, turma: 55, turmaColor: 'green', justificativa: 'Errou 2 de 2 questões no planeta Mat. Etapa 1. Diagnóstico baseado em poucas evidências.', baixaEvidencia: true },
+      { codigo: 'EF05LP01', descricao: 'Leitura inferencial', componente: 'Língua Portuguesa', gap: 'Atenção', questoes: '3 respondidas / 2 erradas', performanceAluno: 33, turma: 62, turmaColor: 'green', justificativa: 'Acertou 1 de 3 questões no satélite avaliativo. Volume de questões insuficiente.', baixaEvidencia: true }
+    ],
+    evolucao: []
+  },
+  'historico': {
+    nome: 'Pedro Alves',
+    performance: 78, performanceTurma: 68, fases: '18/20', fasesPct: 90,
+    ciclo: 'Ciclo 4', cicloPeriodo: '01/07 – 31/07/2026', cicloDias: '2 dias restantes', cicloPct: 90,
+    diagnostico: [
+      { codigo: 'EF07MA09', descricao: 'Potências e raízes', componente: 'Matemática', gap: 'Moderado', questoes: '5 respondidas / 3 erradas', performanceAluno: 40, turma: 52, turmaColor: 'yellow', justificativa: 'Errou 3 de 5 questões em dois planetas diferentes. Melhora consistente nos ciclos anteriores.', baixaEvidencia: false }
+    ],
+    evolucao: []
+  }
+};
 
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Ciclo 1', 'Ciclo 2', 'Ciclo 3', 'Ciclo 4', 'Ciclo 5'],
-      datasets: [{
-        label: 'Taxa de conclusão',
-        data: [20, 45, 35, 72, 82],
-        borderColor: '#2177FF',
-        backgroundColor: 'rgba(33,119,255,0.08)',
-        pointBackgroundColor: '#2177FF',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        borderWidth: 2.5,
-        fill: true,
-        tension: 0.35,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' ' + ctx.raw + '%'
-          },
-          backgroundColor: '#344054',
-          titleColor: '#fff',
-          bodyColor: '#D0D5DD',
-          padding: 10,
-          cornerRadius: 8,
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: '#F2F4F7' },
-          ticks: {
-            font: { family: 'Outfit', size: 11 },
-            color: '#8A95B2'
-          },
-          border: { display: false }
-        },
-        y: {
-          min: 0,
-          max: 100,
-          grid: { color: '#F2F4F7' },
-          ticks: {
-            font: { family: 'Outfit', size: 11 },
-            color: '#8A95B2',
-            callback: v => v + '%',
-            stepSize: 25
-          },
-          border: { display: false }
-        }
-      }
-    }
-  });
+const HISTORICO_CICLOS = {
+  'padrao': [
+    { codigo: 'EF06MA07', descricao: 'Frações',              c1: 0.32, c2: 0.38, c3: 0.41, c4: 0.58, trend: 'up' },
+    { codigo: 'EF06LP03', descricao: 'Interpretação de texto', c1: 0.28, c2: 0.30, c3: 0.29, c4: 0.44, trend: 'up' },
+    { codigo: 'EF06GE02', descricao: 'Equações',              c1: null, c2: 0.42, c3: 0.44, c4: 0.51, trend: 'up' }
+  ],
+  'baixa-evidencia': [
+    { codigo: 'EF05MA04', descricao: 'Números decimais',   c1: null, c2: null, c3: 0.28, c4: 0.30, trend: 'flat' },
+    { codigo: 'EF05LP01', descricao: 'Leitura inferencial', c1: null, c2: 0.30, c3: 0.33, c4: 0.35, trend: 'up' }
+  ],
+  'historico': [
+    { codigo: 'EF07MA09', descricao: 'Potências e raízes', c1: 0.22, c2: 0.35, c3: 0.55, c4: 0.78, trend: 'up' }
+  ]
+};
+
+const TRILHA_BLOCOS = [
+  {
+    num: 1,
+    titulo: 'Revisão: Frações — conceito e representação',
+    habilidade: 'EF06MA07',
+    questoes: [
+      { num: 1, enunciado: 'Qual é a fração que representa a parte colorida da figura abaixo, onde 3 de 8 partes estão marcadas?', tipo: 'Múltipla escolha', dificuldade: 'Fácil', origem: 'banco', gabarito: 'B', alternativas: ['A) 5/8', 'B) 3/8', 'C) 8/3', 'D) 3/5'], gabaritoIdx: 1 },
+      { num: 2, enunciado: 'Qual das opções representa a fração equivalente a 2/4?', tipo: 'Múltipla escolha', dificuldade: 'Fácil', origem: 'banco', gabarito: 'C', alternativas: ['A) 4/6', 'B) 3/6', 'C) 1/2', 'D) 2/8'], gabaritoIdx: 2 },
+      { num: 3, enunciado: 'Uma pizza foi dividida em 8 fatias. João comeu 3 fatias e Maria comeu 2. Qual fração da pizza foi consumida pelos dois juntos?', tipo: 'Aberta', dificuldade: 'Médio', origem: 'ia', gabarito: '5/8', alternativas: null, gabaritoIdx: null }
+    ]
+  },
+  {
+    num: 2,
+    titulo: 'Aplicação: Operações com frações',
+    habilidade: 'EF06MA07',
+    questoes: [
+      { num: 1, enunciado: 'Calcule a soma: 1/3 + 2/6. Qual é o resultado simplificado?', tipo: 'Múltipla escolha', dificuldade: 'Médio', origem: 'banco', gabarito: 'A', alternativas: ['A) 2/3', 'B) 3/9', 'C) 1/2', 'D) 3/6'], gabaritoIdx: 0 },
+      { num: 2, enunciado: 'Um recipiente contém 3/4 de litro de água. Retira-se 1/4 de litro. Quanto sobra no recipiente?', tipo: 'Múltipla escolha', dificuldade: 'Médio', origem: 'ia', gabarito: 'B', alternativas: ['A) 2/8', 'B) 1/2', 'C) 2/4', 'D) 1/4'], gabaritoIdx: 1 }
+    ]
+  },
+  {
+    num: 3,
+    titulo: 'Revisão: Interpretação de texto — inferências',
+    habilidade: 'EF06LP03',
+    questoes: [
+      { num: 1, enunciado: 'Leia o trecho: "A noite caiu rapidamente. Ana fechou as janelas e acendeu a lareira." O que o texto nos permite inferir sobre o clima?', tipo: 'Múltipla escolha', dificuldade: 'Médio', origem: 'banco', gabarito: 'C', alternativas: ['A) Estava chovendo forte', 'B) Era verão', 'C) Estava frio', 'D) Era de manhã'], gabaritoIdx: 2 },
+      { num: 2, enunciado: 'Qual é o propósito principal de um texto de instrução, como uma receita de bolo?', tipo: 'Múltipla escolha', dificuldade: 'Fácil', origem: 'banco', gabarito: 'A', alternativas: ['A) Orientar o leitor passo a passo', 'B) Convencer o leitor de uma ideia', 'C) Narrar uma história', 'D) Descrever um personagem'], gabaritoIdx: 0 }
+    ]
+  }
+];
+
+// ══════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════
+let currentScenario = 'padrao';
+let currentTab = 'diagnostico';
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render(scenario) {
+  const d = CENARIOS[scenario];
+  const hist = HISTORICO_CICLOS[scenario];
+
+  // Header
+  document.getElementById('page-student-name').textContent = d.nome;
+  document.getElementById('breadcrumb-nome').textContent = d.nome;
+
+  // Cards
+  document.getElementById('card-performance').textContent = d.performance + '%';
+  document.getElementById('bar-performance').style.width = d.performance + '%';
+  document.getElementById('bar-performance').className = 'progress-fill ' + (d.performance < 50 ? 'bar-fill-red' : d.performance < 75 ? 'bar-fill-yellow' : 'bar-fill-green');
+  document.getElementById('card-performance-sub').textContent = d.performance < d.performanceTurma ? `Abaixo da média da turma (${d.performanceTurma}%)` : `Acima da média da turma (${d.performanceTurma}%)`;
+  document.getElementById('card-fases').textContent = d.fases;
+  document.getElementById('bar-fases').style.width = d.fasesPct + '%';
+  document.getElementById('bar-fases').className = 'progress-fill ' + (d.fasesPct < 50 ? 'bar-fill-red' : d.fasesPct < 80 ? 'bar-fill-yellow' : 'bar-fill-green');
+  document.getElementById('card-fases-sub').textContent = d.fasesPct + '% do percurso concluído';
+  document.getElementById('card-ciclo-nome').textContent = d.ciclo;
+  document.getElementById('card-ciclo-periodo').textContent = d.cicloPeriodo;
+  document.getElementById('card-ciclo-dias').textContent = d.cicloDias;
+  document.getElementById('ring-pct').textContent = d.cicloPct + '%';
+  const offset = 201 - (201 * d.cicloPct / 100);
+  document.getElementById('ring-progress').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('ring-progress').setAttribute('stroke', d.cicloPct < 50 ? '#F04438' : d.cicloPct < 80 ? '#F79009' : '#12B76A');
+
+  // Tabela Diagnóstico
+  const tbody = document.getElementById('tbody-diagnostico');
+  tbody.innerHTML = d.diagnostico.map(row => {
+    const gapClass = row.gap === 'Crítico' ? 'gap-critico' : row.gap === 'Moderado' ? 'gap-moderado' : 'gap-atencao';
+    const dotClass = row.turmaColor === 'green' ? 'dot-green' : row.turmaColor === 'yellow' ? 'dot-yellow' : 'dot-red';
+    const dotAlunoClass = row.performanceAluno < 40 ? 'dot-red' : row.performanceAluno < 60 ? 'dot-yellow' : 'dot-green';
+    const evidTag = row.baixaEvidencia ? `<br><span class="tag-evidencia"><i class="pi pi-exclamation-triangle" style="font-size:10px"></i> Diagnóstico com baixa evidência</span>` : '';
+    return `<tr>
+      <td class="habilidade-cell"><span class="skill-code">${row.codigo}</span><span class="skill-name">${row.descricao}</span></td>
+      <td style="font-size:13px;color:var(--text-mid)">${row.componente}</td>
+      <td><span class="gap-tag ${gapClass}">${row.gap}</span></td>
+      <td class="acertos-cell" style="font-size:13px">${row.questoes}</td>
+      <td><div class="turma-cell"><span class="dot ${dotAlunoClass}"></span>${row.performanceAluno}%</div></td>
+      <td><div class="turma-cell"><span class="dot ${dotClass}"></span>${row.turma}%</div></td>
+      <td class="justificativa-cell">${row.justificativa}${evidTag}</td>
+    </tr>`;
+  }).join('');
+
+  // Histórico
+  const tbodyHist = document.getElementById('tbody-historico');
+  tbodyHist.innerHTML = hist.map(row => {
+    const fmt = v => v == null ? '—' : (v * 100).toFixed(0) + '%';
+    const trendIcon = row.trend === 'up' ? '<i class="pi pi-arrow-up" style="color:#12B76A;font-size:13px"></i>' : row.trend === 'down' ? '<i class="pi pi-arrow-down" style="color:#F04438;font-size:13px"></i>' : '<i class="pi pi-minus" style="color:#8A95B2;font-size:13px"></i>';
+    const trendLabel = row.trend === 'up' ? '<span style="color:#027A48;font-size:12px;font-weight:600">Recuperação</span>' : row.trend === 'down' ? '<span style="color:#B42318;font-size:12px;font-weight:600">Regressão</span>' : '<span style="color:#8A95B2;font-size:12px">Estável</span>';
+    return `<tr>
+      <td class="habilidade-cell"><span class="skill-code">${row.codigo}</span><span class="skill-name">${row.descricao}</span></td>
+      <td><span class="idh-val">${fmt(row.c1)}</span></td>
+      <td><span class="idh-val">${fmt(row.c2)}</span></td>
+      <td><span class="idh-val">${fmt(row.c3)}</span></td>
+      <td><span class="idh-val" style="color:var(--primary)">${fmt(row.c4)}</span></td>
+      <td><div style="display:flex;align-items:center;gap:6px">${trendIcon}${trendLabel}</div></td>
+    </tr>`;
+  }).join('');
+
+  // Aba Trilha
+  renderTrilha();
+}
+
+function renderTrilha() {
+  const container = document.getElementById('blocos-trilha');
+  container.innerHTML = TRILHA_BLOCOS.map((bloco, bi) => {
+    const questoesHtml = bloco.questoes.map((q, qi) => {
+      const difClass = q.dificuldade === 'Fácil' ? 'qtag-dif-facil' : q.dificuldade === 'Difícil' ? 'qtag-dif-dificil' : 'qtag-dif-medio';
+      const origemClass = q.origem === 'ia' ? 'qtag-origem-ia' : 'qtag-origem-banco';
+      const origemLabel = q.origem === 'ia' ? 'Gerado por IA' : 'Banco de questões';
+      const gabaritoHtml = q.alternativas
+        ? `<div class="questao-gabarito"><span class="gabarito-label">Gabarito:</span> ${q.gabarito}</div>`
+        : `<div class="questao-gabarito"><span class="gabarito-label">Gabarito:</span> ${q.gabarito}</div>`;
+      return `<div class="questao-row">
+        <div class="questao-num">${qi + 1}</div>
+        <div class="questao-info">
+          <div class="questao-enunciado">${q.enunciado.length > 90 ? q.enunciado.substring(0,90) + '...' : q.enunciado}</div>
+          <div class="questao-meta-row">
+            <span class="questao-tag qtag-tipo">${q.tipo}</span>
+            <span class="questao-tag ${difClass}">${q.dificuldade}</span>
+            <span class="questao-tag ${origemClass}">${origemLabel}</span>
+          </div>
+        </div>
+        ${gabaritoHtml}
+        <button class="btn-ver-questao" onclick="openModal(${bi}, ${qi})" title="Visualizar questão"><i class="pi pi-eye" style="font-size:15px"></i></button>
+      </div>`;
+    }).join('');
+
+    return `<div class="trilha-bloco">
+      <div class="trilha-bloco-header" onclick="toggleBloco(this)">
+        <div class="bloco-num">${bloco.num}</div>
+        <div class="bloco-title">${bloco.titulo}</div>
+        <div class="bloco-meta">
+          <span class="bloco-tag tag-habilidade">${bloco.habilidade}</span>
+          <span style="color:var(--text-mid)">${bloco.questoes.length} questões</span>
+          ${bloco.questoes.some(q => q.origem === 'ia') ? '<span class="bloco-tag tag-ia">Conteúdo gerado por IA</span>' : '<span class="bloco-tag tag-banco">Banco</span>'}
+        </div>
+        <i class="pi pi-chevron-up" style="font-size:14px;color:var(--text-light);margin-left:12px"></i>
+      </div>
+      <div class="bloco-content">${questoesHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleBloco(header) {
+  const content = header.nextElementSibling;
+  const icon = header.querySelector('.pi-chevron-up, .pi-chevron-down');
+  if (content.style.display === 'none') {
+    content.style.display = '';
+    icon.className = 'pi pi-chevron-up';
+  } else {
+    content.style.display = 'none';
+    icon.className = 'pi pi-chevron-down';
+  }
+}
+
+// ══════════════════════════════════════════════
+// NAVEGAÇÃO TABS
+// ══════════════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('panel-diagnostico').style.display = tab === 'diagnostico' ? '' : 'none';
+  document.getElementById('panel-trilha').style.display = tab === 'trilha' ? '' : 'none';
+  document.getElementById('tab-diagnostico').classList.toggle('active', tab === 'diagnostico');
+  document.getElementById('tab-trilha').classList.toggle('active', tab === 'trilha');
+}
+
+// ══════════════════════════════════════════════
+// CENÁRIOS
+// ══════════════════════════════════════════════
+function setScenario(scenario, btn) {
+  currentScenario = scenario;
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render(scenario);
+  // volta para aba diagnóstico ao mudar cenário
+  switchTab('diagnostico');
+}
+
+// ══════════════════════════════════════════════
+// MODAL QUESTÃO
+// ══════════════════════════════════════════════
+function openModal(blocoIdx, questaoIdx) {
+  const q = TRILHA_BLOCOS[blocoIdx].questoes[questaoIdx];
+  const difClass = q.dificuldade === 'Fácil' ? 'qtag-dif-facil' : q.dificuldade === 'Difícil' ? 'qtag-dif-dificil' : 'qtag-dif-medio';
+  const origemClass = q.origem === 'ia' ? 'qtag-origem-ia' : 'qtag-origem-banco';
+  const origemLabel = q.origem === 'ia' ? 'Gerado por IA' : 'Banco de questões';
+
+  document.getElementById('modal-tags').innerHTML =
+    `<span class="questao-tag qtag-tipo" style="font-size:12px;padding:3px 10px">${q.tipo}</span>
+     <span class="questao-tag ${difClass}" style="font-size:12px;padding:3px 10px">${q.dificuldade}</span>
+     <span class="questao-tag ${origemClass}" style="font-size:12px;padding:3px 10px">${origemLabel}</span>`;
+
+  document.getElementById('modal-enunciado').textContent = q.enunciado;
+
+  if (q.alternativas) {
+    document.getElementById('modal-alternativas').innerHTML = q.alternativas.map((alt, i) =>
+      `<div class="alternativa ${i === q.gabaritoIdx ? 'gabarito' : ''}">
+        <span class="alt-letra">${alt[0]})</span>
+        <span>${alt.substring(3)}</span>
+        ${i === q.gabaritoIdx ? '<span style="margin-left:auto;font-size:12px;font-weight:700">✓ Gabarito</span>' : ''}
+      </div>`
+    ).join('');
+    document.getElementById('modal-gabarito-wrap').innerHTML = '';
+  } else {
+    document.getElementById('modal-alternativas').innerHTML = '';
+    document.getElementById('modal-gabarito-wrap').innerHTML =
+      `<div style="margin-top:8px"><span class="modal-gabarito-label"><i class="pi pi-check" style="font-size:14px"></i> Gabarito: ${q.gabarito}</span></div>`;
+  }
+
+  document.getElementById('modal-questao').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-questao').classList.remove('open');
+}
+
+// Fechar modal clicando fora
+document.getElementById('modal-questao').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
 });
 
-// ===== HOVER ESTILO NOS LINKS DA SIDEBAR =====
-document.querySelectorAll('.nav-item:not(.active)').forEach(item => {
-  item.addEventListener('mouseenter', () => {
-    item.style.background = 'var(--color-state-overlay)';
-    item.style.color = 'var(--color-on-bg)';
-  });
-  item.addEventListener('mouseleave', () => {
-    item.style.background = '';
-    item.style.color = 'var(--color-on-bg-mid)';
-  });
-});
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+render('padrao');
 </script>
 </body>
 </html>
-
-
-
-

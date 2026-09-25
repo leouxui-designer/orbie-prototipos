@@ -1,0 +1,764 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Detalhe da Trilha Adaptativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --surface-dark: #10203D;
+      --border: #224476;
+      --brand: #0059E7;
+      --brand-hover: #0040A7;
+      --text: #FFFFFF;
+      --text-secondary: #99C0FF;
+      --text-label: #C0CADB;
+      --locked: #526D98;
+      --green: #12B76A;
+      --red: #F04438;
+      --yellow: #FFEA24;
+      --orange: #F79009;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+
+    /* ─── TOP BAR ─── */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      height: 56px;
+    }
+    .top-bar-back {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 150ms;
+      flex-shrink: 0;
+    }
+    .top-bar-back:hover { background: rgba(255,255,255,0.08); }
+    .top-bar-title {
+      flex: 1;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    /* ─── HERO HEADER ─── */
+    .hero {
+      padding: 24px 20px 0;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .hero-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .tag-adaptive { background: rgba(0,89,231,0.18); color: #3F84F3; border: 1px solid rgba(63,132,243,0.3); }
+    .tag-status   { background: rgba(0,89,231,0.18); color: #3F84F3; border: 1px solid rgba(63,132,243,0.3); }
+    .tag-vigencia { background: rgba(82,109,152,0.15); color: var(--locked); border: 1px solid rgba(82,109,152,0.3); }
+
+    .hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 33px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .hero-justificativa {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      line-height: 21px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: rgba(63,132,243,0.07);
+      border-left: 3px solid rgba(63,132,243,0.4);
+      border-radius: 0 8px 8px 0;
+    }
+    .hero-justificativa strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* barra de progresso geral */
+    .progress-header {
+      margin-bottom: 24px;
+    }
+    .progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .progress-count {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, #3F84F3, #0059E7);
+      transition: width 600ms ease-out;
+    }
+
+    /* ─── CTA BUTTON ─── */
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto 28px;
+      padding: 0 20px;
+    }
+    .btn-primary {
+      flex: 1;
+      background: var(--brand);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      height: 52px;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-primary:hover { background: var(--brand-hover); }
+    .btn-secondary-link {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 8px;
+      white-space: nowrap;
+    }
+    .btn-secondary-link:hover { color: #fff; }
+
+    /* ─── BLOCOS DE RECOMPOSIÇÃO ─── */
+    .blocks-area {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .block-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .block-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .block-number {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .block-number.done   { background: rgba(18,183,106,0.2); color: var(--green); border: 1.5px solid rgba(18,183,106,0.4); }
+    .block-number.active { background: rgba(0,89,231,0.2);   color: #3F84F3;      border: 1.5px solid rgba(63,132,243,0.4); }
+    .block-number.locked { background: rgba(82,109,152,0.1); color: var(--locked); border: 1.5px solid rgba(82,109,152,0.3); }
+
+    .block-info { flex: 1; }
+    .block-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .block-meta {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .block-progress-pill {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      flex-shrink: 0;
+    }
+    .block-progress-pill.done   { background: rgba(18,183,106,0.15); color: var(--green); }
+    .block-progress-pill.active { background: rgba(0,89,231,0.15);   color: #3F84F3; }
+    .block-progress-pill.locked { background: rgba(82,109,152,0.1);  color: var(--locked); }
+
+    /* fases dentro do bloco */
+    .phases-list {
+      display: flex;
+      flex-direction: column;
+    }
+    .phase-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(34,68,118,0.5);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .phase-item:last-child { border-bottom: none; }
+    .phase-item:hover:not(.phase-locked) { background: rgba(255,255,255,0.03); }
+    .phase-item.phase-locked { cursor: default; opacity: 0.6; }
+
+    .phase-icon {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .phase-icon.available { background: rgba(0,89,231,0.15); border: 1.5px solid rgba(63,132,243,0.4); }
+    .phase-icon.locked    { background: rgba(82,109,152,0.1); border: 1.5px solid rgba(82,109,152,0.3); }
+    .phase-icon.correct   { background: rgba(18,183,106,0.2); border: 1.5px solid rgba(18,183,106,0.5); }
+    .phase-icon.wrong     { background: rgba(240,68,56,0.2);  border: 1.5px solid rgba(240,68,56,0.5); }
+    .phase-icon.info      { background: rgba(63,132,243,0.1); border: 1.5px dashed rgba(63,132,243,0.4); }
+
+    .phase-body { flex: 1; min-width: 0; }
+    .phase-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .phase-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .phase-action {
+      flex-shrink: 0;
+    }
+    .play-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms;
+    }
+    .phase-item:hover .play-btn { background: var(--brand-hover); }
+
+    /* ─── MODAL CONFIRMAÇÃO SAÍDA (RF09) ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 250ms;
+    }
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      background: #10203D;
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 36px;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(40px);
+      transition: transform 280ms cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .modal-overlay.visible .modal-sheet { transform: translateY(0); }
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .modal-sheet-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .modal-sheet-body {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .modal-sheet-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-danger {
+      background: rgba(240,68,56,0.12);
+      color: #F97066;
+      border: 1px solid rgba(240,68,56,0.3);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 12px;
+      height: 50px;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-danger:hover { background: rgba(240,68,56,0.2); }
+    .btn-ghost {
+      background: transparent;
+      color: rgba(255,255,255,0.5);
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 10px;
+      transition: color 150ms;
+    }
+    .btn-ghost:hover { color: var(--text); }
+
+    /* ─── ANOTAÇÕES ─── */
+    .req-annotation {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 20px 8px;
+      padding: 10px 14px;
+      background: rgba(0,89,231,0.08);
+      border: 1px dashed rgba(63,132,243,0.35);
+      border-radius: 10px;
+    }
+    .req-annotation.warn { background: rgba(247,144,9,0.07); border-color: rgba(247,144,9,0.35); }
+    .req-annotation.success { background: rgba(18,183,106,0.07); border-color: rgba(18,183,106,0.35); }
+    .req-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: rgba(63,132,243,0.18);
+      color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3);
+      margin-top: 1px;
+    }
+    .req-annotation.warn .req-tag { background: rgba(247,144,9,0.15); color: #F79009; border-color: rgba(247,144,9,0.3); }
+    .req-annotation.success .req-tag { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .req-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      line-height: 16px;
+      color: rgba(153,192,255,0.85);
+    }
+    .req-text strong { color: #fff; font-weight: 600; }
+
+    /* ─── SWITCHER DE MODO ─── */
+    .mode-switcher {
+      position: fixed;
+      bottom: 20px;
+      right: 16px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(10,10,30,0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(34,68,118,0.5);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .mode-switcher h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #526D98;
+      margin-bottom: 2px;
+    }
+    .ms-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: #99C0FF;
+      background: transparent;
+      border: 1px solid #224476;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 150ms;
+      white-space: nowrap;
+    }
+    .ms-btn:hover  { background: rgba(0,89,231,0.2); color: #fff; border-color: #0059E7; }
+    .ms-btn.active { background: #0059E7; color: #fff; border-color: #0059E7; }
+
+    /* ─── SECTION DIVIDER ─── */
+    .section-spacer { height: 28px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-back" onclick="history.back()" title="Voltar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="top-bar-title">Revisão de Conteúdos</div>
+    <div style="width:36px"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero" id="hero-section">
+    <div class="hero-tag-row">
+      <span class="tag tag-adaptive">Trilha Adaptativa</span>
+      <span class="tag tag-status" id="status-tag">Em andamento</span>
+      <span class="tag tag-vigencia">Vigência: até 28/08/2026</span>
+    </div>
+    <div class="hero-title">Revisão — Ciclo 3</div>
+    <!-- RF09: justificativa positiva, sem índices comparativos -->
+    <div class="hero-justificativa">
+      <strong>Por que essa revisão?</strong><br>
+      Preparamos esta revisão porque você teve dificuldade em <strong>Frações</strong> e <strong>Geometria Plana</strong>. Nada de comparações — é só para você melhorar!
+    </div>
+    <!-- Barra de progresso geral -->
+    <div class="progress-header">
+      <div class="progress-label-row">
+        <span class="progress-label">Progresso geral</span>
+        <span class="progress-count" id="progress-count">4 de 12 fases</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:33%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANOTAÇÕES RF09 -->
+  <div class="req-annotation" style="max-width:680px;margin:0 auto 6px;margin-left:max(20px,calc(50% - 320px));margin-right:max(20px,calc(50% - 320px));">
+    <span class="req-tag">RF09</span>
+    <span class="req-text"><strong>Justificativa positiva</strong> — Exibida de forma simplificada. Sem índices de defasagem, percentuais da turma ou classificações comparativas.</span>
+  </div>
+  <div class="req-annotation warn" style="max-width:680px;margin:0 auto 16px;margin-left:max(20px,calc(50% - 320px));margin-right:max(20px,calc(50% - 320px));">
+    <span class="req-tag">RF09</span>
+    <span class="req-text"><strong>Desbloqueio sequencial</strong> — Fase 1 inicia Disponível. Ao concluir a fase N, a N+1 desbloqueia. Blocos seguem a mesma lógica: questão informativa antes das práticas.</span>
+  </div>
+
+  <!-- CTA BUTTON -->
+  <div class="cta-btn" id="cta-area">
+    <button class="btn-primary" id="cta-main" onclick="navigateToFase()">Continuar</button>
+    <button class="btn-secondary-link" onclick="showExitModal()">Sair da revisão</button>
+  </div>
+
+  <!-- BLOCOS DE RECOMPOSIÇÃO -->
+  <div class="blocks-area" id="blocks-area">
+    <!-- Renderizados por JS -->
+  </div>
+
+  <div class="section-spacer"></div>
+
+  <!-- MODAL SAÍDA (RF09 — interrupção) -->
+  <div class="modal-overlay" id="exit-modal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-sheet-title">Sair da revisão?</div>
+      <div class="modal-sheet-body">
+        Você pode continuar esta revisão depois. Ela fica disponível até o fim da vigência do ciclo.
+      </div>
+      <div class="modal-sheet-btns">
+        <button class="btn-danger" onclick="doExit()">Sair e continuar depois</button>
+        <button class="btn-ghost"  onclick="hideExitModal()">Continuar revisando agora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SWITCHER DE MODO -->
+  <div class="mode-switcher">
+    <h4>Modo — RF09</h4>
+    <button class="ms-btn active" id="ms-andamento" onclick="setMode(this,'andamento')">Em andamento</button>
+    <button class="ms-btn" id="ms-nao-iniciada" onclick="setMode(this,'nao-iniciada')">Não iniciada</button>
+    <button class="ms-btn" id="ms-concluida"   onclick="setMode(this,'concluida')">Concluída</button>
+  </div>
+
+<script>
+/* ═══════════════════════════════════════════
+   RF09 — Detalhe da Trilha Adaptativa
+   ═══════════════════════════════════════════ */
+
+const BLOCKS_DATA = [
+  {
+    id: 1,
+    title: 'Revisão 1 — Frações',
+    meta: '4 fases · Matemática',
+    state: 'done', // done | active | locked
+    progress: '4/4',
+    phases: [
+      { type: 'info',    label: 'Informativa', name: 'Entendendo Frações', state: 'correct' },
+      { type: 'pratica', label: 'Prática 1',   name: 'Frações equivalentes', state: 'correct' },
+      { type: 'pratica', label: 'Prática 2',   name: 'Soma de frações', state: 'wrong' },
+      { type: 'pratica', label: 'Prática 3',   name: 'Divisão de frações', state: 'correct' },
+    ]
+  },
+  {
+    id: 2,
+    title: 'Revisão 2 — Geometria Plana',
+    meta: '4 fases · Matemática',
+    state: 'active',
+    progress: '0/4',
+    phases: [
+      { type: 'info',    label: 'Informativa', name: 'Introdução à Geometria', state: 'available' },
+      { type: 'pratica', label: 'Prática 1',   name: 'Perímetro de figuras', state: 'locked' },
+      { type: 'pratica', label: 'Prática 2',   name: 'Área de triângulos', state: 'locked' },
+      { type: 'pratica', label: 'Prática 3',   name: 'Área de quadriláteros', state: 'locked' },
+    ]
+  },
+  {
+    id: 3,
+    title: 'Revisão 3 — Porcentagem',
+    meta: '4 fases · Matemática',
+    state: 'locked',
+    progress: '0/4',
+    phases: [
+      { type: 'info',    label: 'Informativa', name: 'O que é porcentagem?', state: 'locked' },
+      { type: 'pratica', label: 'Prática 1',   name: 'Calcular % de um valor', state: 'locked' },
+      { type: 'pratica', label: 'Prática 2',   name: 'Desconto e acréscimo', state: 'locked' },
+      { type: 'pratica', label: 'Prática 3',   name: 'Problemas com %', state: 'locked' },
+    ]
+  }
+];
+
+const PHASE_ICON = {
+  correct: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#12B76A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  wrong:   `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#F04438" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  available:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="#3F84F3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  locked:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 11H7C5.9 11 5 11.9 5 13V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V13C19 11.9 18.1 11 17 11Z" fill="#526D98"/><path d="M8 11V7C8 4.79 9.79 3 12 3C14.21 3 16 4.79 16 7V11" stroke="#526D98" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>`,
+  info:    `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3F84F3" stroke-width="1.8"/><path d="M12 8v1M12 11v5" stroke="#3F84F3" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+
+let currentMode = 'andamento';
+
+function buildBlocks(mode) {
+  let blocks = JSON.parse(JSON.stringify(BLOCKS_DATA));
+  if (mode === 'nao-iniciada') {
+    blocks.forEach(b => {
+      b.state = b.id === 1 ? 'active' : 'locked';
+      b.progress = '0/4';
+      b.phases.forEach((p, i) => { p.state = (b.id === 1 && i === 0) ? 'available' : 'locked'; });
+    });
+  } else if (mode === 'concluida') {
+    blocks.forEach(b => {
+      b.state = 'done';
+      b.progress = '4/4';
+      b.phases.forEach(p => { p.state = Math.random() > 0.3 ? 'correct' : 'wrong'; });
+    });
+  }
+  return blocks;
+}
+
+function renderBlocks(mode) {
+  const blocks = buildBlocks(mode);
+  const area = document.getElementById('blocks-area');
+  area.innerHTML = blocks.map(block => {
+    const isLocked = block.state === 'locked';
+    const isDone   = block.state === 'done';
+    const isActive = block.state === 'active';
+    const numClass = isDone ? 'done' : isActive ? 'active' : 'locked';
+    const pillClass = numClass;
+
+    const phasesHTML = block.phases.map(ph => {
+      const isPhLocked = ph.state === 'locked';
+      const iconKey = ph.type === 'info' && ph.state === 'available' ? 'info' :
+                      ph.type === 'info' && ph.state === 'correct'   ? 'correct' :
+                      ph.state;
+      const iconClass = ph.state === 'available' ? 'available' :
+                        ph.state === 'correct'   ? 'correct'   :
+                        ph.state === 'wrong'     ? 'wrong'     : 'locked';
+      const clickHandler = isPhLocked ? '' : `onclick="navigateToFaseType('${ph.type}','${ph.state}')"`;
+      return `
+        <div class="phase-item ${isPhLocked ? 'phase-locked' : ''}" ${clickHandler}>
+          <div class="phase-icon ${iconClass}">${PHASE_ICON[iconKey] || PHASE_ICON.locked}</div>
+          <div class="phase-body">
+            <div class="phase-label">${ph.label}${ph.type === 'info' ? ' · Sem pontuação [RF09]' : ''}</div>
+            <div class="phase-name">${ph.name}</div>
+          </div>
+          <div class="phase-action">
+            ${isPhLocked ? '' : ph.state === 'correct' || ph.state === 'wrong'
+              ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="#526D98" stroke-width="1.8" stroke-linecap="round"/></svg>`
+              : `<div class="play-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 5L19 12L8 19V5Z" fill="white"/></svg></div>`}
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="block-card">
+        <div class="block-header">
+          <div class="block-number ${numClass}">${block.id}</div>
+          <div class="block-info">
+            <div class="block-title">${block.title}</div>
+            <div class="block-meta">${block.meta}</div>
+          </div>
+          <div class="block-progress-pill ${pillClass}">${block.progress}</div>
+        </div>
+        <div class="phases-list">${phasesHTML}</div>
+      </div>`;
+  }).join('');
+}
+
+function setMode(btn, mode) {
+  document.querySelectorAll('.ms-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = mode;
+  renderBlocks(mode);
+  updateHeroForMode(mode);
+}
+
+function updateHeroForMode(mode) {
+  const statusTag = document.getElementById('status-tag');
+  const ctaMain   = document.getElementById('cta-main');
+  const fill      = document.getElementById('progress-fill');
+  const count     = document.getElementById('progress-count');
+  const ctaArea   = document.getElementById('cta-area');
+  if (mode === 'nao-iniciada') {
+    statusTag.textContent = 'Disponível';
+    ctaMain.textContent = 'Iniciar Revisão';
+    fill.style.width = '0%';
+    count.textContent = '0 de 12 fases';
+    ctaArea.style.display = 'flex';
+  } else if (mode === 'andamento') {
+    statusTag.textContent = 'Em andamento';
+    ctaMain.textContent = 'Continuar';
+    fill.style.width = '33%';
+    count.textContent = '4 de 12 fases';
+    ctaArea.style.display = 'flex';
+  } else if (mode === 'concluida') {
+    statusTag.textContent = 'Concluída';
+    ctaMain.textContent = 'Ver resultado';
+    ctaMain.onclick = () => { window.location.href = 'resultado.html'; };
+    fill.style.width = '100%';
+    count.textContent = '12 de 12 fases';
+    ctaArea.style.display = 'flex';
+  }
+}
+
+function navigateToFase() {
+  if (currentMode === 'concluida') {
+    window.location.href = 'resultado.html';
+  } else {
+    window.location.href = 'fase-informativa.html';
+  }
+}
+
+function navigateToFaseType(type, state) {
+  if (state === 'correct' || state === 'wrong') {
+    // fase já respondida — em modo leitura (RF09: não pode responder de novo)
+    showToast('Fase já respondida — somente leitura [RF09]');
+    return;
+  }
+  if (type === 'info') {
+    window.location.href = 'fase-informativa.html';
+  } else {
+    window.location.href = 'fase-pratica.html';
+  }
+}
+
+function showExitModal() {
+  document.getElementById('exit-modal').classList.add('visible');
+}
+function hideExitModal() {
+  document.getElementById('exit-modal').classList.remove('visible');
+}
+function doExit() {
+  window.location.href = '../home-orbie-app/index.html';
+}
+document.getElementById('exit-modal').addEventListener('click', function(e) {
+  if (e.target === this) hideExitModal();
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#142A51;border:1px solid #224476;border-radius:10px;padding:10px 20px;font-family:'Outfit',sans-serif;font-size:13px;color:#99C0FF;z-index:999;white-space:nowrap;opacity:0;transition:opacity 200ms;pointer-events:none;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+/* init */
+renderBlocks('andamento');
+</script>
+</body>
+</html>

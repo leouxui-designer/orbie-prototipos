@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco de Talentos - Admin | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/painel.css">
+  <style>
+    /* ── Modal método ── */
+    .modal__subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+    }
+    .metodo-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .metodo-card {
+      border: 1.5px solid rgba(0,0,0,0.1);
+      border-radius: 14px;
+      padding: 28px 20px;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition-fast);
+      background: var(--color-bg-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .metodo-card:hover {
+      border-color: var(--color-primary);
+      background: rgba(44,169,66,0.03);
+      box-shadow: 0 4px 20px rgba(44,169,66,0.1);
+      transform: translateY(-2px);
+    }
+    .metodo-card__icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .metodo-card__icon--planilha { background: rgba(44,169,66,0.1); }
+    .metodo-card__icon--manual   { background: rgba(0,0,0,0.05); }
+    .metodo-card__title {
+      font-family: var(--font-header);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-text-default);
+    }
+    .metodo-card__desc {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+    .metodo-card__badge {
+      display: inline-flex;
+      padding: 3px 10px;
+      background: rgba(44,169,66,0.12);
+      color: var(--color-primary);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── Modal planilha ── */
+    .modal__back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 20px;
+      transition: color var(--transition-fast);
+    }
+    .modal__back-btn:hover { color: var(--color-text-default); }
+
+    /* Modelo card */
+    .modelo-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      background: rgba(44,169,66,0.05);
+      border: 1.5px solid rgba(44,169,66,0.18);
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .modelo-card__icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(44,169,66,0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .modelo-card__info { flex: 1; min-width: 0; }
+    .modelo-card__name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-text-default);
+      margin-bottom: 2px;
+    }
+    .modelo-card__meta {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+    .modelo-card__fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .modelo-card__field {
+      padding: 2px 8px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 20px;
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      font-weight: 500;
+    }
+    .modelo-card__dl {
+      flex-shrink: 0;
+    }
+
+    /* Upload zone */
+    .upload-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .upload-zone {
+      border: 2px dashed rgba(0,0,0,0.14);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background: var(--color-bg-light);
+      position: relative;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--color-primary);
+      background: rgba(44,169,66,0.04);
+    }
+    .upload-zone.has-file {
+      border-color: var(--color-primary);
+      border-style: solid;
+      background: rgba(44,169,66,0.04);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-zone__icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      transition: background var(--transition-fast);
+    }
+    .upload-zone.has-file .upload-zone__icon { background: rgba(44,169,66,0.12); }
+    .upload-zone__title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-text-default);
+      margin-bottom: 4px;
+    }
+    .upload-zone__sub {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    .upload-zone__filename {
+      display: none;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+    .upload-zone.has-file .upload-zone__filename { display: block; }
+    .upload-zone.has-file .upload-zone__hint     { display: none; }
+    .upload-zone__hint { font-size: 11px; color: var(--color-text-muted); margin-top: 6px; }
+
+    /* Progress */
+    .upload-progress {
+      display: none;
+      margin-top: 16px;
+    }
+    .upload-progress.visible { display: block; }
+    .upload-progress__row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+    .upload-progress__bar {
+      height: 5px;
+      background: rgba(0,0,0,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .upload-progress__fill {
+      height: 100%;
+      background: var(--color-primary-gradient);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.08s linear;
+    }
+
+    /* Modal footer */
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* Download feedback */
+    .download-done {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #2e7d32;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .download-done.visible { display: flex; }
+  </style>
+</head>
+<body style="padding-top: 80px;">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar--painel navbar--admin">
+    <div class="navbar__inner">
+      <a href="login.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="badge badge--dark" style="font-size: 11px; padding: 4px 10px;">ADMIN</span>
+        <span class="navbar-painel__company-name">Equipe SCTEC</span>
+        <div class="navbar-painel__avatar" id="avatar-toggle" onclick="toggleAvatarMenu()" style="background: #303030;">AD</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header"><strong>Administrador</strong><span>Equipe SCTEC</span></div>
+          <a href="admin-alunos.html" class="avatar-menu__link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Banco de Talentos
+          </a>
+          <div class="avatar-menu__divider"></div>
+          <a href="login.html" class="avatar-menu__link avatar-menu__link--logout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sair
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar sidebar--admin">
+      <div class="sidebar__header">
+        <div class="sidebar__company">Administrador</div>
+        <div class="sidebar__plan">Equipe SCTEC</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="admin-alunos.html" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Banco de Talentos
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Gestão de Empresas
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Usuários
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Banco de Talentos</h1>
+          <p class="painel__subtitle">Gerencie os alunos com acesso ao Portal de Talentos</p>
+        </div>
+        <button class="btn btn--primary" onclick="openModal('modal-metodo')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Cadastrar Aluno
+        </button>
+      </div>
+
+      <div class="painel-filters">
+        <input type="text" class="painel-filter__search" placeholder="Buscar por nome ou e-mail...">
+        <select class="painel-filter__select">
+          <option>Todos os status</option>
+          <option>Ativo</option>
+          <option>Inativo</option>
+        </select>
+        <select class="painel-filter__select">
+          <option>Todas as cidades</option>
+          <option>Florianópolis</option>
+          <option>Joinville</option>
+          <option>Blumenau</option>
+          <option>Chapecó</option>
+          <option>Criciúma</option>
+        </select>
+      </div>
+
+      <p class="painel-results-count">Exibindo <strong>1.247</strong> alunos</p>
+
+      <div class="panel-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>CPF</th>
+              <th>Telefone</th>
+              <th>Cidade</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>João Silva</strong><br><small style="color:var(--color-text-muted)">joao.silva@email.com</small></td>
+              <td><small style="color:var(--color-text-muted)">045.678.901-23</small></td>
+              <td><small style="color:var(--color-text-muted)">(48) 99123-4567</small></td>
+              <td>Florianópolis</td>
+              <td><span class="status status--active">Ativo</span></td>
+              <td><div class="action-group">
+                <a href="#" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+              </div></td>
+            </tr>
+            <tr>
+              <td><strong>Maria Luísa Fernandes</strong><br><small style="color:var(--color-text-muted)">maria.fernandes@email.com</small></td>
+              <td><small style="color:var(--color-text-muted)">123.456.789-00</small></td>
+              <td><small style="color:var(--color-text-muted)">(47) 98765-4321</small></td>
+              <td>Joinville</td>
+              <td><span class="status status--active">Ativo</span></td>
+              <td><div class="action-group">
+                <a href="#" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+              </div></td>
+            </tr>
+            <tr>
+              <td><strong>Pedro Rodrigues</strong><br><small style="color:var(--color-text-muted)">pedro.rodrigues@email.com</small></td>
+              <td><small style="color:var(--color-text-muted)">987.654.321-00</small></td>
+              <td><small style="color:var(--color-text-muted)">(47) 99234-5678</small></td>
+              <td>Blumenau</td>
+              <td><span class="status status--active">Ativo</span></td>
+              <td><div class="action-group">
+                <a href="#" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+              </div></td>
+            </tr>
+            <tr>
+              <td><strong>Ana Beatriz Costa</strong><br><small style="color:var(--color-text-muted)">ana.costa@email.com</small></td>
+              <td><small style="color:var(--color-text-muted)">321.654.987-11</small></td>
+              <td><small style="color:var(--color-text-muted)">(49) 99876-5432</small></td>
+              <td>Chapecó</td>
+              <td><span class="status status--active">Ativo</span></td>
+              <td><div class="action-group">
+                <a href="#" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                <label class="toggle"><input type="checkbox" checked onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+              </div></td>
+            </tr>
+            <tr>
+              <td><strong>Camila de Souza</strong><br><small style="color:var(--color-text-muted)">camila.souza@email.com</small></td>
+              <td><small style="color:var(--color-text-muted)">654.321.098-77</small></td>
+              <td><small style="color:var(--color-text-muted)">(48) 98901-2345</small></td>
+              <td>Florianópolis</td>
+              <td><span class="status status--closed">Inativo</span></td>
+              <td><div class="action-group">
+                <a href="#" class="action-icon" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                <label class="toggle"><input type="checkbox" onchange="showToast('Status alterado.')"><span class="toggle__slider"></span></label>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button class="pagination__btn pagination__btn--arrow" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="pagination__btn pagination__btn--active">1</button>
+        <button class="pagination__btn">2</button>
+        <button class="pagination__btn">3</button>
+        <span class="pagination__info">de 5</span>
+        <button class="pagination__btn pagination__btn--arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       MODAL 1 — Escolha de método
+  ════════════════════════════════════════ -->
+  <div class="modal" id="modal-metodo">
+    <div class="modal__overlay" onclick="closeModal('modal-metodo')"></div>
+    <div class="modal__content" style="max-width: 520px;">
+      <div class="modal__header">
+        <h2 class="modal__title">Cadastrar Aluno</h2>
+        <button class="modal__close" onclick="closeModal('modal-metodo')">&times;</button>
+      </div>
+      <p class="modal__subtitle">Como você deseja adicionar o aluno?</p>
+      <div class="metodo-options">
+
+        <button class="metodo-card" onclick="goToPlanilha()">
+          <div class="metodo-card__icon metodo-card__icon--planilha">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2CA942" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          </div>
+          <div class="metodo-card__title">Via Planilha</div>
+          <div class="metodo-card__desc">Importe vários alunos de uma vez com uma planilha Excel</div>
+          <span class="metodo-card__badge">Recomendado</span>
+        </button>
+
+        <button class="metodo-card" onclick="closeModal('modal-metodo'); showToast('Cadastro manual em desenvolvimento.')">
+          <div class="metodo-card__icon metodo-card__icon--manual">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="metodo-card__title">Manual</div>
+          <div class="metodo-card__desc">Preencha os dados de um aluno individualmente</div>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       MODAL 2 — Importar planilha
+  ════════════════════════════════════════ -->
+  <div class="modal" id="modal-planilha">
+    <div class="modal__overlay" onclick="closeModal('modal-planilha')"></div>
+    <div class="modal__content" style="max-width: 560px;">
+
+      <!-- Header com botão voltar -->
+      <div class="modal__header" style="align-items: flex-start; flex-direction: column; gap: 0;">
+        <button class="modal__back-btn" onclick="voltarParaMetodo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          Voltar
+        </button>
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+          <h2 class="modal__title">Importar via Planilha</h2>
+          <button class="modal__close" onclick="closeModal('modal-planilha')">&times;</button>
+        </div>
+      </div>
+
+      <!-- Step indicator -->
+      <div style="display:flex; align-items:center; gap:0; margin: 20px 0 28px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div id="step-dot-1" style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;">1</div>
+          <span id="step-lbl-1" style="font-size:13px;font-weight:600;color:var(--color-text-default);white-space:nowrap;">Baixar modelo</span>
+        </div>
+        <div id="step-line" style="flex:1;height:2px;background:rgba(0,0,0,0.08);margin:0 12px;"></div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div id="step-dot-2" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--color-text-muted);flex-shrink:0;">2</div>
+          <span id="step-lbl-2" style="font-size:13px;font-weight:500;color:var(--color-text-muted);white-space:nowrap;">Enviar planilha</span>
+        </div>
+      </div>
+
+      <!-- Painel 1: Baixar modelo -->
+      <div id="painel-baixar">
+        <div class="modelo-card">
+          <div class="modelo-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2CA942" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          </div>
+          <div class="modelo-card__info">
+            <div class="modelo-card__name">modelo_importacao_alunos.xlsx</div>
+            <div class="modelo-card__meta">5 colunas obrigatórias</div>
+            <div class="modelo-card__fields">
+              <span class="modelo-card__field">Nome Completo</span>
+              <span class="modelo-card__field">CPF</span>
+              <span class="modelo-card__field">E-mail</span>
+              <span class="modelo-card__field">Telefone</span>
+              <span class="modelo-card__field">Cidade</span>
+            </div>
+          </div>
+          <button class="btn btn--outline btn--sm modelo-card__dl" onclick="triggerDownload()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar
+          </button>
+        </div>
+
+        <div class="download-done" id="download-done">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2CA942" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Modelo baixado. Preencha e salve antes de enviar.
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn--ghost" onclick="closeModal('modal-planilha')">Cancelar</button>
+          <button class="btn btn--primary" onclick="irParaUpload()">
+            Já tenho o arquivo preenchido
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Painel 2: Upload -->
+      <div id="painel-upload" style="display:none;">
+        <span class="upload-section-label">Selecione o arquivo preenchido</span>
+
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(this)">
+          <div class="upload-zone__icon" id="upload-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="upload-zone__title" id="upload-title">Clique ou arraste a planilha aqui</div>
+          <div class="upload-zone__sub" id="upload-sub">Solte o arquivo para iniciar o envio</div>
+          <div class="upload-zone__hint">Formatos aceitos: .xlsx · .xls · .csv</div>
+          <div class="upload-zone__filename" id="upload-filename"></div>
+        </div>
+
+        <div class="upload-progress" id="upload-progress">
+          <div class="upload-progress__row">
+            <span id="progress-text">Processando arquivo...</span>
+            <span id="progress-pct">0%</span>
+          </div>
+          <div class="upload-progress__bar">
+            <div class="upload-progress__fill" id="progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn--ghost" onclick="voltarParaBaixar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+            Voltar
+          </button>
+          <button class="btn btn--primary" id="btn-verificar" disabled onclick="goToChecagem()">
+            Verificar Dados
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ── helpers de modal ── */
+    function openModal(id)  { document.getElementById(id).classList.add('modal--open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('modal--open'); }
+
+    function goToPlanilha() {
+      closeModal('modal-metodo');
+      // reset estado
+      mostrarPainel('baixar');
+      setStep(1);
+      resetUpload();
+      document.getElementById('download-done').classList.remove('visible');
+      openModal('modal-planilha');
+    }
+
+    function voltarParaMetodo() {
+      closeModal('modal-planilha');
+      openModal('modal-metodo');
+    }
+
+    /* ── steps ── */
+    function setStep(n) {
+      const d1 = document.getElementById('step-dot-1');
+      const d2 = document.getElementById('step-dot-2');
+      const l1 = document.getElementById('step-lbl-1');
+      const l2 = document.getElementById('step-lbl-2');
+      const line = document.getElementById('step-line');
+
+      if (n === 1) {
+        d1.style.cssText = 'width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;';
+        d1.innerHTML = '1';
+        l1.style.cssText = 'font-size:13px;font-weight:600;color:var(--color-text-default);white-space:nowrap;';
+        d2.style.cssText = 'width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--color-text-muted);flex-shrink:0;';
+        d2.innerHTML = '2';
+        l2.style.cssText = 'font-size:13px;font-weight:500;color:var(--color-text-muted);white-space:nowrap;';
+        line.style.background = 'rgba(0,0,0,0.08)';
+      } else {
+        d1.style.cssText = 'width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;';
+        d1.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+        l1.style.cssText = 'font-size:13px;font-weight:500;color:var(--color-primary);white-space:nowrap;';
+        d2.style.cssText = 'width:28px;height:28px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;';
+        d2.innerHTML = '2';
+        l2.style.cssText = 'font-size:13px;font-weight:600;color:var(--color-text-default);white-space:nowrap;';
+        line.style.background = 'var(--color-primary)';
+      }
+    }
+
+    /* ── painéis dentro da modal ── */
+    function mostrarPainel(qual) {
+      document.getElementById('painel-baixar').style.display = qual === 'baixar' ? 'block' : 'none';
+      document.getElementById('painel-upload').style.display = qual === 'upload' ? 'block' : 'none';
+    }
+
+    function irParaUpload() {
+      mostrarPainel('upload');
+      setStep(2);
+    }
+
+    function voltarParaBaixar() {
+      mostrarPainel('baixar');
+      setStep(1);
+      resetUpload();
+    }
+
+    /* ── download mockado ── */
+    function triggerDownload() {
+      document.getElementById('download-done').classList.add('visible');
+      showToast('modelo_importacao_alunos.xlsx baixado.');
+    }
+
+    /* ── upload ── */
+    function resetUpload() {
+      const zone = document.getElementById('upload-zone');
+      zone.classList.remove('has-file');
+      document.getElementById('upload-icon').innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+      document.getElementById('upload-icon').style.background = 'rgba(0,0,0,0.06)';
+      document.getElementById('upload-title').textContent = 'Clique ou arraste a planilha aqui';
+      document.getElementById('upload-sub').textContent = 'Solte o arquivo para iniciar o envio';
+      document.getElementById('upload-filename').textContent = '';
+      document.getElementById('upload-progress').classList.remove('visible');
+      document.getElementById('progress-fill').style.width = '0%';
+      document.getElementById('progress-pct').textContent = '0%';
+      document.getElementById('progress-text').textContent = 'Processando arquivo...';
+      document.getElementById('btn-verificar').disabled = true;
+      document.getElementById('file-input').value = '';
+    }
+
+    function handleFileSelect(input) {
+      if (!input.files || !input.files[0]) return;
+      applyFile(input.files[0]);
+    }
+
+    function applyFile(file) {
+      const zone = document.getElementById('upload-zone');
+      zone.classList.add('has-file');
+      document.getElementById('upload-icon').innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2CA942" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+      document.getElementById('upload-icon').style.background = 'rgba(44,169,66,0.12)';
+      document.getElementById('upload-title').textContent = 'Arquivo selecionado';
+      document.getElementById('upload-sub').textContent = (file.size / 1024).toFixed(1) + ' KB';
+      document.getElementById('upload-filename').textContent = file.name;
+      simulateProgress();
+    }
+
+    function simulateProgress() {
+      const progress = document.getElementById('upload-progress');
+      const fill     = document.getElementById('progress-fill');
+      const pct      = document.getElementById('progress-pct');
+      const text     = document.getElementById('progress-text');
+      const btn      = document.getElementById('btn-verificar');
+
+      progress.classList.add('visible');
+      let val = 0;
+      const iv = setInterval(() => {
+        val += Math.random() * 20 + 10;
+        if (val >= 100) {
+          val = 100;
+          clearInterval(iv);
+          fill.style.width = '100%';
+          pct.textContent = '100%';
+          text.textContent = 'Arquivo processado com sucesso!';
+          btn.disabled = false;
+          showToast('Planilha pronta. Clique em Verificar Dados.');
+        } else {
+          fill.style.width = val + '%';
+          pct.textContent = Math.floor(val) + '%';
+        }
+      }, 100);
+    }
+
+    function goToChecagem() {
+      closeModal('modal-planilha');
+      window.location.href = 'admin-checagem-importacao.html';
+    }
+
+    /* ── drag & drop ── */
+    const zone = document.getElementById('upload-zone');
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) applyFile(e.dataTransfer.files[0]);
+    });
+
+    /* ── toast / avatar ── */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+    function toggleAvatarMenu() {
+      document.getElementById('avatar-menu').classList.toggle('avatar-menu--open');
+    }
+    document.addEventListener('click', (e) => {
+      const menu   = document.getElementById('avatar-menu');
+      const toggle = document.getElementById('avatar-toggle');
+      if (menu && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.classList.remove('avatar-menu--open');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCTEC — Buscar Talentos (Proposta Filtros Avançados)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Tokens ──────────────────────────────────────────────── */
+    :root {
+      --green:        #7ab934;
+      --green-dark:   #568328;
+      --green-bg:     #edf6db;
+      --sidebar-bg:   #22292b;
+      --sidebar-text: #ffffff;
+      --sidebar-muted:#d4d4d4;
+      --page-bg:      #f8f9fb;
+      --card-bg:      #ffffff;
+      --border:       #d4d4d4;
+      --text:         #171717;
+      --muted:        #737373;
+      --badge-bg:     #f0f0f0;
+      --shadow:       0 1px 3px rgba(0,0,0,.10), 0 1px 2px -1px rgba(0,0,0,.10);
+      --radius-card:  12px;
+      --radius-panel: 22px;
+      --radius-input: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── Navbar ──────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; height: 80px; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255,255,255,.5);
+      box-shadow: 0 1.2px 15px rgba(69,42,124,.10);
+    }
+    .navbar-brand { line-height: 1; }
+    .navbar-brand .brand-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800; font-size: 20px; color: var(--text);
+    }
+    .navbar-brand .brand-sub {
+      font-size: 12px; font-weight: 600; color: var(--text);
+    }
+    .navbar-right { display: flex; align-items: center; gap: 12px; }
+    .navbar-right span { font-size: 14px; color: #454545; }
+    .avatar-circle {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--green); color: var(--green-dark);
+      font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Layout ──────────────────────────────────────────────── */
+    .layout { display: flex; padding-top: 80px; min-height: 100vh; }
+
+    /* ─── Sidebar ─────────────────────────────────────────────── */
+    .sidebar {
+      width: 256px; flex-shrink: 0;
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      min-height: calc(100vh - 80px);
+      position: sticky; top: 80px; align-self: flex-start;
+      height: calc(100vh - 80px);
+    }
+    .sidebar-header {
+      padding: 16px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .sidebar-header .company { font-weight: 700; font-size: 15px; color: #fff; }
+    .sidebar-header .company-sub { font-size: 12px; color: var(--sidebar-muted); }
+    .sidebar-nav { flex: 1; padding: 16px 8px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 8px; border-radius: 6px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      color: var(--sidebar-muted); text-decoration: none;
+    }
+    .sidebar-item.active {
+      background: var(--green); color: var(--green);
+    }
+    .sidebar-item.active span { color: var(--text); }
+    .sidebar-item svg { flex-shrink: 0; }
+    .sidebar-footer {
+      padding: 8px 8px 24px;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
+
+    /* ─── Main ────────────────────────────────────────────────── */
+    .main {
+      flex: 1; padding: 32px 40px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 30px; font-weight: 700; letter-spacing: -0.75px;
+      color: var(--sidebar-bg);
+    }
+    .page-header p { font-size: 16px; color: var(--muted); margin-top: 4px; }
+
+    .content-row { display: flex; gap: 24px; align-items: flex-start; }
+
+    /* ─── Filters Panel ───────────────────────────────────────── */
+    .filters-panel {
+      width: 340px; flex-shrink: 0;
+      background: var(--card-bg);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+
+    /* Seção label */
+    .filter-section { margin-bottom: 20px; }
+    .filter-section:last-child { margin-bottom: 0; }
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted);
+      margin-bottom: 10px; padding: 0 2px;
+    }
+    .section-label .label-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green); color: white;
+      font-size: 10px; margin-left: 6px; font-weight: 700;
+    }
+
+    /* Input busca */
+    .filter-search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: var(--radius-input);
+      padding: 10px 12px; background: var(--card-bg); width: 100%;
+      font-size: 14px; color: var(--muted);
+    }
+    .filter-search svg { flex-shrink: 0; }
+
+    /* Select estilo */
+    .filter-select {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: var(--radius-input);
+      padding: 10px 12px; background: var(--card-bg); width: 100%;
+      font-size: 14px; color: var(--muted); cursor: pointer;
+      position: relative;
+    }
+    .filter-select svg.icon-right { margin-left: auto; flex-shrink: 0; }
+    .filter-select + .filter-select { margin-top: 8px; }
+
+    /* Stack de selects */
+    .filter-stack { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Chips de categoria tech */
+    .tech-chips {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 12px; border-radius: 20px; font-size: 13px;
+      font-weight: 500; cursor: pointer; transition: all .15s;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      color: var(--muted);
+    }
+    .chip:hover { border-color: var(--green); color: var(--green); }
+    .chip.active {
+      background: var(--green-bg); border-color: var(--green);
+      color: var(--green-dark); font-weight: 700;
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0;
+    }
+    .toggle-row + .toggle-row { border-top: 1px solid #f0f0f0; }
+    .toggle-label { font-size: 14px; color: var(--text); }
+    .toggle-label small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+    .toggle {
+      position: relative; width: 40px; height: 22px; flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; border-radius: 11px;
+      background: var(--border); cursor: pointer; transition: .2s;
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--green); }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: white; transition: .2s; pointer-events: none;
+    }
+    .toggle input:checked ~ .toggle-thumb { left: 21px; }
+
+    /* Checkboxes */
+    .check-group { display: flex; flex-direction: column; gap: 8px; }
+    .check-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--text); cursor: pointer;
+    }
+    .check-item input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--green);
+      cursor: pointer; flex-shrink: 0;
+    }
+
+    /* Range slider */
+    .range-row { display: flex; flex-direction: column; gap: 6px; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .range-input {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      border-radius: 2px; background: var(--border); outline: none;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--green); cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(122,185,52,.2);
+    }
+
+    /* Score slider */
+    .score-value {
+      font-size: 22px; font-weight: 700; color: var(--green);
+      text-align: center; margin-bottom: 4px;
+    }
+    .score-label { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+
+    /* Botão filtros avançados */
+    .btn-advanced {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 10px 16px; border-radius: var(--radius-input);
+      border: 1.5px solid var(--green); background: transparent;
+      color: var(--green); font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all .15s; margin-top: 4px;
+    }
+    .btn-advanced:hover { background: var(--green-bg); }
+    .btn-advanced svg { transition: transform .2s; }
+    .btn-advanced.open svg { transform: rotate(180deg); }
+
+    /* Painel avançado */
+    .advanced-panel {
+      display: none; flex-direction: column; gap: 0;
+      border-top: 1px solid #f0f0f0; margin-top: 16px; padding-top: 16px;
+    }
+    .advanced-panel.open { display: flex; }
+
+    /* Divider */
+    .divider { height: 1px; background: #f0f0f0; margin: 16px 0; }
+
+    /* Botão limpar */
+    .btn-clear {
+      font-size: 13px; color: var(--muted); background: none; border: none;
+      cursor: pointer; text-decoration: underline; text-align: left;
+      padding: 0; margin-top: 8px;
+    }
+    .btn-clear:hover { color: #e44; }
+
+    /* ─── Annotation (arquitetura) ────────────────────────────── */
+    .annotation {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .7px; padding: 3px 8px; border-radius: 4px;
+      display: inline-block; margin-bottom: 2px;
+    }
+    .annotation.primary   { background: #e8f5d0; color: #3d6b12; }
+    .annotation.secondary { background: #f0edff; color: #5b3d99; }
+
+    /* ─── Results ─────────────────────────────────────────────── */
+    .results-col { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .results-meta { font-size: 14px; color: var(--muted); }
+    .results-meta strong { color: var(--text); }
+
+    /* Active filters chips */
+    .active-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .active-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 20px;
+      background: var(--green-bg); color: var(--green-dark);
+      font-size: 12px; font-weight: 600; border: 1px solid var(--green);
+    }
+    .active-chip button {
+      background: none; border: none; cursor: pointer;
+      color: var(--green-dark); font-size: 14px; line-height: 1;
+      padding: 0; display: flex;
+    }
+
+    /* Card talento */
+    .talent-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: box-shadow .15s;
+    }
+    .talent-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+    .talent-avatar {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      object-fit: cover; background: #e0e0e0;
+    }
+    .talent-avatar.initials {
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px;
+    }
+    .talent-info { flex: 1 1 180px; }
+    .talent-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .talent-location { display: flex; align-items: center; gap: 3px; font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .talent-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .meta-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 20px;
+      font-weight: 600; background: #f0f0f0; color: var(--muted);
+    }
+    .meta-tag.video { background: #fffbe6; color: #a06600; }
+    .meta-tag.pcd   { background: #e8f0ff; color: #2a5ab8; }
+    .talent-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; flex-shrink: 0; }
+    .skill-badge {
+      padding: 4px 12px; border-radius: 20px;
+      background: var(--badge-bg); color: var(--text);
+      font-size: 13px; font-weight: 500;
+    }
+    .match-score {
+      flex-shrink: 0; text-align: center; min-width: 52px;
+    }
+    .match-num {
+      font-size: 18px; font-weight: 700; color: var(--green);
+      line-height: 1;
+    }
+    .match-lbl { font-size: 10px; color: var(--muted); font-weight: 600; }
+
+    /* Pagination */
+    .pagination {
+      background: var(--card-bg); border-radius: var(--radius-panel);
+      box-shadow: var(--shadow); padding: 16px 20px;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .page-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid var(--border); background: white;
+      font-size: 14px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--text); transition: all .15s;
+    }
+    .page-btn:hover { border-color: var(--green); color: var(--green); }
+    .page-btn.active {
+      background: linear-gradient(110deg, #2ca942 16%, #55b13a 55%, #52b934 87%);
+      color: white; border: none; font-weight: 700;
+    }
+    .page-sep { font-size: 14px; color: var(--muted); padding: 0 4px; }
+
+    /* ─── Legenda arquitetura ─────────────────────────────────── */
+    .legend {
+      background: white; border-radius: var(--radius-card);
+      box-shadow: var(--shadow); padding: 16px 20px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .legend h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--sidebar-bg); }
+    .legend-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="brand-name">SCTEC</div>
+    <div class="brand-sub">Portal de Talentos</div>
+  </div>
+  <div class="navbar-right">
+    <span>TechCorp Soluções Ltda.</span>
+    <div class="avatar-circle">TC</div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="company">TechCorp Soluções Ltda.</div>
+      <div class="company-sub">Parceiro ativo</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-item active">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span style="color:#171717">Buscar Talentos</span>
+      </div>
+      <a class="sidebar-item" href="#">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Perfil da Empresa
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-item" href="#">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <h1>Banco de Talentos</h1>
+      <p>Filtre e explore perfis de alunos formados pelo programa SCTEC</p>
+    </div>
+
+    <div class="content-row">
+
+      <!-- ═══════════════════════════════════════════════════════
+           PAINEL DE FILTROS
+      ═══════════════════════════════════════════════════════ -->
+      <div class="filters-panel">
+
+        <!-- ── FILTROS PRIMÁRIOS ────────────────────────────── -->
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text)">Filtros</span>
+          <button class="btn-clear" onclick="clearAll()">Limpar todos</button>
+        </div>
+
+        <!-- Busca -->
+        <div class="filter-section">
+          <div class="annotation primary">Primário</div>
+          <div class="section-label">Busca</div>
+          <label class="filter-search">
+            <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Buscar por nome ou cidade..." style="border:none;outline:none;font-size:14px;color:var(--text);background:transparent;width:100%;font-family:inherit;" oninput="updateCount()" />
+          </label>
+        </div>
+
+        <!-- Polo Tecnológico / Localização -->
+        <div class="filter-section">
+          <div class="annotation primary">Primário</div>
+          <div class="section-label">Localização em SC</div>
+          <div class="filter-stack">
+            <div class="filter-select">
+              <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+                <option value="">Polo Tecnológico</option>
+                <optgroup label="📍 Polos Principais">
+                  <option>ACATE — Florianópolis / Grande Florianópolis</option>
+                  <option>Vale do Itajaí — Blumenau / Gaspar / Brusque</option>
+                  <option>Norte Catarinense — Joinville / Jaraguá do Sul</option>
+                  <option>Oeste de SC — Chapecó / Caçador</option>
+                  <option>Sul de SC — Criciúma / Tubarão / Araranguá</option>
+                  <option>Serra — Lages / São Joaquim</option>
+                </optgroup>
+                <optgroup label="🏙 Mesorregiões">
+                  <option>Grande Florianópolis</option>
+                  <option>Norte Catarinense</option>
+                  <option>Vale do Itajaí</option>
+                  <option>Oeste Catarinense</option>
+                  <option>Sul Catarinense</option>
+                  <option>Serrana</option>
+                </optgroup>
+              </select>
+              <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="filter-select">
+              <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+                <option value="">Cidade</option>
+                <option>Florianópolis</option><option>São José</option>
+                <option>Palhoça</option><option>Blumenau</option>
+                <option>Joinville</option><option>Criciúma</option>
+                <option>Tubarão</option><option>Araranguá</option>
+                <option>Chapecó</option><option>Lages</option>
+                <option>Laguna</option><option>Jaguaruna</option>
+                <option>Maracajá</option>
+              </select>
+              <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="filter-select">
+              <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+                <option value="">Bairro (para vagas presenciais)</option>
+                <option>Trindade — Fpolis</option>
+                <option>Itacorubi — Fpolis</option>
+                <option>Kobrasol — São José</option>
+                <option>Centro — Blumenau</option>
+                <option>Joinville — Norte</option>
+              </select>
+              <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stack Tech -->
+        <div class="filter-section">
+          <div class="annotation primary">Primário</div>
+          <div class="section-label">Especialidade Tech</div>
+          <div class="tech-chips">
+            <div class="chip" onclick="toggleChip(this)">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Front-end
+            </div>
+            <div class="chip" onclick="toggleChip(this)">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              Back-end
+            </div>
+            <div class="chip" onclick="toggleChip(this)">📱 Mobile</div>
+            <div class="chip" onclick="toggleChip(this)">📊 Data / BI</div>
+            <div class="chip" onclick="toggleChip(this)">🎨 UI/UX</div>
+            <div class="chip" onclick="toggleChip(this)">⚙️ DevOps</div>
+          </div>
+          <div class="filter-select" style="margin-top:0;">
+            <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9 19.1 19.1"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/></svg>
+            <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+              <option value="">Tecnologias específicas</option>
+              <optgroup label="Front-end">
+                <option>React</option><option>Vue.js</option>
+                <option>Angular</option><option>HTML/CSS</option>
+                <option>TypeScript</option><option>JavaScript</option>
+              </optgroup>
+              <optgroup label="Back-end">
+                <option>Node.js</option><option>Python</option>
+                <option>Java</option><option>C#/.NET</option>
+                <option>PHP</option><option>Go</option>
+              </optgroup>
+              <optgroup label="Mobile">
+                <option>React Native</option><option>Flutter</option>
+                <option>Swift / iOS</option><option>Kotlin / Android</option>
+              </optgroup>
+              <optgroup label="Data">
+                <option>SQL</option><option>Power BI</option>
+                <option>Python (Pandas)</option>
+              </optgroup>
+            </select>
+            <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- Match Score -->
+        <div class="filter-section">
+          <div class="annotation primary">Primário</div>
+          <div class="section-label">Nível mínimo de match</div>
+          <div class="score-value" id="scoreDisplay">60%</div>
+          <div class="score-label">Mínimo de compatibilidade de tecnologias</div>
+          <input type="range" class="range-input" min="0" max="100" value="60"
+            oninput="document.getElementById('scoreDisplay').textContent = this.value + '%'; updateCount()" />
+          <div class="range-labels"><span>0%</span><span>100%</span></div>
+        </div>
+
+        <!-- Vídeo Pitch toggle -->
+        <div class="filter-section">
+          <div class="annotation primary">Primário</div>
+          <div class="section-label">Mídia</div>
+          <div class="toggle-row">
+            <div class="toggle-label">
+              🎥 Possui Vídeo Pitch
+              <small>Priorizar quem já gravou apresentação</small>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" onchange="updateCount()" />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- BOTÃO FILTROS AVANÇADOS -->
+        <button class="btn-advanced" id="btnAdvanced" onclick="toggleAdvanced()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Filtros Avançados
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <!-- ══ PAINEL AVANÇADO ════════════════════════════════ -->
+        <div class="advanced-panel" id="advancedPanel">
+
+          <!-- Disponibilidade -->
+          <div class="filter-section" style="margin-top:16px;">
+            <div class="annotation secondary">Avançado</div>
+            <div class="section-label">Disponibilidade de carga horária</div>
+            <div class="check-group">
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Estágio 4h/dia
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Estágio 6h/dia
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Vaga Júnior 8h/dia (CLT)
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                PJ / Freelance
+              </label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Formação acadêmica -->
+          <div class="filter-section">
+            <div class="annotation secondary">Avançado</div>
+            <div class="section-label">Tipo de formação</div>
+            <div class="check-group">
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Bootcamp / Curso intensivo
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Técnico (SENAI / SENAC / IF)
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Superior em andamento
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Superior concluído
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Autodidatada / Online
+              </label>
+            </div>
+          </div>
+
+          <div class="filter-section" style="margin-top:10px;">
+            <div class="section-label">Semestre do curso</div>
+            <div class="filter-select">
+              <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+                <option value="">Qualquer semestre</option>
+                <option>1º semestre</option>
+                <option>2º semestre</option>
+                <option>3º ao 4º semestre</option>
+                <option>5º ao 6º semestre</option>
+                <option>7º ao 8º semestre (formando)</option>
+                <option>Já formado</option>
+              </select>
+              <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Soft Skills & Metodologias -->
+          <div class="filter-section">
+            <div class="annotation secondary">Avançado</div>
+            <div class="section-label">Soft Skills & Metodologias</div>
+            <div class="check-group">
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Vivência em Scrum / Kanban
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Projetos em equipe (GitHub colaborativo)
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Projetos voluntários / open source
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Participação em hackathons
+              </label>
+              <label class="check-item">
+                <input type="checkbox" onchange="updateCount()" />
+                Comunicação escrita destacada
+              </label>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Faixa etária -->
+          <div class="filter-section">
+            <div class="annotation secondary">Avançado</div>
+            <div class="section-label">Faixa etária</div>
+            <div class="filter-select">
+              <svg width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <select style="border:none;outline:none;font-size:14px;color:var(--muted);background:transparent;width:100%;font-family:inherit;cursor:pointer;" onchange="updateCount()">
+                <option value="">Qualquer idade</option>
+                <option>16 – 18 anos (menor aprendiz)</option>
+                <option>18 – 24 anos</option>
+                <option>25 – 30 anos</option>
+                <option>Acima de 30 anos</option>
+              </select>
+              <svg class="icon-right" width="16" height="16" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Diversidade & Inclusão -->
+          <div class="filter-section">
+            <div class="annotation secondary">Avançado</div>
+            <div class="section-label">
+              Diversidade & Inclusão
+              <span class="label-badge" title="Filtros opcionais de inclusão">♿</span>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                ♿ Pessoa com Deficiência (PCD)
+                <small>Somente talentos PCD declarados</small>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" onchange="updateCount()" />
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <div class="toggle-row" style="margin-top:8px;padding-top:10px;">
+              <div class="toggle-label">
+                🏳️‍🌈 Diversidade de gênero prioritária
+                <small>Destaca perfis de gêneros sub-representados</small>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" onchange="updateCount()" />
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="section-label" style="margin-bottom:8px;">Gênero</div>
+              <div class="check-group">
+                <label class="check-item">
+                  <input type="checkbox" onchange="updateCount()" />
+                  Feminino
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" onchange="updateCount()" />
+                  Masculino
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" onchange="updateCount()" />
+                  Não-binário / Outro
+                </label>
+                <label class="check-item">
+                  <input type="checkbox" onchange="updateCount()" />
+                  Prefiro não informar
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- fim advanced panel -->
+
+      </div>
+      <!-- fim filters-panel -->
+
+      <!-- ═══════════════════════════════════════════════════════
+           COLUNA DE RESULTADOS
+      ═══════════════════════════════════════════════════════ -->
+      <div class="results-col">
+
+        <!-- Meta + chips ativos -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div class="results-meta">Exibindo <strong id="countDisplay">6</strong> talentos</div>
+          <div class="active-filters" id="activeFilters">
+            <div class="active-chip">
+              Front-end
+              <button onclick="removeChip(this)">×</button>
+            </div>
+            <div class="active-chip">
+              Florianópolis
+              <button onclick="removeChip(this)">×</button>
+            </div>
+            <div class="active-chip">
+              🎥 Com vídeo
+              <button onclick="removeChip(this)">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards de talentos -->
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#d1f0a5;color:#3a6b10;">JS</div>
+          <div class="talent-info">
+            <div class="talent-name">João Silva</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Florianópolis, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Superior 5º sem.</span>
+              <span class="meta-tag">⏱ Estágio 6h</span>
+              <span class="meta-tag video">🎥 Vídeo Pitch</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">JavaScript</span>
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">TypeScript</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">92%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#c7deff;color:#1a3d7a;">ACL</div>
+          <div class="talent-info">
+            <div class="talent-name">Anderson Cardoso Lima</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Tubarão, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Técnico SENAI</span>
+              <span class="meta-tag">⏱ Estágio 4h</span>
+              <span class="meta-tag pcd">♿ PCD</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">Node.js</span>
+            <span class="skill-badge">Git</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">85%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#fce4ff;color:#7b1ea2;">ASS</div>
+          <div class="talent-info">
+            <div class="talent-name">Alice Silveira Santos</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Jaguaruna, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Bootcamp</span>
+              <span class="meta-tag">⏱ CLT 8h</span>
+              <span class="meta-tag video">🎥 Vídeo Pitch</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">TypeScript</span>
+            <span class="skill-badge">Node.js</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">78%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#e8f5e9;color:#2e7d32;">DS</div>
+          <div class="talent-info">
+            <div class="talent-name">Diana Santos</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Araranguá, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Superior 3º sem.</span>
+              <span class="meta-tag">⏱ Estágio 6h</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">TypeScript</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">71%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#fff3e0;color:#e65100;">EC</div>
+          <div class="talent-info">
+            <div class="talent-name">Eduardo Costa</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Criciúma, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Técnico IF</span>
+              <span class="meta-tag">⏱ Estágio 4h</span>
+              <span class="meta-tag video">🎥 Vídeo Pitch</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">TypeScript</span>
+            <span class="skill-badge">Node.js</span>
+            <span class="skill-badge">Git</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">68%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <div class="talent-card">
+          <div class="talent-avatar initials" style="background:#e3f2fd;color:#0d47a1;">GS</div>
+          <div class="talent-info">
+            <div class="talent-name">Gabriel Silva</div>
+            <div class="talent-location">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/></svg>
+              Laguna, SC
+            </div>
+            <div class="talent-meta">
+              <span class="meta-tag">🎓 Bootcamp</span>
+              <span class="meta-tag">⏱ CLT 8h</span>
+              <span class="meta-tag pcd">♿ PCD</span>
+            </div>
+          </div>
+          <div class="talent-skills">
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">TypeScript</span>
+            <span class="skill-badge">Git</span>
+          </div>
+          <div class="match-score">
+            <div class="match-num">62%</div>
+            <div class="match-lbl">match</div>
+          </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination">
+          <button class="page-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span class="page-sep">de 5</span>
+          <button class="page-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- Legenda arquitetura -->
+        <div class="legend">
+          <h3>📐 Arquitetura de informação dos filtros</h3>
+          <div class="legend-row">
+            <span class="annotation primary">Primário</span>
+            <span>Visíveis imediatamente no painel: Busca textual, Polo/Cidade/Bairro, Especialidade Tech (chips + select), Match mínimo (slider), Vídeo Pitch (toggle)</span>
+          </div>
+          <div class="legend-row" style="margin-top:8px;">
+            <span class="annotation secondary">Avançado</span>
+            <span>Ocultos em "Filtros Avançados": Disponibilidade de carga horária, Tipo de formação, Semestre, Soft skills & Metodologias, Faixa etária, PCD, Gênero</span>
+          </div>
+          <p style="margin-top:10px;font-size:12px;color:var(--muted);">
+            Os filtros <strong>PCD e Gênero</strong> ficam nos Filtros Avançados para não expor dados sensíveis no acesso primário, seguindo boas práticas de privacidade e inclusão.
+          </p>
+        </div>
+
+      </div>
+      <!-- fim results-col -->
+
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleChip(el) {
+    el.classList.toggle('active');
+    updateCount();
+  }
+
+  function toggleAdvanced() {
+    const panel = document.getElementById('advancedPanel');
+    const btn   = document.getElementById('btnAdvanced');
+    panel.classList.toggle('open');
+    btn.classList.toggle('open');
+    btn.querySelector('span') || null;
+    // troca texto
+    const spans = btn.childNodes;
+    btn.childNodes.forEach(n => {
+      if (n.nodeType === 3 && n.textContent.trim() === 'Filtros Avançados') {
+        n.textContent = panel.classList.contains('open')
+          ? ' Ocultar Avançados '
+          : ' Filtros Avançados ';
+      }
+    });
+  }
+
+  function updateCount() {
+    // Simula variação no contador
+    const base = 6;
+    const inputs = document.querySelectorAll('input[type="checkbox"]:checked, input[type="range"]');
+    const variation = Math.max(1, base - Math.floor(inputs.length * 0.8));
+    document.getElementById('countDisplay').textContent = variation;
+  }
+
+  function removeChip(btn) {
+    btn.closest('.active-chip').remove();
+    updateCount();
+  }
+
+  function clearAll() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+    document.getElementById('scoreDisplay').textContent = '60%';
+    document.querySelector('.range-input').value = 60;
+    document.getElementById('activeFilters').innerHTML = '';
+    document.getElementById('countDisplay').textContent = '6';
+  }
+</script>
+</body>
+</html>

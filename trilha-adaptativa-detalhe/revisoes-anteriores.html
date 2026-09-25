@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Revisões Anteriores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --surface-dark: #10203D;
+      --border: #224476;
+      --brand: #0059E7;
+      --text: #FFFFFF;
+      --text-secondary: #99C0FF;
+      --green: #12B76A;
+      --orange: #F79009;
+      --locked: #526D98;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 20px; height: 56px;
+    }
+    .top-bar-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 150ms;
+    }
+    .top-bar-back:hover { background: rgba(255,255,255,0.08); }
+    .top-bar-title {
+      flex: 1;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 16px; color: var(--text);
+    }
+
+    /* INTRO */
+    .intro-section {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 20px 8px;
+    }
+    .intro-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px; line-height: 22px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 16px;
+    }
+
+    /* ANOTAÇÃO */
+    .req-annotation {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,89,231,0.07);
+      border: 1px dashed rgba(63,132,243,0.35);
+      border-radius: 10px; margin-bottom: 8px;
+    }
+    .req-annotation.success { background: rgba(18,183,106,0.07); border-color: rgba(18,183,106,0.35); }
+    .req-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; padding: 3px 7px; border-radius: 100px;
+      white-space: nowrap; flex-shrink: 0;
+      background: rgba(63,132,243,0.18); color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3); margin-top: 1px;
+    }
+    .req-annotation.success .req-tag { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .req-text { font-family: 'Outfit', sans-serif; font-size: 11px; line-height: 16px; color: rgba(153,192,255,0.85); }
+    .req-text strong { color: #fff; font-weight: 600; }
+
+    /* CARDS */
+    .cards-area {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .review-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 150ms;
+    }
+    .review-card:hover { border-color: rgba(63,132,243,0.3); }
+    .review-card-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px;
+    }
+    .review-card-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .review-card-icon.done     { background: rgba(18,183,106,0.15); border: 1.5px solid rgba(18,183,106,0.4); }
+    .review-card-icon.expired  { background: rgba(82,109,152,0.12);  border: 1.5px solid rgba(82,109,152,0.3); }
+    .review-card-icon.partial  { background: rgba(247,144,9,0.12);   border: 1.5px solid rgba(247,144,9,0.35); }
+
+    .review-card-body { flex: 1; min-width: 0; }
+    .review-card-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 15px; color: var(--text);
+      margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .review-card-period {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .review-card-badge {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 100px; flex-shrink: 0;
+    }
+    .badge-done    { background: rgba(18,183,106,0.15); color: var(--green); border: 1px solid rgba(18,183,106,0.3); }
+    .badge-expired { background: rgba(82,109,152,0.1);  color: var(--locked); border: 1px solid rgba(82,109,152,0.25); }
+    .badge-partial { background: rgba(247,144,9,0.12);  color: var(--orange); border: 1px solid rgba(247,144,9,0.3); }
+
+    /* detalhes */
+    .review-card-details {
+      border-top: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .detail-pill {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .detail-pill svg { flex-shrink: 0; }
+
+    /* habilidades */
+    .skills-row {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      padding: 0 18px 14px;
+    }
+    .skill-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; font-weight: 500;
+      background: rgba(0,89,231,0.12);
+      color: #3F84F3; border: 1px solid rgba(63,132,243,0.25);
+      border-radius: 100px; padding: 3px 10px;
+    }
+
+    /* read-only button */
+    .review-card-action {
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
+    }
+    .btn-read-only {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; height: 42px;
+      background: rgba(0,89,231,0.1);
+      border: 1px solid rgba(63,132,243,0.25);
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 13px;
+      color: #3F84F3; cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-read-only:hover { background: rgba(0,89,231,0.2); }
+    .btn-read-only.disabled {
+      background: transparent;
+      border-color: rgba(82,109,152,0.2);
+      color: var(--locked); cursor: default;
+    }
+    .btn-read-only.disabled:hover { background: transparent; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .empty-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: rgba(82,109,152,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .empty-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+    .empty-text  { font-family: 'Outfit', sans-serif; font-size: 14px; color: rgba(255,255,255,0.4); }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--locked);
+      max-width: 640px; margin: 0 auto 8px;
+      padding: 0 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-back" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="top-bar-title">Revisões Anteriores</div>
+    <div style="width:36px"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro-section">
+    <div class="intro-text">
+      Todas as revisões concluídas e expiradas ficam salvas aqui. Você pode rever seus acertos e erros em modo leitura — sem gerar nova pontuação.
+    </div>
+    <div class="req-annotation">
+      <span class="req-tag">RF08</span>
+      <span class="req-text"><strong>Histórico acessível</strong> — Via Detalhe da Trilha e via Perfil do jogador. Exibe título, período, % de acertos, habilidades e status.</span>
+    </div>
+    <div class="req-annotation success">
+      <span class="req-tag">RF08</span>
+      <span class="req-text"><strong>Modo leitura</strong> — Trilhas concluídas podem ser reabertas para rever acertos e erros. <strong>Não gera nova pontuação, não altera ranking nem performance.</strong></span>
+    </div>
+  </div>
+
+  <div style="height:20px;"></div>
+  <div class="section-label">3 revisões encontradas</div>
+
+  <!-- CARDS -->
+  <div class="cards-area" id="cards-area"></div>
+
+<script>
+const REVIEWS = [
+  {
+    title: 'Revisão — Ciclo 3',
+    period: '01/08 – 14/08/2026',
+    status: 'done',
+    acertos: 67,
+    total: 12,
+    skills: ['Frações', 'Geometria Plana', 'Porcentagem'],
+  },
+  {
+    title: 'Revisão — Ciclo 2',
+    period: '15/07 – 28/07/2026',
+    status: 'expired',
+    acertos: 0,
+    total: 8,
+    skills: ['Álgebra', 'Equações'],
+  },
+  {
+    title: 'Revisão — Ciclo 1',
+    period: '01/07 – 14/07/2026',
+    status: 'done',
+    acertos: 83,
+    total: 6,
+    skills: ['Números Inteiros', 'Operações Básicas'],
+  },
+];
+
+const ICON = {
+  done:    `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#12B76A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  expired: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#526D98" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#526D98" stroke-width="2" stroke-linecap="round"/></svg>`,
+  partial: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F79009" stroke-width="1.8"/><path d="M12 8v4M12 16v.5" stroke="#F79009" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+const BADGE_LABEL = { done: 'Concluída', expired: 'Expirada', partial: 'Parcial' };
+
+function renderCards() {
+  const area = document.getElementById('cards-area');
+  area.innerHTML = REVIEWS.map(r => {
+    const canRead = r.status === 'done';
+    const btnClass = canRead ? '' : 'disabled';
+    const btnText = canRead ? 'Rever acertos e erros (modo leitura)' : 'Expirada sem conclusão';
+    const acertoText = r.status === 'expired' ? '—' : `${r.acertos}%`;
+    return `
+      <div class="review-card">
+        <div class="review-card-header">
+          <div class="review-card-icon ${r.status}">${ICON[r.status]}</div>
+          <div class="review-card-body">
+            <div class="review-card-title">${r.title}</div>
+            <div class="review-card-period">${r.period}</div>
+          </div>
+          <div class="review-card-badge badge-${r.status}">${BADGE_LABEL[r.status]}</div>
+        </div>
+        <div class="review-card-details">
+          <div class="detail-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 7" stroke="#99C0FF" stroke-width="1.8" stroke-linecap="round"/></svg>
+            ${acertoText} de acertos
+          </div>
+          <div class="detail-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#99C0FF" stroke-width="1.8"/><path d="M12 7v5l2 2" stroke="#99C0FF" stroke-width="1.8" stroke-linecap="round"/></svg>
+            ${r.total} fases
+          </div>
+        </div>
+        <div class="skills-row">
+          ${r.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+        </div>
+        <div class="review-card-action">
+          <button class="btn-read-only ${btnClass}" onclick="${canRead ? "showReadOnlyToast()" : ""}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5C5 5 1 12 1 12C1 12 5 19 12 19C19 19 23 12 23 12C23 12 19 5 12 5Z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+            </svg>
+            ${btnText}
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function showReadOnlyToast() {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#142A51;border:1px solid #224476;border-radius:10px;padding:10px 20px;font-family:'Outfit',sans-serif;font-size:13px;color:#99C0FF;z-index:999;white-space:nowrap;opacity:0;transition:opacity 200ms;pointer-events:none;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = 'Modo leitura — sem nova pontuação [RF08]';
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+renderCards();
+</script>
+</body>
+</html>

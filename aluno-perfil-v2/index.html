@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Portal de Talentos | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CSS Variables – SCTEC Design System
+    ============================================================ */
+    :root {
+      --color-primary: #2CA942;
+      --color-primary-light: #55B13A;
+      --color-primary-dark: #52B934;
+      --color-primary-gradient: linear-gradient(136deg, #2CA942 16%, #55B13A 55%, #52B934 87%);
+      --color-secondary: #7AB934;
+      --color-dark: #141414;
+      --color-text-default: #000000;
+      --color-text-secondary: rgba(0,0,0,0.8);
+      --color-text-tertiary: #454545;
+      --color-text-muted: #6B7280;
+      --color-text-invert: #FFFFFF;
+      --color-bg-white: #FFFFFF;
+      --color-bg-light: #F8F9FB;
+      --color-border-default: rgba(0,0,0,0.1);
+      --color-border-highlight: #7AB934;
+      --color-fill-opacity-white-70: rgba(255,255,255,0.7);
+      --font-header: 'Montserrat', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+      --navbar-height: 80px;
+      --sidebar-width: 256px;
+      --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.12);
+      --transition-fast: 150ms ease;
+      --transition-default: 250ms ease;
+      --spacing-4: 4px; --spacing-8: 8px; --spacing-12: 12px;
+      --spacing-16: 16px; --spacing-20: 20px; --spacing-24: 24px;
+      --spacing-28: 28px; --spacing-32: 32px; --spacing-40: 40px;
+      --spacing-48: 48px; --spacing-64: 64px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg-light);
+      color: var(--color-text-default);
+      padding-top: var(--navbar-height);
+    }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: var(--font-body); cursor: pointer; border: none; background: none; }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
+      height: var(--navbar-height);
+      background: var(--color-bg-white);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      display: flex; align-items: center; padding: 0 24px;
+    }
+    .navbar__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 1440px; margin: 0 auto;
+    }
+    .navbar__brand {
+      font-family: var(--font-header); font-weight: 800; font-size: 22px;
+      color: var(--color-text-default); display: flex; align-items: center; gap: 8px;
+    }
+    .navbar__brand-dot { color: var(--color-primary); }
+    .navbar__right { display: flex; align-items: center; gap: 16px; position: relative; }
+    .navbar__username { font-size: 14px; color: var(--color-text-muted); }
+    .navbar__avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--color-primary-gradient);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 14px; cursor: pointer;
+      transition: box-shadow var(--transition-fast);
+    }
+    .navbar__avatar:hover { box-shadow: 0 0 0 3px rgba(44,169,66,0.25); }
+    .avatar-menu {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      width: 220px; background: var(--color-bg-white); border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);
+      padding: 8px 0; z-index: 1200;
+    }
+    .avatar-menu--open { display: block; }
+    .avatar-menu__header {
+      padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 4px;
+    }
+    .avatar-menu__header strong { font-size: 14px; display: block; }
+    .avatar-menu__header span { font-size: 12px; color: var(--color-text-muted); }
+    .avatar-menu__link {
+      display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+      font-size: 14px; color: var(--color-text-secondary); transition: background var(--transition-fast);
+    }
+    .avatar-menu__link:hover { background: var(--color-bg-light); }
+    .avatar-menu__link svg { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+    .avatar-menu__link--logout { color: #E53935; }
+    .avatar-menu__divider { height: 1px; background: rgba(0,0,0,0.06); margin: 4px 0; }
+
+    /* ============================================================
+       LAYOUT (sidebar + main)
+    ============================================================ */
+    .layout { display: flex; min-height: calc(100vh - var(--navbar-height)); }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width); background: var(--color-dark);
+      color: var(--color-text-invert);
+      position: fixed; top: var(--navbar-height); left: 0;
+      height: calc(100vh - var(--navbar-height));
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 100;
+      padding: 24px 0;
+    }
+    .sidebar__user {
+      padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 8px;
+    }
+    .sidebar__avatar-lg {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--color-primary-gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; color: white;
+      margin-bottom: 10px;
+    }
+    .sidebar__name { font-family: var(--font-header); font-weight: 700; font-size: 15px; }
+    .sidebar__trilha { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .sidebar__nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; flex: 1; }
+    .sidebar__link {
+      display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+      border-radius: 8px; font-size: 14px; color: rgba(255,255,255,0.65);
+      transition: all var(--transition-fast);
+    }
+    .sidebar__link:hover { background: rgba(255,255,255,0.07); color: white; }
+    .sidebar__link--active {
+      background: rgba(44,169,66,0.15); color: var(--color-primary); font-weight: 600;
+    }
+    .sidebar__link svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+    .sidebar__link--active svg { opacity: 1; }
+    .sidebar__footer {
+      padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: auto;
+    }
+    .sidebar__logout {
+      display: flex; align-items: center; gap: 8px; font-size: 13px;
+      color: rgba(255,255,255,0.4); cursor: pointer; transition: color var(--transition-fast);
+    }
+    .sidebar__logout:hover { color: rgba(255,255,255,0.8); }
+    .sidebar__logout svg { width: 16px; height: 16px; }
+
+    /* MAIN */
+    .main {
+      flex: 1; margin-left: var(--sidebar-width);
+      padding: 32px 40px; background: var(--color-bg-light);
+    }
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .page-header__title {
+      font-family: var(--font-header); font-size: 26px; font-weight: 700;
+    }
+    .page-header__subtitle { font-size: 14px; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* Two-column content layout (form + checklist) */
+    .content-cols {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .content-cols__form {
+      flex: 1;
+      min-width: 0;
+    }
+    .content-cols__aside {
+      width: 296px;
+      flex-shrink: 0;
+      position: sticky;
+      top: calc(var(--navbar-height) + 24px);
+    }
+
+    /* ============================================================
+       PROFILE CHECKLIST CARD (lateral / sticky)
+    ============================================================ */
+    .checklist-card {
+      background: var(--color-bg-white);
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .checklist-card__title {
+      font-family: var(--font-header); font-size: 14px; font-weight: 700;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .checklist-progress {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .checklist-progress__bar {
+      flex: 1; height: 6px; background: rgba(0,0,0,0.07); border-radius: 99px; overflow: hidden;
+    }
+    .checklist-progress__fill {
+      height: 100%; background: var(--color-primary-gradient);
+      border-radius: 99px; transition: width 0.6s ease;
+    }
+    .checklist-progress__pct { font-size: 13px; font-weight: 700; color: var(--color-primary); white-space: nowrap; }
+    /* Coluna única no modo lateral */
+    .checklist-items { display: flex; flex-direction: column; gap: 10px; }
+    .checklist-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--color-text-muted);
+      padding: 8px 10px; border-radius: 8px;
+      transition: background var(--transition-fast);
+    }
+    .checklist-item--done {
+      color: var(--color-primary);
+      background: rgba(44,169,66,0.05);
+    }
+    .checklist-item__icon {
+      width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid currentColor;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .checklist-item--done .checklist-item__icon {
+      background: var(--color-primary); border-color: var(--color-primary); color: white;
+    }
+    .checklist-card__footer {
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);
+      font-size: 12px; color: var(--color-text-muted); line-height: 1.5; text-align: center;
+    }
+
+    /* ============================================================
+       FORM CARD (base section)
+    ============================================================ */
+    .form-card {
+      background: var(--color-bg-white);
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .form-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .form-card__title {
+      font-family: var(--font-header); font-size: 16px; font-weight: 700;
+    }
+    .form-card__subtitle {
+      font-size: 13px; color: var(--color-text-muted); margin-top: 2px;
+    }
+    .form-card__body { padding: 24px; }
+
+    /* ============================================================
+       INPUTS / SELECTS
+    ============================================================ */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field__label {
+      font-size: 13px; font-weight: 500; color: var(--color-text-tertiary);
+    }
+    .field__required { color: #E53935; margin-left: 2px; }
+    .field__input, .field__select, .field__textarea {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
+      font-size: 14px; font-family: var(--font-body); color: var(--color-text-default);
+      background: var(--color-bg-white); transition: border-color var(--transition-fast);
+    }
+    .field__input:focus, .field__select:focus, .field__textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(44,169,66,0.1);
+      outline: none;
+    }
+    .field__input::placeholder, .field__textarea::placeholder { color: #9CA3AF; }
+    .field__textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    .field__select {
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .field__hint { font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-full { grid-column: 1 / -1; }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      font-family: var(--font-body); font-weight: 600; font-size: 14px;
+      padding: 11px 22px; border-radius: 80px;
+      cursor: pointer; transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+      white-space: nowrap; border: none;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn:active { transform: translateY(0); }
+    .btn--primary { background: var(--color-primary-gradient); color: white; }
+    .btn--outline {
+      border: 1.5px solid var(--color-primary); color: var(--color-primary);
+      background: white;
+    }
+    .btn--outline:hover { background: rgba(44,169,66,0.06); }
+    .btn--ghost { color: var(--color-text-tertiary); padding: 8px 14px; }
+    .btn--ghost:hover { background: rgba(0,0,0,0.05); box-shadow: none; transform: none; }
+    .btn--sm { padding: 7px 16px; font-size: 13px; }
+    .btn--danger-ghost { color: #E53935; padding: 6px 12px; }
+    .btn--danger-ghost:hover { background: rgba(229,57,53,0.06); box-shadow: none; transform: none; }
+    .btn svg { width: 16px; height: 16px; }
+
+    /* ============================================================
+       AVATAR SECTION
+    ============================================================ */
+    .avatar-upload-area {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .avatar-wrap {
+      position: relative; width: 96px; height: 96px; flex-shrink: 0; cursor: pointer;
+    }
+    .avatar-wrap__img {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: #E5E7EB;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-header); font-weight: 700; font-size: 28px;
+      color: var(--color-text-muted); overflow: hidden; border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .avatar-wrap__img img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-wrap__edit {
+      position: absolute; bottom: 0; right: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--color-primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .avatar-wrap__edit svg { width: 14px; height: 14px; }
+    .avatar-upload-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .avatar-upload-info p { font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
+
+    /* ============================================================
+       BADGE SELECTOR (interest / skills)
+    ============================================================ */
+    .badge-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge-sel {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      border: 1.5px solid rgba(0,0,0,0.12); color: var(--color-text-tertiary);
+      background: white; cursor: pointer; transition: all var(--transition-fast);
+      user-select: none;
+    }
+    .badge-sel:hover { border-color: var(--color-primary); color: var(--color-primary); background: rgba(44,169,66,0.04); }
+    .badge-sel--active {
+      border-color: var(--color-primary); background: rgba(44,169,66,0.1);
+      color: var(--color-primary); font-weight: 600;
+    }
+    .badge-sel--active .badge-sel__check { opacity: 1; }
+    .badge-sel__check { opacity: 0; transition: opacity var(--transition-fast); }
+    .badge-sel__check svg { width: 12px; height: 12px; }
+    .badge-subsection { margin-bottom: 20px; }
+    .badge-subsection__label {
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--color-text-muted); margin-bottom: 10px;
+    }
+
+    /* ============================================================
+       EXPERIENCE / CERTIFICATE CARDS
+    ============================================================ */
+    .entry-list { display: flex; flex-direction: column; gap: 12px; }
+    .entry-item {
+      background: var(--color-bg-light); border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 10px; padding: 16px 20px;
+      display: flex; gap: 14px; align-items: flex-start; position: relative;
+    }
+    .entry-item__icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: rgba(44,169,66,0.1); color: var(--color-primary);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .entry-item__icon svg { width: 20px; height: 20px; }
+    .entry-item__body { flex: 1; min-width: 0; }
+    .entry-item__title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .entry-item__sub { font-size: 13px; color: var(--color-text-muted); }
+    .entry-item__desc { font-size: 13px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.5; }
+    .entry-item__actions {
+      display: flex; gap: 4px; flex-shrink: 0; margin-left: auto;
+    }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 6px; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--color-text-muted); transition: all var(--transition-fast);
+    }
+    .icon-btn:hover { background: rgba(0,0,0,0.07); color: var(--color-text-default); }
+    .icon-btn--danger:hover { background: rgba(229,57,53,0.08); color: #E53935; }
+    .icon-btn svg { width: 16px; height: 16px; }
+    .entry-empty {
+      text-align: center; padding: 24px; color: var(--color-text-muted);
+      font-size: 14px; border: 1.5px dashed rgba(0,0,0,0.12);
+      border-radius: 10px;
+    }
+    .entry-empty svg { width: 28px; height: 28px; margin: 0 auto 8px; display: block; opacity: 0.4; }
+
+    /* ============================================================
+       IDIOMA TAG (in list)
+    ============================================================ */
+    .lang-item {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      padding: 8px 14px; font-size: 14px;
+    }
+    .lang-item__name { font-weight: 600; }
+    .lang-item__level { color: var(--color-text-muted); font-size: 13px; }
+    .lang-item__remove {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted); cursor: pointer; font-size: 16px; line-height: 1;
+    }
+    .lang-item__remove:hover { background: rgba(0,0,0,0.06); }
+
+    /* ============================================================
+       PCD RADIO GROUP
+    ============================================================ */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      border: 1.5px solid rgba(0,0,0,0.12); color: var(--color-text-tertiary);
+      background: white; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .radio-badge input { display: none; }
+    .radio-badge:has(input:checked) {
+      border-color: var(--color-primary); background: rgba(44,169,66,0.1);
+      color: var(--color-primary); font-weight: 600;
+    }
+    .radio-badge:hover { border-color: var(--color-primary); }
+
+    /* ============================================================
+       ALERT BANNER
+    ============================================================ */
+    .alert-banner {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px; border-radius: 10px; font-size: 14px;
+      background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+      color: #92400E;
+    }
+    .alert-banner svg { width: 20px; height: 20px; flex-shrink: 0; color: #F59E0B; margin-top: 1px; }
+    .alert-banner p { line-height: 1.5; }
+    .alert-banner a { color: var(--color-primary); font-weight: 600; text-decoration: underline; }
+
+    /* ============================================================
+       FOOTER CARD (save button)
+    ============================================================ */
+    .form-footer {
+      background: var(--color-bg-white); border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 12px; padding: 20px 24px;
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 12px; margin-bottom: 40px;
+    }
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 2000;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-backdrop--open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px;
+      width: 100%; max-width: 560px; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal--sm { max-width: 440px; }
+    .modal--lg { max-width: 680px; }
+    .modal__head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid rgba(0,0,0,0.07);
+      position: sticky; top: 0; background: white; z-index: 1;
+    }
+    .modal__head h2 { font-family: var(--font-header); font-size: 18px; font-weight: 700; }
+    .modal__close {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: var(--color-text-muted); cursor: pointer; line-height: 1;
+    }
+    .modal__close:hover { background: var(--color-bg-light); }
+    .modal__body { padding: 24px; }
+    .modal__body .grid-2 { gap: 14px; }
+    .modal__body .field { margin-bottom: 16px; }
+    .modal__body .field:last-child { margin-bottom: 0; }
+    .modal__foot {
+      padding: 16px 24px; border-top: 1px solid rgba(0,0,0,0.07);
+      display: flex; justify-content: flex-end; gap: 10px;
+      position: sticky; bottom: 0; background: white;
+    }
+    .modal__subtitle { font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.5; }
+    .modal__count { font-size: 12px; color: var(--color-text-muted); }
+    .modal__count span { font-weight: 700; color: var(--color-primary); }
+
+    /* SKILLS GRID inside modal */
+    .skills-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .skill-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+      border: 1.5px solid rgba(0,0,0,0.1); color: var(--color-text-tertiary);
+      background: white; cursor: pointer; transition: all var(--transition-fast);
+      user-select: none;
+    }
+    .skill-tag:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .skill-tag--active {
+      background: rgba(44,169,66,0.1); border-color: var(--color-primary);
+      color: var(--color-primary); font-weight: 600;
+    }
+    .skill-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--color-text-muted); margin: 14px 0 8px; display: block; width: 100%;
+    }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1a1a1a; color: white; padding: 11px 22px;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s; pointer-events: none;
+    }
+    .toast--on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ============================================================
+       VIEW TOGGLE (modo edição / visualização)
+    ============================================================ */
+    .view-toggle {
+      display: flex; background: rgba(0,0,0,0.05); border-radius: 8px;
+      padding: 3px; gap: 2px;
+    }
+    .view-toggle__btn {
+      padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      color: var(--color-text-muted); cursor: pointer; transition: all var(--transition-fast);
+    }
+    .view-toggle__btn--active {
+      background: white; color: var(--color-text-default);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* ============================================================
+       COMPLETE PROFILE VIEW (preview mode)
+    ============================================================ */
+    .profile-preview { display: none; }
+    .profile-preview--visible { display: block; }
+    .profile-edit--hidden { display: none; }
+
+    .preview-hero {
+      background: var(--color-bg-white); border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 12px; padding: 28px 24px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 24px;
+    }
+    .preview-hero__avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: var(--color-primary-gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-header); font-weight: 700; font-size: 28px;
+      color: white; flex-shrink: 0; overflow: hidden;
+    }
+    .preview-hero__avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-hero__name { font-family: var(--font-header); font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .preview-hero__meta { font-size: 14px; color: var(--color-text-muted); margin-bottom: 10px; }
+    .preview-hero__links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .preview-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.12); font-size: 13px; color: var(--color-text-secondary);
+      background: white; transition: all var(--transition-fast);
+    }
+    .preview-link:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .preview-link svg { width: 14px; height: 14px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1100px) {
+      .content-cols__aside { width: 260px; }
+    }
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 16px; }
+      .content-cols { flex-direction: column-reverse; }
+      .content-cols__aside { width: 100%; position: static; }
+      .checklist-items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+    }
+    @media (max-width: 600px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .checklist-items { grid-template-columns: 1fr; }
+      .avatar-upload-area { flex-direction: column; align-items: flex-start; }
+      .page-header { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__brand">
+        SCTEC<span class="navbar__brand-dot">.</span>
+      </div>
+      <div class="navbar__right">
+        <span class="navbar__username">João Silva</span>
+        <div class="navbar__avatar" id="nav-avatar" onclick="toggleAvatarMenu()">JS</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header">
+            <strong>João Silva</strong>
+            <span>Desenvolvimento de Software</span>
+          </div>
+          <a href="#" class="avatar-menu__link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Buscar Empresas
+          </a>
+          <a href="#" class="avatar-menu__link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Meu Perfil
+          </a>
+          <div class="avatar-menu__divider"></div>
+          <a href="#" class="avatar-menu__link avatar-menu__link--logout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sair
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       LAYOUT
+  ============================================================ -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar-lg">JS</div>
+        <div class="sidebar__name">João Silva</div>
+        <div class="sidebar__trilha">Desenvolvimento de Software</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Buscar Empresas
+        </a>
+        <a href="#" class="sidebar__link sidebar__link--active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Meu Perfil
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Vagas para mim
+        </a>
+        <a href="#" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Meu desempenho
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="sidebar__logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair da conta
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-header__title">Meu Perfil</h1>
+          <p class="page-header__subtitle">Preencha suas informações para que as empresas possam te encontrar</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="view-toggle">
+            <button class="view-toggle__btn view-toggle__btn--active" onclick="setView('edit',this)">Editar</button>
+            <button class="view-toggle__btn" onclick="setView('preview',this)">Visualizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT COLS: form + checklist lateral -->
+      <div class="content-cols" id="content-cols">
+
+        <!-- FORM COLUMN -->
+        <div class="content-cols__form">
+
+      <!-- ======================================================
+           EDIT MODE
+      ====================================================== -->
+      <form id="edit-form" onsubmit="event.preventDefault(); saveProfile();">
+
+        <!-- 1. FOTO DE PERFIL -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Foto de perfil</div>
+            </div>
+          </div>
+          <div class="form-card__body">
+            <div class="avatar-upload-area">
+              <div class="avatar-wrap" onclick="document.getElementById('avatar-input').click()" title="Clique para alterar foto">
+                <div class="avatar-wrap__img" id="avatar-display">JS</div>
+                <div class="avatar-wrap__edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatar(this)">
+              </div>
+              <div class="avatar-upload-info">
+                <h3>Adicionar foto</h3>
+                <p>JPG ou PNG, até 5 MB.<br>Uma boa foto aumenta suas chances com recrutadores.</p>
+                <div style="margin-top:10px;display:flex;gap:8px;">
+                  <button type="button" class="btn btn--outline btn--sm" onclick="document.getElementById('avatar-input').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Enviar foto
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. DADOS PESSOAIS -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Dados pessoais</div>
+              <div class="form-card__subtitle">Informações básicas do seu perfil</div>
+            </div>
+          </div>
+          <div class="form-card__body">
+            <div class="grid-2" style="margin-bottom:16px;">
+              <div class="field grid-full">
+                <label class="field__label">Nome completo <span class="field__required">*</span></label>
+                <input type="text" class="field__input" id="f-nome" value="João Silva" required>
+              </div>
+              <div class="field">
+                <label class="field__label">E-mail <span class="field__required">*</span></label>
+                <input type="email" class="field__input" id="f-email" value="joao.silva@email.com" required>
+              </div>
+              <div class="field">
+                <label class="field__label">Telefone / WhatsApp</label>
+                <input type="tel" class="field__input" id="f-tel" value="(48) 99123-4567" placeholder="(XX) XXXXX-XXXX">
+              </div>
+              <div class="field">
+                <label class="field__label">Cidade <span class="field__required">*</span></label>
+                <input type="text" class="field__input" id="f-cidade" value="Florianópolis" required>
+              </div>
+              <div class="field">
+                <label class="field__label">Estado</label>
+                <select class="field__select" id="f-estado">
+                  <option value="SC" selected>Santa Catarina – SC</option>
+                  <option value="SP">São Paulo – SP</option>
+                  <option value="PR">Paraná – PR</option>
+                  <option value="RS">Rio Grande do Sul – RS</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label">Nível de escolaridade</label>
+                <select class="field__select" id="f-escolaridade">
+                  <option value="">Selecione...</option>
+                  <option value="ensino-medio">Ensino Médio Completo</option>
+                  <option value="tecnico" selected>Técnico em andamento</option>
+                  <option value="tecnico-completo">Técnico Completo</option>
+                  <option value="superior">Superior em andamento</option>
+                  <option value="superior-completo">Superior Completo</option>
+                  <option value="pos">Pós-graduação</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label">Trilha SCTEC</label>
+                <select class="field__select" id="f-trilha">
+                  <option value="dev-software" selected>Desenvolvimento de Software</option>
+                  <option value="dados-ia">Dados e IA</option>
+                  <option value="ciberseg">Cibersegurança</option>
+                  <option value="cloud">Cloud Computing</option>
+                  <option value="ux">UX/Design</option>
+                  <option value="marketing">Marketing Digital</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label">Disponibilidade</label>
+                <select class="field__select" id="f-disponibilidade">
+                  <option value="">Selecione...</option>
+                  <option value="imediata" selected>Imediata</option>
+                  <option value="15-dias">Em 15 dias</option>
+                  <option value="30-dias">Em 30 dias</option>
+                  <option value="a-combinar">A combinar</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. SOBRE MIM -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Sobre mim</div>
+              <div class="form-card__subtitle">Uma apresentação curta para as empresas</div>
+            </div>
+          </div>
+          <div class="form-card__body">
+            <div class="field">
+              <label class="field__label">Apresentação <span class="field__required">*</span></label>
+              <textarea class="field__textarea" id="f-sobre" rows="4" style="min-height:100px" oninput="countChars(this,'sobre-count',500)">Desenvolvedor front-end em formação pelo programa SCTEC. Apaixonado por interfaces responsivas e boas práticas de código. Buscando minha primeira oportunidade profissional na área de desenvolvimento web.</textarea>
+              <span class="field__hint" id="sobre-count">196/500 caracteres</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. CERTIFICADOS -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Certificados SCTEC</div>
+              <div class="form-card__subtitle">Certificados obtidos nas trilhas do programa</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-cert')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <div class="form-card__body">
+            <div class="entry-list" id="cert-list">
+              <div class="entry-empty" id="cert-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 15l8.385-8.415a2.1 2.1 0 000-2.97L18.415 1.64a2.1 2.1 0 00-2.97 0L7 10M12 15l-4.5 4.5M12 15H7m5 0v5m4.5-4.5L21 21"/></svg>
+                Nenhum certificado adicionado ainda
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. EXPERIÊNCIA PROFISSIONAL -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Experiência profissional</div>
+              <div class="form-card__subtitle">Inclua estágios, empregos, freelas e projetos relevantes</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-exp')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <div class="form-card__body">
+            <div class="entry-list" id="exp-list">
+              <div class="entry-item">
+                <div class="entry-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+                </div>
+                <div class="entry-item__body">
+                  <div class="entry-item__title">Estagiário de Desenvolvimento</div>
+                  <div class="entry-item__sub">StartupSC · Mar 2026 – Atual</div>
+                  <div class="entry-item__desc">Desenvolvimento de features no front-end com React e TypeScript. Participação em code reviews e dailys ágeis.</div>
+                </div>
+                <div class="entry-item__actions">
+                  <button type="button" class="icon-btn icon-btn--danger" title="Remover" onclick="removeEntry(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. ÁREA DE INTERESSE -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Área de interesse</div>
+              <div class="form-card__subtitle">Quais segmentos você quer trabalhar?</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-interesse')">Editar</button>
+          </div>
+          <div class="form-card__body">
+            <!-- Área principal -->
+            <div class="badge-subsection">
+              <div class="badge-subsection__label">Qual é a área que mais lhe atrai?</div>
+              <div class="badge-selector" id="interesse-area">
+                <span class="badge-sel">Desenvolvimento de Software</span>
+                <span class="badge-sel">Dados e Análise</span>
+                <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Inteligência Artificial</span>
+              </div>
+            </div>
+            <!-- Especialidade -->
+            <div class="badge-subsection">
+              <div class="badge-subsection__label">Qual é sua especialidade?</div>
+              <div class="badge-selector" id="interesse-esp">
+                <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Front-end</span>
+                <span class="badge-sel">Back-end</span>
+                <span class="badge-sel">Full Stack</span>
+                <span class="badge-sel">Mobile</span>
+                <span class="badge-sel">DevOps</span>
+                <span class="badge-sel">Data Science</span>
+                <span class="badge-sel">Machine Learning</span>
+                <span class="badge-sel">Segurança da Informação</span>
+                <span class="badge-sel">UX/UI Design</span>
+                <span class="badge-sel">Banco de Dados</span>
+              </div>
+            </div>
+            <!-- Tecnologia -->
+            <div class="badge-subsection">
+              <div class="badge-subsection__label">Em qual tecnologia?</div>
+              <div class="badge-selector" id="interesse-tec">
+                <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>React</span>
+                <span class="badge-sel">Angular</span>
+                <span class="badge-sel">Vue.js</span>
+                <span class="badge-sel">Node.js</span>
+                <span class="badge-sel">Python</span>
+                <span class="badge-sel">Java</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. LINKS / PORTFÓLIO -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Links e portfólio</div>
+              <div class="form-card__subtitle">Ajuda recrutadores a conhecer seu trabalho</div>
+            </div>
+          </div>
+          <div class="form-card__body">
+            <div class="grid-2">
+              <div class="field">
+                <label class="field__label">GitHub</label>
+                <input type="url" class="field__input" id="f-github" value="https://github.com/joaosilva" placeholder="https://github.com/seu-usuario">
+              </div>
+              <div class="field">
+                <label class="field__label">LinkedIn</label>
+                <input type="url" class="field__input" id="f-linkedin" placeholder="https://linkedin.com/in/seu-perfil">
+              </div>
+              <div class="field">
+                <label class="field__label">Portfólio / site pessoal</label>
+                <input type="url" class="field__input" id="f-portfolio" value="https://joaosilva.dev" placeholder="https://seusite.com">
+              </div>
+              <div class="field">
+                <label class="field__label">Vídeo de apresentação (YouTube)</label>
+                <input type="url" class="field__input" id="f-video" placeholder="https://youtube.com/watch?v=..." oninput="updateVideo()">
+              </div>
+            </div>
+            <div id="video-wrap" style="display:none; margin-top:16px; border-radius:10px; overflow:hidden; aspect-ratio:16/9; max-width:480px; background:#000;"></div>
+          </div>
+        </div>
+
+        <!-- 8. HARD SKILLS -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Hard Skills</div>
+              <div class="form-card__subtitle">Até 10 habilidades técnicas (quanto mais específico, melhor)</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-hard')">Editar skills</button>
+          </div>
+          <div class="form-card__body">
+            <div class="badge-selector" id="hard-display">
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>React</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>TypeScript</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Node.js</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Git</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>PostgreSQL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. SOFT SKILLS -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Soft Skills</div>
+              <div class="form-card__subtitle">Suas competências comportamentais</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-soft')">Editar</button>
+          </div>
+          <div class="form-card__body">
+            <div class="badge-selector" id="soft-display">
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Comunicação</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Trabalho em equipe</span>
+              <span class="badge-sel badge-sel--active"><span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>Proatividade</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. IDIOMAS -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Idiomas</div>
+              <div class="form-card__subtitle">Informe os idiomas que você fala</div>
+            </div>
+            <button type="button" class="btn btn--outline btn--sm" onclick="openModal('modal-idioma')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <div class="form-card__body">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;" id="idioma-list">
+              <div class="lang-item">
+                <span class="lang-item__name">Inglês</span>
+                <span class="lang-item__level">· Intermediário</span>
+                <span class="lang-item__remove" onclick="removeParent(this, '.lang-item')">&times;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11. INFORMAÇÕES ADICIONAIS (PCD) -->
+        <div class="form-card">
+          <div class="form-card__header">
+            <div>
+              <div class="form-card__title">Informações adicionais</div>
+              <div class="form-card__subtitle">Informações de acessibilidade (confidenciais, visíveis apenas para RH)</div>
+            </div>
+          </div>
+          <div class="form-card__body">
+            <div style="margin-bottom:20px;">
+              <div class="field__label" style="margin-bottom:10px;">Pessoa com deficiência (PCD)?</div>
+              <div class="radio-group" id="pcd-group">
+                <label class="radio-badge"><input type="radio" name="pcd" value="nao" checked> Não</label>
+                <label class="radio-badge"><input type="radio" name="pcd" value="sim"> Sim</label>
+                <label class="radio-badge"><input type="radio" name="pcd" value="prefiro"> Prefiro não informar</label>
+              </div>
+            </div>
+            <div>
+              <div class="field__label" style="margin-bottom:10px;">Necessita de adaptação/recursos de acessibilidade para participar de processos seletivos?</div>
+              <div class="radio-group" id="adapt-group">
+                <label class="radio-badge"><input type="radio" name="adapt" value="nao" checked> Não</label>
+                <label class="radio-badge"><input type="radio" name="adapt" value="sim"> Sim</label>
+                <label class="radio-badge"><input type="radio" name="adapt" value="prefiro"> Não tenho certeza ainda</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERT -->
+        <div class="alert-banner" id="alert-incompleto" style="margin-bottom:20px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>Seu perfil ainda está incompleto. Adicione certificados, experiências e habilidades para aumentar suas chances de ser encontrado pelas empresas. <a href="#" onclick="scrollTop()">Ver o que falta</a></p>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="form-footer">
+          <button type="button" class="btn btn--ghost" onclick="showToast('Alterações descartadas.')">Cancelar</button>
+          <button type="submit" class="btn btn--primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Salvar perfil
+          </button>
+        </div>
+
+      </form><!-- /edit-form -->
+
+      <!-- ======================================================
+           PREVIEW MODE
+      ====================================================== -->
+      <div id="preview-mode" class="profile-preview">
+        <div class="preview-hero">
+          <div class="preview-hero__avatar" id="preview-avatar">JS</div>
+          <div>
+            <div class="preview-hero__name" id="preview-nome">João Silva</div>
+            <div class="preview-hero__meta" id="preview-meta">Desenvolvimento de Software · Florianópolis, SC</div>
+            <div class="preview-hero__links">
+              <a href="#" class="preview-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                GitHub
+              </a>
+              <a href="#" class="preview-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                LinkedIn
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card__header"><div class="form-card__title">Sobre mim</div></div>
+          <div class="form-card__body" id="preview-sobre" style="font-size:14px;color:#454545;line-height:1.7;">
+            Desenvolvedor front-end em formação pelo programa SCTEC. Apaixonado por interfaces responsivas e boas práticas de código.
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card__header"><div class="form-card__title">Hard Skills</div></div>
+          <div class="form-card__body">
+            <div class="badge-selector" id="preview-hard"></div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card__header"><div class="form-card__title">Experiência profissional</div></div>
+          <div class="form-card__body">
+            <div class="entry-list" id="preview-exp">
+              <div class="entry-item">
+                <div class="entry-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+                </div>
+                <div class="entry-item__body">
+                  <div class="entry-item__title">Estagiário de Desenvolvimento</div>
+                  <div class="entry-item__sub">StartupSC · Mar 2026 – Atual</div>
+                  <div class="entry-item__desc">Desenvolvimento de features no front-end com React e TypeScript. Participação em code reviews e dailys ágeis.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /layout -->
+
+  <!-- ============================================================
+       MODAL: Adicionar Certificado
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-cert">
+    <div class="modal modal--sm">
+      <div class="modal__head">
+        <h2>Adicionar Certificado</h2>
+        <button class="modal__close" onclick="closeModal('modal-cert')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">Trilha / Programa <span class="field__required">*</span></label>
+          <select class="field__select" id="cert-trilha">
+            <option value="">Selecione a trilha...</option>
+            <option value="dev-software">Desenvolvimento de Software</option>
+            <option value="dados-ia">Dados e Inteligência Artificial</option>
+            <option value="ciberseg">Cibersegurança</option>
+            <option value="cloud">Cloud Computing</option>
+            <option value="ux">UX e Design Digital</option>
+            <option value="marketing">Marketing Digital</option>
+            <option value="empreend">Empreendedorismo Digital</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label">Título do certificado <span class="field__required">*</span></label>
+          <input type="text" class="field__input" id="cert-titulo" placeholder="Ex: Certificado de Conclusão - Módulo 1">
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label class="field__label">Instituição</label>
+            <input type="text" class="field__input" id="cert-inst" value="SCTEC" placeholder="Ex: SCTEC / SENAI / Udemy">
+          </div>
+          <div class="field">
+            <label class="field__label">Carga horária</label>
+            <input type="text" class="field__input" id="cert-horas" placeholder="Ex: 120h">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label class="field__label">Mês/Ano de conclusão</label>
+            <input type="month" class="field__input" id="cert-data">
+          </div>
+          <div class="field">
+            <label class="field__label">Link do certificado</label>
+            <input type="url" class="field__input" id="cert-link" placeholder="https://...">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label">Upload do arquivo (PDF/imagem)</label>
+          <input type="file" class="field__input" id="cert-file" accept=".pdf,image/*" style="padding:8px;">
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-cert')">Cancelar</button>
+        <button class="btn btn--primary" onclick="addCertificado()">Salvar certificado</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: Adicionar Experiência
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-exp">
+    <div class="modal">
+      <div class="modal__head">
+        <h2>Adicionar Experiência</h2>
+        <button class="modal__close" onclick="closeModal('modal-exp')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="grid-2">
+          <div class="field">
+            <label class="field__label">Cargo / Função <span class="field__required">*</span></label>
+            <input type="text" class="field__input" id="exp-cargo" placeholder="Ex: Desenvolvedor Júnior">
+          </div>
+          <div class="field">
+            <label class="field__label">Empresa <span class="field__required">*</span></label>
+            <input type="text" class="field__input" id="exp-empresa" placeholder="Nome da empresa">
+          </div>
+          <div class="field">
+            <label class="field__label">Tipo</label>
+            <select class="field__select" id="exp-tipo">
+              <option value="emprego">Emprego</option>
+              <option value="estagio" selected>Estágio</option>
+              <option value="freela">Freelance</option>
+              <option value="voluntario">Voluntário</option>
+              <option value="projeto">Projeto pessoal</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label">Modalidade</label>
+            <select class="field__select" id="exp-mod">
+              <option value="presencial">Presencial</option>
+              <option value="remoto" selected>Remoto</option>
+              <option value="hibrido">Híbrido</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label">Início <span class="field__required">*</span></label>
+            <input type="month" class="field__input" id="exp-inicio">
+          </div>
+          <div class="field" id="exp-fim-group">
+            <label class="field__label">Fim (vazio = atual)</label>
+            <input type="month" class="field__input" id="exp-fim">
+          </div>
+        </div>
+        <div style="margin:12px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="exp-atual" onchange="toggleAtual(this)"> Trabalho aqui atualmente
+          </label>
+        </div>
+        <div class="field">
+          <label class="field__label">Descrição das atividades</label>
+          <textarea class="field__textarea" id="exp-desc" rows="3" placeholder="Descreva suas principais atividades e realizações..."></textarea>
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-exp')">Cancelar</button>
+        <button class="btn btn--primary" onclick="addExperiencia()">Salvar experiência</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: Área de Interesse
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-interesse">
+    <div class="modal modal--lg">
+      <div class="modal__head">
+        <h2>Área de interesse</h2>
+        <button class="modal__close" onclick="closeModal('modal-interesse')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__subtitle">Selecione a área, especialidade e tecnologia de seu interesse. Isso ajuda as empresas a te encontrar mais rápido.</p>
+
+        <div class="badge-subsection">
+          <div class="badge-subsection__label">Qual é a área que mais lhe atrai?</div>
+          <div class="skills-grid">
+            <span class="skill-tag skill-tag--active" onclick="toggleSkill(this,'area')">Desenvolvimento de Software</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'area')">Dados e Análise</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'area')">Inteligência Artificial</span>
+          </div>
+        </div>
+
+        <div class="badge-subsection">
+          <div class="badge-subsection__label">Qual é sua especialidade?</div>
+          <div class="skills-grid">
+            <span class="skill-tag skill-tag--active" onclick="toggleSkill(this,'esp')">Front-end</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Back-end</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Full Stack</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Mobile</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">DevOps/Cloud</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Data Science</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Machine Learning</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Segurança da Informação</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">UX/UI Design</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">Gestão de Projetos</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'esp')">QA / Testes</span>
+          </div>
+        </div>
+
+        <div class="badge-subsection">
+          <div class="badge-subsection__label">Em qual tecnologia principal?</div>
+          <div class="skills-grid">
+            <span class="skill-tag skill-tag--active" onclick="toggleSkill(this,'tec')">React</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Angular</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Vue.js</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Next.js</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Node.js</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Python</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">Java</span>
+            <span class="skill-tag" onclick="toggleSkill(this,'tec')">C#</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-interesse')">Cancelar</button>
+        <button class="btn btn--primary" onclick="closeModal('modal-interesse'); showToast('Área de interesse atualizada.')">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: Hard Skills
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-hard">
+    <div class="modal modal--lg">
+      <div class="modal__head">
+        <h2>Hard Skills</h2>
+        <button class="modal__close" onclick="closeModal('modal-hard')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__subtitle">Selecione até 10 habilidades técnicas que você domina. Selecionadas: <span id="hard-count">5</span>/10</p>
+        <div class="skills-grid" id="hard-skill-grid">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-hard')">Cancelar</button>
+        <button class="btn btn--primary" onclick="saveHardSkills()">Salvar skills</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: Soft Skills
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-soft">
+    <div class="modal modal--lg">
+      <div class="modal__head">
+        <h2>Soft Skills</h2>
+        <button class="modal__close" onclick="closeModal('modal-soft')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__subtitle">Selecione até 8 competências comportamentais.</p>
+        <div class="skills-grid" id="soft-skill-grid">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-soft')">Cancelar</button>
+        <button class="btn btn--primary" onclick="saveSoftSkills()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: Adicionar Idioma
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-idioma">
+    <div class="modal modal--sm">
+      <div class="modal__head">
+        <h2>Adicionar Idioma</h2>
+        <button class="modal__close" onclick="closeModal('modal-idioma')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">Idioma <span class="field__required">*</span></label>
+          <select class="field__select" id="idioma-nome">
+            <option value="">Selecione...</option>
+            <option value="Inglês" selected>Inglês</option>
+            <option value="Espanhol">Espanhol</option>
+            <option value="Mandarim">Mandarim</option>
+            <option value="Alemão">Alemão</option>
+            <option value="Francês">Francês</option>
+            <option value="Italiano">Italiano</option>
+            <option value="Japonês">Japonês</option>
+            <option value="Português">Português (outro dialeto)</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label">Nível <span class="field__required">*</span></label>
+          <select class="field__select" id="idioma-nivel">
+            <option value="">Selecione...</option>
+            <option value="Básico">Básico</option>
+            <option value="Intermediário" selected>Intermediário</option>
+            <option value="Avançado">Avançado</option>
+            <option value="Fluente">Fluente</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" onclick="closeModal('modal-idioma')">Cancelar</button>
+        <button class="btn btn--primary" onclick="addIdioma()">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================
+       SCRIPT
+  ============================================================ -->
+  <script>
+    /* ========== STATE ========== */
+    const hardSkillsAll = [
+      { g:'Front-end', items:['HTML/CSS','JavaScript','TypeScript','React','Angular','Vue.js','Next.js','Tailwind CSS','SASS/LESS','Webpack'] },
+      { g:'Back-end', items:['Node.js','Python','Java','C#','PHP','Go','Rust','Spring Boot','Django','Laravel','Express'] },
+      { g:'Mobile', items:['React Native','Flutter','Swift','Kotlin','Ionic'] },
+      { g:'Banco de Dados', items:['SQL','PostgreSQL','MySQL','MongoDB','Redis','Firebase'] },
+      { g:'DevOps & Cloud', items:['Git','Docker','Kubernetes','AWS','Azure','GCP','CI/CD','Linux','Nginx'] },
+      { g:'Dados & IA', items:['Python','Pandas','NumPy','TensorFlow','PyTorch','Scikit-learn','Power BI','Tableau','Spark','ETL'] },
+      { g:'Outros', items:['REST APIs','GraphQL','Testes automatizados','Scrum/Agile','UML','Figma','Photoshop'] }
+    ];
+    const softSkillsAll = [
+      'Comunicação','Trabalho em equipe','Proatividade','Resolução de problemas','Pensamento crítico',
+      'Liderança','Adaptabilidade','Organização','Criatividade','Empatia','Gestão de tempo',
+      'Inteligência emocional','Ética profissional','Resiliência','Foco em resultados'
+    ];
+    let selectedHard = new Set(['React','TypeScript','Node.js','Git','PostgreSQL']);
+    let selectedSoft = new Set(['Comunicação','Trabalho em equipe','Proatividade']);
+
+    /* ========== INIT ========== */
+    document.addEventListener('DOMContentLoaded', () => {
+      buildHardGrid();
+      buildSoftGrid();
+      renderHardDisplay();
+      renderSoftDisplay();
+      updateChecklist();
+      countChars(document.getElementById('f-sobre'),'sobre-count',500);
+    });
+
+    /* ========== HARD SKILLS ========== */
+    function buildHardGrid() {
+      const grid = document.getElementById('hard-skill-grid');
+      grid.innerHTML = '';
+      hardSkillsAll.forEach(cat => {
+        const lbl = document.createElement('span');
+        lbl.className = 'skill-section-label';
+        lbl.textContent = cat.g;
+        grid.appendChild(lbl);
+        cat.items.forEach(s => {
+          const tag = document.createElement('span');
+          tag.className = 'skill-tag' + (selectedHard.has(s) ? ' skill-tag--active' : '');
+          tag.textContent = s;
+          tag.onclick = () => toggleHard(tag, s);
+          grid.appendChild(tag);
+        });
+      });
+    }
+    function toggleHard(el, s) {
+      if (selectedHard.has(s)) {
+        selectedHard.delete(s); el.classList.remove('skill-tag--active');
+      } else {
+        if (selectedHard.size >= 10) { showToast('Máximo de 10 hard skills atingido.'); return; }
+        selectedHard.add(s); el.classList.add('skill-tag--active');
+      }
+      document.getElementById('hard-count').textContent = selectedHard.size;
+    }
+    function saveHardSkills() {
+      renderHardDisplay();
+      closeModal('modal-hard');
+      showToast('Hard skills atualizadas.');
+      updateChecklist();
+    }
+    function renderHardDisplay() {
+      const cont = document.getElementById('hard-display');
+      if (selectedHard.size === 0) {
+        cont.innerHTML = '<span style="font-size:13px;color:#9CA3AF;">Nenhuma hard skill selecionada ainda.</span>';
+        return;
+      }
+      cont.innerHTML = '';
+      selectedHard.forEach(s => {
+        const sp = document.createElement('span');
+        sp.className = 'badge-sel badge-sel--active';
+        sp.innerHTML = `<span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>${s}`;
+        cont.appendChild(sp);
+      });
+    }
+
+    /* ========== SOFT SKILLS ========== */
+    function buildSoftGrid() {
+      const grid = document.getElementById('soft-skill-grid');
+      grid.innerHTML = '';
+      softSkillsAll.forEach(s => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag' + (selectedSoft.has(s) ? ' skill-tag--active' : '');
+        tag.textContent = s;
+        tag.onclick = () => toggleSoft(tag, s);
+        grid.appendChild(tag);
+      });
+    }
+    function toggleSoft(el, s) {
+      if (selectedSoft.has(s)) {
+        selectedSoft.delete(s); el.classList.remove('skill-tag--active');
+      } else {
+        if (selectedSoft.size >= 8) { showToast('Máximo de 8 soft skills atingido.'); return; }
+        selectedSoft.add(s); el.classList.add('skill-tag--active');
+      }
+    }
+    function saveSoftSkills() {
+      renderSoftDisplay();
+      closeModal('modal-soft');
+      showToast('Soft skills atualizadas.');
+      updateChecklist();
+    }
+    function renderSoftDisplay() {
+      const cont = document.getElementById('soft-display');
+      if (selectedSoft.size === 0) {
+        cont.innerHTML = '<span style="font-size:13px;color:#9CA3AF;">Nenhuma soft skill selecionada ainda.</span>';
+        return;
+      }
+      cont.innerHTML = '';
+      selectedSoft.forEach(s => {
+        const sp = document.createElement('span');
+        sp.className = 'badge-sel badge-sel--active';
+        sp.innerHTML = `<span class="badge-sel__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>${s}`;
+        cont.appendChild(sp);
+      });
+    }
+
+    /* ========== BADGE SELECTORS (inline) ========== */
+    document.querySelectorAll('.badge-selector').forEach(container => {
+      container.addEventListener('click', e => {
+        const badge = e.target.closest('.badge-sel');
+        if (!badge) return;
+        badge.classList.toggle('badge-sel--active');
+      });
+    });
+    function toggleSkill(el) { el.classList.toggle('skill-tag--active'); }
+
+    /* ========== CERTIFICADOS ========== */
+    function addCertificado() {
+      const trilha = document.getElementById('cert-trilha').value;
+      const titulo = document.getElementById('cert-titulo').value.trim();
+      const inst = document.getElementById('cert-inst').value.trim() || 'SCTEC';
+      const horas = document.getElementById('cert-horas').value.trim();
+      const data = document.getElementById('cert-data').value;
+      if (!titulo) { showToast('Informe o título do certificado.'); return; }
+      const list = document.getElementById('cert-list');
+      const empty = document.getElementById('cert-empty');
+      if (empty) empty.remove();
+      const item = document.createElement('div');
+      item.className = 'entry-item';
+      const dataFmt = data ? new Date(data + '-02').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '';
+      item.innerHTML = `
+        <div class="entry-item__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <div class="entry-item__body">
+          <div class="entry-item__title">${titulo}</div>
+          <div class="entry-item__sub">${inst}${horas ? ' · ' + horas : ''}${dataFmt ? ' · ' + dataFmt : ''}</div>
+        </div>
+        <div class="entry-item__actions">
+          <button type="button" class="icon-btn icon-btn--danger" title="Remover" onclick="removeEntry(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>`;
+      list.appendChild(item);
+      closeModal('modal-cert');
+      showToast('Certificado adicionado.');
+      // reset
+      document.getElementById('cert-titulo').value = '';
+      document.getElementById('cert-data').value = '';
+      document.getElementById('cert-horas').value = '';
+      document.getElementById('cert-link').value = '';
+      updateChecklist();
+    }
+
+    /* ========== EXPERIÊNCIAS ========== */
+    function addExperiencia() {
+      const cargo = document.getElementById('exp-cargo').value.trim();
+      const empresa = document.getElementById('exp-empresa').value.trim();
+      const tipo = document.getElementById('exp-tipo');
+      const inicio = document.getElementById('exp-inicio').value;
+      const fim = document.getElementById('exp-fim').value;
+      const atual = document.getElementById('exp-atual').checked;
+      const desc = document.getElementById('exp-desc').value.trim();
+      if (!cargo || !empresa) { showToast('Cargo e empresa são obrigatórios.'); return; }
+      const list = document.getElementById('exp-list');
+      const inicioFmt = inicio ? new Date(inicio + '-02').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '';
+      const fimFmt = atual ? 'Atual' : (fim ? new Date(fim + '-02').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '');
+      const period = inicioFmt ? (inicioFmt + (fimFmt ? ' – ' + fimFmt : '')) : '';
+      const item = document.createElement('div');
+      item.className = 'entry-item';
+      item.innerHTML = `
+        <div class="entry-item__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        </div>
+        <div class="entry-item__body">
+          <div class="entry-item__title">${cargo}</div>
+          <div class="entry-item__sub">${empresa}${period ? ' · ' + period : ''}</div>
+          ${desc ? '<div class="entry-item__desc">' + desc + '</div>' : ''}
+        </div>
+        <div class="entry-item__actions">
+          <button type="button" class="icon-btn icon-btn--danger" title="Remover" onclick="removeEntry(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>`;
+      list.appendChild(item);
+      closeModal('modal-exp');
+      showToast('Experiência adicionada.');
+      document.getElementById('exp-cargo').value = '';
+      document.getElementById('exp-empresa').value = '';
+      document.getElementById('exp-inicio').value = '';
+      document.getElementById('exp-fim').value = '';
+      document.getElementById('exp-desc').value = '';
+      document.getElementById('exp-atual').checked = false;
+      updateChecklist();
+    }
+    function removeEntry(btn) {
+      btn.closest('.entry-item').remove();
+      showToast('Item removido.');
+      updateChecklist();
+    }
+    function toggleAtual(cb) {
+      document.getElementById('exp-fim-group').style.opacity = cb.checked ? '0.4' : '1';
+      document.getElementById('exp-fim').disabled = cb.checked;
+    }
+
+    /* ========== IDIOMAS ========== */
+    function addIdioma() {
+      const nome = document.getElementById('idioma-nome').value;
+      const nivel = document.getElementById('idioma-nivel').value;
+      if (!nome || !nivel) { showToast('Selecione o idioma e o nível.'); return; }
+      const list = document.getElementById('idioma-list');
+      const item = document.createElement('div');
+      item.className = 'lang-item';
+      item.innerHTML = `
+        <span class="lang-item__name">${nome}</span>
+        <span class="lang-item__level">· ${nivel}</span>
+        <span class="lang-item__remove" onclick="removeParent(this, '.lang-item')">&times;</span>`;
+      list.appendChild(item);
+      closeModal('modal-idioma');
+      showToast('Idioma adicionado.');
+      updateChecklist();
+    }
+    function removeParent(el, selector) {
+      el.closest(selector).remove();
+      showToast('Removido.');
+    }
+
+    /* ========== VIDEO ========== */
+    function updateVideo() {
+      const url = document.getElementById('f-video').value.trim();
+      const wrap = document.getElementById('video-wrap');
+      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+      let embed = '';
+      if (ytMatch) embed = 'https://www.youtube.com/embed/' + ytMatch[1];
+      else if (vimeoMatch) embed = 'https://player.vimeo.com/video/' + vimeoMatch[1];
+      if (embed) {
+        wrap.style.display = 'block';
+        wrap.innerHTML = `<iframe width="100%" height="100%" src="${embed}" frameborder="0" allowfullscreen></iframe>`;
+      } else {
+        wrap.style.display = 'none';
+        wrap.innerHTML = '';
+      }
+    }
+
+    /* ========== AVATAR ========== */
+    function handleAvatar(input) {
+      if (!input.files || !input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const d = document.getElementById('avatar-display');
+        d.innerHTML = `<img src="${e.target.result}" alt="Foto de perfil">`;
+        document.getElementById('nav-avatar').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        showToast('Foto de perfil atualizada.');
+        updateChecklist();
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    /* ========== CHAR COUNT ========== */
+    function countChars(el, countId, max) {
+      const val = el.value.length;
+      document.getElementById(countId).textContent = val + '/' + max + ' caracteres';
+    }
+
+    /* ========== CHECKLIST ========== */
+    function updateChecklist() {
+      const keys = {
+        foto: () => document.getElementById('avatar-display').querySelector('img') !== null,
+        dados: () => document.getElementById('f-nome').value.trim() !== '',
+        sobre: () => document.getElementById('f-sobre').value.trim().length > 30,
+        certificados: () => document.querySelectorAll('#cert-list .entry-item').length > 0,
+        experiencia: () => document.querySelectorAll('#exp-list .entry-item').length > 0,
+        interesse: () => document.querySelectorAll('#interesse-area .badge-sel--active').length > 0,
+        hardskills: () => selectedHard.size > 0,
+        softskills: () => selectedSoft.size > 0,
+        idiomas: () => document.querySelectorAll('#idioma-list .lang-item').length > 0,
+      };
+      let done = 0;
+      Object.entries(keys).forEach(([key, check]) => {
+        const el = document.querySelector(`[data-key="${key}"]`);
+        if (!el) return;
+        const isDone = check();
+        if (isDone) done++;
+        el.classList.toggle('checklist-item--done', isDone);
+        const ico = el.querySelector('.checklist-item__icon');
+        ico.innerHTML = isDone ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+      });
+      const total = Object.keys(keys).length;
+      const pct = Math.round((done / total) * 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-pct').textContent = pct + '%';
+      const alert = document.getElementById('alert-incompleto');
+      if (alert) alert.style.display = pct >= 100 ? 'none' : 'flex';
+    }
+
+    /* ========== SAVE PROFILE ========== */
+    function saveProfile() {
+      updateChecklist();
+      showToast('✓ Perfil salvo com sucesso!');
+    }
+
+    /* ========== VIEW TOGGLE ========== */
+    function setView(mode, btn) {
+      document.querySelectorAll('.view-toggle__btn').forEach(b => b.classList.remove('view-toggle__btn--active'));
+      btn.classList.add('view-toggle__btn--active');
+      const editForm = document.getElementById('edit-form');
+      const preview = document.getElementById('preview-mode');
+      const checklist = document.getElementById('checklist-card');
+      if (mode === 'preview') {
+        updatePreview();
+        editForm.style.display = 'none';
+        preview.style.display = 'block';
+        checklist.style.display = 'none';
+      } else {
+        editForm.style.display = 'block';
+        preview.style.display = 'none';
+        checklist.style.display = 'block';
+      }
+    }
+    function updatePreview() {
+      document.getElementById('preview-nome').textContent = document.getElementById('f-nome').value || 'Seu nome';
+      document.getElementById('preview-meta').textContent =
+        (document.getElementById('f-trilha').options[document.getElementById('f-trilha').selectedIndex].text) +
+        ' · ' + (document.getElementById('f-cidade').value || '') + ', ' +
+        document.getElementById('f-estado').value;
+      document.getElementById('preview-sobre').textContent = document.getElementById('f-sobre').value;
+      // hard skills preview
+      const phc = document.getElementById('preview-hard');
+      phc.innerHTML = '';
+      selectedHard.forEach(s => {
+        const sp = document.createElement('span');
+        sp.className = 'badge-sel badge-sel--active';
+        sp.textContent = s;
+        phc.appendChild(sp);
+      });
+    }
+
+    /* ========== MODAL HELPERS ========== */
+    function openModal(id) { document.getElementById(id).classList.add('modal-backdrop--open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('modal-backdrop--open'); }
+    document.querySelectorAll('.modal-backdrop').forEach(bd => {
+      bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('modal-backdrop--open'); });
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop--open').forEach(m => m.classList.remove('modal-backdrop--open'));
+    });
+
+    /* ========== AVATAR MENU ========== */
+    function toggleAvatarMenu() { document.getElementById('avatar-menu').classList.toggle('avatar-menu--open'); }
+    document.addEventListener('click', e => {
+      const menu = document.getElementById('avatar-menu');
+      const btn = document.getElementById('nav-avatar');
+      if (menu && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('avatar-menu--open');
+    });
+
+    /* ========== TOAST ========== */
+    let _toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--on');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => t.classList.remove('toast--on'), 3000);
+    }
+
+    function scrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  </script>
+</body>
+</html>

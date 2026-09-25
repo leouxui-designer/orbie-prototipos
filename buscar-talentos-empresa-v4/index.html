@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscar Talentos – SCTEC Empresa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; background: #f8f9fb; color: #171717; min-height: 100vh; overflow-x: hidden; }
+
+    :root {
+      --green: #2ca942;
+      --green-grad: linear-gradient(128deg, #2ca942 15%, #55b13a 55%, #52b934 87%);
+      --green-light: rgba(44,169,66,.10);
+      --green-border: rgba(44,169,66,.30);
+      --green-container: #7ab934;
+      --sidebar-bg: #22292b;
+      --bg-card: #fff;
+      --border: #e8e8e8;
+      --border-mid: #d4d4d4;
+      --text: #171717;
+      --text-2: #737373;
+      --text-3: #a3a3a3;
+      --text-head: #22292b;
+      --radius-card: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+    }
+
+    /* ── Navbar ─────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 80px;
+      background: rgba(255,255,255,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 1px 15px rgba(69,42,124,.08);
+      display: flex; align-items: center; padding: 0 24px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 1px; width: 220px; }
+    .brand-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 28px; line-height: 1; color: #171717; }
+    .brand-sub  { font-size: 14px; font-weight: 600; color: #171717; }
+    .nav-right  { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .nav-company { font-size: 13px; color: #454545; }
+    .av { width: 40px; height: 40px; border-radius: 50%; background: var(--green-container); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #568328; flex-shrink: 0; }
+
+    /* ── Sidebar nav ────────────────────────────────── */
+    .sidenav {
+      position: fixed; top: 80px; left: 0; bottom: 0; width: 220px;
+      background: var(--sidebar-bg); display: flex; flex-direction: column; z-index: 50;
+    }
+    .sn-hdr { padding: 14px 8px; border-bottom: 1px solid rgba(255,255,255,.10); }
+    .sn-co   { font-family: 'Montserrat',sans-serif; font-weight: 700; font-size: 14px; color: #fff; padding: 0 8px; }
+    .sn-role { font-size: 11px; color: rgba(255,255,255,.5); padding: 0 8px; margin-top: 1px; }
+    .sn-body { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 3px; }
+    .sn-item { display: flex; align-items: center; gap: 8px; padding: 10px 8px; border-radius: 6px; color: rgba(255,255,255,.7); font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background .12s; }
+    .sn-item:hover { background: rgba(255,255,255,.07); }
+    .sn-item.active { background: rgba(122,185,52,.18); color: var(--green-container); }
+    .sn-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sn-ftr { padding: 8px 8px 20px; border-top: 1px solid rgba(255,255,255,.10); }
+
+    /* ── Layout principal ───────────────────────────── */
+    .main {
+      margin-left: 220px;
+      margin-top: 80px;
+      padding: 28px 32px;
+      max-width: calc(100vw - 220px);
+      /* se drawer aberto, comprime */
+      transition: padding-right .35s cubic-bezier(.4,0,.2,1);
+    }
+    .main.drawer-open { padding-right: calc(480px + 32px); }
+
+    /* ── Barra de busca ─────────────────────────────── */
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-card); border: 1px solid var(--border-mid);
+      border-radius: 12px; padding: 0 16px; height: 48px;
+      box-shadow: var(--shadow);
+    }
+    .search-bar svg { width: 18px; height: 18px; color: #999; flex-shrink: 0; }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; font-family: 'Roboto', sans-serif; background: transparent; color: var(--text); }
+    .search-bar input::placeholder { color: var(--text-3); }
+
+    /* ── Barra de filtros inline ────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    /* Filtro select estilizado */
+    .f-select-wrap { position: relative; }
+    .f-select-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 36px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border-mid); background: var(--bg-card);
+      font-size: 13px; font-weight: 500; color: var(--text-2);
+      cursor: pointer; white-space: nowrap; transition: all .15s;
+      font-family: 'Roboto', sans-serif;
+    }
+    .f-select-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .f-select-btn .chevron { width: 12px; height: 12px; color: #bbb; transition: transform .2s; margin-left: 2px; }
+    .f-select-btn:hover, .f-select-btn.active { border-color: var(--green); color: var(--green); background: var(--green-light); }
+    .f-select-btn.active .chevron { transform: rotate(180deg); }
+    .f-select-btn.has-value { border-color: var(--green); color: var(--green); font-weight: 600; background: var(--green-light); }
+
+    /* Dropdown dos filtros */
+    .f-dropdown {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      background: var(--bg-card); border: 1px solid var(--border-mid);
+      border-radius: 12px; box-shadow: var(--shadow-md);
+      z-index: 200; min-width: 220px; padding: 6px;
+      animation: fadeDown .15s ease;
+    }
+    .f-dropdown.open { display: block; }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    .fd-search {
+      display: flex; align-items: center; gap: 6px;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0 10px; height: 34px; margin-bottom: 6px;
+    }
+    .fd-search svg { width: 13px; height: 13px; color: #bbb; flex-shrink: 0; }
+    .fd-search input { border: none; outline: none; font-size: 12px; font-family: 'Roboto', sans-serif; background: transparent; flex: 1; }
+
+    .fd-option {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 7px; cursor: pointer;
+      font-size: 13px; color: var(--text); transition: background .1s;
+    }
+    .fd-option:hover { background: #f5f5f5; }
+    .fd-option.selected { color: var(--green); font-weight: 600; }
+    .fd-option.selected::after { content: '✓'; margin-left: auto; font-size: 12px; }
+
+    /* Separador de filtros */
+    .f-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+    /* Pills de área — filtros rápidos */
+    .area-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .area-pill {
+      height: 34px; padding: 0 14px; border-radius: 100px;
+      border: 1px solid var(--border-mid); background: var(--bg-card);
+      font-size: 12px; font-weight: 500; color: var(--text-2);
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+      font-family: 'Roboto', sans-serif;
+    }
+    .area-pill:hover { border-color: var(--green); color: var(--green); }
+    .area-pill.active { background: var(--green-grad); color: #fff; border-color: transparent; font-weight: 600; }
+
+    /* Chips de filtros ativos */
+    .active-filters { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; min-height: 24px; }
+    .af-label { font-size: 11px; color: var(--text-3); }
+    .af-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--green-light); border: 1px solid var(--green-border);
+      border-radius: 100px; padding: 2px 8px 2px 10px;
+      font-size: 11px; font-weight: 600; color: var(--green);
+    }
+    .af-chip button { background: none; border: none; cursor: pointer; color: var(--green); font-size: 12px; padding: 0 0 0 2px; opacity: .7; line-height: 1; }
+    .af-chip button:hover { opacity: 1; }
+
+    /* Contagem */
+    .res-count { font-size: 12px; color: var(--text-2); margin-bottom: 12px; }
+    .res-count b { color: var(--text); }
+
+    /* ── Lista de candidatos ────────────────────────── */
+    .clist {
+      display: flex; flex-direction: column;
+      background: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+
+    .crow {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+      cursor: pointer; transition: background .12s;
+    }
+    .crow:last-child { border-bottom: none; }
+    .crow:hover { background: #f7fbff; }
+    .crow.active { background: #f0f9f2; border-left: 3px solid var(--green); padding-left: 17px; }
+
+    .cav {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; background: var(--green-container); color: #568328;
+      overflow: hidden;
+    }
+    .cav img { width: 100%; height: 100%; object-fit: cover; }
+
+    .cbody { flex: 1; min-width: 0; }
+    .cname { font-size: 14px; font-weight: 700; color: var(--text-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Linha título: área · especialidade · techs */
+    .ctrow { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+    .carea { font-size: 12px; color: var(--text-2); }
+    .csep  { color: #ddd; font-size: 12px; }
+    .cspec { font-size: 12px; font-weight: 600; color: var(--text); }
+    .ctechs { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    .ctag { font-size: 11px; font-weight: 500; color: #555; border: 1px solid #e8e8e8; border-radius: 100px; padding: 1px 8px; background: #fafafa; white-space: nowrap; }
+    .ctag.m { border-color: var(--green-border); background: var(--green-light); color: var(--green); font-weight: 600; }
+    .cmore { font-size: 10px; color: var(--text-3); padding-left: 2px; }
+
+    /* Linha meta: localização · inglês · modalidade */
+    .cmeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .cloc  { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-2); }
+    .cloc svg { width: 11px; height: 11px; flex-shrink: 0; }
+    .cdot  { color: #ddd; font-size: 10px; }
+    .ceng  { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-2); }
+    .edot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .edot.h { background: var(--green); }
+    .edot.m { background: #f59e0b; }
+    .edot.l { background: #d1d5db; }
+    .cmode { font-size: 10px; color: var(--text-2); background: #f5f5f5; border-radius: 3px; padding: 1px 6px; }
+
+    /* ── Paginação ──────────────────────────────────── */
+    .pag-wrap { display: flex; justify-content: center; padding: 16px 0 8px; }
+    .pag { display: flex; align-items: center; gap: 4px; }
+    .pbtn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border-mid); background: var(--bg-card); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); transition: all .15s; font-family: 'Roboto', sans-serif; }
+    .pbtn:hover { border-color: var(--green); color: var(--green); }
+    .pbtn.active { background: var(--green-grad); color: #fff; border-color: transparent; font-weight: 700; }
+    .pbtn svg { width: 13px; height: 13px; }
+    .pof { font-size: 12px; color: var(--text-2); padding: 0 4px; }
+
+    /* ═══════════════════════════════════════
+       DRAWER — Perfil do candidato
+    ═══════════════════════════════════════ */
+    .drawer {
+      position: fixed; top: 80px; right: -480px; bottom: 0;
+      width: 480px; background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 24px rgba(0,0,0,.10);
+      display: flex; flex-direction: column;
+      transition: right .35s cubic-bezier(.4,0,.2,1);
+      z-index: 90; overflow: hidden;
+    }
+    .drawer.open { right: 0; }
+
+    .dr-head { padding: 20px 20px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .dr-head-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .dr-profile { display: flex; gap: 14px; align-items: flex-start; }
+    .dr-avatar { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--green-container); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #568328; }
+    .dr-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .dr-id { display: flex; flex-direction: column; gap: 2px; }
+    .dr-name { font-size: 16px; font-weight: 700; color: var(--text-head); }
+    .dr-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .dr-loc { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-2); margin-top: 2px; }
+    .dr-loc svg { width: 11px; height: 11px; }
+    .dr-close { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-mid); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-2); flex-shrink: 0; transition: all .15s; }
+    .dr-close:hover { background: #f5f5f5; }
+    .dr-close svg { width: 13px; height: 13px; }
+
+    .dr-meta { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+    .dr-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
+    .dr-pill.green { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+    .dr-pill.gray  { background: #f5f5f5; color: var(--text-2); border: 1px solid #eee; }
+    .dr-pill svg { width: 10px; height: 10px; }
+
+    /* Quick links */
+    .dr-quicklinks { display: flex; gap: 6px; padding-bottom: 14px; flex-wrap: wrap; }
+    .dr-ql { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--border-mid); background: var(--bg-card); font-size: 11px; font-weight: 500; color: var(--text-2); text-decoration: none; transition: all .15s; white-space: nowrap; }
+    .dr-ql svg { width: 11px; height: 11px; flex-shrink: 0; }
+    .dr-ql:hover { background: #f0f8f2; color: var(--green); border-color: var(--green-border); }
+    .dr-ql-pdf { background: #fff8f0; border-color: #f0d9c0; color: #b45309; }
+    .dr-ql-pdf:hover { background: #fff0e0; color: #92400e; }
+
+    .dr-body { flex: 1; overflow-y: auto; }
+    .dr-section { padding: 14px 20px; border-bottom: 1px solid #f5f5f5; }
+    .dr-section:last-child { border-bottom: none; }
+    .dr-sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-3); margin-bottom: 10px; }
+    .dr-about { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+    /* Interesse */
+    .dr-interest { display: flex; flex-direction: column; gap: 6px; }
+    .dr-int-row { display: flex; align-items: center; gap: 6px; }
+    .dr-int-area { font-size: 12px; color: var(--text-2); }
+    .dr-int-arrow { color: #ccc; font-size: 12px; }
+    .dr-int-spec { font-size: 12px; font-weight: 600; color: var(--text); }
+    .dr-int-techs { display: flex; gap: 5px; flex-wrap: wrap; padding-left: 0; margin-top: 4px; }
+
+    /* Tags */
+    .dr-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .dr-tag { font-size: 12px; font-weight: 500; color: #444; border: 1px solid #e0e0e0; border-radius: 100px; padding: 3px 10px; background: #fafafa; }
+    .dr-tag.m { border-color: var(--green-border); background: var(--green-light); color: var(--green); font-weight: 600; }
+
+    /* Soft skills */
+    .dr-soft { display: flex; flex-wrap: wrap; gap: 5px; }
+    .soft-tag { font-size: 11px; font-weight: 500; color: #555; border: 1px solid #e8e8e8; border-radius: 100px; padding: 2px 9px; background: #fafafa; }
+
+    /* Certificados */
+    .dr-cert { display: flex; flex-direction: column; gap: 7px; }
+    .cert-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px; background: #fafafa; border-radius: 8px; border: 1px solid #f0f0f0; }
+    .cert-badge { width: 34px; height: 34px; border-radius: 7px; background: var(--green-light); border: 1px solid var(--green-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cert-badge svg { width: 15px; height: 15px; color: var(--green); }
+    .cert-info { flex: 1; min-width: 0; }
+    .cert-name { font-size: 12px; font-weight: 700; color: var(--text-head); }
+    .cert-inst { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+    .cert-prog { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+    .prog-bar { flex: 1; height: 3px; background: #e8e8e8; border-radius: 2px; overflow: hidden; }
+    .prog-fill { height: 100%; background: var(--green-grad); border-radius: 2px; }
+    .prog-pct { font-size: 10px; font-weight: 600; color: var(--green); }
+
+    /* Experiência */
+    .dr-exp { display: flex; flex-direction: column; gap: 7px; }
+    .exp-item { padding: 8px; background: #fafafa; border-radius: 8px; border: 1px solid #f0f0f0; }
+    .exp-role { font-size: 12px; font-weight: 700; color: var(--text-head); }
+    .exp-co   { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+    .exp-period { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+    .exp-desc { font-size: 11px; color: var(--text); margin-top: 5px; line-height: 1.5; }
+
+    /* Idiomas */
+    .dr-langs { display: flex; flex-direction: column; gap: 6px; }
+    .lang-row { display: flex; align-items: center; justify-content: space-between; }
+    .lang-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .lang-levels { display: flex; gap: 3px; }
+    .llvl { font-size: 10px; padding: 2px 7px; border-radius: 100px; border: 1px solid #e8e8e8; color: var(--text-3); background: #fafafa; }
+    .llvl.active { background: var(--green-light); border-color: var(--green-border); color: var(--green); font-weight: 600; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="brand"><span class="brand-name">SCTEC</span><span class="brand-sub">Portal de Talentos</span></div>
+  <div class="nav-right">
+    <span class="nav-company">TechCorp Soluções Ltda.</span>
+    <div class="av">TC</div>
+  </div>
+</nav>
+
+<!-- Sidebar nav -->
+<aside class="sidenav">
+  <div class="sn-hdr">
+    <div class="sn-co">TechCorp Soluções Ltda.</div>
+    <div class="sn-role">Parceiro ativo</div>
+  </div>
+  <div class="sn-body">
+    <a class="sn-item active" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Buscar Talentos
+    </a>
+    <a class="sn-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil da Empresa
+    </a>
+  </div>
+  <div class="sn-ftr">
+    <a class="sn-item" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </a>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main" id="main">
+
+  <!-- Busca por nome -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar por nome…" />
+    </div>
+  </div>
+
+  <!-- Barra de filtros inline -->
+  <div class="filter-bar">
+
+    <!-- Pills de área -->
+    <div class="area-pills">
+      <button class="area-pill active" onclick="setArea(this)">Todas</button>
+      <button class="area-pill" onclick="setArea(this)">Front-End</button>
+      <button class="area-pill" onclick="setArea(this)">Back-End</button>
+      <button class="area-pill" onclick="setArea(this)">Mobile</button>
+      <button class="area-pill" onclick="setArea(this)">Dados</button>
+      <button class="area-pill" onclick="setArea(this)">IA</button>
+    </div>
+
+    <div class="f-sep"></div>
+
+    <!-- Filtro: Tecnologias -->
+    <div class="f-select-wrap">
+      <button class="f-select-btn has-value" id="btn-tec" onclick="toggleDropdown('dd-tec', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Tecnologias
+        <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="f-dropdown" id="dd-tec">
+        <div class="fd-search">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Ex: React, Python, SQL…" />
+        </div>
+        <div class="fd-option selected" onclick="toggleOption(this)">React</div>
+        <div class="fd-option selected" onclick="toggleOption(this)">TypeScript</div>
+        <div class="fd-option" onclick="toggleOption(this)">Node.js</div>
+        <div class="fd-option" onclick="toggleOption(this)">Python</div>
+        <div class="fd-option" onclick="toggleOption(this)">SQL</div>
+        <div class="fd-option" onclick="toggleOption(this)">Java</div>
+        <div class="fd-option" onclick="toggleOption(this)">Angular</div>
+        <div class="fd-option" onclick="toggleOption(this)">Vue.js</div>
+        <div class="fd-option" onclick="toggleOption(this)">Flutter</div>
+        <div class="fd-option" onclick="toggleOption(this)">Docker</div>
+      </div>
+    </div>
+
+    <!-- Filtro: Localização -->
+    <div class="f-select-wrap">
+      <button class="f-select-btn" id="btn-loc" onclick="toggleDropdown('dd-loc', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Localização
+        <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="f-dropdown" id="dd-loc">
+        <div class="fd-option" onclick="toggleOption(this)">Grande Florianópolis</div>
+        <div class="fd-option" onclick="toggleOption(this)">Sul Catarinense</div>
+        <div class="fd-option" onclick="toggleOption(this)">Norte Catarinense</div>
+        <div class="fd-option" onclick="toggleOption(this)">Vale do Itajaí</div>
+        <div class="fd-option" onclick="toggleOption(this)">Oeste Catarinense</div>
+      </div>
+    </div>
+
+    <!-- Filtro: Inglês -->
+    <div class="f-select-wrap">
+      <button class="f-select-btn" id="btn-ing" onclick="toggleDropdown('dd-ing', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Inglês
+        <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="f-dropdown" id="dd-ing">
+        <div class="fd-option" onclick="toggleOption(this)">Básico ou mais</div>
+        <div class="fd-option" onclick="toggleOption(this)">Intermediário ou mais</div>
+        <div class="fd-option" onclick="toggleOption(this)">Avançado ou mais</div>
+        <div class="fd-option" onclick="toggleOption(this)">Fluente</div>
+      </div>
+    </div>
+
+    <!-- Limpar filtros -->
+    <button class="f-select-btn" style="color:#ef4444;border-color:#fca5a5;background:#fff5f5;" onclick="clearAll()">
+      Limpar filtros
+    </button>
+
+  </div><!-- /filter-bar -->
+
+  <!-- Chips ativos -->
+  <div class="active-filters" id="active-filters">
+    <span class="af-label">Ativos:</span>
+    <span class="af-chip">Front-End <button onclick="removeChip(this)">✕</button></span>
+    <span class="af-chip">React <button onclick="removeChip(this)">✕</button></span>
+    <span class="af-chip">TypeScript <button onclick="removeChip(this)">✕</button></span>
+  </div>
+
+  <!-- Contagem -->
+  <div class="res-count">Exibindo <b>10</b> de <b>576</b> talentos</div>
+
+  <!-- Lista -->
+  <div class="clist">
+
+    <div class="crow active" onclick="openDrawer(this)">
+      <div class="cav" style="background:#e0f2fe;color:#0284c7;">JS</div>
+      <div class="cbody">
+        <div class="cname">João Silva</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Front-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag m">React</span><span class="ctag m">TypeScript</span><span class="ctag">Next.js</span><span class="ctag">Git</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot m"></span>Inglês intermediário</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#fce7f3;color:#be185d;">AC</div>
+      <div class="cbody">
+        <div class="cname">Anderson Cardoso Lima</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Front-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag m">React</span><span class="ctag">Angular</span><span class="ctag">Vue.js</span><span class="ctag">JavaScript</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot l"></span>Inglês básico</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#f0fdf4;color:#15803d;">AS</div>
+      <div class="cbody">
+        <div class="cname">Alice Silveira Santos</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Back-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">Java</span><span class="ctag">Spring Boot</span><span class="ctag">SQL</span><span class="ctag">Docker</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Jaguaruna, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot m"></span>Inglês intermediário</span>
+          <span class="cdot">·</span><span class="cmode">Híbrido</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav">DS</div>
+      <div class="cbody">
+        <div class="cname">Diana Santos</div>
+        <div class="ctrow">
+          <span class="carea">Análise de Dados</span><span class="csep">·</span>
+          <span class="cspec">Analista de Dados</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">Python</span><span class="ctag">SQL</span><span class="ctag">Power BI</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Araranguá, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot h"></span>Inglês avançado</span>
+          <span class="cdot">·</span><span class="cmode">Presencial</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#fef9c3;color:#854d0e;">EC</div>
+      <div class="cbody">
+        <div class="cname">Eduardo Costa</div>
+        <div class="ctrow">
+          <span class="carea">Inteligência Artificial</span><span class="csep">·</span>
+          <span class="cspec">Análise Preditiva</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">Python</span><span class="ctag">Scikit-learn</span><span class="ctag">SQL</span><span class="cmore">+1</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot m"></span>Inglês intermediário</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#ede9fe;color:#6d28d9;">GS</div>
+      <div class="cbody">
+        <div class="cname">Gabriel Silva</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Back-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">PostgreSQL</span><span class="ctag">Node.js</span><span class="ctag">Docker</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot l"></span>Inglês básico</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#ffedd5;color:#c2410c;">HP</div>
+      <div class="cbody">
+        <div class="cname">Helena Pereira</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Back-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">Java</span><span class="ctag">JSF</span><span class="ctag">SQL</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot l"></span>Inglês básico</span>
+          <span class="cdot">·</span><span class="cmode">Híbrido</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#e0f2fe;color:#0369a1;">LS</div>
+      <div class="cbody">
+        <div class="cname">Lucas Silva</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Front-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag m">React</span><span class="ctag">Angular</span><span class="ctag">CSS</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Florianópolis, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot h"></span>Inglês avançado</span>
+          <span class="cdot">·</span><span class="cmode">Híbrido</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#f0fdf4;color:#166534;">MC</div>
+      <div class="cbody">
+        <div class="cname">Mariana Costa</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Front-End</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag m">React</span><span class="ctag">Vue.js</span><span class="ctag">Figma</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Joinville, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot m"></span>Inglês intermediário</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="crow" onclick="openDrawer(this)">
+      <div class="cav" style="background:#fdf2f8;color:#9d174d;">RG</div>
+      <div class="cbody">
+        <div class="cname">Rafael Gomes</div>
+        <div class="ctrow">
+          <span class="carea">Desenv. de Software</span><span class="csep">·</span>
+          <span class="cspec">Mobile</span><span class="csep">·</span>
+          <div class="ctechs">
+            <span class="ctag">React Native</span><span class="ctag">Flutter</span><span class="ctag">JavaScript</span>
+          </div>
+        </div>
+        <div class="cmeta">
+          <span class="cloc"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Blumenau, SC</span>
+          <span class="cdot">·</span><span class="ceng"><span class="edot l"></span>Inglês básico</span>
+          <span class="cdot">·</span><span class="cmode">Remoto</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /clist -->
+
+  <div class="pag-wrap">
+    <div class="pag">
+      <button class="pbtn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="pbtn active">1</button>
+      <button class="pbtn">2</button>
+      <button class="pbtn">3</button>
+      <span class="pof">de 58</span>
+      <button class="pbtn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════
+     DRAWER
+═══════════════════════════════════════ -->
+<aside class="drawer" id="drawer">
+  <div class="dr-head">
+    <div class="dr-head-top">
+      <div class="dr-profile">
+        <div class="dr-avatar" style="background:#e0f2fe;color:#0284c7;">JS</div>
+        <div class="dr-id">
+          <div class="dr-name">João da Silva</div>
+          <div class="dr-title">Desenvolvedor Front-End</div>
+          <div class="dr-loc">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Florianópolis, SC · 21 anos
+          </div>
+        </div>
+      </div>
+      <button class="dr-close" onclick="closeDrawer()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="dr-meta">
+      <span class="dr-pill green">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Remoto
+      </span>
+      <span class="dr-pill green">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Inglês intermediário
+      </span>
+      <span class="dr-pill gray">Emprego · Freelancer</span>
+      <span class="dr-pill gray">SCTEC ✓</span>
+    </div>
+    <div class="dr-quicklinks">
+      <a class="dr-ql" href="#" target="_blank">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a class="dr-ql" href="#" target="_blank">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a class="dr-ql" href="#" target="_blank">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Portfólio
+      </a>
+      <a class="dr-ql dr-ql-pdf" href="#" target="_blank">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Currículo
+      </a>
+    </div>
+  </div>
+
+  <div class="dr-body">
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Sobre</div>
+      <div class="dr-about">Desenvolvedor Front-End em formação pelo SCTEC, com foco em React e TypeScript. Busca primeira oportunidade profissional em desenvolvimento web.</div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Interesse profissional</div>
+      <div class="dr-interest">
+        <div class="dr-int-row">
+          <span class="dr-int-area">Desenv. de Software</span>
+          <span class="dr-int-arrow">›</span>
+          <span class="dr-int-spec">Front-End</span>
+        </div>
+        <div class="dr-int-techs">
+          <span class="dr-tag">React</span>
+          <span class="dr-tag">TypeScript</span>
+          <span class="dr-tag">Next.js</span>
+          <span class="dr-tag">Angular</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Competências técnicas</div>
+      <div class="dr-tags">
+        <span class="dr-tag m">React</span>
+        <span class="dr-tag m">TypeScript</span>
+        <span class="dr-tag">JavaScript</span>
+        <span class="dr-tag">Next.js</span>
+        <span class="dr-tag">Angular</span>
+        <span class="dr-tag">HTML</span>
+        <span class="dr-tag">CSS</span>
+        <span class="dr-tag">Git e GitHub</span>
+        <span class="dr-tag">Node.js</span>
+        <span class="dr-tag">SQL</span>
+      </div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Competências comportamentais</div>
+      <div class="dr-soft">
+        <span class="soft-tag">Comunicação</span>
+        <span class="soft-tag">Proatividade</span>
+        <span class="soft-tag">Aprendizado contínuo</span>
+        <span class="soft-tag">Colaboração</span>
+        <span class="soft-tag">Autonomia</span>
+      </div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Formação e certificados SCTEC</div>
+      <div class="dr-cert">
+        <div class="cert-item">
+          <div class="cert-badge"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <div class="cert-info">
+            <div class="cert-name">Desenvolvedor Front-End React · SCTEC</div>
+            <div class="cert-inst">Concluído em 01/01/2025</div>
+            <div class="cert-prog"><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div><span class="prog-pct">100%</span></div>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="cert-badge"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="cert-info">
+            <div class="cert-name">Desenvolvedor Back-End Node · SCTEC</div>
+            <div class="cert-inst">Concluído em 12/11/2024</div>
+            <div class="cert-prog"><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div><span class="prog-pct">100%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Experiência profissional</div>
+      <div class="dr-exp">
+        <div class="exp-item">
+          <div class="exp-role">Estagiário de Desenvolvimento</div>
+          <div class="exp-co">Empresa de Desenvolvimento Ltda.</div>
+          <div class="exp-period">Nov 2024 · Atual · 5 meses</div>
+          <div class="exp-desc">Desenvolvimento de features com React e TypeScript. Participação em code reviews e cerimônias ágeis.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dr-section">
+      <div class="dr-sec-title">Idiomas</div>
+      <div class="dr-langs">
+        <div class="lang-row">
+          <span class="lang-name">Inglês</span>
+          <div class="lang-levels">
+            <span class="llvl">Básico</span>
+            <span class="llvl active">Intermediário</span>
+            <span class="llvl">Avançado</span>
+            <span class="llvl">Fluente</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<script>
+/* ── Filtros ──────────────────────────────────────────── */
+function toggleDropdown(id, btn) {
+  const dd = document.getElementById(id);
+  const isOpen = dd.classList.contains('open');
+  // fecha todos
+  document.querySelectorAll('.f-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.f-select-btn').forEach(b => b.classList.remove('active'));
+  if (!isOpen) {
+    dd.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+
+function toggleOption(el) {
+  el.classList.toggle('selected');
+}
+
+function setArea(btn) {
+  document.querySelectorAll('.area-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function removeChip(btn) { btn.closest('.af-chip').remove(); }
+
+function clearAll() {
+  document.querySelectorAll('.fd-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.f-select-btn').forEach(b => { b.classList.remove('active','has-value'); });
+  document.querySelectorAll('.area-pill').forEach(b => b.classList.remove('active'));
+  document.querySelector('.area-pill').classList.add('active');
+  document.querySelectorAll('.af-chip').forEach(c => c.remove());
+  document.querySelectorAll('.f-dropdown').forEach(d => d.classList.remove('open'));
+}
+
+// fecha dropdown clicando fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('.f-select-wrap')) {
+    document.querySelectorAll('.f-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.f-select-btn:not(.has-value)').forEach(b => b.classList.remove('active'));
+  }
+});
+
+/* ── Drawer ───────────────────────────────────────────── */
+function openDrawer(row) {
+  document.querySelectorAll('.crow').forEach(r => r.classList.remove('active'));
+  row.classList.add('active');
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('main').classList.add('drawer-open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('main').classList.remove('drawer-open');
+  document.querySelectorAll('.crow').forEach(r => r.classList.remove('active'));
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+// Abrir João por padrão
+window.addEventListener('load', () => openDrawer(document.querySelector('.crow')));
+</script>
+</body>
+</html>

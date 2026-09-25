@@ -1,0 +1,402 @@
+/**
+ * Orbie Design System — CSS Custom Properties
+ * Gerado a partir de tokens_admin.json (Tokens Studio for Figma)
+ * Fonte de verdade: Orbie-Design-System.fig
+ *
+ * USO:
+ *   Adicione no <head> do protótipo:
+ *   <link rel="stylesheet" href="../../orbie-tokens.css">
+ *   ou use o path relativo correto.
+ *
+ * TEMAS:
+ *   <body>              → tema light (admin padrão)
+ *   <body class="dark"> → tema dark
+ */
+
+/* ============================================================
+   CORE — Paleta de cores base (Color/Mode 1)
+   ============================================================ */
+:root {
+  /* Brand */
+  --brand-50:  #f7f8ff;
+  --brand-100: #eff6ff;
+  --brand-200: #dbeafe;
+  --brand-300: #698afa;
+  --brand-400: #2177ff;
+  --brand-500: #226de5;
+  --brand-600: #0050dc;
+  --brand-700: #0045cf;
+  --brand-800: #003ac4;
+  --brand-900: #0026b2;
+
+  /* Gray */
+  --gray-50:  #f5f6f7;
+  --gray-100: #edeff7;
+  --gray-200: #dde4eb;
+  --gray-300: #98a2b3;
+  --gray-400: #8a95b2;
+  --gray-500: #525e76;
+  --gray-600: #344054;
+  --gray-700: #1d2939;
+  --gray-800: #101828;
+
+  /* Green */
+  --green-100: #a6f4c5;
+  --green-200: #6ce9a6;
+  --green-300: #32d583;
+  --green-400: #12b76a;
+  --green-500: #039855;
+  --green-600: #027a48;
+  --green-700: #05603a;
+  --green-800: #054f31;
+
+  /* Red */
+  --red-100: #fecdca;
+  --red-200: #fda29b;
+  --red-300: #f97066;
+  --red-400: #f04438;
+  --red-500: #d9372b;
+  --red-600: #b42318;
+  --red-700: #912018;
+  --red-800: #7a271a;
+
+  /* Yellow */
+  --yellow-100: #fedf89;
+  --yellow-200: #fec84b;
+  --yellow-300: #fdb022;
+  --yellow-400: #f79009;
+  --yellow-500: #dc6803;
+  --yellow-600: #b54708;
+  --yellow-700: #93370d;
+  --yellow-800: #7a2e0e;
+
+  /* Dark Blue */
+  --dark-blue-50:    #e8ebf0;
+  --dark-blue-100:   #c3ccda;
+  --dark-blue-200:   #9eabc1;
+  --dark-blue-300:   #798ba8;
+  --dark-blue-400:   #5c7296;
+  --dark-blue-500:   #3f5a87;
+  --dark-blue-600:   #39537f;
+  --dark-blue-700:   #314973;
+  --dark-blue-800:   #2a3f66;
+  --dark-blue-900:   #222f4d;
+  --dark-blue-color: #002e68;
+
+  /* Graph */
+  --graph-orange:  #ff953e;
+  --graph-yellow:  #ffee00;
+  --graph-green:   #7cfc87;
+  --graph-water:   #2ed3d0;
+  --graph-blue:    #488eff;
+  --graph-purple:  #a87df3;
+  --graph-violet:  #e66df1;
+  --graph-magenta: #fc5b93;
+
+  /* Opacity — Black */
+  --opacity-black-5:   #0000000d;
+  --opacity-black-10:  #0000001a;
+  --opacity-black-20:  #00000033;
+  --opacity-black-30:  #0000004d;
+  --opacity-black-40:  #00000066;
+  --opacity-black-50:  #00000080;
+  --opacity-black-60:  #00000099;
+  --opacity-black-70:  #000000b3;
+  --opacity-black-80:  #000000cc;
+  --opacity-black-90:  #000000e6;
+  --opacity-black-100: #000000;
+
+  /* Opacity — White */
+  --opacity-white-10:  #ffffff1a;
+  --opacity-white-20:  #ffffff33;
+  --opacity-white-30:  #ffffff4d;
+  --opacity-white-40:  #ffffff66;
+  --opacity-white-50:  #ffffff80;
+  --opacity-white-60:  #ffffff99;
+  --opacity-white-70:  #ffffffb3;
+  --opacity-white-80:  #ffffffcc;
+  --opacity-white-90:  #ffffffe6;
+  --opacity-white-100: #ffffff;
+
+  /* Opacity — Brand */
+  --opacity-brand-50:  #2177ff08;
+  --opacity-brand-100: #2177ff0d;
+  --opacity-brand-200: #2177ff14;
+  --opacity-brand-300: #2177ff1a;
+}
+
+/* ============================================================
+   LAYOUT — Tipografia, espaçamentos, raios, tamanhos
+   ============================================================ */
+:root {
+  /* Fontes */
+  --font-display:  'Orbitron', sans-serif;
+  --font-default:  'Outfit', sans-serif;
+
+  /* Pesos */
+  --font-bold:     700;
+  --font-medium:   500;
+  --font-regular:  400;
+  --font-light:    300;
+
+  /* Tamanhos de fonte */
+  --font-size-xxxsm: 12px;
+  --font-size-xxsm:  14px;
+  --font-size-xsm:   16px;
+  --font-size-sm:    18px;
+  --font-size-md:    22px;
+  --font-size-lg:    28px;
+  --font-size-xl:    32px;
+  --font-size-xxl:   40px;
+
+  /* Line heights (mapeados pelo tamanho da fonte) */
+  --line-height-12:  16px;
+  --line-height-14:  21px;
+  --line-height-16:  24px;
+  --line-height-18:  27px;
+  --line-height-22:  33px;
+  --line-height-28:  33px;
+  --line-height-32:  38px;
+  --line-height-40:  48px;
+
+  /* Letter spacing */
+  --letter-spacing-default: 0;
+
+  /* Raio de borda */
+  --radius-xxxs: 2px;
+  --radius-xxs:  4px;
+  --radius-xs:   6px;
+  --radius-sm:   8px;
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-xxl:  24px;
+  --radius-full: 1000px;
+
+  /* Padding */
+  --padding-xxxs: 2px;
+  --padding-xxs:  4px;
+  --padding-xs:   6px;
+  --padding-sm:   8px;
+  --padding-md:   12px;
+  --padding-lg:   16px;
+  --padding-xl:   24px;
+  --padding-xxl:  32px;
+
+  /* Gap */
+  --gap-xxxs: 2px;
+  --gap-xxs:  4px;
+  --gap-xs:   6px;
+  --gap-sm:   8px;
+  --gap-md:   12px;
+  --gap-lg:   16px;
+  --gap-xll:  32px;
+  --gap-xxl:  36px;
+  --gap-xxxl: 40px;
+
+  /* Stroke */
+  --stroke-xs: 1px;
+  --stroke-sm: 2px;
+
+  /* Layout */
+  --page-width: 1440px;
+
+  /* Modais */
+  --modal-xs: 200px;
+  --modal-xm: 400px;
+  --modal-md: 600px;
+  --modal-lg: 800px;
+}
+
+/* ============================================================
+   TEMA LIGHT — Admin (padrão)
+   ============================================================ */
+:root,
+body,
+body.light {
+  color-scheme: light;
+
+  /* Fill */
+  --fill-menu:              #002e68;
+  --fill-brand:             #2177ff;
+  --fill-accent-light:      #eff6ff;
+  --fill-accent-extra-light:#f7f8ff;
+  --fill-default:           #ffffff;
+  --fill-success:           #039855;
+  --fill-info:              #edeff7;
+  --fill-error:             #d9372b;
+  --fill-warning-light:     #ffecb3;
+  --fill-error-light:       #ffdfe3;
+  --fill-success-light:     #c8e6c9;
+  --fill-neutral:           #f5f6f7;
+
+  /* Text */
+  --text-light:              #ffffff;
+  --text-light-transparence: #ffffffcc;
+  --text-accent:             #2177ff;
+  --text-title:              #344054;
+  --text-placeholder:        #8a95b2;
+  --text-body:               #525e76;
+  --text-disabled:           #8a95b2;
+  --text-success:            #224a23;
+  --text-error:              #b71c1c;
+  --text-warning:            #7f6003;
+
+  /* Stroke */
+  --stroke-neutral:       #dde4eb;
+  --stroke-accent:        #2177ff;
+  --stroke-disabled:      #f5f6f7;
+  --stroke-accent-light:  #f7f8ff;
+  --stroke-light:         #ffffff;
+  --stroke-neutral-dark:  #dde4eb;
+
+  /* Icon */
+  --icon-neutral:      #8a95b2;
+  --icon-brand:        #2177ff;
+  --icon-disabled:     #8a95b2;
+  --icon-light:        #ffffff;
+  --icon-neutral-dark: #344054;
+  --icon-warning:      #7f6003;
+  --icon-error:        #b71c1c;
+  --icon-success:      #224a23;
+
+  /* Button */
+  --btn-primary-default:  #2177ff;
+  --btn-primary-hover:    #226de5;
+  --btn-primary-disabled: #f5f6f7;
+
+  --btn-secondary-default:  #ffffff;
+  --btn-secondary-hover:    #f7f8ff;
+  --btn-secondary-disabled: #f5f6f7;
+
+  --btn-tertiary-default:  #eff6ff;
+  --btn-tertiary-hover:    #dbeafe;
+  --btn-tertiary-disabled: #f5f6f7;
+
+  --btn-link-hover: #f7f8ff;
+
+  /* Input */
+  --input-fill-default:      #ffffff;
+  --input-fill-disabled:     #dde4eb;
+  --input-text-default:      #344054;
+  --input-text-placeholder:  #8a95b2;
+  --input-text-disabled:     #8a95b2;
+  --input-icon-default:      #344054;
+  --input-icon-disabled:     #dde4eb;
+
+  /* Background */
+  --bg-brand:   #2177ff;
+  --bg-default: #ffffff;
+
+  /* Logo */
+  --logo-orange: #f79750;
+  --logo-white:  #ffffff;
+  --logo-green:  #29b84c;
+}
+
+/* ============================================================
+   TEMA DARK
+   ============================================================ */
+body.dark {
+  color-scheme: dark;
+
+  /* Fill */
+  --fill-menu:               #002e68;
+  --fill-brand:              #698afa;
+  --fill-accent-light:       #eff6ff;
+  --fill-accent-extra-light: #ffffff1a;
+  --fill-default:            #121e36;
+  --fill-success:            #039855;
+  --fill-info:               #ffffff33;
+  --fill-error:              #d9372b;
+  --fill-warning-light:      #ffffff;
+  --fill-error-light:        #ffffff;
+  --fill-success-light:      #ffffff;
+  --fill-neutral:            #ffffff;
+
+  /* Text */
+  --text-light:              #ffffff;
+  --text-light-transparence: #ffffffcc;
+  --text-accent:             #698afa;
+  --text-title:              #ffffff;
+  --text-placeholder:        #8a95b2;
+  --text-body:               #525e76;
+  --text-disabled:           #8a95b2;
+  --text-success:            #7cfc87;
+  --text-error:              #fda29b;
+  --text-warning:            #fedf89;
+
+  /* Stroke */
+  --stroke-neutral:       #ffffff1a;
+  --stroke-accent:        #698afa;
+  --stroke-disabled:      #525e76;
+  --stroke-accent-light:  #f7f8ff;
+  --stroke-light:         #ffffff;
+  --stroke-neutral-dark:  #25395b;
+
+  /* Icon */
+  --icon-neutral:      #8a95b2;
+  --icon-brand:        #698afa;
+  --icon-disabled:     #98a2b3;
+  --icon-light:        #ffffff;
+  --icon-neutral-dark: #ffffff;
+  --icon-warning:      #ffffff;
+  --icon-error:        #ffffff;
+  --icon-success:      #ffffff;
+
+  /* Button */
+  --btn-primary-default:  #698afa;
+  --btn-primary-hover:    #226de5;
+  --btn-primary-disabled: #ffffff33;
+
+  --btn-secondary-default:  #ffffff1a;
+  --btn-secondary-hover:    #ffffff1a;
+  --btn-secondary-disabled: #f5f6f7;
+
+  --btn-tertiary-default:  #ffffff14;
+  --btn-tertiary-hover:    #ffffff33;
+  --btn-tertiary-disabled: #f5f6f7;
+
+  --btn-link-hover: #f7f8ff;
+
+  /* Input */
+  --input-fill-default:      #ffffff;
+  --input-fill-disabled:     #dde4eb;
+  --input-text-default:      #344054;
+  --input-text-placeholder:  #8a95b2;
+  --input-text-disabled:     #8a95b2;
+  --input-icon-default:      #344054;
+  --input-icon-disabled:     #8a95b2;
+
+  /* Background */
+  --bg-brand:   #002e68;
+  --bg-default: #0d1a32;
+
+  /* Logo */
+  --logo-orange: #f79750;
+  --logo-white:  #ffffff;
+  --logo-green:  #29b84c;
+}
+
+/* ============================================================
+   UTILITÁRIOS — Atalhos semânticos prontos para usar
+   ============================================================ */
+
+/* Tipografia — combinações prontas */
+.text-display-xl  { font-family: var(--font-display); font-size: var(--font-size-xxl); line-height: var(--line-height-40); font-weight: var(--font-bold); }
+.text-display-lg  { font-family: var(--font-display); font-size: var(--font-size-xl);  line-height: var(--line-height-32); font-weight: var(--font-bold); }
+.text-display-md  { font-family: var(--font-display); font-size: var(--font-size-lg);  line-height: var(--line-height-28); font-weight: var(--font-bold); }
+
+.text-heading-xl  { font-family: var(--font-default); font-size: var(--font-size-xl);  line-height: var(--line-height-32); font-weight: var(--font-bold); }
+.text-heading-lg  { font-family: var(--font-default); font-size: var(--font-size-lg);  line-height: var(--line-height-28); font-weight: var(--font-bold); }
+.text-heading-md  { font-family: var(--font-default); font-size: var(--font-size-md);  line-height: var(--line-height-22); font-weight: var(--font-bold); }
+.text-heading-sm  { font-family: var(--font-default); font-size: var(--font-size-sm);  line-height: var(--line-height-18); font-weight: var(--font-bold); }
+
+.text-body-lg     { font-family: var(--font-default); font-size: var(--font-size-sm);  line-height: var(--line-height-18); font-weight: var(--font-regular); }
+.text-body-md     { font-family: var(--font-default); font-size: var(--font-size-xsm); line-height: var(--line-height-16); font-weight: var(--font-regular); }
+.text-body-sm     { font-family: var(--font-default); font-size: var(--font-size-xxsm);line-height: var(--line-height-14); font-weight: var(--font-regular); }
+.text-body-xs     { font-family: var(--font-default); font-size: var(--font-size-xxxsm);line-height:var(--line-height-12); font-weight: var(--font-regular); }
+
+.text-body-lg-bold{ font-family: var(--font-default); font-size: var(--font-size-sm);  line-height: var(--line-height-18); font-weight: var(--font-bold); }
+.text-body-md-bold{ font-family: var(--font-default); font-size: var(--font-size-xsm); line-height: var(--line-height-16); font-weight: var(--font-bold); }
+.text-body-sm-bold{ font-family: var(--font-default); font-size: var(--font-size-xxsm);line-height: var(--line-height-14); font-weight: var(--font-bold); }

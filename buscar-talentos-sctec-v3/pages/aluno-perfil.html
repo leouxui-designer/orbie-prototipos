@@ -1,0 +1,446 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Portal de Talentos | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/painel.css">
+</head>
+<body style="padding-top: 80px;">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar--painel">
+    <div class="navbar__inner">
+      <a href="../index.html" class="navbar__brand">SCTEC</a>
+      <div class="navbar-painel__right">
+        <span class="navbar-painel__company-name">João Silva</span>
+        <div class="navbar-painel__avatar" id="avatar-toggle" onclick="toggleAvatarMenu()">JS</div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu__header"><strong>João Silva</strong><span>Desenvolvimento de Software</span></div>
+          <a href="aluno-empresas.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Buscar Empresas</a>
+          <a href="aluno-perfil.html" class="avatar-menu__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Meu Perfil</a>
+          <div class="avatar-menu__divider"></div>
+          <a href="login.html" class="avatar-menu__link avatar-menu__link--logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="painel">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="sidebar__company">João Silva</div>
+        <div class="sidebar__plan">Desenvolvimento de Software</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="aluno-empresas.html" class="sidebar__link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Buscar Empresas</a>
+        <a href="aluno-perfil.html" class="sidebar__link sidebar__link--active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Meu Perfil</a>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="login.html" class="sidebar__logout"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="painel__main">
+      <div class="painel__header">
+        <div>
+          <h1 class="painel__title">Meu Perfil</h1>
+          <p class="painel__subtitle">Edite suas informações e visualize como as empresas veem seu perfil</p>
+        </div>
+        <a href="aluno-perfil-publico.html" class="btn btn--outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Visualizar perfil
+        </a>
+      </div>
+
+      <form class="perfil-form" onsubmit="event.preventDefault(); showToast('Perfil atualizado.');">
+        <!-- Foto -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Foto de perfil</h2>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="position: relative; cursor: pointer;" onclick="document.getElementById('avatar-upload').click()">
+              <div id="avatar-preview" style="width: 72px; height: 72px; border-radius: 50%; background: #e2e4e9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; color: var(--color-text-tertiary); overflow: hidden;">JS</div>
+              <div style="position: absolute; bottom: -2px; right: -2px; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <input type="file" id="avatar-upload" accept="image/*" style="display:none;" onchange="previewAvatar(this)">
+            </div>
+            <span style="font-size: 13px; color: var(--color-text-muted);">Clique para adicionar ou alterar sua foto</span>
+          </div>
+        </div>
+
+        <!-- Dados pessoais -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Dados pessoais</h2>
+          </div>
+          <div class="perfil-form__grid">
+            <div class="form-group">
+              <label class="form-group__label">Nome completo</label>
+              <input type="text" class="form-group__input" value="João Silva">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">CPF</label>
+              <input type="text" class="form-group__input" value="012.345.678-90">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">E-mail</label>
+              <input type="email" class="form-group__input" value="joao.silva@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">Telefone/WhatsApp</label>
+              <input type="tel" class="form-group__input" value="(48) 99123-4567">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">Cidade</label>
+              <input type="text" class="form-group__input" value="Florianópolis, SC">
+            </div>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Links</h2>
+          </div>
+          <div class="perfil-form__grid">
+            <div class="form-group">
+              <label class="form-group__label">GitHub (opcional)</label>
+              <input type="url" class="form-group__input" placeholder="https://github.com/seu-usuario" value="https://github.com/joaosilva">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">LinkedIn (opcional)</label>
+              <input type="url" class="form-group__input" placeholder="https://linkedin.com/in/seu-perfil">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">Portfólio (opcional)</label>
+              <input type="url" class="form-group__input" value="https://joaosilva.dev">
+            </div>
+          </div>
+        </div>
+
+        <!-- Sobre mim -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Sobre mim</h2>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">Apresentação breve</label>
+            <textarea class="form-group__input" rows="3" style="resize: vertical; font-family: var(--font-body);">Desenvolvedor front-end em formação pelo programa SCTEC. Apaixonado por interfaces responsivas e boas práticas de código. Buscando minha primeira oportunidade profissional na área.</textarea>
+          </div>
+        </div>
+
+        <!-- Vídeo de apresentação -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Vídeo de apresentação</h2>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">Link do vídeo (YouTube ou Vimeo)</label>
+            <input type="url" class="form-group__input" id="video-url" placeholder="https://youtube.com/watch?v=..." value="https://www.youtube.com/watch?v=dQw4w9WgXcQ" oninput="updateVideoPreview()">
+          </div>
+          <div id="video-preview" style="margin-top: 12px; border-radius: 8px; overflow: hidden; aspect-ratio: 16/9; max-width: 480px; background: #000;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen style="border: none;"></iframe>
+          </div>
+        </div>
+
+        <!-- Habilidades -->
+        <div class="perfil-section">
+          <div class="perfil-section__header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 class="perfil-section__title">Habilidades</h2>
+            <button type="button" class="btn btn--ghost btn--sm" onclick="document.getElementById('modal-skills').classList.add('modal--open')">+ Adicionar</button>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="skills-list">
+            <span class="candidate-card__skill" style="font-size: 13px; padding: 4px 12px;">React <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;">×</button></span>
+            <span class="candidate-card__skill" style="font-size: 13px; padding: 4px 12px;">TypeScript <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;">×</button></span>
+            <span class="candidate-card__skill" style="font-size: 13px; padding: 4px 12px;">Node.js <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;">×</button></span>
+            <span class="candidate-card__skill" style="font-size: 13px; padding: 4px 12px;">Git <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;">×</button></span>
+            <span class="candidate-card__skill" style="font-size: 13px; padding: 4px 12px;">PostgreSQL <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;">×</button></span>
+          </div>
+        </div>
+
+        <!-- Experiência profissional -->
+        <div class="perfil-section">
+          <div class="perfil-section__header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 class="perfil-section__title">Experiência profissional</h2>
+            <button type="button" class="btn btn--ghost btn--sm" onclick="document.getElementById('new-exp-form').style.display='block'">+ Adicionar</button>
+          </div>
+          <!-- Form nova experiência (oculto) -->
+          <div id="new-exp-form" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--color-bg-light); border-radius: 8px;">
+            <div class="perfil-form__grid">
+              <div class="form-group">
+                <label class="form-group__label">Cargo</label>
+                <input type="text" class="form-group__input" id="exp-cargo" placeholder="Ex: Desenvolvedor Júnior">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Empresa</label>
+                <input type="text" class="form-group__input" id="exp-empresa" placeholder="Nome da empresa">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Início</label>
+                <input type="month" class="form-group__input" id="exp-inicio">
+              </div>
+              <div class="form-group">
+                <label class="form-group__label">Fim (vazio = atual)</label>
+                <input type="month" class="form-group__input" id="exp-fim">
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 12px;">
+              <label class="form-group__label">Descrição (opcional)</label>
+              <textarea class="form-group__input" id="exp-desc" rows="2" placeholder="Principais atividades e responsabilidades..." style="resize: vertical; font-family: var(--font-body);"></textarea>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button type="button" class="btn btn--primary btn--sm" onclick="addExperience()">Salvar</button>
+              <button type="button" class="btn btn--ghost btn--sm" onclick="document.getElementById('new-exp-form').style.display='none'">Cancelar</button>
+            </div>
+          </div>
+          <!-- Lista de experiências -->
+          <div id="exp-list" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="exp-item" style="padding: 16px; background: var(--color-bg-light); border-radius: 8px; position: relative;">
+              <button onclick="this.parentElement.remove(); showToast('Experiência removida.')" class="action-icon" title="Remover" style="position: absolute; top: 12px; right: 12px; width: 24px; height: 24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+              <strong style="font-size: 15px;">Estagiário de Desenvolvimento</strong>
+              <p style="font-size: 13px; color: var(--color-text-muted); margin-top: 2px;">StartupSC • Mar 2026 - Atual</p>
+              <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;">Desenvolvimento de features no front-end com React e TypeScript. Participação em code reviews e dailys.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Currículo em PDF -->
+        <div class="perfil-section">
+          <div class="perfil-section__header">
+            <h2 class="perfil-section__title">Currículo (PDF)</h2>
+          </div>
+          <div class="dropzone" id="pdf-dropzone" onclick="document.getElementById('pdf-input').click()">
+            <svg class="dropzone__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 16.58A5 5 0 0018 7h-1.26A8 8 0 103 16.29"/><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
+            <p class="dropzone__text">Arraste e solte seu currículo em PDF aqui</p>
+            <p class="dropzone__hint">ou</p>
+            <button type="button" class="btn btn--outline btn--sm" onclick="event.stopPropagation(); document.getElementById('pdf-input').click()">Selecionar arquivo</button>
+            <input type="file" id="pdf-input" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this)">
+            <div class="dropzone__file" id="pdf-file" style="display: none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span id="pdf-filename">nenhum arquivo</span>
+              <button type="button" class="dropzone__remove" onclick="event.stopPropagation(); clearPdf()" aria-label="Remover">&times;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="perfil-actions">
+          <button type="submit" class="btn btn--primary">Salvar alterações</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Modal Habilidades -->
+  <div class="modal" id="modal-skills">
+    <div class="modal__overlay" onclick="this.parentElement.classList.remove('modal--open')"></div>
+    <div class="modal__content" style="max-width: 520px;">
+      <div class="modal__header">
+        <h2 class="modal__title">Selecionar Habilidades</h2>
+        <button class="modal__close" onclick="this.closest('.modal').classList.remove('modal--open')">&times;</button>
+      </div>
+      <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Marque as habilidades que você domina</p>
+      <div style="margin-bottom: 16px;">
+        <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted);">Desenvolvimento</strong>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px;" id="skills-dev">
+          <label class="checkbox-item"><input type="checkbox" value="React"> React</label>
+          <label class="checkbox-item"><input type="checkbox" value="Angular"> Angular</label>
+          <label class="checkbox-item"><input type="checkbox" value="Vue.js"> Vue.js</label>
+          <label class="checkbox-item"><input type="checkbox" value="TypeScript"> TypeScript</label>
+          <label class="checkbox-item"><input type="checkbox" value="JavaScript"> JavaScript</label>
+          <label class="checkbox-item"><input type="checkbox" value="Node.js"> Node.js</label>
+          <label class="checkbox-item"><input type="checkbox" value="Python"> Python</label>
+          <label class="checkbox-item"><input type="checkbox" value="Java"> Java</label>
+          <label class="checkbox-item"><input type="checkbox" value="C#"> C#</label>
+          <label class="checkbox-item"><input type="checkbox" value="PHP"> PHP</label>
+          <label class="checkbox-item"><input type="checkbox" value="Go"> Go</label>
+          <label class="checkbox-item"><input type="checkbox" value="HTML/CSS"> HTML/CSS</label>
+          <label class="checkbox-item"><input type="checkbox" value="Next.js"> Next.js</label>
+          <label class="checkbox-item"><input type="checkbox" value="Tailwind CSS"> Tailwind CSS</label>
+          <label class="checkbox-item"><input type="checkbox" value="Docker"> Docker</label>
+          <label class="checkbox-item"><input type="checkbox" value="Git"> Git</label>
+          <label class="checkbox-item"><input type="checkbox" value="REST APIs"> REST APIs</label>
+          <label class="checkbox-item"><input type="checkbox" value="GraphQL"> GraphQL</label>
+          <label class="checkbox-item"><input type="checkbox" value="SQL"> SQL</label>
+          <label class="checkbox-item"><input type="checkbox" value="PostgreSQL"> PostgreSQL</label>
+          <label class="checkbox-item"><input type="checkbox" value="MongoDB"> MongoDB</label>
+          <label class="checkbox-item"><input type="checkbox" value="AWS"> AWS</label>
+          <label class="checkbox-item"><input type="checkbox" value="Azure"> Azure</label>
+          <label class="checkbox-item"><input type="checkbox" value="DevOps/CI-CD"> DevOps/CI-CD</label>
+        </div>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted);">Dados e IA</strong>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px;" id="skills-data">
+          <label class="checkbox-item"><input type="checkbox" value="Power BI"> Power BI</label>
+          <label class="checkbox-item"><input type="checkbox" value="Tableau"> Tableau</label>
+          <label class="checkbox-item"><input type="checkbox" value="Pandas"> Pandas</label>
+          <label class="checkbox-item"><input type="checkbox" value="Machine Learning"> Machine Learning</label>
+          <label class="checkbox-item"><input type="checkbox" value="Deep Learning"> Deep Learning</label>
+          <label class="checkbox-item"><input type="checkbox" value="TensorFlow"> TensorFlow</label>
+          <label class="checkbox-item"><input type="checkbox" value="PyTorch"> PyTorch</label>
+          <label class="checkbox-item"><input type="checkbox" value="NLP"> NLP</label>
+          <label class="checkbox-item"><input type="checkbox" value="Estatística"> Estatística</label>
+          <label class="checkbox-item"><input type="checkbox" value="Big Data"> Big Data</label>
+          <label class="checkbox-item"><input type="checkbox" value="Spark"> Spark</label>
+          <label class="checkbox-item"><input type="checkbox" value="ETL"> ETL</label>
+          <label class="checkbox-item"><input type="checkbox" value="R"> R</label>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn--ghost" onclick="this.closest('.modal').classList.remove('modal--open')">Cancelar</button>
+        <button class="btn btn--primary" onclick="saveSkills()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function updateVideoPreview() {
+      const url = document.getElementById('video-url').value.trim();
+      const preview = document.getElementById('video-preview');
+      let embedUrl = '';
+      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+      if (ytMatch) embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1];
+      else if (vimeoMatch) embedUrl = 'https://player.vimeo.com/video/' + vimeoMatch[1];
+      if (embedUrl) {
+        preview.style.display = 'block';
+        preview.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allowfullscreen style="border:none;"></iframe>`;
+      } else {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+      }
+    }
+
+    function addExperience() {
+      const cargo = document.getElementById('exp-cargo').value.trim();
+      const empresa = document.getElementById('exp-empresa').value.trim();
+      const inicio = document.getElementById('exp-inicio').value;
+      const fim = document.getElementById('exp-fim').value || 'Atual';
+      const desc = document.getElementById('exp-desc').value.trim();
+      if (!cargo || !empresa) return;
+      const list = document.getElementById('exp-list');
+      const item = document.createElement('div');
+      item.className = 'exp-item';
+      item.style.cssText = 'padding: 16px; background: var(--color-bg-light); border-radius: 8px; position: relative;';
+      const fimText = fim === 'Atual' ? 'Atual' : fim;
+      item.innerHTML = `<button onclick="this.parentElement.remove(); showToast('Experiência removida.')" class="action-icon" title="Remover" style="position: absolute; top: 12px; right: 12px; width: 24px; height: 24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button><strong style="font-size: 15px;">${cargo}</strong><p style="font-size: 13px; color: var(--color-text-muted); margin-top: 2px;">${empresa} • ${inicio} - ${fimText}</p>${desc ? `<p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;">${desc}</p>` : ''}`;
+      list.appendChild(item);
+      document.getElementById('exp-cargo').value = '';
+      document.getElementById('exp-empresa').value = '';
+      document.getElementById('exp-inicio').value = '';
+      document.getElementById('exp-fim').value = '';
+      document.getElementById('exp-desc').value = '';
+      document.getElementById('new-exp-form').style.display = 'none';
+      showToast('Experiência adicionada.');
+    }
+
+    function handlePdfUpload(input) {
+      if (input.files && input.files[0]) {
+        showPdf(input.files[0].name);
+      }
+    }
+
+    function showPdf(name) {
+      document.getElementById('pdf-filename').textContent = name;
+      document.getElementById('pdf-file').style.display = 'inline-flex';
+      showToast('Currículo enviado.');
+    }
+
+    function clearPdf() {
+      document.getElementById('pdf-input').value = '';
+      document.getElementById('pdf-file').style.display = 'none';
+      showToast('Currículo removido.');
+    }
+
+    (function initDropzone() {
+      const dz = document.getElementById('pdf-dropzone');
+      if (!dz) return;
+      ['dragenter', 'dragover'].forEach(evt =>
+        dz.addEventListener(evt, (e) => { e.preventDefault(); dz.classList.add('dropzone--over'); }));
+      ['dragleave', 'drop'].forEach(evt =>
+        dz.addEventListener(evt, (e) => { e.preventDefault(); dz.classList.remove('dropzone--over'); }));
+      dz.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type === 'application/pdf') {
+          document.getElementById('pdf-input').files = e.dataTransfer.files;
+          showPdf(file.name);
+        } else if (file) {
+          showToast('Envie um arquivo PDF.');
+        }
+      });
+    })();
+
+    function previewAvatar(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const preview = document.getElementById('avatar-preview');
+          preview.innerHTML = '';
+          preview.style.background = 'none';
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          preview.appendChild(img);
+          showToast('Foto atualizada.');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function saveSkills() {
+      const checkboxes = document.querySelectorAll('#modal-skills input[type="checkbox"]:checked');
+      const list = document.getElementById('skills-list');
+      checkboxes.forEach(function(cb) {
+        const existing = Array.from(list.querySelectorAll('span')).map(function(s) { return s.childNodes[0].textContent.trim(); });
+        if (!existing.includes(cb.value)) {
+          const skill = document.createElement('span');
+          skill.className = 'candidate-card__skill';
+          skill.style.cssText = 'font-size: 13px; padding: 4px 12px;';
+          skill.textContent = cb.value + ' ';
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '\u00d7';
+          removeBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--color-text-muted);margin-left:4px;font-size:14px;';
+          removeBtn.onclick = function() { this.parentElement.remove(); };
+          skill.appendChild(removeBtn);
+          list.appendChild(skill);
+        }
+      });
+      document.getElementById('modal-skills').classList.remove('modal--open');
+      showToast('Habilidades atualizadas.');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+
+    function toggleAvatarMenu() {
+      document.getElementById('avatar-menu').classList.toggle('avatar-menu--open');
+    }
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('avatar-menu');
+      const toggle = document.getElementById('avatar-toggle');
+      if (menu && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.classList.remove('avatar-menu--open');
+      }
+    });
+  </script>
+</body>
+</html>

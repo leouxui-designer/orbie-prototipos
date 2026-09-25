@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbie — Fase Informativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D1A32;
+      --surface: #142A51;
+      --border: #224476;
+      --brand: #0059E7;
+      --text: #FFFFFF;
+      --text-secondary: #99C0FF;
+    }
+    html, body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* PHASE HEADER */
+    .phase-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px 14px;
+      flex-shrink: 0;
+    }
+    .phase-header-row1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .close-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 150ms;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.08); }
+    .phase-progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .phase-progress-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 100px;
+      width: 8%; /* fase 1 de 12 */
+    }
+    .phase-counter {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .phase-type-label {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* CONTENT */
+    .phase-content {
+      flex: 1;
+      padding: 28px 24px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* INFO BADGE */
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(63,132,243,0.12);
+      border: 1px solid rgba(63,132,243,0.3);
+      border-radius: 100px;
+      padding: 5px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #3F84F3;
+    }
+
+    .phase-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 32px;
+      color: var(--text);
+    }
+
+    .info-card {
+      background: #0D2B6B;
+      border: 1px solid rgba(63,132,243,0.3);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .info-card-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: rgba(63,132,243,0.15);
+      border: 2px solid rgba(63,132,243,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .info-card-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      line-height: 26px;
+      color: rgba(255,255,255,0.88);
+    }
+    .info-card-text strong { color: #fff; }
+
+    /* ANOTAÇÃO */
+    .req-annotation {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,89,231,0.07);
+      border: 1px dashed rgba(63,132,243,0.35);
+      border-radius: 10px;
+    }
+    .req-annotation.success { background: rgba(18,183,106,0.07); border-color: rgba(18,183,106,0.35); }
+    .req-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: rgba(63,132,243,0.18);
+      color: #3F84F3;
+      border: 1px solid rgba(63,132,243,0.3);
+    }
+    .req-annotation.success .req-tag { background: rgba(18,183,106,0.15); color: #12B76A; border-color: rgba(18,183,106,0.3); }
+    .req-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      line-height: 16px;
+      color: rgba(153,192,255,0.85);
+    }
+    .req-text strong { color: #fff; font-weight: 600; }
+
+    /* BOTTOM CTA */
+    .phase-cta {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px 24px;
+    }
+    .btn-primary {
+      width: 100%;
+      max-width: 640px;
+      display: block;
+      margin: 0 auto;
+      background: var(--brand);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      height: 52px;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-primary:hover { background: #0040A7; }
+  </style>
+</head>
+<body>
+
+  <!-- PHASE HEADER -->
+  <div class="phase-header">
+    <div class="phase-header-row1">
+      <div class="close-btn" onclick="confirmExit()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6L18 18M18 6L6 18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="phase-progress-bar">
+        <div class="phase-progress-fill"></div>
+      </div>
+      <span class="phase-counter">1 / 12</span>
+    </div>
+    <div class="phase-type-label">Questão Informativa</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="phase-content">
+    <span class="info-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3F84F3" stroke-width="1.8"/><path d="M12 8v1M12 11v5" stroke="#3F84F3" stroke-width="2" stroke-linecap="round"/></svg>
+      Leitura — sem pontuação
+    </span>
+
+    <div class="phase-title">Revisão 2 — Geometria Plana<br>O que você vai revisar</div>
+
+    <div class="info-card">
+      <div class="info-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M3 3L21 3L12 20L3 3Z" stroke="#3F84F3" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M3 3L21 3M12 20L3 3" stroke="#3F84F3" stroke-width="1.2" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="info-card-text">
+        <strong>Geometria Plana</strong> estuda figuras bidimensionais — aquelas que têm comprimento e largura, mas não altura.<br><br>
+        Neste bloco você vai revisar:<br>
+        • Como calcular o <strong>perímetro</strong> de figuras<br>
+        • A <strong>área</strong> de triângulos e quadriláteros<br><br>
+        Leia com atenção — as práticas a seguir vão testar exatamente esses conceitos.
+      </div>
+    </div>
+
+    <div class="req-annotation">
+      <span class="req-tag">RF09</span>
+      <span class="req-text"><strong>Questão informativa</strong> — Exibida sem campo de resposta. Botão "Entendi / Continuar". <strong>Não gera acerto, erro nem pontuação.</strong> Deve ser a primeira fase de cada bloco — não é possível pular.</span>
+    </div>
+    <div class="req-annotation success">
+      <span class="req-tag">RF09</span>
+      <span class="req-text"><strong>Sem Chance Extra</strong> — A trilha adaptativa não oferece chances extras. Esta fase informativa também não entra nos registros de tentativa.</span>
+    </div>
+  </div>
+
+  <!-- CTA BOTTOM -->
+  <div class="phase-cta">
+    <button class="btn-primary" onclick="avancar()">Entendi, vamos praticar!</button>
+  </div>
+
+<script>
+function avancar() {
+  window.location.href = 'fase-pratica.html';
+}
+function confirmExit() {
+  const ok = confirm('Você pode continuar esta revisão depois. Deseja sair?');
+  if (ok) window.location.href = 'detalhe.html';
+}
+</script>
+</body>
+</html>

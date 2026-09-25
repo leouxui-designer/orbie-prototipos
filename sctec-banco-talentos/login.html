@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Talentos - Login | SCTEC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/login.css">
+  <style>
+    body {
+      background: var(--color-bg-light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-page {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    .login-card {
+      background: var(--color-bg-white);
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    }
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .login-brand__logo {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary-gradient);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-brand__logo svg { width: 20px; height: 20px; }
+    .login-brand__name {
+      font-family: var(--font-header);
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--color-text-default);
+    }
+    .login-card__title {
+      font-family: var(--font-header);
+      font-weight: 700;
+      font-size: 26px;
+      color: var(--color-text-default);
+      margin-bottom: 6px;
+    }
+    .login-card__subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: 32px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group__label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      margin-bottom: 6px;
+    }
+    .form-group__input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--color-text-default);
+      background: var(--color-bg-white);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      box-sizing: border-box;
+    }
+    .form-group__input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(44,169,66,0.12);
+      outline: none;
+    }
+    .login-card__options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+    .login-card__remember {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+    .login-card__forgot {
+      color: var(--color-primary);
+      font-weight: 500;
+    }
+    .btn--login {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      border-radius: 10px;
+      justify-content: center;
+    }
+    .login-card__divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    .login-card__divider::before,
+    .login-card__divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+    }
+
+    /* Modal perfil */
+    .perfil-options { display: flex; flex-direction: column; gap: 12px; }
+    .perfil-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border: 1.5px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      background: var(--color-bg-white);
+    }
+    .perfil-option:hover {
+      border-color: var(--color-primary);
+      background: rgba(44,169,66,0.04);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(44,169,66,0.1);
+    }
+    .perfil-option__icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .perfil-option__icon--admin { background: #1a1a1a; }
+    .perfil-option__icon--empresa { background: var(--color-primary-gradient); }
+    .perfil-option__icon--aluno { background: rgba(0,0,0,0.06); }
+    .perfil-option__info { flex: 1; }
+    .perfil-option__label {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-text-default);
+    }
+    .perfil-option__desc {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .perfil-option__arrow {
+      color: var(--color-text-muted);
+      opacity: 0.4;
+    }
+    .modal__content--perfil {
+      max-width: 440px;
+    }
+    .modal__subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="login-page">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-brand__logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="login-brand__name">SCTEC</span>
+      </div>
+
+      <h1 class="login-card__title">Bom te ver de volta</h1>
+      <p class="login-card__subtitle">Portal de Talentos — acesse sua conta</p>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-group__label">E-mail</label>
+          <input type="email" class="form-group__input" placeholder="seu@email.com.br" value="admin@sctec.edu.br">
+        </div>
+        <div class="form-group">
+          <label class="form-group__label">Senha</label>
+          <input type="password" class="form-group__input" placeholder="••••••••" value="••••••••">
+        </div>
+        <div class="login-card__options">
+          <label class="login-card__remember">
+            <input type="checkbox" checked> Lembrar de mim
+          </label>
+          <a href="#" class="login-card__forgot">Esqueci minha senha</a>
+        </div>
+        <button type="submit" class="btn btn--primary btn--login">Entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Modal seleção de perfil -->
+  <div class="modal" id="modal-perfil">
+    <div class="modal__overlay" onclick="this.parentElement.classList.remove('modal--open')"></div>
+    <div class="modal__content modal__content--perfil">
+      <div class="modal__header">
+        <h2 class="modal__title">Escolha seu perfil</h2>
+        <button class="modal__close" onclick="this.closest('.modal').classList.remove('modal--open')">&times;</button>
+      </div>
+      <p class="modal__subtitle">Selecione como deseja acessar o portal</p>
+      <div class="perfil-options">
+        <a href="admin-alunos.html" class="perfil-option">
+          <div class="perfil-option__icon perfil-option__icon--admin">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <div class="perfil-option__info">
+            <div class="perfil-option__label">Administrador</div>
+            <div class="perfil-option__desc">Gerencie alunos, empresas e usuários</div>
+          </div>
+          <svg class="perfil-option__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="#" class="perfil-option">
+          <div class="perfil-option__icon perfil-option__icon--empresa">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+          </div>
+          <div class="perfil-option__info">
+            <div class="perfil-option__label">Empresa</div>
+            <div class="perfil-option__desc">Encontre e gerencie candidatos</div>
+          </div>
+          <svg class="perfil-option__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        <a href="#" class="perfil-option">
+          <div class="perfil-option__icon perfil-option__icon--aluno">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#454545" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="perfil-option__info">
+            <div class="perfil-option__label">Aluno</div>
+            <div class="perfil-option__desc">Visualize seu perfil e vagas disponíveis</div>
+          </div>
+          <svg class="perfil-option__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function handleLogin(e) {
+      e.preventDefault();
+      document.getElementById('modal-perfil').classList.add('modal--open');
+    }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('toast--visible');
+      setTimeout(() => t.classList.remove('toast--visible'), 3000);
+    }
+  </script>
+</body>
+</html>

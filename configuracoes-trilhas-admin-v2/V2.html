@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Configurações — Trilhas Adaptativas | Orbie Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#F1F4F9;color:#344054;min-width:1440px;font-size:14px}
+
+/* layout */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#fff;border-right:1px solid #E1E8EF;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;display:flex;flex-direction:column}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+
+/* topbar */
+.topbar{height:64px;background:#fff;border-bottom:1px solid #E1E8EF;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:100}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:#52607A}
+.breadcrumb strong{color:#344054}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#52607A;cursor:pointer}
+.topbar-icon:hover{background:#F1F4F9}
+.avatar{width:36px;height:36px;border-radius:50%;background:#2177FF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+
+/* sidebar */
+.sidebar-logo{padding:18px 20px 14px;border-bottom:1px solid #E1E8EF}
+.nav-section-label{padding:8px 24px 4px;font-size:11px;font-weight:700;color:#8A95B2;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:8px;cursor:pointer;font-size:14px;color:#52607A;transition:background .15s}
+.nav-item:hover{background:#F8F9FC}
+.nav-item .pi{font-size:17px;width:20px;text-align:center}
+.nav-item.active-parent{color:#2177FF;background:#EFF8FF;font-weight:600}
+.nav-sub-item{display:block;padding:7px 12px;margin:1px 8px 1px 46px;border-radius:6px;cursor:pointer;font-size:13px;color:#52607A}
+.nav-sub-item:hover{background:#F8F9FC}
+.nav-sub-item.active{color:#2177FF;font-weight:600}
+
+/* page */
+.page-content{padding:32px;max-width:860px}
+.page-header{margin-bottom:32px}
+.page-title{font-size:22px;font-weight:700;color:#1D2939;margin-bottom:6px}
+.page-desc{font-size:14px;color:#52607A;line-height:1.6;max-width:620px}
+
+/* section */
+.section{background:#fff;border:1px solid #E1E8EF;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px;overflow:hidden}
+.section-head{padding:18px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #E1E8EF}
+.section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-blue{background:#EFF8FF;color:#1849A9}
+.ic-green{background:#ECFDF3;color:#027A48}
+.ic-orange{background:#FFFAEB;color:#B54708}
+.ic-purple{background:#F5F0FF;color:#6941C6}
+.ic-gray{background:#F1F4F9;color:#344054}
+.ic-gold{background:#FFF8E6;color:#92400E}
+.section-title{font-size:15px;font-weight:700;color:#1D2939}
+.section-sub{font-size:12px;color:#8A95B2;margin-top:2px}
+
+/* param block */
+.param-block{padding:20px 24px;border-bottom:1px solid #F1F4F9;display:flex;flex-direction:column;gap:10px}
+.param-block:last-child{border-bottom:none}
+.param-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.param-label{font-size:14px;font-weight:600;color:#1D2939;display:flex;align-items:center;gap:6px}
+.param-label .pi{font-size:13px;color:#8A95B2;cursor:help}
+.param-plain{font-size:13px;color:#52607A;line-height:1.5;max-width:540px}
+.param-default-chip{background:#F1F4F9;border-radius:99px;padding:2px 10px;font-size:12px;color:#52607A;white-space:nowrap;flex-shrink:0}
+
+/* tooltip */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1D2939;color:#fff;font-size:12px;padding:6px 12px;border-radius:6px;white-space:normal;max-width:260px;text-align:center;z-index:999;line-height:1.5;pointer-events:none}
+
+/* slider control */
+.slider-wrap{display:flex;align-items:center;gap:12px}
+.slider-wrap input[type=range]{flex:1;height:6px;accent-color:#2177FF;cursor:pointer}
+.slider-val{min-width:56px;text-align:center;font-size:14px;font-weight:700;color:#2177FF;background:#EFF8FF;border-radius:8px;padding:4px 10px}
+.slider-labels{display:flex;justify-content:space-between;font-size:11px;color:#8A95B2;margin-top:4px;padding:0 2px}
+
+/* number input small */
+.num-inp{height:36px;border:1px solid #E1E8EF;border-radius:8px;padding:0 10px;font-size:14px;font-family:'Outfit',sans-serif;color:#344054;background:#fff;outline:none;width:90px;text-align:center;font-weight:600;transition:border .15s}
+.num-inp:focus{border-color:#2177FF;box-shadow:0 0 0 3px rgba(33,119,255,.1)}
+.num-inp.err{border-color:#F04438;background:#FEF3F2}
+
+/* time input */
+.time-inp{height:36px;border:1px solid #E1E8EF;border-radius:8px;padding:0 12px;font-size:14px;font-family:'Outfit',sans-serif;color:#344054;background:#fff;outline:none;width:120px;transition:border .15s}
+.time-inp:focus{border-color:#2177FF}
+
+/* select */
+.sel-inp{height:36px;border:1px solid #E1E8EF;border-radius:8px;padding:0 10px;font-size:14px;font-family:'Outfit',sans-serif;color:#344054;background:#fff;outline:none;cursor:pointer;appearance:auto;transition:border .15s}
+.sel-inp:focus{border-color:#2177FF}
+
+/* toggle */
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#C5D0DE;border-radius:24px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked + .toggle-slider{background:#2177FF}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px)}
+.toggle-row{display:flex;align-items:center;gap:10px}
+.toggle-state{font-size:13px;font-weight:500}
+
+/* impact preview */
+.impact-preview{background:#F8F9FC;border:1px solid #E1E8EF;border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#52607A;line-height:1.5}
+.impact-preview .pi{color:#2177FF;flex-shrink:0;margin-top:1px}
+
+/* advanced accordion */
+.adv-toggle{display:flex;align-items:center;gap:6px;padding:10px 24px;cursor:pointer;font-size:13px;color:#52607A;border-top:1px dashed #E1E8EF;user-select:none;transition:background .15s}
+.adv-toggle:hover{background:#F8F9FC;color:#344054}
+.adv-toggle .pi-chevron{transition:transform .2s}
+.adv-toggle.open .pi-chevron{transform:rotate(180deg)}
+.adv-body{display:none;background:#F8F9FC;border-top:1px solid #E1E8EF}
+.adv-body.open{display:block}
+
+/* pesos grid */
+.pesos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 24px}
+.peso-item{display:flex;flex-direction:column;gap:5px}
+.peso-item label{font-size:11px;color:#52607A;font-weight:600;line-height:1.3}
+.peso-soma-row{padding:0 24px 14px;display:flex;align-items:center;gap:10px}
+.soma-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:700}
+.soma-ok{background:#ECFDF3;color:#027A48}
+.soma-err{background:#FEF3F2;color:#B42318}
+
+/* prompt area */
+.prompt-wrap{padding:16px 24px}
+.prompt-label{font-size:13px;font-weight:600;color:#344054;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.version-badge{background:#F1F4F9;color:#52607A;border-radius:99px;padding:1px 8px;font-size:11px}
+.ta{width:100%;border:1px solid #E1E8EF;border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Outfit',sans-serif;color:#344054;resize:vertical;outline:none;line-height:1.6;min-height:72px;transition:border .15s}
+.ta:focus{border-color:#2177FF;box-shadow:0 0 0 3px rgba(33,119,255,.08)}
+
+/* input with unit */
+.inp-unit-wrap{display:flex;align-items:center;gap:0}
+.inp-unit-wrap .num-inp{border-radius:8px 0 0 8px;width:80px}
+.unit-label{height:36px;border:1px solid #E1E8EF;border-left:none;background:#F8F9FC;padding:0 12px;border-radius:0 8px 8px 0;display:flex;align-items:center;font-size:13px;color:#52607A;font-weight:500}
+
+/* btn */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:10px;font-size:13px;font-family:'Outfit',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:#2177FF;color:#fff}
+.btn-primary:hover{background:#0059E7}
+.btn-secondary{background:#fff;color:#344054;border:1px solid #E1E8EF}
+.btn-secondary:hover{background:#F8F9FC}
+.btn-ghost-danger{background:none;border:none;color:#B42318;font-size:13px;font-family:'Outfit',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:6px}
+.btn-ghost-danger:hover{background:#FEF3F2}
+
+/* footer */
+.sticky-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid #E1E8EF;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;margin-left:240px;z-index:50}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:460px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid #E1E8EF;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:700;color:#1D2939}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid #E1E8EF;display:flex;justify-content:flex-end;gap:8px}
+
+/* toast */
+.toast{position:fixed;bottom:80px;right:32px;border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:600;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast-ok{background:#1D2939;color:#fff}
+.toast-err{background:#B42318;color:#fff}
+
+/* inline number row */
+.inline-num-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inline-num-item{display:flex;flex-direction:column;gap:3px;align-items:center}
+.inline-num-item label{font-size:11px;color:#8A95B2;font-weight:600;text-align:center;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="96" height="28" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#cl)"><path d="M41.763 56C56.537 56 67.751 45.014 67.751 30.467C67.751 15.919 56.539 4.936 41.763 4.936C26.987 4.936 15.778 15.922 15.778 30.467C15.778 45.012 26.916 56 41.766 56M41.766 52.136C29.416 52.136 20.097 42.893 20.097 30.467C20.097 18.041 29.416 8.798 41.766 8.798C54.115 8.798 63.434 18.041 63.434 30.467C63.434 42.893 54.115 52.136 41.766 52.136Z" fill="#1064AD"/><path d="M92.769 16.832C91.481 16.453 90.495 16.3 88.981 16.3C84.134 16.3 80.495 19.029 78.45 23.422V18.572C78.45 17.586 77.919 16.981 76.936 16.981H76.026C75.117 16.981 74.512 17.589 74.512 18.572V53.424C74.512 54.41 75.119 55.091 76.026 55.091H77.162C78.072 55.091 78.676 54.41 78.676 53.424V33.196C78.676 25.543 82.843 20.012 88.602 20.012C89.512 20.012 90.345 20.165 91.405 20.467C92.314 20.77 93.148 20.693 93.526 19.558L93.679 18.95C94.133 17.662 93.526 17.055 92.769 16.829" fill="#1064AD"/><path d="M116.487 16.3C110.046 16.3 104.82 19.103 101.408 23.574V2.586C101.408 1.451 100.954 0.767 99.666 1.146L98.756 1.372C97.694 1.674 97.315 2.205 97.315 3.039V53.421C97.315 54.407 97.846 55.088 98.83 55.088H99.892C100.877 55.088 101.406 54.407 101.406 53.421V48.498C104.663 53.043 109.891 56 116.484 56C127.699 56 135.577 47.21 135.577 36.148C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.21C107.696 52.21 101.18 46.3 101.027 36.148C100.875 25.996 107.77 20.086 116.106 20.086C125.272 20.086 131.334 27.284 131.334 36.148C131.334 45.012 125.272 52.21 116.106 52.21Z" fill="#1064AD"/><path d="M143.848 55.091H144.984C145.969 55.091 146.498 54.41 146.498 53.424V18.572C146.498 17.586 145.967 16.981 144.984 16.981H143.848C142.939 16.981 142.334 17.589 142.334 18.572V53.424C142.334 54.41 142.941 55.091 143.848 55.091Z" fill="#1064AD"/><path d="M157.566 37.438H188.478C189.766 37.438 190.523 36.605 190.523 35.393C190.523 30.619 188.856 25.998 185.749 22.512C182.642 18.648 177.944 16.3 172.111 16.3C161.125 16.3 153.244 24.862 153.244 36.227C153.244 48.653 162.64 56 172.944 56C178.097 56 184.385 53.955 188.704 49.407C189.235 48.8 189.613 47.893 188.78 47.06L188.325 46.681C187.644 46 186.811 45.848 185.825 46.681C181.961 50.545 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.757 157.566 37.438ZM172.113 20.089C176.963 20.089 180.752 22.058 183.099 25.393C184.842 27.591 185.901 30.393 186.28 33.653H157.566C158.399 25.546 164.083 20.091 172.113 20.091" fill="#1064AD"/><path d="M140.645 6.445C141.212 8.486 143.361 9.69 145.442 9.133C147.522 8.577 148.749 6.471 148.183 4.431C147.616 2.391 145.467 1.186 143.386 1.745C141.305 2.302 140.078 4.408 140.645 6.448" fill="#29B84C"/><path d="M79.976 3.577C79.851 2.269 78.863 1.321 78.147 0.846C77.547 0.447 76.203 0 74.681 0C70.802 0 64.316 1.941 56.628 5.386L52.908 7.241C53.777 7.627 54.618 8.056 55.426 8.529L57.842 7.264C65.53 3.811 71.688 1.969 75.431 1.969C76.178 1.969 76.965 2.071 77.306 2.203C77.649 2.335 78.03 2.513 78.045 3.229C78.088 5.356 75.431 9.255 70.634 14.029C64.369 20.264 55.068 27.4 44.443 34.12C25.36 46.191 10.653 51.595 4.545 51.595C1.021 51.595 2.027 49.461 1.966 49.946C2.274 47.489 5.472 42.647 13.991 35.218L15.947 33.498C15.846 32.566 15.787 31.618 15.78 30.65L12.65 33.394C4.449 40.492 0 46.264 0 49.682C0 50.126 0.193 52.286 2.779 53.2C3.46 53.442 4.301 53.564 5.297 53.564C12.927 53.564 28.823 46.628 45.797 35.891C56.384 29.197 65.685 22.088 71.988 15.881C75.962 11.966 80.288 6.888 79.976 3.577" fill="#F79850"/></g><defs><clipPath id="cl"><rect width="190.523" height="56" fill="white"/></clipPath></defs></svg>
+  </div>
+  <nav style="flex:1;padding:8px 0 16px">
+    <div class="nav-section-label">Menu</div>
+    <div class="nav-item"><i class="pi pi-home"></i>Início</div>
+    <div class="nav-item"><i class="pi pi-users"></i>Turmas</div>
+    <div class="nav-item"><i class="pi pi-chart-line"></i>Acompanhamento</div>
+    <div class="nav-section-label">Sistema</div>
+    <div class="nav-item active-parent"><i class="pi pi-cog"></i>Configurações</div>
+    <div class="nav-sub-item active">Trilhas Adaptativas</div>
+    <div class="nav-item"><i class="pi pi-question-circle"></i>Suporte</div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="breadcrumb">
+      Configurações <i class="pi pi-chevron-right" style="font-size:10px;color:#C5D0DE;margin:0 4px"></i>
+      <strong>Trilhas Adaptativas</strong>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-icon"><i class="pi pi-bell"></i></div>
+      <div class="topbar-icon"><i class="pi pi-question-circle"></i></div>
+      <div class="avatar">SA</div>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="page-header">
+      <h1 class="page-title">Configurações — Trilhas Adaptativas</h1>
+      <p class="page-desc">Ajuste como as trilhas de revisão são geradas para os estudantes. Qualquer mudança só vale a partir do próximo ciclo — o que já está em andamento não é afetado.</p>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 1 — DIAGNÓSTICO
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-blue"><i class="pi pi-search"></i></div>
+        <div>
+          <div class="section-title">Como identificar quem precisa de revisão</div>
+          <div class="section-sub">Define o quanto um estudante precisa errar para receber uma trilha de recomposição</div>
+        </div>
+      </div>
+
+      <!-- LIMIAR -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Sensibilidade do diagnóstico
+              <i class="pi pi-info-circle" data-tip="Quanto mais sensível, mais estudantes recebem trilhas. Quanto mais exigente, apenas quem errou bastante recebe."></i>
+            </div>
+            <div class="param-plain">Controla o nível mínimo de dificuldade que um estudante precisa ter em uma habilidade para receber uma trilha de revisão sobre ela.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 50</span>
+        </div>
+        <div>
+          <div class="slider-wrap">
+            <span style="font-size:12px;color:#8A95B2;white-space:nowrap">Mais sensível</span>
+            <input type="range" id="sl-limiar" min="10" max="90" value="50" step="5" oninput="updSlider('sl-limiar','lbl-limiar')">
+            <span style="font-size:12px;color:#8A95B2;white-space:nowrap">Mais exigente</span>
+            <div class="slider-val" id="lbl-limiar">50</div>
+          </div>
+        </div>
+        <div class="impact-preview" id="prev-limiar">
+          <i class="pi pi-info-circle"></i>
+          <span>Com esse valor, estudantes que acertaram menos de <strong id="pct-limiar">50%</strong> das questões de uma habilidade recebem trilha de revisão.</span>
+        </div>
+      </div>
+
+      <!-- N_MIN -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Mínimo de questões para confiar no diagnóstico
+              <i class="pi pi-info-circle" data-tip="Se o estudante respondeu poucas questões de uma habilidade, o sistema reduz automaticamente a confiança no diagnóstico dessa habilidade."></i>
+            </div>
+            <div class="param-plain">Quantas questões o estudante precisa ter respondido em uma habilidade para que o diagnóstico seja considerado confiável.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 4 questões</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">1</span>
+          <input type="range" id="sl-nmin" min="1" max="20" value="4" step="1" oninput="updSlider('sl-nmin','lbl-nmin')">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">20</span>
+          <div class="slider-val" id="lbl-nmin">4</div>
+        </div>
+      </div>
+
+      <!-- N_GATILHO -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Quando gerar trilha para quem chegou depois
+              <i class="pi pi-info-circle" data-tip="Estudantes que não usaram a plataforma no início do ciclo podem receber uma trilha assim que acumularem respostas suficientes."></i>
+            </div>
+            <div class="param-plain">Número de respostas que um estudante inativo precisa dar durante o ciclo para que o sistema gere uma trilha para ele antes do fim do período.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 8 respostas</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">1</span>
+          <input type="range" id="sl-gatilho" min="1" max="50" value="8" step="1" oninput="updSlider('sl-gatilho','lbl-gatilho')">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">50</span>
+          <div class="slider-val" id="lbl-gatilho">8</div>
+        </div>
+      </div>
+
+      <!-- ANTECEDÊNCIA VIGÊNCIA -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Prazo mínimo antes do fim do ciclo para gerar trilha
+              <i class="pi pi-info-circle" data-tip="Se faltar menos do que esse tempo para o ciclo acabar, o sistema não publica a trilha gerada por entrada tardia — seria pouco tempo para o aluno concluir."></i>
+            </div>
+            <div class="param-plain">Tempo mínimo restante no ciclo (em horas) para que uma trilha gerada por "entrada tardia" seja publicada ao estudante. Se restar menos, o sistema aguarda o próximo ciclo.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 48h</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">12h</span>
+          <input type="range" id="sl-antec" min="12" max="120" value="48" step="12" oninput="updSlider('sl-antec','lbl-antec',true)">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">120h</span>
+          <div class="slider-val" id="lbl-antec">48h</div>
+        </div>
+      </div>
+
+      <!-- AVANÇADO: PESOS + FAIXAS -->
+      <div class="adv-toggle" id="adv-diag-btn" onclick="toggleAdv('adv-diag')">
+        <i class="pi pi-sliders-h"></i>
+        <span>Configurações avançadas — Pesos e faixas do diagnóstico</span>
+        <i class="pi pi-chevron-down pi-chevron" style="margin-left:auto"></i>
+      </div>
+      <div class="adv-body" id="adv-diag">
+        <div style="padding:14px 24px 6px">
+          <div style="font-size:13px;color:#52607A;margin-bottom:12px;line-height:1.5">O diagnóstico calcula um índice de dificuldade por habilidade combinando sete fatores. Cada fator tem um peso percentual. <strong>A soma de todos os pesos deve ser exatamente 100%.</strong></div>
+          <div class="pesos-grid">
+            <div class="peso-item">
+              <label>Desempenho geral na habilidade</label>
+              <input type="number" class="num-inp" id="g1" value="40" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Diferença em relação à turma</label>
+              <input type="number" class="num-inp" id="g2" value="15" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Errar questões fáceis</label>
+              <input type="number" class="num-inp" id="g3" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Não recuperar em chances extras</label>
+              <input type="number" class="num-inp" id="g4" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Dificuldade que se repete em ciclos</label>
+              <input type="number" class="num-inp" id="g5" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Piora em relação ao ciclo anterior</label>
+              <input type="number" class="num-inp" id="g6" value="5" min="0" max="100" oninput="recalcSoma()">
+            </div>
+            <div class="peso-item">
+              <label>Erros em avaliações formais</label>
+              <input type="number" class="num-inp" id="g7" value="10" min="0" max="100" oninput="recalcSoma()">
+            </div>
+          </div>
+          <div class="peso-soma-row">
+            <span id="soma-badge" class="soma-chip soma-ok"><i class="pi pi-check-circle"></i>Total: <strong id="soma-val">100%</strong></span>
+            <span id="soma-err" style="font-size:12px;color:#B42318;display:none"><i class="pi pi-exclamation-triangle"></i> Corrija para que a soma seja 100% antes de salvar.</span>
+          </div>
+        </div>
+        <div style="border-top:1px solid #E1E8EF;padding:14px 24px">
+          <div style="font-size:13px;font-weight:600;color:#344054;margin-bottom:10px">Limites entre as faixas de urgência</div>
+          <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:12px;color:#52607A;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#F04438;display:inline-block"></span>Urgente (Gap Crítico) — índice ≥</label>
+              <input type="number" class="num-inp" id="faixa-c" value="70" min="1" max="100" oninput="validFaixas()">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:12px;color:#52607A;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#F79009;display:inline-block"></span>Moderada — índice ≥</label>
+              <input type="number" class="num-inp" id="faixa-m" value="50" min="1" max="99" oninput="validFaixas()">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:12px;color:#52607A;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#2177FF;display:inline-block"></span>Atenção — índice ≥</label>
+              <input type="number" class="num-inp" id="faixa-a" value="30" min="1" max="98" oninput="validFaixas()">
+            </div>
+            <div id="faixa-err" style="font-size:12px;color:#B42318;display:none;align-self:center"><i class="pi pi-exclamation-triangle"></i> Os valores devem ser Urgente &gt; Moderada &gt; Atenção.</div>
+          </div>
+          <div style="font-size:11px;color:#8A95B2;margin-top:8px">Padrão: Urgente = 70 · Moderada = 50 · Atenção = 30</div>
+        </div>
+        <!-- % máx componente -->
+        <div style="border-top:1px solid #E1E8EF;padding:14px 24px">
+          <div style="font-size:13px;font-weight:600;color:#344054;margin-bottom:4px">Máximo de revisão do mesmo assunto em uma trilha</div>
+          <div style="font-size:13px;color:#52607A;margin-bottom:10px">Porcentagem máxima de blocos de um mesmo componente curricular (ex: Matemática) dentro de uma única trilha. Garante que a trilha seja variada quando o estudante tem dificuldades em mais de um assunto.</div>
+          <div class="slider-wrap">
+            <span style="font-size:12px;color:#8A95B2">20%</span>
+            <input type="range" id="sl-pctcomp" min="20" max="100" value="60" step="5" oninput="updSlider('sl-pctcomp','lbl-pctcomp',true,'%')">
+            <span style="font-size:12px;color:#8A95B2">100%</span>
+            <div class="slider-val" id="lbl-pctcomp">60%</div>
+          </div>
+          <div style="font-size:11px;color:#8A95B2;margin-top:6px">Padrão: 60%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 2 — TRILHA
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-orange"><i class="pi pi-list"></i></div>
+        <div>
+          <div class="section-title">Como montar a trilha de revisão</div>
+          <div class="section-sub">Define o tamanho, a composição e as regras de variedade de cada trilha gerada</div>
+        </div>
+      </div>
+
+      <!-- BLOCOS MÍNIMOS -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Quantos blocos de atividades por periodicidade
+              <i class="pi pi-info-circle" data-tip="Cada bloco tem 1 texto explicativo + até 3 exercícios. Turmas com ciclos mais longos podem ter trilhas maiores."></i>
+            </div>
+            <div class="param-plain">Define quantos blocos de recomposição a trilha deve ter, de acordo com o período configurado na turma. Cada bloco foca em uma habilidade específica.</div>
+          </div>
+        </div>
+        <div class="inline-num-row">
+          <div class="inline-num-item">
+            <label>Semanal<br>(7 dias)</label>
+            <input type="number" class="num-inp" id="bm-sem" value="2" min="2" max="10">
+          </div>
+          <div style="font-size:20px;color:#C5D0DE;padding-top:16px">→</div>
+          <div class="inline-num-item">
+            <label>Quinzenal<br>(15 dias)</label>
+            <input type="number" class="num-inp" id="bm-qui" value="3" min="2" max="10">
+          </div>
+          <div style="font-size:20px;color:#C5D0DE;padding-top:16px">→</div>
+          <div class="inline-num-item">
+            <label>Mensal<br>(30 dias)</label>
+            <input type="number" class="num-inp" id="bm-men" value="5" min="2" max="10">
+          </div>
+          <div style="font-size:20px;color:#C5D0DE;padding-top:16px">→</div>
+          <div class="inline-num-item">
+            <label>Trimestral<br>(90 dias)</label>
+            <input type="number" class="num-inp" id="bm-tri" value="5" min="2" max="10">
+          </div>
+        </div>
+        <div style="font-size:12px;color:#8A95B2">Valor mínimo: 2 blocos. O sistema pode gerar até 1 bloco a mais que o configurado.</div>
+      </div>
+
+      <!-- PRÁTICAS POR BLOCO -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Exercícios práticos por bloco
+              <i class="pi pi-info-circle" data-tip="Cada bloco começa com um texto explicativo e depois apresenta exercícios. Aqui você define quantos exercícios vêm após o texto."></i>
+            </div>
+            <div class="param-plain">Quantos exercícios práticos aparecem em cada bloco de revisão, depois do texto explicativo de introdução.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 3 exercícios</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2">1</span>
+          <input type="range" id="sl-prat" min="1" max="5" value="3" step="1" oninput="updSlider('sl-prat','lbl-prat')">
+          <span style="font-size:12px;color:#8A95B2">5</span>
+          <div class="slider-val" id="lbl-prat">3</div>
+        </div>
+      </div>
+
+      <!-- ANTIRREPETIÇÃO -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Evitar repetir exercícios das últimas trilhas
+              <i class="pi pi-info-circle" data-tip="O sistema evita reapresentar questões já usadas nas últimas trilhas do estudante. Defina quantas trilhas anteriores considerar."></i>
+            </div>
+            <div class="param-plain">Quantas trilhas anteriores do estudante o sistema verifica para evitar repetir os mesmos exercícios na nova trilha.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 2 trilhas</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">Não evitar</span>
+          <input type="range" id="sl-anti" min="0" max="5" value="2" step="1" oninput="updSlider('sl-anti','lbl-anti')">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">5 trilhas</span>
+          <div class="slider-val" id="lbl-anti">2</div>
+        </div>
+      </div>
+
+      <!-- PISO ABSOLUTO -->
+      <div class="param-block" style="border-bottom:none">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Mínimo para publicar a trilha
+              <i class="pi pi-info-circle" data-tip="Se o sistema não conseguir montar pelo menos esse número de blocos (por falta de conteúdo), a trilha não é publicada e o professor recebe um aviso."></i>
+            </div>
+            <div class="param-plain">Número mínimo de blocos completos que a trilha precisa ter para ser enviada ao estudante. Se o banco de questões não tiver conteúdo suficiente, a trilha não é publicada.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 2 blocos</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2">1</span>
+          <input type="range" id="sl-piso" min="1" max="5" value="2" step="1" oninput="updSlider('sl-piso','lbl-piso')">
+          <span style="font-size:12px;color:#8A95B2">5</span>
+          <div class="slider-val" id="lbl-piso">2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 3 — IA GENERATIVA
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-purple"><i class="pi pi-sparkles"></i></div>
+        <div>
+          <div class="section-title">Geração automática de conteúdo</div>
+          <div class="section-sub">Quando o banco de questões não tem conteúdo suficiente, a IA cria exercícios novos</div>
+        </div>
+      </div>
+
+      <!-- LIMITE CHAMADAS -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Limite de geração por turma a cada ciclo
+              <i class="pi pi-info-circle" data-tip="Controla o custo da IA. Quando o limite é atingido, o sistema usa apenas o que já existe no banco."></i>
+            </div>
+            <div class="param-plain">Número máximo de vezes que a IA pode criar conteúdo novo para uma turma em um único ciclo. Quando atingido, os blocos são montados apenas com questões já existentes.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 200</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2">0</span>
+          <input type="range" id="sl-chamadas" min="0" max="500" value="200" step="25" oninput="updSlider('sl-chamadas','lbl-chamadas')">
+          <span style="font-size:12px;color:#8A95B2">500</span>
+          <div class="slider-val" id="lbl-chamadas">200</div>
+        </div>
+        <div class="impact-preview">
+          <i class="pi pi-info-circle"></i>
+          <span id="prev-chamadas">Com 200 chamadas por ciclo, turmas com muitos estudantes com lacunas em habilidades com pouco conteúdo no banco podem usar todo o limite rapidamente.</span>
+        </div>
+      </div>
+
+      <!-- CACHE -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Reutilizar conteúdo criado recentemente
+              <i class="pi pi-info-circle" data-tip="Se dois estudantes da mesma turma precisam de conteúdo sobre a mesma habilidade, o sistema usa a questão já criada em vez de gerar outra. Isso economiza créditos de IA."></i>
+            </div>
+            <div class="param-plain">Quando a IA cria uma questão para um estudante, ela pode ser reutilizada para outros da mesma turma com a mesma dificuldade durante esse período, sem gerar novamente.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 24h</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">1h</span>
+          <input type="range" id="sl-cache" min="1" max="168" value="24" step="1" oninput="updSlider('sl-cache','lbl-cache',true)">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">7 dias</span>
+          <div class="slider-val" id="lbl-cache">24h</div>
+        </div>
+      </div>
+
+      <!-- TIMEOUT + TENTATIVAS em linha -->
+      <div class="param-block">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div class="param-label" style="margin-bottom:6px">
+              Tempo máximo de espera por geração
+              <i class="pi pi-info-circle" data-tip="Se a IA demorar mais do que esse tempo, o sistema tenta de novo e depois segue sem o conteúdo gerado."></i>
+            </div>
+            <div class="param-plain" style="margin-bottom:10px">Tempo de espera por resposta da IA antes de desistir e tentar de novo.</div>
+            <div class="slider-wrap">
+              <span style="font-size:12px;color:#8A95B2">10s</span>
+              <input type="range" id="sl-timeout" min="10" max="60" value="30" step="5" oninput="updSlider('sl-timeout','lbl-timeout',true,'s')">
+              <span style="font-size:12px;color:#8A95B2">60s</span>
+              <div class="slider-val" id="lbl-timeout">30s</div>
+            </div>
+            <div style="font-size:11px;color:#8A95B2;margin-top:4px">Padrão: 30 segundos</div>
+          </div>
+          <div>
+            <div class="param-label" style="margin-bottom:6px">
+              Tentativas em caso de falha na qualidade
+              <i class="pi pi-info-circle" data-tip="Quando a questão gerada não passa na verificação de qualidade automática, o sistema tenta novamente esse número de vezes antes de desistir."></i>
+            </div>
+            <div class="param-plain" style="margin-bottom:10px">Quantas vezes o sistema tenta regenerar uma questão que não passou na verificação de qualidade.</div>
+            <div class="slider-wrap">
+              <span style="font-size:12px;color:#8A95B2">0</span>
+              <input type="range" id="sl-tent" min="0" max="3" value="2" step="1" oninput="updSlider('sl-tent','lbl-tent')">
+              <span style="font-size:12px;color:#8A95B2">3</span>
+              <div class="slider-val" id="lbl-tent">2</div>
+            </div>
+            <div style="font-size:11px;color:#8A95B2;margin-top:4px">Padrão: 2 tentativas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPTS — accordion -->
+      <div class="adv-toggle" id="adv-ia-btn" onclick="toggleAdv('adv-ia')">
+        <i class="pi pi-file-edit"></i>
+        <span>Instruções para a IA — Prompts de geração</span>
+        <i class="pi pi-chevron-down pi-chevron" style="margin-left:auto"></i>
+      </div>
+      <div class="adv-body" id="adv-ia">
+        <div class="prompt-wrap">
+          <div class="prompt-label">
+            Instrução para criar exercícios de revisão
+            <span class="version-badge">v3</span>
+            <span style="font-size:11px;color:#8A95B2;margin-left:auto;font-weight:400">Alterações criam nova versão automaticamente</span>
+          </div>
+          <div style="font-size:12px;color:#8A95B2;margin-bottom:8px">Use <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px">[ano/série]</code> <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px">[código – descrição]</code> <code style="background:#F1F4F9;padding:1px 5px;border-radius:4px">[objetivo]</code> como variáveis.</div>
+          <textarea class="ta" id="prompt-recomp" rows="4">Gere atividades de recomposição de aprendizagem para um estudante de [ano/série] que apresentou dificuldade na habilidade [código – descrição], especificamente no objetivo de aprendizagem [objetivo]. O conteúdo deve retomar o conceito de forma clara e progressiva, com linguagem adequada à faixa etária, contextualizada e sem pressupor domínio prévio do conceito em defasagem.</textarea>
+        </div>
+        <div class="prompt-wrap" style="border-top:1px solid #E1E8EF">
+          <div class="prompt-label">
+            Instrução para criar o texto introdutório do bloco
+            <span class="version-badge">v2</span>
+            <span style="font-size:11px;color:#8A95B2;margin-left:auto;font-weight:400">Alterações criam nova versão automaticamente</span>
+          </div>
+          <div style="font-size:12px;color:#8A95B2;margin-bottom:8px">Cada bloco começa com um texto explicativo. O texto gerado deve ter no máximo 1.200 caracteres.</div>
+          <textarea class="ta" id="prompt-info" rows="3">Gere um texto de apoio pedagógico curto (máximo 1.200 caracteres) que explique o conceito central da habilidade [código – descrição] para um estudante de [ano/série], em linguagem acessível, com um exemplo prático. O conteúdo não deve conter pergunta nem campo de resposta.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 4 — CICLO
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-gray"><i class="pi pi-clock"></i></div>
+        <div>
+          <div class="section-title">Agendamento</div>
+          <div class="section-sub">Quando o sistema processa os ciclos e gera as trilhas</div>
+        </div>
+      </div>
+      <div class="param-block" style="border-bottom:none">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Horário de geração das trilhas
+              <i class="pi pi-info-circle" data-tip="O sistema roda automaticamente nesse horário para processar os ciclos que terminaram e gerar as trilhas do próximo ciclo. Recomende horários de pouco uso."></i>
+            </div>
+            <div class="param-plain">Todo dia nesse horário (fuso de Brasília), o sistema verifica quais turmas têm ciclo encerrando e gera as trilhas de revisão para os próximos dias.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 02:00</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="time" class="time-inp" id="horario-job" value="02:00">
+          <span style="font-size:13px;color:#52607A">horário de Brasília (GMT-03:00)</span>
+        </div>
+        <div class="impact-preview">
+          <i class="pi pi-info-circle"></i>
+          <span>Escolha um horário em que a plataforma é pouco usada pelos estudantes. O horário padrão (02:00) foi definido para minimizar impacto no desempenho.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 5 — REVISÃO
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-blue"><i class="pi pi-eye"></i></div>
+        <div>
+          <div class="section-title">Revisão pelo professor antes de publicar</div>
+          <div class="section-sub">Permite que o professor aprove cada trilha antes de ela chegar ao estudante</div>
+        </div>
+      </div>
+
+      <!-- TOGGLE REVISÃO -->
+      <div class="param-block">
+        <div class="param-head">
+          <div>
+            <div class="param-label">Exigir aprovação do professor</div>
+            <div class="param-plain">Quando ativado, cada trilha gerada fica aguardando revisão do professor antes de ser enviada ao estudante. Quando desativado, as trilhas são publicadas automaticamente.</div>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle">
+            <input type="checkbox" id="tog-revisao" onchange="updToggle(this,'lbl-revisao','Aprovação exigida','Publicação automática')">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-state" id="lbl-revisao" style="color:#52607A">Publicação automática</span>
+        </div>
+        <div class="impact-preview" id="prev-revisao">
+          <i class="pi pi-info-circle"></i>
+          <span>As trilhas serão publicadas automaticamente após a geração, sem necessidade de aprovação manual.</span>
+        </div>
+      </div>
+
+      <!-- JANELA REVISÃO -->
+      <div class="param-block" style="border-bottom:none">
+        <div class="param-head">
+          <div>
+            <div class="param-label">
+              Prazo para o professor revisar
+              <i class="pi pi-info-circle" data-tip="Se o professor não revisar dentro desse prazo, a trilha é publicada automaticamente para não deixar o estudante sem conteúdo."></i>
+            </div>
+            <div class="param-plain">Depois de gerada, a trilha fica aguardando revisão por esse período. Se o professor não agir dentro do prazo, ela é publicada automaticamente.</div>
+          </div>
+          <span class="param-default-chip">Padrão: 72h</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">1 dia</span>
+          <input type="range" id="sl-janela" min="24" max="168" value="72" step="24" oninput="updSlider('sl-janela','lbl-janela',true)">
+          <span style="font-size:12px;color:#8A95B2;white-space:nowrap">7 dias</span>
+          <div class="slider-val" id="lbl-janela">72h</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SEÇÃO 6 — RECOMPENSA
+    ══════════════════════════════════ -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ic-gold"><i class="pi pi-star"></i></div>
+        <div>
+          <div class="section-title">Recompensa ao concluir a trilha</div>
+          <div class="section-sub">O que o estudante recebe ao completar todos os exercícios da revisão</div>
+        </div>
+      </div>
+
+      <div class="param-block">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <!-- SIGCOINS -->
+          <div>
+            <div class="param-label" style="margin-bottom:6px">
+              Sigcoins por trilha concluída
+              <i class="pi pi-info-circle" data-tip="O estudante recebe essa quantidade de Sigcoins ao terminar todas as fases da trilha, independente de quantas questões acertou."></i>
+            </div>
+            <div class="param-plain" style="margin-bottom:10px">Valor fixo em Sigcoins ao concluir. Não depende do desempenho — é uma recompensa pelo esforço de revisão.</div>
+            <div class="slider-wrap">
+              <span style="font-size:12px;color:#8A95B2">0</span>
+              <input type="range" id="sl-sig" min="0" max="200" value="50" step="10" oninput="updSlider('sl-sig','lbl-sig')">
+              <span style="font-size:12px;color:#8A95B2">200</span>
+              <div class="slider-val" id="lbl-sig">50</div>
+            </div>
+            <div style="font-size:11px;color:#8A95B2;margin-top:4px">Padrão: 50 Sigcoins</div>
+          </div>
+          <!-- XP -->
+          <div>
+            <div class="param-label" style="margin-bottom:6px">
+              XP por trilha concluída
+              <i class="pi pi-info-circle" data-tip="Disponível quando o sistema de XP das Trilhas Auto-Guiadas estiver ativado. Use a mesma escala dessas trilhas para manter coerência."></i>
+            </div>
+            <div class="param-plain" style="margin-bottom:10px">Pontos de experiência (XP) concedidos ao concluir. Use a mesma escala das Trilhas Auto-Guiadas.</div>
+            <div class="slider-wrap">
+              <span style="font-size:12px;color:#8A95B2">0</span>
+              <input type="range" id="sl-xp" min="0" max="500" value="0" step="25" oninput="updSlider('sl-xp','lbl-xp')">
+              <span style="font-size:12px;color:#8A95B2">500</span>
+              <div class="slider-val" id="lbl-xp">0</div>
+            </div>
+            <div style="font-size:11px;color:#8A95B2;margin-top:4px">Padrão: conforme escala Trilhas Auto-Guiadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div><!-- /page-content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- STICKY FOOTER -->
+<div class="sticky-footer">
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn-ghost-danger" onclick="openModal()"><i class="pi pi-refresh"></i>Restaurar padrões</button>
+    <span style="font-size:12px;color:#8A95B2">As mudanças valem a partir do próximo ciclo</span>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-secondary" onclick="location.reload()">Descartar</button>
+    <button class="btn btn-primary" onclick="salvar()"><i class="pi pi-check"></i>Salvar configurações</button>
+  </div>
+</div>
+
+<!-- MODAL RESTAURAR -->
+<div class="modal-overlay" id="modal-rest">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Restaurar configurações padrão</div>
+      <button style="background:none;border:none;cursor:pointer;color:#52607A;font-size:18px;line-height:1" onclick="closeModal()"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Todos os parâmetros serão redefinidos para os valores originais do sistema. Essa ação é registrada no histórico de auditoria.</p>
+      <p style="margin-top:12px;font-size:13px;color:#B42318"><i class="pi pi-exclamation-triangle" style="margin-right:4px"></i>Ciclos já processados não são afetados. Apenas os próximos ciclos usarão os valores padrão.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn" style="background:#B42318;color:#fff" onclick="restaurar()"><i class="pi pi-refresh"></i>Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── SLIDER UPDATE ── */
+function updSlider(id, lblId, withUnit, suffix) {
+  var val = document.getElementById(id).value;
+  var display = val;
+  if(withUnit && !suffix) display = val + 'h';
+  else if(suffix) display = val + suffix;
+  document.getElementById(lblId).textContent = display;
+
+  /* preview dinâmico */
+  if(id === 'sl-limiar') {
+    var pct = 100 - parseInt(val);
+    document.getElementById('pct-limiar').textContent = pct + '%';
+  }
+  if(id === 'sl-chamadas') {
+    var n = parseInt(val);
+    var txt = n === 0 ? 'A geração de conteúdo por IA está desativada. Apenas questões do banco serão usadas.' :
+      'Com ' + n + ' chamadas por ciclo, a IA pode criar conteúdo novo até esse limite por turma.';
+    document.getElementById('prev-chamadas').textContent = txt;
+  }
+}
+
+/* ── TOGGLE UPDATE ── */
+function updToggle(el, lblId, activeText, inactiveText) {
+  var lbl = document.getElementById(lblId);
+  lbl.textContent = el.checked ? activeText : inactiveText;
+  lbl.style.color = el.checked ? '#2177FF' : '#52607A';
+  var prev = document.getElementById('prev-revisao');
+  if(prev) {
+    prev.querySelector('span').textContent = el.checked
+      ? 'Cada trilha gerada ficará em aguardando aprovação antes de ser enviada ao estudante. Se o professor não revisar dentro do prazo configurado, ela será publicada automaticamente.'
+      : 'As trilhas serão publicadas automaticamente após a geração, sem necessidade de aprovação manual.';
+  }
+}
+
+/* ── ACCORDION ── */
+function toggleAdv(id) {
+  var body = document.getElementById(id);
+  var btn = document.getElementById(id + '-btn');
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+/* ── SOMA PESOS ── */
+function recalcSoma() {
+  var ids = ['g1','g2','g3','g4','g5','g6','g7'];
+  var soma = ids.reduce(function(a,id){ return a + (parseInt(document.getElementById(id).value)||0); }, 0);
+  document.getElementById('soma-val').textContent = soma + '%';
+  var badge = document.getElementById('soma-badge');
+  var err = document.getElementById('soma-err');
+  if(soma === 100) {
+    badge.className = 'soma-chip soma-ok';
+    badge.innerHTML = '<i class="pi pi-check-circle"></i>Total: <strong id="soma-val">100%</strong>';
+    err.style.display = 'none';
+    ids.forEach(function(id){ document.getElementById(id).classList.remove('err'); });
+  } else {
+    badge.className = 'soma-chip soma-err';
+    badge.innerHTML = '<i class="pi pi-exclamation-triangle"></i>Total: <strong id="soma-val">'+soma+'%</strong>';
+    err.style.display = 'inline-flex';
+    ids.forEach(function(id){ document.getElementById(id).classList.add('err'); });
+  }
+}
+
+/* ── VALIDAR FAIXAS ── */
+function validFaixas() {
+  var c = parseInt(document.getElementById('faixa-c').value)||0;
+  var m = parseInt(document.getElementById('faixa-m').value)||0;
+  var a = parseInt(document.getElementById('faixa-a').value)||0;
+  var ok = c > m && m > a;
+  ['faixa-c','faixa-m','faixa-a'].forEach(function(id){
+    document.getElementById(id).classList.toggle('err', !ok);
+  });
+  document.getElementById('faixa-err').style.display = ok ? 'none' : 'flex';
+}
+
+/* ── SALVAR ── */
+function salvar() {
+  var soma = ['g1','g2','g3','g4','g5','g6','g7'].reduce(function(a,id){return a+(parseInt(document.getElementById(id).value)||0);},0);
+  if(soma !== 100) {
+    document.getElementById('adv-diag').classList.add('open');
+    document.getElementById('adv-diag-btn').classList.add('open');
+    showToast('A soma dos fatores de diagnóstico precisa ser 100%. Verifique as configurações avançadas.','err');
+    return;
+  }
+  var c=parseInt(document.getElementById('faixa-c').value)||0,
+      m=parseInt(document.getElementById('faixa-m').value)||0,
+      a=parseInt(document.getElementById('faixa-a').value)||0;
+  if(!(c>m&&m>a)) {
+    document.getElementById('adv-diag').classList.add('open');
+    document.getElementById('adv-diag-btn').classList.add('open');
+    showToast('Os limites de urgência precisam ser: Urgente > Moderada > Atenção.','err');
+    return;
+  }
+  showToast('Configurações salvas. Nova versão criada e registrada no histórico.','ok');
+}
+
+/* ── MODAL ── */
+function openModal(){ document.getElementById('modal-rest').classList.add('open'); }
+function closeModal(){ document.getElementById('modal-rest').classList.remove('open'); }
+document.getElementById('modal-rest').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+/* ── RESTAURAR ── */
+function restaurar() {
+  closeModal();
+  /* sliders */
+  var s = {
+    'sl-limiar':50,'sl-nmin':4,'sl-gatilho':8,'sl-antec':48,
+    'sl-pctcomp':60,'sl-prat':3,'sl-anti':2,'sl-piso':2,
+    'sl-chamadas':200,'sl-cache':24,'sl-timeout':30,'sl-tent':2,
+    'sl-janela':72,'sl-sig':50,'sl-xp':0
+  };
+  Object.keys(s).forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    el.value=s[id];
+    var lblId=id.replace('sl-','lbl-');
+    var lbl=document.getElementById(lblId); if(!lbl) return;
+    var withH=['sl-antec','sl-cache','sl-janela'];
+    var withS=['sl-timeout'];
+    var withPct=['sl-pctcomp'];
+    if(withH.indexOf(id)>-1) lbl.textContent=s[id]+'h';
+    else if(withS.indexOf(id)>-1) lbl.textContent=s[id]+'s';
+    else if(withPct.indexOf(id)>-1) lbl.textContent=s[id]+'%';
+    else lbl.textContent=s[id];
+  });
+  /* pct-limiar preview */
+  document.getElementById('pct-limiar').textContent=(100-50)+'%';
+  /* number inputs */
+  var n={'g1':40,'g2':15,'g3':10,'g4':10,'g5':10,'g6':5,'g7':10,'faixa-c':70,'faixa-m':50,'faixa-a':30,'bm-sem':2,'bm-qui':3,'bm-men':5,'bm-tri':5};
+  Object.keys(n).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=n[id]; });
+  /* toggle */
+  document.getElementById('tog-revisao').checked=false;
+  document.getElementById('lbl-revisao').textContent='Publicação automática';
+  document.getElementById('lbl-revisao').style.color='#52607A';
+  /* time */
+  document.getElementById('horario-job').value='02:00';
+  /* prompts */
+  document.getElementById('prompt-recomp').value='Gere atividades de recomposição de aprendizagem para um estudante de [ano/série] que apresentou dificuldade na habilidade [código – descrição], especificamente no objetivo de aprendizagem [objetivo]. O conteúdo deve retomar o conceito de forma clara e progressiva, com linguagem adequada à faixa etária, contextualizada e sem pressupor domínio prévio do conceito em defasagem.';
+  document.getElementById('prompt-info').value='Gere um texto de apoio pedagógico curto (máximo 1.200 caracteres) que explique o conceito central da habilidade [código – descrição] para um estudante de [ano/série], em linguagem acessível, com um exemplo prático. O conteúdo não deve conter pergunta nem campo de resposta.';
+  recalcSoma(); validFaixas();
+  showToast('Padrões restaurados com sucesso. Auditoria registrada.','ok');
+}
+
+/* ── TOAST ── */
+function showToast(msg, type) {
+  var t=document.getElementById('toast');
+  t.innerHTML=(type==='ok'?'<i class="pi pi-check-circle"></i>':'<i class="pi pi-exclamation-triangle"></i>')+msg;
+  t.className='toast show '+(type==='ok'?'toast-ok':'toast-err');
+  setTimeout(function(){ t.classList.remove('show'); }, 4200);
+}
+</script>
+</body>
+</html>

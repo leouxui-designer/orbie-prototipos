@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Star Animation — Orbie App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1A32;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Outfit', sans-serif;
+      gap: 40px;
+    }
+
+    /* ── Container do componente ── */
+    .star-animation {
+      position: relative;
+      width: 172px;
+      height: 172px;
+    }
+
+    /* ── Ring (background + progress indicator) ── */
+    .ring {
+      position: absolute;
+      inset: 0;
+      width: 172px;
+      height: 172px;
+    }
+
+    .ring-bg {
+      position: absolute;
+      /* 4.26% / 5.12% inset — ≈ 7.3px / 8.8px */
+      top: 7.33px;
+      left: 7.33px;
+      right: 8.81px;
+      bottom: 8.81px;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .ring-bg img {
+      position: absolute;
+      /* expand -10.56% beyond container ≈ -16.5px */
+      inset: -10.56%;
+      width: calc(100% + 21.12%);
+      height: calc(100% + 21.12%);
+      display: block;
+    }
+
+    .ring-progress {
+      position: absolute;
+      top: 7.33px;
+      left: 7.33px;
+      right: 8.81px;
+      bottom: 8.81px;
+    }
+
+    .ring-progress img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ── Círculo amarelo (Star bg) ── */
+    .star-bg {
+      position: absolute;
+      /* left: 14.89%, right: 15.96%, top: calc(50% - 0.91px), height = width */
+      left: 14.89%;
+      right: 15.96%;
+      /* Centro vertical */
+      top: 50%;
+      transform: translateY(-50%) translateY(-0.91px);
+      aspect-ratio: 1 / 1;
+      background: #E5B400;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Estrela central ── */
+    .star-center {
+      width: 36px;
+      height: 36px;
+      display: block;
+      transform-origin: center center;
+      animation: starCenterScale 1.369205s linear infinite;
+    }
+
+    @keyframes starCenterScale {
+      0%       { transform: scale(1); }
+      55.204%  { transform: scale(0.9); animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      75.467%  { transform: scale(1.5); animation-timing-function: cubic-bezier(0.5, 0, 1, 0.144); }
+      91.246%  { transform: scale(1); }
+      100%     { transform: scale(1); }
+    }
+
+    /* ── Estrelinhas pequenas (posicionadas no centro do componente) ── */
+    .little-star {
+      position: absolute;
+      width: 16.468px;
+      height: 16.468px;
+      /* Todas partem do centro */
+      left: 50%;
+      top: 50%;
+      transform-origin: center center;
+    }
+
+    /* SVG inline das estrelinhas */
+    .little-star svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Estrela 1 — dispara para cima (-9.285, -56.285) */
+    .little-star-1 {
+      margin-left: -8.234px; /* metade da largura */
+      margin-top: -8.234px;
+      animation:
+        ls1-opacity  1.369205s linear infinite,
+        ls1-translate 1.369205s linear infinite,
+        ls1-scale    1.369205s linear infinite;
+    }
+
+    @keyframes ls1-opacity {
+      0%       { opacity: 0.5; }
+      88.854%  { opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      100%     { opacity: 0; }
+    }
+    @keyframes ls1-translate {
+      0%      { translate: -0.411px  0.018px; }
+      56.95%  { translate: -0.411px  0.018px; }
+      81.992% { translate: -9.285px -56.285px; }
+      100%    { translate: -9.285px -56.285px; }
+    }
+    @keyframes ls1-scale {
+      0%      { scale: 1 1; }
+      69.618% { scale: 1 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.854% { scale: 1.5 1.5; }
+      100%    { scale: 1.5 1.5; }
+    }
+
+    /* Estrela 2 — dispara para esquerda-cima (-54.749, -36.75) */
+    .little-star-2 {
+      margin-left: -8.234px;
+      margin-top: -8.234px;
+      animation:
+        ls2-opacity   1.369205s linear infinite,
+        ls2-translate 1.369205s linear infinite,
+        ls2-scale     1.369205s linear infinite;
+    }
+
+    @keyframes ls2-opacity {
+      0%      { opacity: 1; }
+      88.854% { opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      100%    { opacity: 0; }
+    }
+    @keyframes ls2-translate {
+      0%     { translate: -0.41px  0.02px; }
+      56.95% { translate: -0.41px  0.02px; }
+      100%   { translate: -54.749px -36.75px; }
+    }
+    @keyframes ls2-scale {
+      0%      { scale: 1 1; }
+      69.618% { scale: 1 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.854% { scale: 1.5 1.5; }
+      100%    { scale: 1.5 1.5; }
+    }
+
+    /* Estrela 3 — dispara para direita-baixo (46.899, 40.9) */
+    .little-star-3 {
+      margin-left: -8.234px;
+      margin-top: -8.234px;
+      animation:
+        ls3-opacity   1.369205s linear infinite,
+        ls3-translate 1.369205s linear infinite,
+        ls3-scale     1.369205s linear infinite;
+    }
+
+    @keyframes ls3-opacity {
+      0%      { opacity: 1; }
+      88.854% { opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      100%    { opacity: 0; }
+    }
+    @keyframes ls3-translate {
+      0%     { translate: -0.41px 0.02px; }
+      56.95% { translate: -0.41px 0.02px; }
+      100%   { translate: 46.899px 40.9px; }
+    }
+    @keyframes ls3-scale {
+      0%      { scale: 1 1; }
+      69.618% { scale: 1 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.854% { scale: 1.2 1.2; }
+      100%    { scale: 1.2 1.2; }
+    }
+
+    /* Estrela 4 — dispara para direita-cima (23.9, -61.1) */
+    .little-star-4 {
+      margin-left: -8.234px;
+      margin-top: -8.234px;
+      animation:
+        ls4-opacity   1.369205s linear infinite,
+        ls4-translate 1.369205s linear infinite,
+        ls4-scale     1.369205s linear infinite;
+    }
+
+    @keyframes ls4-opacity {
+      0%      { opacity: 1; }
+      88.869% { opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      93.75%  { opacity: 0; }
+      100%    { opacity: 0; }
+    }
+    @keyframes ls4-translate {
+      0%      { translate: -0.411px  0.018px; }
+      56.964% { translate: -0.411px  0.018px; }
+      88.869% { translate: 23.9px   -61.1px; }
+      100%    { translate: 23.9px   -61.1px; }
+    }
+    @keyframes ls4-scale {
+      0%      { scale: 0.3 0.3; }
+      56.964% { scale: 0.3 0.3; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      69.633% { scale: 1 1;   animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.869% { scale: 1.2 1.2; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.884% { scale: 0.8 0.8; }
+      100%    { scale: 0.8 0.8; }
+    }
+
+    /* Estrela 5 — quase estática, apenas pulsa e desaparece */
+    .little-star-5 {
+      margin-left: -8.234px;
+      margin-top: -8.234px;
+      animation:
+        ls5-opacity   1.369205s linear infinite,
+        ls5-translate 1.369205s linear infinite,
+        ls5-scale     1.369205s linear infinite;
+    }
+
+    @keyframes ls5-opacity {
+      0%      { opacity: 1; }
+      88.854% { opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      93.735% { opacity: 0; }
+      100%    { opacity: 0; }
+    }
+    @keyframes ls5-translate {
+      0%      { translate: -0.41px 0.02px; }
+      56.95%  { translate: -0.41px 0.02px; }
+      88.854% { translate: -1.348px 0.148px; }
+      100%    { translate: -1.348px 0.148px; }
+    }
+    @keyframes ls5-scale {
+      0%      { scale: 0.3 0.3; }
+      56.95%  { scale: 0.3 0.3; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.854% { scale: 0.6 0.6; animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); }
+      88.869% { scale: 0.8 0.8; }
+      100%    { scale: 0.8 0.8; }
+    }
+
+    /* ── Label de controle abaixo ── */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      color: #99C0FF;
+      letter-spacing: 0;
+      text-align: center;
+    }
+
+    .btn-replay {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: #0059E7;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 24px;
+      cursor: pointer;
+      transition: background 200ms ease-in-out;
+    }
+    .btn-replay:hover { background: #3F84F3; }
+    .btn-replay:active { background: #0040A7; }
+  </style>
+</head>
+<body>
+
+  <div class="star-animation" aria-label="Star Animation">
+
+    <!-- Ring: background + progress indicator (SVGs do Figma) -->
+    <div class="ring">
+      <div class="ring-bg">
+        <img
+          src="https://www.figma.com/api/mcp/asset/5102d2a6-f1c2-4164-9e15-def5ba707870.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
+      <div class="ring-progress">
+        <img
+          src="https://www.figma.com/api/mcp/asset/2080ff05-c685-4c5b-aac2-e840185815fd.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+
+    <!-- Círculo amarelo com estrela central -->
+    <div class="star-bg">
+      <img
+        class="star-center"
+        src="https://www.figma.com/api/mcp/asset/e8930f16-fe66-48db-890f-8d36a96a73d5.svg"
+        alt="Estrela"
+      />
+    </div>
+
+    <!-- Estrelinhas que explodem para fora -->
+    <!-- Estrela 1 (topo-centro) -->
+    <div class="little-star little-star-1" aria-hidden="true">
+      <img src="https://www.figma.com/api/mcp/asset/22c190d1-a747-4a94-a624-955a8ea9c683.svg" alt="" style="width:100%;height:100%;display:block;" />
+    </div>
+
+    <!-- Estrela 2 (esquerda-cima) -->
+    <div class="little-star little-star-2" aria-hidden="true">
+      <img src="https://www.figma.com/api/mcp/asset/22c190d1-a747-4a94-a624-955a8ea9c683.svg" alt="" style="width:100%;height:100%;display:block;" />
+    </div>
+
+    <!-- Estrela 3 (direita-baixo) -->
+    <div class="little-star little-star-3" aria-hidden="true">
+      <img src="https://www.figma.com/api/mcp/asset/e3e801d7-c618-4a11-8560-44ddfbda6c64.svg" alt="" style="width:100%;height:100%;display:block;" />
+    </div>
+
+    <!-- Estrela 4 (direita-cima, menor, começa pequena) -->
+    <div class="little-star little-star-4" aria-hidden="true">
+      <img src="https://www.figma.com/api/mcp/asset/13864ddb-b1d6-4717-afb3-0290ba03c2a9.svg" alt="" style="width:100%;height:100%;display:block;" />
+    </div>
+
+    <!-- Estrela 5 (quase estática, pulsa e desaparece) -->
+    <div class="little-star little-star-5" aria-hidden="true">
+      <img src="https://www.figma.com/api/mcp/asset/d5c41666-5a81-453e-a1bd-c0ae6190cd5b.svg" alt="" style="width:100%;height:100%;display:block;" />
+    </div>
+
+  </div>
+
+  <!-- Controles -->
+  <div class="controls">
+    <span class="label">Star Animation · 1.37s loop</span>
+    <button class="btn-replay" onclick="replayAnimation()">Replay</button>
+  </div>
+
+  <script>
+    function replayAnimation() {
+      // Remove e re-adiciona o componente para forçar restart das animations
+      const el = document.querySelector('.star-animation');
+      const clone = el.cloneNode(true);
+      el.parentNode.replaceChild(clone, el);
+    }
+  </script>
+
+</body>
+</html>
