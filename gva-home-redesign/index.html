@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280" />
+  <title>GVA — Guia Virtual de Aprendizagem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM TOKENS — baseado em design_orbie_app.md
+    ============================================================ */
+    :root {
+      /* ── Brand Blue */
+      --bb-100: #99C0FF;
+      --bb-200: #3F84F3;
+      --bb-300: #0059E7;
+      --bb-400: #0040A7;
+      --bb-500: #002868;
+      --bb-600: #0D1A32;
+
+      /* ── Gray Blue surfaces */
+      --gb-100: #C0CADB;
+      --gb-200: #98A8C2;
+      --gb-300: #7187A9;
+      --gb-400: #526D98;
+      --gb-500: #31558A;
+      --gb-700: #224476;
+      --gb-800: #1D3258;
+      --gb-900: #142A51;
+      --gb-1000: #10203D;
+
+      /* ── Semantic */
+      --bg:           #0D1A32;
+      --surface:      #142A51;
+      --surface-dark: #10203D;
+      --border:       #224476;
+      --primary:      #0059E7;
+      --primary-h:    #3F84F3;
+      --primary-p:    #0040A7;
+
+      --text:       #FFFFFF;
+      --text-2:     #99C0FF;
+      --text-label: #C0CADB;
+      --text-muted: #526D98;
+
+      --success:    #12B76A;
+      --success-bg: rgba(18,183,106,0.10);
+      --warning:    #F79009;
+      --warning-bg: rgba(247,144,9,0.08);
+      --error:      #F04438;
+      --error-bg:   rgba(240,68,56,0.10);
+      --yellow:     #FFEA24;
+
+      --progress-track: #224476;
+
+      /* ── Typography */
+      --font-d: 'Orbitron', monospace;
+      --font-u: 'Outfit', sans-serif;
+
+      /* ── Radius */
+      --r4:   4px;
+      --r8:   8px;
+      --r12:  12px;
+      --r16:  16px;
+      --rfull:1000px;
+
+      /* ── Shadow */
+      --sh-sm: 0 1px 3px rgba(0,0,0,.20);
+      --sh-md: 0 2px 8px rgba(0,0,0,.30);
+
+      /* ── Layout */
+      --sidebar: 240px;
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-u);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+    }
+
+    button { font-family: var(--font-u); cursor: pointer; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Focus ring (accessibility) */
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: var(--r4);
+    }
+
+    /* ============================================================
+       APP SHELL
+    ============================================================ */
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
+    .sidebar {
+      width: var(--sidebar);
+      min-width: var(--sidebar);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* logo */
+    .sb-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-brand {
+      font-family: var(--font-d);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+    .sb-brand em { color: var(--primary); font-style: normal; }
+    .sb-tagline {
+      font-size: 10px;
+      color: var(--text-2);
+      margin-top: 3px;
+      letter-spacing: .4px;
+    }
+
+    /* nav */
+    .sb-nav {
+      flex: 1;
+      padding: 14px 10px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+    }
+
+    .sb-item button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: var(--r12);
+      background: transparent;
+      border: none;
+      color: var(--text-2);
+      font-size: 13.5px;
+      font-weight: 500;
+      width: 100%;
+      text-align: left;
+      transition: background .15s, color .15s;
+    }
+    .sb-item button:hover { background: rgba(255,255,255,.05); color: var(--text); }
+    .sb-item.active button {
+      background: var(--primary);
+      color: #fff;
+    }
+    .sb-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* divider */
+    .sb-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+    .sb-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 4px 12px 6px;
+    }
+
+    /* user */
+    .sb-user {
+      padding: 12px 10px;
+      border-top: 1px solid var(--border);
+    }
+    .sb-user-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--r12);
+      border: none;
+      background: transparent;
+      width: 100%;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .sb-user-btn:hover { background: rgba(255,255,255,.05); }
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: var(--rfull);
+      background: linear-gradient(135deg, var(--primary), #3F84F3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-d);
+      font-size: 12px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .sb-user-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+    .sb-user-role  { font-size: 11px; color: var(--text-2); }
+    .sb-user-info  { flex: 1; min-width: 0; text-align: left; }
+
+    /* ============================================================
+       MAIN
+    ============================================================ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* top bar */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .class-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--rfull);
+      background: transparent;
+      color: var(--text-2);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .class-pill:hover { border-color: var(--primary); color: var(--text); }
+    .class-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 36px; height: 36px;
+      border-radius: var(--r8);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,.06); color: var(--text); }
+
+    /* scroll area */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gb-700) var(--surface-dark);
+    }
+    .scroll-area::-webkit-scrollbar { width: 5px; }
+    .scroll-area::-webkit-scrollbar-track { background: var(--surface-dark); }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--gb-700); border-radius: 4px; }
+
+    /* views */
+    .view { display: none; padding: 36px 40px 48px; max-width: 1000px; }
+    .view.active { display: block; animation: fadein .2s ease; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ============================================================
+       TYPOGRAPHY HELPERS
+    ============================================================ */
+    .display-md {
+      font-family: var(--font-d);
+      font-size: 22px; font-weight: 700; line-height: 1.4;
+    }
+    .display-sm {
+      font-family: var(--font-d);
+      font-size: 16px; font-weight: 700; line-height: 1.4;
+    }
+    .heading { font-size: 22px; font-weight: 700; line-height: 1.35; }
+    .body-lg  { font-size: 16px; line-height: 1.5; }
+    .body-md  { font-size: 14px; line-height: 1.5; }
+    .body-sm  { font-size: 12px; line-height: 1.4; }
+    .label    { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+    /* ============================================================
+       GREETING HEADER
+    ============================================================ */
+    .greeting { margin-bottom: 32px; }
+    .greeting-accent {
+      width: 36px; height: 3px;
+      border-radius: 2px;
+      background: var(--primary);
+      margin-bottom: 14px;
+    }
+    .greeting-title {
+      font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.3;
+    }
+    .greeting-sub {
+      font-size: 14px; color: var(--text-2); margin-top: 4px;
+    }
+
+    /* ============================================================
+       DS CARD
+    ============================================================ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r16);
+      overflow: hidden;
+      box-shadow: var(--sh-sm);
+      transition: box-shadow .2s ease;
+    }
+    .card:hover { box-shadow: var(--sh-md); }
+    .card-accent {
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-h));
+    }
+    .card-body { padding: 20px; }
+    .card-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .card-title { font-size: 14.5px; font-weight: 700; color: var(--text); }
+    .cico {      /* card icon */
+      width: 18px; height: 18px; color: var(--primary); flex-shrink: 0;
+    }
+
+    /* ============================================================
+       HOME GRID
+    ============================================================ */
+    .home-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ============================================================
+       PROGRESS BAR
+    ============================================================ */
+    .progress-track {
+      height: 6px;
+      border-radius: var(--rfull);
+      background: var(--progress-track);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: var(--rfull);
+      background: linear-gradient(90deg, var(--primary), var(--primary-h));
+      transition: width .8s ease-out;
+    }
+
+    /* ============================================================
+       WEEKLY PROGRESS COMPONENT
+    ============================================================ */
+    .days-grid {
+      display: flex; justify-content: space-between; gap: 4px;
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      padding: 12px 8px;
+      margin: 12px 0;
+    }
+    .day-col {
+      display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1;
+    }
+    .day-ring {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      transition: transform .15s;
+    }
+    .day-col:hover .day-ring { transform: scale(1.1); }
+    .day-ring.ok    { background: var(--success-bg); color: var(--success); }
+    .day-ring.miss  { background: var(--error-bg);   color: var(--error);   }
+    .day-ring.extra { background: rgba(0,89,231,.10); color: var(--primary); }
+    .day-ring.empty { background: rgba(82,109,152,.20); color: var(--text-muted); }
+    .day-today .day-ring { box-shadow: 0 0 0 2px var(--primary); transform: scale(1.05); }
+    .day-lbl {
+      font-size: 10px; font-weight: 600;
+      color: var(--text-2); text-transform: uppercase; letter-spacing: .04em;
+    }
+    .day-today .day-lbl { color: var(--primary); font-weight: 700; }
+
+    /* expandable panel */
+    .expand-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      background: transparent;
+      color: var(--primary);
+      font-size: 12.5px; font-weight: 600;
+      transition: background .15s;
+    }
+    .expand-btn:hover { background: rgba(0,89,231,.08); }
+
+    .panel {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .3s ease, opacity .25s ease;
+      border-top: 0px solid var(--border);
+    }
+    .panel.open {
+      max-height: 500px;
+      opacity: 1;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .panel-inner {
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* DS number display — Orbitron for gamified metrics */
+    .ds-num {
+      font-family: var(--font-d);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12.5px;
+    }
+    .stat-row .key   { color: var(--text-2); }
+    .stat-row .val   { font-weight: 700; color: var(--text); }
+    .stat-row .time  { display: flex; gap: 6px; align-items: center;
+                       font-size: 13px; font-weight: 600; color: var(--text); }
+    .stat-row .sep   { color: var(--text-muted); font-weight: 400; }
+
+    .badge {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 12px;
+      border-radius: var(--r8);
+      font-size: 12.5px;
+    }
+    .badge-check {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .badge-check svg { color: var(--success); }
+    .badge-check strong { color: var(--text); font-weight: 700; }
+    .badge-streak {
+      background: var(--warning-bg);
+      border: 1px solid rgba(247,144,9,.25);
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       STUDY FOCUS
+    ============================================================ */
+    .focus-desc { font-size: 12.5px; color: var(--text-2); line-height: 1.55; margin-top: -10px; margin-bottom: 16px; }
+
+    .disc-header {
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .disc-bar   { width: 4px; height: 28px; border-radius: 2px; background: var(--primary); flex-shrink: 0; }
+    .disc-name  { font-size: 13px; font-weight: 700; color: var(--text); }
+    .disc-class { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+
+    .std-group {
+      border: 1px solid rgba(247,144,9,.35);
+      border-radius: var(--r12);
+      padding: 14px;
+      background: rgba(247,144,9,.04);
+      margin-bottom: 10px;
+    }
+    .std-group:last-child { margin-bottom: 0; }
+
+    .std-header {
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(247,144,9,.18);
+    }
+    .std-name { flex: 1; font-size: 12px; font-weight: 700; color: var(--text-label); }
+    .foco-tag {
+      background: var(--warning);
+      color: #fff;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: .5px;
+      padding: 2px 7px;
+      border-radius: var(--r4);
+    }
+
+    .cap-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .cap-card:last-child { margin-bottom: 0; }
+    .cap-name { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.35; }
+
+    .prog-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .prog-row .progress-track { flex: 1; }
+    .prog-pct {
+      font-size: 11.5px; font-weight: 800; color: var(--primary);
+      background: rgba(0,89,231,.10);
+      padding: 2px 8px; border-radius: var(--rfull);
+      white-space: nowrap;
+    }
+    .cap-actions { display: flex; gap: 8px; }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn-pri {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: var(--r12);
+      background: var(--primary);
+      border: 1px solid var(--primary);
+      color: #fff;
+      font-size: 12.5px; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-pri:hover { background: var(--primary-h); }
+    .btn-sec {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: var(--r12);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-size: 12.5px; font-weight: 600;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-sec:hover { border-color: var(--primary); color: var(--text); }
+    .btn-ghost {
+      padding: 10px 14px;
+      border-radius: var(--r12);
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-size: 13px; font-weight: 600;
+      transition: background .15s;
+      width: 100%;
+    }
+    .btn-ghost:hover { background: rgba(0,89,231,.08); }
+    .btn-full {
+      display: block; width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--r12);
+      background: var(--primary);
+      border: 1px solid var(--primary);
+      color: #fff;
+      font-size: 14px; font-weight: 700;
+      transition: background .15s;
+      min-height: 52px;
+    }
+    .btn-full:hover { background: var(--primary-h); }
+
+    /* ============================================================
+       MINI PROFILE (right col)
+    ============================================================ */
+    .profile-summary {
+      background: var(--surface-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .prof-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .prof-row:last-child { border-bottom: none; }
+    .prof-ico { width: 16px; height: 16px; color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+    .prof-lbl { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+    .prof-val { font-size: 13px; font-weight: 500; color: var(--text); margin-top: 2px; }
+
+    /* ============================================================
+       STUDY TIME GRID
+    ============================================================ */
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .time-tile {
+      padding: 14px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      background: var(--surface-dark);
+      color: var(--text-2);
+      font-size: 13px; font-weight: 600;
+      text-align: center;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .time-tile:hover {
+      border-color: var(--primary);
+      background: rgba(0,89,231,.08);
+      color: var(--text);
+    }
+    .time-tile.sel {
+      border-color: var(--primary);
+      background: rgba(0,89,231,.15);
+      color: var(--primary);
+    }
+
+    /* ============================================================
+       MAP UC CARD
+    ============================================================ */
+    .mapa-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .mapa-desc { font-size: 12.5px; color: var(--text-2); line-height: 1.5; max-width: 170px; }
+    .btn-outline-sm {
+      flex-shrink: 0;
+      padding: 9px 14px;
+      border: 1px solid var(--primary);
+      border-radius: var(--r8);
+      background: transparent;
+      color: var(--primary);
+      font-size: 12.5px; font-weight: 600;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .btn-outline-sm:hover { background: rgba(0,89,231,.08); }
+
+    /* ============================================================
+       PROFILE VIEW
+    ============================================================ */
+    .profile-hero {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 28px;
+    }
+    .avatar-lg {
+      width: 72px; height: 72px; border-radius: var(--rfull);
+      background: linear-gradient(135deg, var(--primary), #3F84F3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-d); font-size: 24px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+    .profile-hero-name { font-size: 22px; font-weight: 700; color: var(--text); }
+    .profile-hero-sub  { font-size: 13px; color: var(--text-2); margin-top: 5px; }
+
+    .pref-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .pref-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      padding: 16px;
+    }
+    .pref-lbl { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); margin-bottom: 6px; }
+    .pref-val { font-size: 15px; font-weight: 600; color: var(--text); }
+
+    .full-col { grid-column: 1 / -1; }
+
+    /* sliders */
+    .slider-group { display: flex; flex-direction: column; gap: 18px; }
+    .slider-item  { display: flex; flex-direction: column; gap: 7px; }
+    .slider-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+    .slider-poles { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-2); }
+    .slider-track {
+      position: relative; height: 6px;
+      background: var(--progress-track); border-radius: var(--rfull);
+    }
+    .slider-fill { height: 100%; border-radius: var(--rfull); background: var(--primary); }
+    .slider-thumb {
+      position: absolute; top: 50%; transform: translate(-50%, -50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--primary); border: 2px solid var(--bg);
+    }
+
+    /* onboarding steps */
+    .steps-row { display: flex; align-items: center; gap: 6px; margin-bottom: 24px; }
+    .step-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+    .step-dot.done { background: var(--primary); }
+    .step-line { flex: 1; height: 2px; background: var(--border); border-radius: 1px; }
+    .step-line.done { background: var(--primary); }
+
+    /* ============================================================
+       PLACEHOLDER VIEWS (Mapa, Estudo)
+    ============================================================ */
+    .placeholder-box {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 360px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r16);
+      gap: 14px; color: var(--text-2); text-align: center; padding: 40px;
+    }
+    .ph-emoji { font-size: 48px; margin-bottom: 4px; }
+
+    /* ============================================================
+       CHIPS
+    ============================================================ */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: var(--rfull);
+      font-size: 11.5px; font-weight: 500;
+    }
+    .chip-ok  { background: var(--success-bg); color: var(--success); border: 1px solid rgba(18,183,106,.25); }
+    .chip-pri { background: rgba(0,89,231,.10); color: var(--bb-100); border: 1px solid rgba(0,89,231,.2); }
+
+    /* ============================================================
+       SEPARATOR
+    ============================================================ */
+    .sep { height: 1px; background: var(--border); margin: 14px 0; }
+
+    /* ============================================================
+       CHATBOT FAB
+    ============================================================ */
+    .fab {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      width: 52px; height: 52px;
+      border-radius: var(--rfull);
+      background: var(--primary);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,89,231,.4);
+      cursor: pointer;
+      transition: background .15s, transform .15s;
+      z-index: 100;
+    }
+    .fab:hover { background: var(--primary-h); transform: scale(1.05); }
+
+    /* ============================================================
+       SCROLLBAR NICE (main scroll area already done above)
+    ============================================================ */
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ════════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════ -->
+  <nav class="sidebar" aria-label="Navegação principal">
+
+    <!-- logo -->
+    <div class="sb-logo">
+      <div class="sb-brand">ORBIE <em>GVA</em></div>
+      <div class="sb-tagline">Guia Virtual de Aprendizagem</div>
+    </div>
+
+    <!-- nav items -->
+    <ul class="sb-nav">
+      <li class="sb-item active" id="nav-home">
+        <button onclick="go('home')" aria-label="Home">
+          <!-- home icon -->
+          <svg class="sb-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          Home
+        </button>
+      </li>
+      <li class="sb-item" id="nav-map">
+        <button onclick="go('map')" aria-label="Mapa da UC">
+          <!-- sitemap icon -->
+          <svg class="sb-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+          </svg>
+          Mapa da UC
+        </button>
+      </li>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section-label">Aprendizagem</div>
+
+      <li class="sb-item" id="nav-study">
+        <button onclick="go('study')" aria-label="Sessão de Estudo">
+          <!-- school icon -->
+          <svg class="sb-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+          </svg>
+          Sessão de Estudo
+        </button>
+      </li>
+
+      <div class="sb-divider"></div>
+
+      <li class="sb-item" id="nav-profile">
+        <button onclick="go('profile')" aria-label="Meu Perfil">
+          <!-- person icon -->
+          <svg class="sb-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Meu Perfil
+        </button>
+      </li>
+    </ul>
+
+    <!-- user footer -->
+    <div class="sb-user">
+      <button class="sb-user-btn" onclick="go('profile')" aria-label="Abrir perfil">
+        <div class="avatar">MS</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name">Maria Silva</div>
+          <div class="sb-user-role">Estudante</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-muted);flex-shrink:0">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       MAIN AREA
+  ════════════════════════════════════════════ -->
+  <div class="main">
+
+    <!-- top bar -->
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Configuração de Redes e Hardware</span>
+      <div class="topbar-right">
+        <button class="icon-btn" type="button" aria-label="Notificações" title="Notificações">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+          </svg>
+        </button>
+        <button class="class-pill" type="button" aria-label="Selecionar turma">
+          <span class="class-dot"></span>
+          Turma 3A — Análise de Sistemas
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- scrollable content -->
+    <div class="scroll-area" id="scroll-area">
+
+      <!-- ══════════════════════
+           VIEW: HOME
+      ══════════════════════ -->
+      <div id="view-home" class="view active">
+
+        <div class="greeting">
+          <div class="greeting-accent"></div>
+          <h1 class="greeting-title">Olá, Maria! 👋</h1>
+          <p class="greeting-sub">Por onde vamos começar hoje?</p>
+        </div>
+
+        <div class="home-grid">
+
+          <!-- ── LEFT COLUMN ── -->
+          <div class="col">
+
+            <!-- WEEKLY PROGRESS ─────────────────────── -->
+            <div class="card">
+              <div class="card-accent"></div>
+              <div class="card-body">
+                <div class="card-header">
+                  <svg class="cico" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                  <span class="card-title">Progresso Semanal</span>
+                </div>
+
+                <!-- visual bar -->
+                <div class="progress-track" style="height:4px;margin-bottom:0">
+                  <div class="progress-fill" style="width:65%"></div>
+                </div>
+
+                <!-- days -->
+                <div class="days-grid" aria-label="Dias da semana" role="list">
+                  <div class="day-col" role="listitem" title="Segunda — Cumprido">
+                    <div class="day-ring ok">🔥</div>
+                    <span class="day-lbl">Seg</span>
+                  </div>
+                  <div class="day-col" role="listitem" title="Terça — Cumprido">
+                    <div class="day-ring ok">🔥</div>
+                    <span class="day-lbl">Ter</span>
+                  </div>
+                  <div class="day-col" role="listitem" title="Quarta — Cumprido">
+                    <div class="day-ring ok">🔥</div>
+                    <span class="day-lbl">Qua</span>
+                  </div>
+                  <div class="day-col day-today" role="listitem" title="Quinta — Hoje (Extra)">
+                    <div class="day-ring extra">❄️</div>
+                    <span class="day-lbl">Qui</span>
+                  </div>
+                  <div class="day-col" role="listitem" title="Sexta — Neutro">
+                    <div class="day-ring empty">—</div>
+                    <span class="day-lbl">Sex</span>
+                  </div>
+                  <div class="day-col" role="listitem" title="Sábado — Neutro">
+                    <div class="day-ring empty">—</div>
+                    <span class="day-lbl">Sáb</span>
+                  </div>
+                  <div class="day-col" role="listitem" title="Domingo — Neutro">
+                    <div class="day-ring empty">—</div>
+                    <span class="day-lbl">Dom</span>
+                  </div>
+                </div>
+
+                <!-- toggle -->
+                <button class="expand-btn" id="exp-toggle" type="button" onclick="togglePanel()" aria-expanded="false">
+                  <span id="exp-label">Ver mais detalhes</span>
+                  <svg id="exp-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="transition:transform .25s ease"><path d="M7 10l5 5 5-5z"/></svg>
+                </button>
+
+                <!-- collapsible details -->
+                <div class="panel" id="exp-panel">
+                  <div class="panel-inner">
+                    <div class="stat-row">
+                      <span class="key">Meta semanal</span>
+                      <span class="val"><span class="ds-num" style="font-size:15px">65%</span></span>
+                    </div>
+                    <div class="progress-track" style="height:8px">
+                      <div class="progress-fill" style="width:65%"></div>
+                    </div>
+                    <div class="stat-row" style="justify-content:center">
+                      <div class="time">
+                        <span class="ds-num" style="font-size:14px">1h 15min</span>
+                        <span class="sep" style="color:var(--text-muted);margin:0 4px">/</span>
+                        <span style="color:var(--text-2);font-size:14px;font-weight:600">1h 55min</span>
+                      </div>
+                    </div>
+                    <div class="badge badge-check">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Consistência <strong>75%</strong>
+                      <span style="font-size:11px;opacity:.7">(3/4 dias)</span>
+                    </div>
+                    <div class="badge badge-streak">
+                      ⭐ Incrível! Você está estudando toda semana há 4 semanas!
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STUDY FOCUS ──────────────────────────── -->
+            <div class="card">
+              <div class="card-accent"></div>
+              <div class="card-body">
+                <div class="card-header">
+                  <svg class="cico" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                  </svg>
+                  <span class="card-title">Foco de Estudo</span>
+                </div>
+                <p class="focus-desc">Capacidades indicadas pelo professor para este momento da UC. Priorize-as para maximizar seu desempenho.</p>
+
+                <!-- Discipline -->
+                <div class="disc-header">
+                  <div class="disc-bar"></div>
+                  <div>
+                    <div class="disc-name">Configuração de Redes e Hardware</div>
+                    <div class="disc-class">Turma 3A (T3A2024)</div>
+                  </div>
+                </div>
+
+                <!-- Standard group 1 -->
+                <div class="std-group">
+                  <div class="std-header">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="color:var(--warning);flex-shrink:0">
+                      <path d="M4 11v2h16v-2H4zm0 7h16v-2H4v2zM4 6v2h16V6H4z"/>
+                    </svg>
+                    <span class="std-name">PD 1 — Instalação e Configuração de Hardware</span>
+                    <span class="foco-tag">FOCO</span>
+                  </div>
+
+                  <div class="cap-card">
+                    <span class="cap-name">Instalar e configurar componentes de hardware em desktops e notebooks</span>
+                    <div class="prog-row">
+                      <div class="progress-track"><div class="progress-fill" style="width:40%"></div></div>
+                      <span class="prog-pct">40%</span>
+                    </div>
+                    <div class="cap-actions">
+                      <button class="btn-pri" type="button" onclick="go('study')">Estude no seu tempo</button>
+                      <button class="btn-sec" type="button">Gerar quiz</button>
+                    </div>
+                  </div>
+
+                  <div class="cap-card">
+                    <span class="cap-name">Realizar diagnóstico e manutenção preventiva de equipamentos</span>
+                    <div class="prog-row">
+                      <div class="progress-track"><div class="progress-fill" style="width:70%"></div></div>
+                      <span class="prog-pct">70%</span>
+                    </div>
+                    <div class="cap-actions">
+                      <button class="btn-pri" type="button" onclick="go('study')">Estude no seu tempo</button>
+                      <button class="btn-sec" type="button">Gerar quiz</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Standard group 2 -->
+                <div class="std-group">
+                  <div class="std-header">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="color:var(--warning);flex-shrink:0">
+                      <path d="M4 11v2h16v-2H4zm0 7h16v-2H4v2zM4 6v2h16V6H4z"/>
+                    </svg>
+                    <span class="std-name">PD 2 — Redes Locais e Protocolos TCP/IP</span>
+                    <span class="foco-tag">FOCO</span>
+                  </div>
+                  <div class="cap-card">
+                    <span class="cap-name">Configurar redes locais (LAN) com protocolos TCP/IP e subnetting</span>
+                    <div class="prog-row">
+                      <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+                      <span class="prog-pct">20%</span>
+                    </div>
+                    <div class="cap-actions">
+                      <button class="btn-pri" type="button" onclick="go('study')">Estude no seu tempo</button>
+                      <button class="btn-sec" type="button">Gerar quiz</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- ── RIGHT COLUMN ── -->
+          <div class="col">
+
+            <!-- MINI PROFILE ─────────────────────────── -->
+            <div class="card">
+              <div class="card-accent"></div>
+              <div class="card-body">
+                <div class="card-header">
+                  <svg class="cico" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                  <span class="card-title">Meu Perfil de Estudo</span>
+                </div>
+
+                <div class="profile-summary">
+                  <div class="prof-row">
+                    <svg class="prof-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                    <div>
+                      <div class="prof-lbl">Recursos preferidos</div>
+                      <div class="prof-val">Lendo resumos de tópicos específicos</div>
+                    </div>
+                  </div>
+                  <div class="prof-row">
+                    <svg class="prof-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg>
+                    <div>
+                      <div class="prof-lbl">Nível de experiência</div>
+                      <div class="prof-val">Intermediário</div>
+                    </div>
+                  </div>
+                  <div class="prof-row">
+                    <svg class="prof-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-7h5v5h-5z"/></svg>
+                    <div>
+                      <div class="prof-lbl">Meta semanal</div>
+                      <div class="prof-val">4 dias/sem · 30 min/sessão</div>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="btn-ghost" type="button" onclick="go('profile')">
+                  Refazer preferências
+                </button>
+              </div>
+            </div>
+
+            <!-- STUDY TIME ───────────────────────────── -->
+            <div class="card">
+              <div class="card-accent"></div>
+              <div class="card-body">
+                <div class="card-header">
+                  <svg class="cico" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
+                  </svg>
+                  <span class="card-title">Estude no seu tempo</span>
+                </div>
+                <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin-bottom:14px">
+                  Informe quanto tempo você tem disponível e explore os conteúdos da forma que melhor atende às suas necessidades.
+                </p>
+                <div class="time-grid">
+                  <button class="time-tile" onclick="pickTime(this)">5 min</button>
+                  <button class="time-tile" onclick="pickTime(this)">10 min</button>
+                  <button class="time-tile" onclick="pickTime(this)">15 min</button>
+                  <button class="time-tile" onclick="pickTime(this)">30 min</button>
+                  <button class="time-tile" onclick="pickTime(this)">45 min</button>
+                  <button class="time-tile" onclick="pickTime(this)">60 min</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- MAP UC CARD ──────────────────────────── -->
+            <div class="card">
+              <div class="card-accent"></div>
+              <div class="card-body">
+                <div class="card-header">
+                  <svg class="cico" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 11v2h16v-2H4zm0 7h16v-2H4v2zM4 6v2h16V6H4z"/>
+                  </svg>
+                  <span class="card-title">Explorar o Mapa da UC</span>
+                </div>
+                <div class="mapa-row">
+                  <p class="mapa-desc">Conheça os temas da UC e encontre novos caminhos de estudo</p>
+                  <button class="btn-outline-sm" onclick="go('map')">Abrir mapa mental</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /home-grid -->
+      </div><!-- /view-home -->
+
+
+      <!-- ══════════════════════
+           VIEW: MAP
+      ══════════════════════ -->
+      <div id="view-map" class="view">
+        <div class="greeting">
+          <div class="greeting-accent"></div>
+          <h1 class="greeting-title">Mapa da Unidade Curricular</h1>
+          <p class="greeting-sub">Configuração de Redes e Hardware — Turma 3A</p>
+        </div>
+        <div class="placeholder-box">
+          <div class="ph-emoji">🗺️</div>
+          <div class="display-sm">Mapa Mental Interativo</div>
+          <p style="font-size:13.5px;max-width:320px;color:var(--text-2)">
+            Visualize capacidades e padrões de desempenho da UC em um grafo interativo com Vue Flow.
+          </p>
+          <button class="btn-pri" style="width:auto;padding:11px 28px;border-radius:var(--r12);margin-top:8px" onclick="">
+            Carregar mapa
+          </button>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════
+           VIEW: STUDY SESSION
+      ══════════════════════ -->
+      <div id="view-study" class="view">
+        <div class="greeting">
+          <div class="greeting-accent"></div>
+          <h1 class="greeting-title">Sessão de Estudo</h1>
+          <p class="greeting-sub">Aprendizado personalizado com IA</p>
+        </div>
+        <div class="placeholder-box">
+          <div class="ph-emoji">🤖</div>
+          <div class="display-sm">Sessão IA</div>
+          <p style="font-size:13.5px;max-width:320px;color:var(--text-2)">
+            Selecione um tempo de estudo na Home e inicie uma sessão de aprendizado personalizada pelo assistente.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:260px;margin-top:12px">
+            <button class="time-tile">15 min</button>
+            <button class="time-tile">30 min</button>
+            <button class="time-tile">60 min</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════
+           VIEW: PROFILE
+      ══════════════════════ -->
+      <div id="view-profile" class="view">
+
+        <div class="greeting">
+          <div class="greeting-accent"></div>
+          <h1 class="greeting-title">Meu Perfil de Estudo</h1>
+          <p class="greeting-sub">Personalize como a IA se comunica e como você prefere aprender</p>
+        </div>
+
+        <!-- hero -->
+        <div class="profile-hero">
+          <div class="avatar-lg">MS</div>
+          <div>
+            <div class="profile-hero-name">Maria Silva</div>
+            <div class="profile-hero-sub">
+              <span class="chip chip-ok">● Estudante</span>
+              &nbsp;&nbsp;Turma 3A · Análise de Sistemas
+            </div>
+          </div>
+        </div>
+
+        <!-- onboarding progress indicator -->
+        <div style="margin-bottom:28px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px">
+            Etapas de configuração concluídas
+          </div>
+          <div class="steps-row">
+            <div class="step-dot done" title="Idade"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot done" title="Tempo preferido"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot done" title="Meta semanal"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot done" title="Preferências"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot done" title="Nível de experiência"></div>
+            <div class="step-line done"></div>
+            <div class="step-dot done" title="Tom de voz da IA"></div>
+          </div>
+          <div style="font-size:12px;color:var(--success);margin-top:6px">✓ Perfil completo</div>
+        </div>
+
+        <!-- prefs grid -->
+        <div class="pref-grid">
+
+          <div class="pref-card">
+            <div class="pref-lbl">Recursos preferidos</div>
+            <div class="pref-val">Lendo resumos</div>
+          </div>
+
+          <div class="pref-card">
+            <div class="pref-lbl">Nível de experiência</div>
+            <div class="pref-val">Intermediário</div>
+          </div>
+
+          <div class="pref-card">
+            <div class="pref-lbl">Meta semanal</div>
+            <div class="pref-val">4 dias / semana</div>
+          </div>
+
+          <div class="pref-card">
+            <div class="pref-lbl">Duração da sessão</div>
+            <div class="pref-val">30 min / sessão</div>
+          </div>
+
+          <div class="pref-card">
+            <div class="pref-lbl">Horário preferido</div>
+            <div class="pref-val">Noite (após 18h)</div>
+          </div>
+
+          <div class="pref-card">
+            <div class="pref-lbl">Idade</div>
+            <div class="pref-val">19 anos</div>
+          </div>
+
+          <!-- Tone sliders — full width -->
+          <div class="pref-card full-col">
+            <div class="pref-lbl" style="margin-bottom:18px">Perfil de comunicação da IA</div>
+            <div class="slider-group">
+              <div class="slider-item">
+                <div class="slider-name">Formalidade</div>
+                <div class="slider-poles">
+                  <span>Informal</span>
+                  <span>Formal</span>
+                </div>
+                <div class="slider-track">
+                  <div class="slider-fill" style="width:60%"></div>
+                  <div class="slider-thumb" style="left:60%"></div>
+                </div>
+              </div>
+              <div class="slider-item">
+                <div class="slider-name">Detalhamento</div>
+                <div class="slider-poles">
+                  <span>Resumido</span>
+                  <span>Detalhado</span>
+                </div>
+                <div class="slider-track">
+                  <div class="slider-fill" style="width:40%"></div>
+                  <div class="slider-thumb" style="left:40%"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:var(--surface-dark);border:1px solid var(--border);border-radius:var(--r8);font-size:12.5px;color:var(--text-2)">
+              Tom atual: <strong style="color:var(--text)">Levemente formal, com nível médio de detalhamento</strong>
+            </div>
+          </div>
+
+        </div><!-- /pref-grid -->
+
+        <div class="sep"></div>
+
+        <button class="btn-full" type="button" style="max-width:320px">
+          Refazer onboarding completo
+        </button>
+
+      </div><!-- /view-profile -->
+
+    </div><!-- /scroll-area -->
+  </div><!-- /main -->
+
+</div><!-- /app -->
+
+<!-- Chatbot FAB -->
+<button class="fab" aria-label="Abrir Assistente IA" title="Assistente IA" onclick="alert('Chatbot — integrar com ChatbotWidget.vue')">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+</button>
+
+<script>
+  /* ────────────────────────────────────────────────────────
+     Navigation
+  ──────────────────────────────────────────────────────── */
+  const titles = {
+    home:    'Configuração de Redes e Hardware',
+    map:     'Mapa da UC',
+    study:   'Sessão de Estudo — IA',
+    profile: 'Meu Perfil',
+  };
+
+  function go(view) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+
+    const vEl = document.getElementById('view-' + view);
+    const nEl = document.getElementById('nav-' + view);
+
+    if (vEl) vEl.classList.add('active');
+    if (nEl) nEl.classList.add('active');
+
+    document.getElementById('scroll-area').scrollTop = 0;
+    document.getElementById('topbar-title').textContent = titles[view] || '';
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Expand/Collapse weekly panel
+  ──────────────────────────────────────────────────────── */
+  function togglePanel() {
+    const panel  = document.getElementById('exp-panel');
+    const toggle = document.getElementById('exp-toggle');
+    const label  = document.getElementById('exp-label');
+    const arrow  = document.getElementById('exp-arrow');
+    const open   = panel.classList.toggle('open');
+
+    toggle.setAttribute('aria-expanded', open);
+    label.textContent = open ? 'Ocultar detalhes' : 'Ver mais detalhes';
+    arrow.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Time tile selection
+  ──────────────────────────────────────────────────────── */
+  function pickTime(btn) {
+    document.querySelectorAll('.time-tile').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    setTimeout(() => go('study'), 300);
+  }
+</script>
+</body>
+</html>
