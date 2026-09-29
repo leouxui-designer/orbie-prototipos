@@ -1,0 +1,1208 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440" />
+  <title>GVA — Guia Virtual de Aprendizagem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet" />
+  <style>
+    /* ================================================================
+       DESIGN SYSTEM TOKENS — IggEFikdXEoJKTi9UxnsTI (get_variable_defs)
+    ================================================================ */
+    :root {
+      /* Primary (laranja — theme.colors.primary) */
+      --c-primary:      #e84910;   /* primary[600] = brand.accent */
+      --c-primary-h:    #f5631a;   /* primary[500] hover */
+      --c-primary-d:    #bf340f;   /* primary[700] pressed */
+      --c-primary-bg:   #fff6ed;   /* primary[50] tint */
+
+      /* Secondary (azul) */
+      --c-blue:         #1670fa;   /* secondary[600] */
+      --c-blue-d:       #164194;   /* Brand/Text */
+
+      /* Neutros */
+      --c-text:         #383e41;   /* neutrals[900] */
+      --c-text-sm:      #475157;   /* neutrals[700] */
+      --c-text-muted:   #7c8e94;   /* neutrals[400] */
+
+      /* Superfícies */
+      --c-bg:           #ffffff;   /* neutrals[50] */
+      --c-surface:      #ffffff;
+      --c-border:       #e4e8e9;   /* neutrals[150] */
+      --c-group-bg:     #22272a0d; /* darkOverlay[50] */
+
+      /* Overlays DS */
+      --c-pov-50:       #e849100d; /* primaryOverlay[50] */
+      --c-pov-100:      #e849101a; /* primaryOverlay[100] */
+      --c-pov-200:      #e8491033; /* primaryOverlay[200] */
+      --c-sov-300:      #01b5744d; /* successOverlay[300] */
+      --c-wov-300:      #f976074d; /* warningOverlay[300] */
+      --c-dov-50:       #22272a0d; /* darkOverlay[50] */
+      --c-dov-100:      #22272a1a; /* darkOverlay[100] */
+
+      /* Semânticos */
+      --c-success:      #01b574;   /* success[500] */
+      --c-success-bg:   #ebfef4;   /* success[50] */
+      --c-warning:      #f97607;   /* warning[500] */
+      --c-warning-bg:   #fff8eb;   /* warning[50] */
+      --c-danger:       #e31a1a;   /* danger[600] */
+      --c-danger-bg:    #fff1f1;   /* danger[50] */
+      --c-info:         #0086ff;   /* info[500] */
+      --c-info-bg:      #e9faff;   /* info[50] */
+
+      /* Tipografia — Open Sans */
+      --font: 'Open Sans', sans-serif;
+
+      /* Espaçamentos (theme.size.spacing) */
+      --sp-xs:  8px;
+      --sp-sm:  12px;
+      --sp-md:  16px;
+      --sp-lg:  24px;
+      --sp-xl:  32px;
+
+      /* Raios */
+      --r-xs:   8px;
+      --r-sm:  12px;
+      --r-md:  16px;
+      --r-full: 1000px;
+
+      /* Sombras */
+      --sh-sm: 0 1px 3px var(--c-dov-100);
+      --sh-md: 0 2px 8px var(--c-dov-100);
+
+      /* Layout */
+      --sidebar-w: 290px;
+    }
+
+    /* ── Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--c-bg);
+      color: var(--c-text);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      font-variation-settings: 'wdth' 100;
+    }
+    button, input, select { font-family: var(--font); }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; }
+
+    /* Material Symbols Rounded — DS spec: Style Rounded, Weight 300, Fill Off */
+    .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      font-style: normal; font-size: 24px; line-height: 1;
+      letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap;
+      direction: ltr; -webkit-font-smoothing: antialiased; user-select: none;
+    }
+
+    /* ── Focus */
+    :focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; border-radius: var(--r-xs); }
+
+    /* ================================================================
+       APP SHELL
+    ================================================================ */
+    .app { display: flex; height: 100vh; overflow: hidden; max-width: 1440px; margin: 0 auto; }
+
+    /* ================================================================
+       SIDEBAR (Menu node 8153:63419)
+    ================================================================ */
+    .sidebar {
+      width: var(--sidebar-w); min-width: var(--sidebar-w);
+      background: var(--c-surface);
+      border-right: none;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow-y: auto;
+      padding: 40px 16px 24px; gap: var(--sp-xs);
+      scrollbar-width: thin; scrollbar-color: var(--c-border) transparent;
+    }
+
+    .sb-logo { display: flex; align-items: center; justify-content: center; margin-bottom: var(--sp-md); }
+    .sb-logo-text { font-size: 20px; font-weight: 700; letter-spacing: -.2px; color: var(--c-text); }
+    .sb-logo-text .acc { color: var(--c-primary); }
+
+    /* 1 único grupo (backgound.neutralOverlay50 + border.neutral150 + radius 12px) */
+    .sb-group {
+      background: var(--c-group-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r-sm);
+      padding: var(--sp-xs);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+
+    /* item height 36px, padding 8px, radius 8px — do Figma */
+    .sb-item {
+      display: flex; align-items: center; gap: 10px;
+      height: 36px; padding: var(--sp-xs);
+      border-radius: var(--r-xs); border: none;
+      background: transparent; color: var(--c-text);
+      font-size: 14px; font-weight: 400; width: 100%; text-align: left;
+      transition: background .12s;
+    }
+    .sb-item:hover { background: var(--c-dov-100); }
+    .sb-item.active { background: var(--c-surface); box-shadow: var(--sh-sm); font-weight: 600; }
+    .sb-ico { font-size: 20px; color: var(--c-text-muted); flex-shrink: 0; width: 24px; text-align: center; }
+    .sb-item.active .sb-ico { color: var(--c-primary); }
+    .sb-lbl { flex: 1; }
+
+    /* Action icons (48x48, 1.5px border primary-d, radius 12px) */
+    .sb-actions { display: flex; flex-direction: column; gap: var(--sp-xs); margin-top: auto; padding-top: var(--sp-md); }
+    .sb-action {
+      width: 48px; height: 48px; border: 1.5px solid var(--c-primary-d);
+      border-radius: var(--r-sm); background: transparent;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s;
+    }
+    .sb-action:hover { background: var(--c-pov-100); }
+    .sb-action .material-symbols-rounded { font-size: 20px; color: var(--c-primary-d); }
+
+    .sb-user {
+      display: flex; align-items: center; gap: 10px; padding: var(--sp-xs);
+      border-radius: var(--r-xs); border-top: 1px solid var(--c-border);
+      padding-top: var(--sp-sm); margin-top: var(--sp-xs);
+      cursor: pointer; transition: background .12s;
+    }
+    .sb-user:hover { background: var(--c-group-bg); }
+    .avatar {
+      width: 32px; height: 32px; border-radius: var(--r-full);
+      background: var(--c-primary); color: white;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .avatar-sm { width: 40px; height: 40px; font-size: 14px; }
+    .avatar-lg { width: 70px; height: 70px; font-size: 26px; border: 2px solid var(--c-border); }
+    .sb-uname { font-size: 13px; font-weight: 600; color: var(--c-text); }
+    .sb-urole { font-size: 11px; color: var(--c-text-muted); }
+
+    /* ================================================================
+       MAIN
+    ================================================================ */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      background: var(--c-surface);
+      border-bottom: none;
+      height: 60px; padding: 0 var(--sp-xl);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; gap: 16px;
+    }
+    .tb-crumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-text-muted); }
+    .tb-crumb .sep { font-size: 14px; opacity: .4; }
+    .tb-crumb .cur { color: var(--c-text); font-weight: 600; }
+
+    .tb-right { display: flex; align-items: center; gap: 8px; }
+    .tb-icon {
+      width: 36px; height: 36px; border: 1px solid var(--c-border);
+      border-radius: var(--r-xs); background: transparent; color: var(--c-text-muted);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s;
+    }
+    .tb-icon:hover { background: var(--c-group-bg); }
+    .tb-icon .material-symbols-rounded { font-size: 20px; }
+
+    .tb-pill {
+      display: flex; align-items: center; gap: 7px; padding: 8px 14px;
+      border: 1px solid var(--c-border); border-radius: var(--r-sm);
+      background: transparent; color: var(--c-text-sm);
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: border-color .15s;
+    }
+    .tb-pill:hover { border-color: var(--c-primary); color: var(--c-text); }
+    .tb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-success); }
+    .tb-pill .material-symbols-rounded { font-size: 14px; }
+
+    .scroll-area {
+      flex: 1; overflow-y: auto; background: var(--c-bg);
+      scrollbar-width: thin; scrollbar-color: var(--c-border) transparent;
+    }
+    .scroll-area::-webkit-scrollbar { width: 5px; }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 4px; }
+
+    .view { display: none; padding: var(--sp-xl); max-width: 1100px; }
+    .view.active { display: block; animation: fadein .18s ease; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* ================================================================
+       COMPONENTES DO DS
+    ================================================================ */
+
+    /* Cabeçalho de página */
+    .pg-title { font-size: 22px; font-weight: 700; color: var(--c-text); line-height: 1.3; }
+    .pg-sub   { font-size: 13px; color: var(--c-text-muted); margin-top: 2px; }
+    .greeting { margin-bottom: var(--sp-xl); }
+
+    /* Card — border 1px #e4e8e9, radius 12px, bg white */
+    .card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-sm); }
+    .card-body { padding: var(--sp-md) var(--sp-lg); }
+    .card-hdr  { display: flex; align-items: center; gap: 8px; margin-bottom: var(--sp-sm); }
+    .card-ttl  { font-size: 15px; font-weight: 600; color: var(--c-text); }
+    .cico      { font-size: 18px; color: var(--c-text-muted); flex-shrink: 0; }
+    .cico.red  { color: var(--c-primary); }
+
+    /* Home grid 3:2 */
+    .hgrid { display: grid; grid-template-columns: 3fr 2fr; gap: var(--sp-md); align-items: start; }
+    .col   { display: flex; flex-direction: column; gap: var(--sp-md); }
+
+    /* Progress bar */
+    .prog-track { height: 8px; border-radius: var(--r-full); background: var(--c-border); overflow: hidden; }
+    .prog-fill  { height: 100%; border-radius: var(--r-full); background: var(--c-primary); transition: width .7s ease-out; }
+
+    /* Days grid (Progresso Semanal) */
+    .days-grid { display: flex; justify-content: space-between; gap: 4px; padding: 10px 0; margin: 10px 0; }
+    .day-col { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+    .day-ring {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 14px; transition: transform .15s;
+    }
+    .day-col:hover .day-ring { transform: scale(1.08); }
+    .day-ring.ok    { background: var(--c-primary); color: white; }
+    .day-ring.miss  { background: var(--c-info-bg); color: var(--c-info); }
+    .day-ring.extra { background: var(--c-pov-100); color: var(--c-primary); }
+    .day-ring.empty { background: #f5f5f5; color: #a7b5b9; }
+    .day-today .day-ring { box-shadow: 0 0 0 2px var(--c-primary); transform: scale(1.06); }
+    .day-lbl { font-size: 10px; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .day-today .day-lbl { color: var(--c-primary); font-weight: 700; }
+    .day-col:has(.day-ring.ok) .day-lbl { color: var(--c-text); font-weight: 700; }
+
+    /* Badges */
+    .badge { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--r-sm); font-size: 14px; line-height: 20px; }
+    .bdg-ok   { background: var(--c-success-bg); border: 1px solid var(--c-sov-300); color: var(--c-success); }
+    .bdg-warn { background: var(--c-warning-bg); border: 1px solid var(--c-wov-300); color: var(--c-warning); font-weight: 600; }
+
+    /* Inline stat row */
+    .si { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+    .si .k { color: var(--c-text-muted); }
+    .si .v { font-weight: 700; color: var(--c-text); }
+
+    /* ── Foco de Estudo — hierarquia UC > PD > Capacidade */
+    .focus-desc { font-size: 12.5px; color: var(--c-text-muted); line-height: 1.55; margin-top: -8px; margin-bottom: 16px; }
+
+    /* UC como header do bloco */
+    .uc-block { margin-bottom: 14px; }
+    .uc-block:last-child { margin-bottom: 0; }
+    .uc-hdr {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+      padding: 10px 12px; background: var(--c-group-bg);
+      border-radius: var(--r-xs); margin-bottom: 10px;
+    }
+    .uc-hdr-name { font-size: 13.5px; font-weight: 700; color: var(--c-text); line-height: 1.4; }
+    .uc-foco { flex-shrink: 0; background: var(--c-primary); color: white; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: .5px; text-transform: uppercase; margin-top: 2px; }
+
+    /* PD — rótulo de seção */
+    .pd-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--c-text-muted); padding: 6px 0 4px; border-top: 1px solid var(--c-border); margin-top: 2px;
+    }
+    .pd-lbl:first-child { border-top: none; padding-top: 0; }
+
+    /* Capacidade — linha minimalista */
+        .cap-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 6px; margin: 0 -6px;
+      border-radius: var(--r-xs); cursor: pointer;
+      position: relative;
+      border-bottom: 1px solid var(--c-border);
+      transition: background .12s;
+    }
+    .cap-row:hover { background: var(--c-group-bg); }
+    .cap-row.open  { background: var(--c-group-bg); }
+    .cap-row:last-child { border-bottom: none; }
+    .cap-row-body { flex: 1; min-width: 0; }
+    .cap-row-name { font-size: 13px; font-weight: 500; color: var(--c-text); line-height: 1.35; margin-bottom: 5px; }
+    .cap-row-prog { display: flex; align-items: center; gap: 8px; }
+    .cap-row-prog .prog-track { flex: 1; height: 4px; }
+    .cap-row-pct { font-size: 11px; font-weight: 700; color: var(--c-text-muted); white-space: nowrap; min-width: 28px; text-align: right; }
+    .cap-row-pct.has-progress { color: var(--c-primary); }
+
+    /* Dropdown do botão de ação da capacidade */
+        /* chevron no fim da linha */
+    .cap-row-arrow { font-size: 18px; color: var(--c-text-muted); flex-shrink: 0; transition: transform .2s ease; pointer-events: none; }
+    .cap-row.open .cap-row-arrow { transform: rotate(90deg); color: var(--c-primary); }
+        .cap-dropdown {
+      position: absolute; left: -6px; right: -6px;
+      top: calc(100% + 2px); z-index: 50;
+      background: white; border: 1px solid var(--c-border);
+      border-radius: var(--r-sm); box-shadow: 0 4px 16px var(--c-dov-100);
+      overflow: hidden; animation: ddIn .12s ease;
+    }
+    .cap-dropdown.hidden { display: none; }
+    @keyframes ddIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+    .cap-dd-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; cursor: pointer; font-size: 13px;
+      font-weight: 500; color: var(--c-text); border: none;
+      background: transparent; width: 100%; text-align: left;
+      transition: background .12s;
+    }
+    .cap-dd-item:hover { background: var(--c-group-bg); }
+    .cap-dd-item:not(:last-child) { border-bottom: 1px solid var(--c-border); }
+    .cap-dd-item .material-symbols-rounded { font-size: 18px; color: var(--c-text-muted); flex-shrink: 0; }
+
+    /* Botões — DS: padding 6/12, radius r-xs, font 13px/600 (compacto card) */
+    .btn-pri {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 6px 12px; border-radius: var(--r-xs);
+      background: var(--c-primary); border: 1.5px solid var(--c-primary);
+      color: white; font-size: 13px; font-weight: 600; line-height: 18px; transition: background .15s;
+    }
+    .btn-pri:hover  { background: var(--c-primary-h); border-color: var(--c-primary-h); }
+    .btn-pri:active { background: var(--c-primary-d); }
+
+    .btn-out {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 6px 12px; border-radius: var(--r-xs);
+      background: transparent; border: 1.5px solid var(--c-border);
+      color: var(--c-text); font-size: 13px; font-weight: 600; line-height: 18px; transition: background .15s, border-color .15s;
+    }
+    .btn-out:hover { background: var(--c-group-bg); border-color: var(--c-text-sm); }
+
+    .btn-ghost {
+      width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 8px 14px; border-radius: var(--r-sm);
+      background: transparent; border: 1.5px solid var(--c-primary);
+      color: var(--c-primary); font-size: 13px; font-weight: 600; line-height: 18px; transition: background .15s;
+    }
+    .btn-ghost:hover { background: var(--c-pov-100); }
+
+    .btn-full {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+      padding: 8px 14px; border-radius: var(--r-sm);
+      background: var(--c-primary); border: 1.5px solid var(--c-primary);
+      color: white; font-size: 14px; font-weight: 700; line-height: 20px; transition: background .15s;
+    }
+    .btn-full:hover { background: var(--c-primary-h); }
+
+    .btn-sm {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border: 1.5px solid var(--c-primary); border-radius: var(--r-sm);
+      background: transparent; color: var(--c-primary);
+      font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; transition: background .15s;
+    }
+    .btn-sm:hover { background: var(--c-pov-100); }
+
+    /* Mini Perfil */
+    .prof-list { border: 1px solid var(--c-border); border-radius: var(--r-xs); overflow: hidden; margin-bottom: var(--sp-md); }
+    .prof-row  { display: flex; align-items: flex-start; gap: 10px; padding: 11px var(--sp-sm); border-bottom: 1px solid var(--c-border); }
+    .prof-row:last-child { border-bottom: none; }
+    .prof-ico  { font-size: 16px; color: var(--c-text-muted); flex-shrink: 0; margin-top: 2px; }
+    .prof-lbl  { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--c-text-muted); }
+    .prof-val  { font-size: 14px; font-weight: 500; color: var(--c-text); line-height: 20px; margin-top: 2px; }
+
+    /* Estude no seu tempo */
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .time-tile {
+      padding: 12px 16px; border: 1.5px solid var(--c-border); border-radius: var(--r-sm);
+      background: white; color: var(--c-text); font-size: 14px; font-weight: 600; line-height: 20px;
+      text-align: center; transition: border-color .15s, background .15s, color .15s;
+    }
+    .time-tile:hover { border-color: var(--c-primary); background: var(--c-pov-100); color: var(--c-primary); }
+    .time-tile.sel   { border-color: var(--c-primary); background: var(--c-primary); color: white; }
+
+    /* Map UC */
+    .mapa-row  { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .mapa-desc { font-size: 12.5px; color: var(--c-text-muted); line-height: 1.5; max-width: 170px; }
+
+    /* Separador */
+    .sep { height: 1px; background: var(--c-border); margin: var(--sp-md) 0; }
+
+    /* Chip */
+    .chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: var(--r-full); font-size: 11.5px; font-weight: 600; }
+    .chip-ok  { background: var(--c-success-bg); color: var(--c-success); }
+    .chip-pri { background: var(--c-primary-bg); color: var(--c-primary); }
+
+    /* Placeholder */
+    .placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 320px; background: white; border: 1px solid var(--c-border); border-radius: var(--r-sm);
+      gap: 14px; color: var(--c-text-muted); text-align: center; padding: 40px;
+    }
+
+    /* Perfil */
+    .profile-hero { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; }
+    .phr-name { font-size: 20px; font-weight: 700; color: var(--c-text); }
+    .phr-sub  { font-size: 13px; color: var(--c-text-muted); margin-top: 4px; }
+    .pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-sm); margin-bottom: var(--sp-md); }
+    .pref-card { background: white; border: 1px solid var(--c-border); border-radius: var(--r-sm); padding: var(--sp-md); }
+    .pref-lbl  { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c-text-muted); margin-bottom: 5px; }
+    .pref-val  { font-size: 14px; font-weight: 600; color: var(--c-text); }
+    .full-col  { grid-column: 1/-1; }
+
+    .slider-group { display: flex; flex-direction: column; gap: 16px; }
+    .slider-item  { display: flex; flex-direction: column; gap: 6px; }
+    .slider-name  { font-size: 13px; font-weight: 600; color: var(--c-text); }
+    .slider-poles { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--c-text-muted); }
+    .slider-track { position: relative; height: 6px; background: var(--c-border); border-radius: var(--r-full); }
+    .slider-fill  { height: 100%; border-radius: var(--r-full); background: var(--c-primary); }
+    .slider-thumb { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 14px; height: 14px; border-radius: 50%; background: var(--c-primary); border: 2px solid white; box-shadow: var(--sh-sm); }
+
+    .steps-row { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+    .step-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--c-border); }
+    .step-dot.done { background: var(--c-primary); }
+    .step-line { flex: 1; height: 2px; background: var(--c-border); border-radius: 1px; }
+    .step-line.done { background: var(--c-primary); }
+
+    /* ================================================================
+       MAPA DA UC — Canvas VueFlow-like + layout horizontal LR
+    ================================================================ */
+    #view-map.active {
+      display: flex !important; flex-direction: column;
+      padding: 0 !important; max-width: none !important;
+      height: calc(100vh - 60px);
+    }
+    .mm-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; background: var(--c-surface);
+      border-bottom: 1px solid var(--c-border); flex-shrink: 0; gap: 16px;
+    }
+    .mm-bar-title { font-size: 15px; font-weight: 700; color: var(--c-text); }
+    .mm-bar-sub   { font-size: 12px; color: var(--c-text-muted); margin-top: 1px; }
+    .mm-hint { font-size: 11.5px; color: var(--c-text-muted); display: flex; align-items: center; gap: 5px; }
+    .mm-prog-pill {
+      display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+      background: var(--c-group-bg); border: 1px solid var(--c-border);
+      border-radius: var(--r-full); font-size: 13px; color: var(--c-text-sm);
+    }
+    .mm-prog-pill strong { color: var(--c-primary); }
+
+    .mm-canvas {
+      flex: 1; overflow: auto; position: relative;
+      background: #ffffff;
+      background-image: radial-gradient(circle, var(--c-border) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      min-height: 600px;
+    }
+    .mm-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+
+    .mm-node {
+      position: absolute; border-radius: 16px;
+      padding: 12px 20px; color: white;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      user-select: none; text-align: center; line-height: 1.35;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15); border: 1px solid rgba(255,255,255,.25);
+      display: flex; align-items: center; justify-content: center; min-height: 54px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .mm-node:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 22px rgba(0,0,0,.22); }
+    .mm-node-uc  { min-width: 230px; max-width: 290px; min-height: 64px; font-size: 14px; padding: 16px 24px; }
+    .mm-node-grp { min-width: 165px; max-width: 200px; }
+    .mm-node-std { min-width: 145px; max-width: 175px; font-size: 12px; padding: 10px 14px; min-height: 48px; border-radius: 14px; }
+    .mm-node-std.in-focus { box-shadow: 0 0 0 3px #f97607, 0 4px 16px rgba(0,0,0,.15); }
+
+    .mm-badge-prog {
+      position: absolute; top: -8px; right: -8px;
+      color: white; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: var(--r-full); border: 2px solid white; white-space: nowrap;
+    }
+    .mm-badge-foco {
+      position: absolute; top: -8px; left: 8px;
+      background: #f97607; color: white;
+      font-size: 9px; font-weight: 700;
+      padding: 2px 7px; border-radius: var(--r-full); border: 2px solid white; letter-spacing: .4px;
+    }
+
+    .mm-appear { animation: mmIn .35s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes mmIn {
+      from { opacity: 0; transform: scale(.5) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .mm-cap-node {
+      position: absolute; background: white; border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.10); width: 310px;
+      overflow: hidden; animation: mmIn .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .mm-cap-header { padding: 9px 14px; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+    .mm-cap-list   { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .mm-cap-btn {
+      width: 100%; border-radius: 10px; border: 2.5px solid;
+      background: transparent; padding: 9px 11px; text-align: left; cursor: pointer;
+      font-size: 12.5px; font-weight: 500; color: var(--c-text);
+      transition: filter .15s; display: flex; align-items: center; gap: 8px; line-height: 1.4;
+    }
+    .mm-cap-btn:hover { filter: brightness(.96); }
+    .mm-cap-txt  { flex: 1; }
+    .mm-cap-pct  { flex-shrink: 0; color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: var(--r-full); }
+    .mm-cap-foco { flex-shrink: 0; background: #f97607; color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: .3px; }
+
+    .mm-line       { fill: none; stroke: #c5cdd1; stroke-width: 1.5; }
+    .mm-line-focus { fill: none; stroke: #f97607; stroke-width: 2; stroke-dasharray: 5,3; }
+
+    /* Study modal */
+    .study-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(34,39,42,.48); display: flex; align-items: center; justify-content: center; }
+    .study-overlay.hidden { display: none; }
+    .study-dialog { background: white; border-radius: 20px; overflow: hidden; width: 90vw; max-width: 660px; box-shadow: 0 20px 60px rgba(0,0,0,.28); animation: mmIn .3s cubic-bezier(.34,1.56,.64,1); }
+    .study-dlg-hdr { padding: 20px 24px; color: white; display: flex; align-items: flex-start; gap: 14px; }
+    .study-dlg-ico   { font-size: 28px; line-height: 1; }
+    .study-dlg-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .study-dlg-sub   { font-size: 12.5px; opacity: .85; margin-top: 3px; }
+    .study-dlg-close { margin-left: auto; flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,.2); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s; }
+    .study-dlg-close:hover { background: rgba(255,255,255,.35); }
+    .study-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 24px; }
+    .scard { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--c-border); background: white; cursor: pointer; text-align: left; transition: border-color .15s, background .15s; }
+    .scard:hover { border-color: var(--c-primary); background: var(--c-primary-bg); }
+    .scard-ico { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .scard-ico .material-symbols-rounded { font-size: 22px; }
+    .scard-title { font-size: 13px; font-weight: 700; color: var(--c-text); }
+    .scard-desc  { font-size: 11.5px; color: var(--c-text-muted); margin-top: 1px; }
+    .ico-session { background: #fff6ed; color: #e84910; }
+    .ico-ai      { background: #e9faff; color: #0086ff; }
+    .ico-ex      { background: #ebfef4; color: #01b574; }
+    .ico-sim     { background: #f0eeff; color: #7c3aed; }
+    .ico-podcast { background: #fff1f6; color: #e84910; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="Navegação principal">
+    <div class="sb-logo">
+      <span class="sb-logo-text"><span class="acc">guia</span> virtual</span>
+    </div>
+    <div class="sb-group">
+      <button type="button" class="sb-item active" id="nav-home" onclick="go('home')">
+        <span class="sb-ico material-symbols-rounded">home</span>
+        <span class="sb-lbl">Início</span>
+      </button>
+      <button type="button" class="sb-item" id="nav-map" onclick="go('map')">
+        <span class="sb-ico material-symbols-rounded">account_tree</span>
+        <span class="sb-lbl">Mapa da UC</span>
+      </button>
+      <button type="button" class="sb-item" id="nav-study" onclick="go('study')">
+        <span class="sb-ico material-symbols-rounded">school</span>
+        <span class="sb-lbl">Sessão de Estudo</span>
+      </button>
+      <button type="button" class="sb-item" id="nav-profile" onclick="go('profile')">
+        <span class="sb-ico material-symbols-rounded">person_outline</span>
+        <span class="sb-lbl">Meu Perfil</span>
+      </button>
+    </div>
+    <div class="sb-actions">
+      <button type="button" class="sb-action" title="Acessibilidade">
+        <span class="material-symbols-rounded">accessibility_new</span>
+      </button>
+      <button type="button" class="sb-action" title="Assistente IA">
+        <span class="material-symbols-rounded">smart_toy</span>
+      </button>
+    </div>
+    <div class="sb-user" role="button" onclick="go('profile')">
+      <div class="avatar">MS</div>
+      <div>
+        <div class="sb-uname">Maria Silva</div>
+        <div class="sb-urole">Estudante</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-crumb">
+        <span>GVA</span>
+        <span class="sep material-symbols-rounded" style="font-size:14px">chevron_right</span>
+        <span id="tb-cur" class="cur">Início</span>
+      </div>
+      <div class="tb-right">
+        <button type="button" class="tb-icon" aria-label="Notificações">
+          <span class="material-symbols-rounded">notifications_none</span>
+        </button>
+        <button type="button" class="tb-pill">
+          <span class="tb-dot"></span>
+          Turma 3A — Análise de Sistemas
+          <span class="material-symbols-rounded">expand_more</span>
+        </button>
+        <div class="avatar avatar-sm" style="cursor:pointer" onclick="go('profile')">MS</div>
+      </div>
+    </header>
+
+    <div class="scroll-area" id="scroll-area">
+
+      <!-- HOME -->
+      <div id="view-home" class="view active">
+        <div class="greeting">
+          <h1 class="pg-title">Olá, Maria! <span class="material-symbols-rounded" style="font-size:22px;vertical-align:middle;color:var(--c-primary)">waving_hand</span></h1>
+          <p class="pg-sub">Por onde vamos começar hoje?</p>
+        </div>
+        <div class="hgrid">
+          <!-- COLUNA ESQUERDA -->
+          <div class="col">
+            <!-- Progresso Semanal -->
+            <div class="card">
+              <div class="card-body">
+                <div class="card-hdr">
+                  <span class="material-symbols-rounded cico red">bar_chart</span>
+                  <span class="card-ttl">Progresso Semanal</span>
+                </div>
+                <div style="margin-bottom:10px">
+                  <div class="si" style="margin-bottom:5px">
+                    <span class="k">Meta semanal</span>
+                    <span class="v">65%</span>
+                  </div>
+                  <div class="prog-track"><div class="prog-fill" style="width:65%"></div></div>
+                </div>
+                <div class="days-grid" role="list">
+                  <div class="day-col" role="listitem"><div class="day-ring ok"><span class="material-symbols-rounded" style="font-size:18px">local_fire_department</span></div><span class="day-lbl">Seg</span></div>
+                  <div class="day-col" role="listitem"><div class="day-ring ok"><span class="material-symbols-rounded" style="font-size:18px">local_fire_department</span></div><span class="day-lbl">Ter</span></div>
+                  <div class="day-col" role="listitem"><div class="day-ring ok"><span class="material-symbols-rounded" style="font-size:18px">local_fire_department</span></div><span class="day-lbl">Qua</span></div>
+                  <div class="day-col" role="listitem"><div class="day-ring miss"><span class="material-symbols-rounded" style="font-size:18px">ac_unit</span></div><span class="day-lbl">Qui</span></div>
+                  <div class="day-col day-today" role="listitem"><div class="day-ring empty"></div><span class="day-lbl">Sex</span></div>
+                  <div class="day-col" role="listitem"><div class="day-ring empty"></div><span class="day-lbl">Sáb</span></div>
+                  <div class="day-col" role="listitem"><div class="day-ring empty"></div><span class="day-lbl">Dom</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Foco de Estudo -->
+            <div class="card">
+              <div class="card-body">
+                <div class="card-hdr">
+                  <span class="material-symbols-rounded cico red">my_location</span>
+                  <span class="card-ttl">Foco de Estudo</span>
+                </div>
+                <p class="focus-desc">Capacidades indicadas pelo professor para este momento.</p>
+
+                <!-- UC 1 -->
+                <div class="uc-block">
+                  <div class="uc-hdr">
+                    <span class="uc-hdr-name">Fabricação Mecânica Aplicada à Manutenção e à Montagem</span>
+                  </div>
+                  <div class="pd-lbl">PD 1 — Manutenção Preventiva</div>
+                  <div class="cap-row" onclick="capMenu(this)">
+                    <div class="cap-row-body">
+                      <div class="cap-row-name">Identificar e corrigir falhas em sistemas mecânicos de transmissão</div>
+                      <div class="cap-row-prog">
+                        <div class="prog-track"><div class="prog-fill" style="width:70%"></div></div>
+                        <span class="cap-row-pct has-progress">70%</span>
+                      </div>
+                    </div>
+                    <span class="cap-row-arrow material-symbols-rounded">chevron_right</span>
+                    <div class="cap-dropdown hidden" onclick="event.stopPropagation()">
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu();go('study')">
+                        <span class="material-symbols-rounded">school</span>
+                        Iniciar sessão de estudos
+                      </button>
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu()">
+                        <span class="material-symbols-rounded">quiz</span>
+                        Gerar quiz
+                      </button>
+                    </div>
+                  </div>
+                  <div class="cap-row" onclick="capMenu(this)">
+                    <div class="cap-row-body">
+                      <div class="cap-row-name">Aplicar técnicas de lubrificação e regulagem de componentes</div>
+                      <div class="cap-row-prog">
+                        <div class="prog-track"><div class="prog-fill" style="width:40%"></div></div>
+                        <span class="cap-row-pct has-progress">40%</span>
+                      </div>
+                    </div>
+                    <span class="cap-row-arrow material-symbols-rounded">chevron_right</span>
+                    <div class="cap-dropdown hidden" onclick="event.stopPropagation()">
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu();go('study')">
+                        <span class="material-symbols-rounded">school</span>
+                        Iniciar sessão de estudos
+                      </button>
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu()">
+                        <span class="material-symbols-rounded">quiz</span>
+                        Gerar quiz
+                      </button>
+                    </div>
+                  </div>
+                  <div class="cap-row" onclick="capMenu(this)">
+                    <div class="cap-row-body">
+                      <div class="cap-row-name">Utilizar instrumentos de medição dimensional (paquímetro, micrômetro)</div>
+                      <div class="cap-row-prog">
+                        <div class="prog-track"><div class="prog-fill" style="width:0%"></div></div>
+                        <span class="cap-row-pct">—</span>
+                      </div>
+                    </div>
+                    <span class="cap-row-arrow material-symbols-rounded">chevron_right</span>
+                    <div class="cap-dropdown hidden" onclick="event.stopPropagation()">
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu();go('study')">
+                        <span class="material-symbols-rounded">school</span>
+                        Iniciar sessão de estudos
+                      </button>
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu()">
+                        <span class="material-symbols-rounded">quiz</span>
+                        Gerar quiz
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- UC 2 -->
+                <div class="uc-block">
+                  <div class="uc-hdr">
+                    <span class="uc-hdr-name">Montagem de Sistemas Elétricos</span>
+                  </div>
+                  <div class="pd-lbl">PD 1 — Instalação Elétrica Industrial</div>
+                  <div class="cap-row" onclick="capMenu(this)">
+                    <div class="cap-row-body">
+                      <div class="cap-row-name">Interpretar diagramas elétricos e esquemas de ligação</div>
+                      <div class="cap-row-prog">
+                        <div class="prog-track"><div class="prog-fill" style="width:20%"></div></div>
+                        <span class="cap-row-pct has-progress">20%</span>
+                      </div>
+                    </div>
+                    <span class="cap-row-arrow material-symbols-rounded">chevron_right</span>
+                    <div class="cap-dropdown hidden" onclick="event.stopPropagation()">
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu();go('study')">
+                        <span class="material-symbols-rounded">school</span>
+                        Iniciar sessão de estudos
+                      </button>
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu()">
+                        <span class="material-symbols-rounded">quiz</span>
+                        Gerar quiz
+                      </button>
+                    </div>
+                  </div>
+                  <div class="cap-row" onclick="capMenu(this)">
+                    <div class="cap-row-body">
+                      <div class="cap-row-name">Executar montagem de painéis elétricos conforme norma NR-10</div>
+                      <div class="cap-row-prog">
+                        <div class="prog-track"><div class="prog-fill" style="width:0%"></div></div>
+                        <span class="cap-row-pct">—</span>
+                      </div>
+                    </div>
+                    <span class="cap-row-arrow material-symbols-rounded">chevron_right</span>
+                    <div class="cap-dropdown hidden" onclick="event.stopPropagation()">
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu();go('study')">
+                        <span class="material-symbols-rounded">school</span>
+                        Iniciar sessão de estudos
+                      </button>
+                      <button type="button" class="cap-dd-item" onclick="closeCapMenu()">
+                        <span class="material-symbols-rounded">quiz</span>
+                        Gerar quiz
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA -->
+          <div class="col">
+            <!-- Mini Perfil -->
+            <div class="card">
+              <div class="card-body">
+                <div class="card-hdr">
+                  <span class="material-symbols-rounded cico red">person_outline</span>
+                  <span class="card-ttl">Meu Perfil de Estudo</span>
+                </div>
+                <div class="prof-list">
+                  <div class="prof-row">
+                    <span class="material-symbols-rounded prof-ico">bolt</span>
+                    <div><div class="prof-lbl">Recursos preferidos</div><div class="prof-val">Lendo resumos de tópicos específicos</div></div>
+                  </div>
+                  <div class="prof-row">
+                    <span class="material-symbols-rounded prof-ico">star_outline</span>
+                    <div><div class="prof-lbl">Nível de experiência</div><div class="prof-val">Intermediário</div></div>
+                  </div>
+                  <div class="prof-row">
+                    <span class="material-symbols-rounded prof-ico">calendar_today</span>
+                    <div><div class="prof-lbl">Meta semanal</div><div class="prof-val">4 dias/sem · 30 min/sessão</div></div>
+                  </div>
+                </div>
+                <button type="button" class="btn-ghost" onclick="go('profile')">Refazer preferências</button>
+              </div>
+            </div>
+
+            <!-- Estude no seu tempo -->
+            <div class="card">
+              <div class="card-body">
+                <div class="card-hdr">
+                  <span class="material-symbols-rounded cico red">schedule</span>
+                  <span class="card-ttl">Estude no seu tempo</span>
+                </div>
+                <p style="font-size:12px;color:var(--c-text-muted);line-height:1.55;margin-bottom:14px">
+                  Informe quanto tempo você tem disponível e explore os conteúdos da forma que melhor atende às suas necessidades.
+                </p>
+                <div class="time-grid">
+                  <button type="button" class="time-tile" onclick="pickTime(this)">5 min</button>
+                  <button type="button" class="time-tile" onclick="pickTime(this)">10 min</button>
+                  <button type="button" class="time-tile" onclick="pickTime(this)">15 min</button>
+                  <button type="button" class="time-tile" onclick="pickTime(this)">30 min</button>
+                  <button type="button" class="time-tile" onclick="pickTime(this)">45 min</button>
+                  <button type="button" class="time-tile" onclick="pickTime(this)">60 min</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mapa UC -->
+            <div class="card">
+              <div class="card-body">
+                <div class="card-hdr">
+                  <span class="material-symbols-rounded cico red">account_tree</span>
+                  <span class="card-ttl">Explorar o Mapa da UC</span>
+                </div>
+                <div class="mapa-row">
+                  <p class="mapa-desc">Conheça os temas da UC e encontre novos caminhos de estudo</p>
+                  <button type="button" class="btn-sm" onclick="go('map')">Abrir mapa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAPA DA UC -->
+      <div id="view-map" class="view">
+        <div class="mm-bar">
+          <div>
+            <div class="mm-bar-title">Configuração de Redes e Hardware</div>
+            <div class="mm-bar-sub">Turma 3A — Análise de Sistemas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div class="mm-hint"><span class="material-symbols-rounded" style="font-size:15px">touch_app</span>Clique nos nós para expandir</div>
+            <div class="mm-prog-pill">Progresso geral <strong>38%</strong></div>
+          </div>
+        </div>
+        <div class="mm-canvas" id="mm-canvas"><svg id="mm-svg" class="mm-svg"></svg></div>
+        <div class="study-overlay hidden" id="study-overlay">
+          <div class="study-dialog" onclick="event.stopPropagation()">
+            <div class="study-dlg-hdr" id="study-dlg-hdr" style="background:linear-gradient(135deg,#e84910,#bf340f)">
+              <span class="study-dlg-ico">⚡</span>
+              <div><div class="study-dlg-title" id="study-dlg-title">Capacidade</div><div class="study-dlg-sub">Selecione uma opção de estudo</div></div>
+              <button type="button" class="study-dlg-close" onclick="closeStudyModal()">
+                <span class="material-symbols-rounded" style="font-size:18px">close</span>
+              </button>
+            </div>
+            <div class="study-cards-grid">
+              <button type="button" class="scard" onclick="closeStudyModal();go('study')">
+                <div class="scard-ico ico-session"><span class="material-symbols-rounded">schedule</span></div>
+                <div><div class="scard-title">Estudar no seu Tempo</div><div class="scard-desc">Sessão personalizada com IA</div></div>
+              </button>
+              <button type="button" class="scard" onclick="closeStudyModal()">
+                <div class="scard-ico ico-ai"><span class="material-symbols-rounded">smart_toy</span></div>
+                <div><div class="scard-title">Estudar com IA</div><div class="scard-desc">Converse com o assistente virtual</div></div>
+              </button>
+              <button type="button" class="scard" onclick="closeStudyModal()">
+                <div class="scard-ico ico-ex"><span class="material-symbols-rounded">school</span></div>
+                <div><div class="scard-title">Estudar com Exercícios</div><div class="scard-desc">Questões personalizadas sobre o tema</div></div>
+              </button>
+              <button type="button" class="scard" id="scard-sim" style="display:none" onclick="closeStudyModal()">
+                <div class="scard-ico ico-sim"><span class="material-symbols-rounded">computer</span></div>
+                <div><div class="scard-title">Estudar com Práticas</div><div class="scard-desc">Simuladores e atividades práticas</div></div>
+              </button>
+              <button type="button" class="scard" onclick="closeStudyModal()">
+                <div class="scard-ico ico-podcast"><span class="material-symbols-rounded">mic</span></div>
+                <div><div class="scard-title">Estudar com Podcast</div><div class="scard-desc">Conteúdo educativo gerado por IA</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSÃO DE ESTUDO -->
+      <div id="view-study" class="view">
+        <div class="greeting">
+          <h1 class="pg-title">Sessão de Estudo</h1>
+          <p class="pg-sub">Aprendizado personalizado com Assistente IA</p>
+        </div>
+        <div class="placeholder">
+          <span class="material-symbols-rounded" style="font-size:48px;opacity:.25">smart_toy</span>
+          <strong style="font-size:15px;color:var(--c-text)">Assistente IA</strong>
+          <p style="font-size:13px;max-width:300px">Selecione um tempo de estudo na tela inicial para iniciar sua sessão personalizada.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:240px">
+            <button type="button" class="time-tile">15 min</button>
+            <button type="button" class="time-tile">30 min</button>
+            <button type="button" class="time-tile">60 min</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEU PERFIL -->
+      <div id="view-profile" class="view">
+        <div class="greeting">
+          <h1 class="pg-title">Meu Perfil de Estudo</h1>
+          <p class="pg-sub">Personalize como o Assistente IA se comunica com você</p>
+        </div>
+        <div class="profile-hero">
+          <div class="avatar avatar-lg">MS</div>
+          <div>
+            <div class="phr-name">Maria Silva</div>
+            <div class="phr-sub"><span class="chip chip-ok">● Estudante</span>&nbsp;&nbsp;Turma 3A · Análise de Sistemas</div>
+          </div>
+        </div>
+        <div style="margin-bottom:24px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-text-muted);margin-bottom:10px">Etapas de configuração</div>
+          <div class="steps-row">
+            <div class="step-dot done"></div><div class="step-line done"></div>
+            <div class="step-dot done"></div><div class="step-line done"></div>
+            <div class="step-dot done"></div><div class="step-line done"></div>
+            <div class="step-dot done"></div><div class="step-line done"></div>
+            <div class="step-dot done"></div><div class="step-line done"></div>
+            <div class="step-dot done"></div>
+          </div>
+          <div style="font-size:12px;color:var(--c-success);margin-top:5px;font-weight:600">✓ Perfil completo — 6/6 etapas</div>
+        </div>
+        <div class="pref-grid">
+          <div class="pref-card"><div class="pref-lbl">Recursos preferidos</div><div class="pref-val">Lendo resumos</div></div>
+          <div class="pref-card"><div class="pref-lbl">Nível de experiência</div><div class="pref-val">Intermediário</div></div>
+          <div class="pref-card"><div class="pref-lbl">Meta semanal</div><div class="pref-val">4 dias / semana</div></div>
+          <div class="pref-card"><div class="pref-lbl">Duração da sessão</div><div class="pref-val">30 min / sessão</div></div>
+          <div class="pref-card"><div class="pref-lbl">Horário preferido</div><div class="pref-val">Noite (após 18h)</div></div>
+          <div class="pref-card"><div class="pref-lbl">Idade</div><div class="pref-val">19 anos</div></div>
+          <div class="pref-card full-col">
+            <div class="pref-lbl" style="margin-bottom:16px">Tom de comunicação da IA</div>
+            <div class="slider-group">
+              <div class="slider-item">
+                <div class="slider-name">Formalidade</div>
+                <div class="slider-poles"><span>Informal</span><span>Formal</span></div>
+                <div class="slider-track"><div class="slider-fill" style="width:60%"></div><div class="slider-thumb" style="left:60%"></div></div>
+              </div>
+              <div class="slider-item">
+                <div class="slider-name">Detalhamento</div>
+                <div class="slider-poles"><span>Resumido</span><span>Detalhado</span></div>
+                <div class="slider-track"><div class="slider-fill" style="width:40%"></div><div class="slider-thumb" style="left:40%"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:var(--c-group-bg);border:1px solid var(--c-border);border-radius:var(--r-xs);font-size:12.5px;color:var(--c-text-muted)">
+              Tom atual: <strong style="color:var(--c-text)">Levemente formal, com nível médio de detalhamento</strong>
+            </div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <button type="button" class="btn-full" style="max-width:320px">Refazer onboarding completo</button>
+      </div>
+
+    </div><!-- /scroll-area -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  const TITLES = { home:'Início', map:'Mapa da UC', study:'Sessão de Estudo', profile:'Meu Perfil' };
+
+  function go(view) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+    const v = document.getElementById('view-' + view);
+    const n = document.getElementById('nav-' + view);
+    if (v) v.classList.add('active');
+    if (n) n.classList.add('active');
+    document.getElementById('scroll-area').scrollTop = 0;
+    document.getElementById('tb-cur').textContent = TITLES[view] || view;
+    if (view === 'map') setTimeout(mmInit, 60);
+  }
+
+  function pickTime(btn) {
+    document.querySelectorAll('.time-tile').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    setTimeout(() => go('study'), 250);
+  }
+
+  /* Dropdown das capacidades (Foco de Estudo) */
+  let _openDropdown = null;
+
+  function capMenu(row) {
+    const dd      = row.querySelector('.cap-dropdown');
+    const isOpen  = !dd.classList.contains('hidden');
+
+    closeCapMenu();
+
+    if (!isOpen) {
+      dd.classList.remove('hidden');
+      row.classList.add('open');
+      _openDropdown = row;
+    }
+  }
+
+  function closeCapMenu() {
+    if (_openDropdown) {
+      _openDropdown.querySelector('.cap-dropdown').classList.add('hidden');
+      _openDropdown.classList.remove('open');
+      _openDropdown = null;
+    }
+  }
+
+  document.addEventListener('click', e => {
+    if (_openDropdown && !_openDropdown.contains(e.target)) closeCapMenu();
+  });
+
+  /* ================================================================
+     MAPA DA UC — Layout horizontal (esquerda→direita), fiel ao projeto
+  ================================================================ */
+  const UC = {
+    id: 1, label: 'Configuração de Redes e Hardware', color: '#e84910', pct: 38,
+    groups: [
+      {
+        id: 10, label: 'Instalação e Configuração', color: '#e84910', pct: 55,
+        standards: [
+          { id: 101, label: 'Instalar e Configurar Hardware', color: '#e84910', pct: 55, isFocus: false,
+            capacities: [
+              { id: 1001, label: 'Instalar e configurar componentes de hardware em desktops e notebooks', pct: 40, isFocus: false, hasSim: false },
+              { id: 1002, label: 'Realizar diagnóstico e manutenção preventiva de equipamentos', pct: 70, isFocus: false, hasSim: false }
+            ]},
+          { id: 102, label: 'Configurar BIOS e Firmware', color: '#e84910', pct: null, isFocus: false,
+            capacities: [
+              { id: 1003, label: 'Interpretar e ajustar parâmetros do BIOS/UEFI', pct: null, isFocus: false, hasSim: false },
+              { id: 1004, label: 'Atualizar firmware e drivers de dispositivos', pct: null, isFocus: false, hasSim: false }
+            ]}
+        ]
+      },
+      {
+        id: 11, label: 'Redes e Conectividade', color: '#1670fa', pct: 7,
+        standards: [
+          { id: 103, label: 'Redes Locais TCP/IP', color: '#1670fa', pct: 7, isFocus: true,
+            capacities: [
+              { id: 1005, label: 'Configurar redes locais (LAN) com protocolos TCP/IP e subnetting', pct: 20, isFocus: true, hasSim: false },
+              { id: 1006, label: 'Utilizar ferramentas de diagnóstico de rede (ping, traceroute, nmap)', pct: null, isFocus: false, hasSim: false },
+              { id: 1007, label: 'Segmentar redes com subnetting e VLSM', pct: null, isFocus: false, hasSim: false }
+            ]},
+          { id: 104, label: 'Cabeamento Estruturado', color: '#1670fa', pct: null, isFocus: false,
+            capacities: [
+              { id: 1008, label: 'Certificar cabos de rede com equipamentos homologados', pct: null, isFocus: false, hasSim: true },
+              { id: 1009, label: 'Implementar e documentar patch panels e racks', pct: null, isFocus: false, hasSim: false }
+            ]}
+        ]
+      }
+    ]
+  };
+
+  const mm = { ready: false, groupsOpen: false, openStds: new Set(), openCaps: new Set() };
+
+  // Colunas (x) — layout esquerda→direita
+  const COLS = { uc: 60, grp: 360, std: 600, cap: 830 };
+  const NODE_H = { uc: 62, grp: 52, std: 46, gap: 90 };
+
+  // Distribuir todos os padrões verticalmente
+  const allStds = UC.groups.flatMap(g => g.standards);
+  const S_TOTAL = allStds.length * NODE_H.std + (allStds.length - 1) * NODE_H.gap;
+  const CH = Math.max(640, S_TOTAL + 200);
+  const S_START = (CH - S_TOTAL) / 2;
+
+  const SP = {};
+  allStds.forEach((std, i) => {
+    SP[std.id] = { x: COLS.std, y: Math.round(S_START + i*(NODE_H.std+NODE_H.gap)), w: 168, h: NODE_H.std };
+  });
+
+  const GP = UC.groups.map(g => {
+    const fy = SP[g.standards[0].id].y + NODE_H.std/2;
+    const ly = SP[g.standards[g.standards.length-1].id].y + NODE_H.std/2;
+    return { x: COLS.grp, y: Math.round((fy+ly)/2 - NODE_H.grp/2), w: 172, h: NODE_H.grp };
+  });
+
+  const ucY = Math.round((GP[0].y+NODE_H.grp/2 + GP[GP.length-1].y+NODE_H.grp/2)/2 - NODE_H.uc/2);
+  const UCP = { x: COLS.uc, y: ucY, w: 230, h: NODE_H.uc };
+
+  const CP = {};
+  UC.groups.forEach(g => g.standards.forEach(std => {
+    CP[std.id] = { x: COLS.cap, y: SP[std.id].y - 8, w: 300 };
+  }));
+
+  function darken(hex, amt=40) {
+    const n=parseInt(hex.replace('#',''),16);
+    return `rgb(${Math.max(0,((n>>16)&255)-amt)},${Math.max(0,((n>>8)&255)-amt)},${Math.max(0,(n&255)-amt)})`;
+  }
+  function pctColor(p) { return p>=70?'#01b574':p>=30?'#f97607':'#e84910'; }
+  function capStyle(cap, color) {
+    if (!cap.pct) return `border-color:${color};background:${color}12`;
+    const t=cap.pct/100;
+    const r=Math.round(220-(220-16)*t),g=Math.round(240-(240-185)*t),b=Math.round(220-(220-129)*t);
+    return `border-color:rgb(${r},${g},${b});background:rgba(${r},${g},${b},0.09)`;
+  }
+
+  function mkNode(id,cls,x,y,w,h,color,label,pct,isFocus,xCls='') {
+    const el=document.createElement('div');
+    el.id=id; el.className=`mm-node ${cls} mm-appear ${xCls}`;
+    el.style.cssText=`left:${x}px;top:${y}px;width:${w}px;min-height:${h}px;background:linear-gradient(135deg,${color},${darken(color)})`;
+    el.innerHTML=`<span style="position:relative;z-index:1">${label}</span>`;
+    if (pct!==null){const b=document.createElement('div');b.className='mm-badge-prog';b.style.background=pctColor(pct);b.textContent=pct+'%';el.appendChild(b);}
+    if (isFocus){const f=document.createElement('div');f.className='mm-badge-foco';f.textContent='FOCO';el.appendChild(f);}
+    return el;
+  }
+
+  function mkLine(svg,x1,y1,x2,y2,focus=false) {
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    const mx=(x1+x2)/2;
+    p.setAttribute('d',`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    p.setAttribute('class',focus?'mm-line mm-line-focus':'mm-line');
+    svg.appendChild(p);
+  }
+
+  function mkCapCard(std) {
+    const cp=CP[std.id];
+    const el=document.createElement('div');
+    el.id=`cap-${std.id}`; el.className='mm-cap-node';
+    el.style.cssText=`left:${cp.x}px;top:${cp.y}px;border:2.5px solid ${std.color}`;
+    el.innerHTML=`<div class="mm-cap-header" style="background:${std.color}"><span class="material-symbols-rounded" style="font-size:14px">check_circle</span> Você será capaz de:</div><div class="mm-cap-list" id="clist-${std.id}"></div>`;
+    std.capacities.forEach(cap => {
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='mm-cap-btn'; btn.style.cssText=capStyle(cap,std.color);
+      let h=`<span class="mm-cap-txt">${cap.label}</span>`;
+      if(cap.isFocus) h+=`<span class="mm-cap-foco">FOCO</span>`;
+      if(cap.pct!==null){const pc=Math.round(cap.pct);h+=`<span class="mm-cap-pct" style="background:${pctColor(pc)}">${pc}%</span>`;}
+      btn.innerHTML=h;
+      btn.onclick=e=>{e.stopPropagation();openStudyModal(cap.label,std.color,cap.hasSim);};
+      el.querySelector(`#clist-${std.id}`).appendChild(btn);
+    });
+    return el;
+  }
+
+  function mmInit() {
+    if (mm.ready) return;
+    const canvas=document.getElementById('mm-canvas'), svg=document.getElementById('mm-svg');
+    if(!canvas||!svg) return;
+    canvas.style.minWidth=(COLS.cap+320)+'px'; canvas.style.minHeight=CH+'px';
+    const ucEl=mkNode('mm-uc','mm-node-uc',UCP.x,UCP.y,UCP.w,UCP.h,UC.color,UC.label,UC.pct,false);
+    ucEl.onclick=()=>mmOpenGroups(canvas,svg);
+    canvas.appendChild(ucEl);
+    setTimeout(()=>{canvas.scrollLeft=0;canvas.scrollTop=Math.max(0,(CH-canvas.clientHeight)/2);},80);
+    mm.ready=true;
+  }
+
+  function mmOpenGroups(canvas,svg) {
+    if(mm.groupsOpen) return; mm.groupsOpen=true;
+    UC.groups.forEach((g,gi)=>{
+      const gp=GP[gi];
+      const gEl=mkNode(`mm-g${g.id}`,'mm-node-grp',gp.x,gp.y,gp.w,gp.h,g.color,g.label,g.pct,false);
+      gEl.onclick=()=>mmOpenStandards(canvas,svg,g,gi);
+      canvas.appendChild(gEl);
+      mkLine(svg,UCP.x+UCP.w,UCP.y+UCP.h/2,gp.x,gp.y+gp.h/2);
+    });
+  }
+
+  function mmOpenStandards(canvas,svg,group,gi) {
+    if(mm.openStds.has(group.id)) return; mm.openStds.add(group.id);
+    const gp=GP[gi];
+    group.standards.forEach(std=>{
+      const sp=SP[std.id];
+      const sEl=mkNode(`mm-s${std.id}`,'mm-node-std',sp.x,sp.y,sp.w,sp.h,group.color,std.label,std.pct,std.isFocus,std.isFocus?'in-focus':'');
+      sEl.onclick=()=>mmOpenCapCard(canvas,svg,std);
+      canvas.appendChild(sEl);
+      mkLine(svg,gp.x+gp.w,gp.y+gp.h/2,sp.x,sp.y+sp.h/2,std.isFocus);
+    });
+  }
+
+  function mmOpenCapCard(canvas,svg,std) {
+    if(mm.openCaps.has(std.id)) return; mm.openCaps.add(std.id);
+    const sp=SP[std.id],cp=CP[std.id];
+    canvas.appendChild(mkCapCard(std));
+    mkLine(svg,sp.x+sp.w,sp.y+sp.h/2,cp.x,cp.y+22,std.isFocus);
+  }
+
+  function openStudyModal(label,color,hasSim) {
+    document.getElementById('study-dlg-title').textContent=label;
+    document.getElementById('study-dlg-hdr').style.background=`linear-gradient(135deg,${color},${darken(color)})`;
+    document.getElementById('scard-sim').style.display=hasSim?'flex':'none';
+    document.getElementById('study-overlay').classList.remove('hidden');
+  }
+  function closeStudyModal() { document.getElementById('study-overlay').classList.add('hidden'); }
+  document.addEventListener('click',e=>{
+    const ov=document.getElementById('study-overlay');
+    if(ov&&!ov.classList.contains('hidden')&&e.target===ov) closeStudyModal();
+  });
+</script>
+</body>
+</html>
+
+
+
+
+
+
