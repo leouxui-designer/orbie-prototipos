@@ -147,7 +147,7 @@
     /* ─── KPI CARDS ─── */
     .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
     .kpi-card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 6px; }
-    .kpi-card.urgent { border-color: rgba(240,68,56,.3); background: linear-gradient(145deg,#fff,#fff8f7); }
+    .kpi-card.urgent { border-color: rgba(240,68,56,.25); background: var(--surface); }
     .kpi-icon { width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; margin-bottom: 4px; }
     .kpi-icon-brand   { background: var(--brand-bg);   color: var(--brand);   }
     .kpi-icon-warning { background: var(--warning-bg); color: var(--warning); }
@@ -659,22 +659,25 @@
 
           <!-- Estudantes que precisam de atenção (todas as turmas) -->
           <div class="section" id="homeAttentionSection">
-            <div class="section-header">
+            <div class="section-header" style="margin-bottom:12px">
               <div class="section-label" style="margin:0">Estudantes que precisam de atenção</div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <div class="filter-pills" id="homeFilterPills" role="group" aria-label="Filtrar por situação"></div>
-                <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
-                  Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
+              <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
+                Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
+              </button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+              <div class="dropdown-wrap">
+                <button class="sort-btn" id="homeTurmaBtn" onclick="openDd('homeTurmaFilter','homeTurmaBtn')">
+                  <span id="homeTurmaLabel">Todas as turmas</span>
+                  <i class="pi pi-chevron-down" style="font-size:10px;color:var(--text-300)"></i>
                 </button>
+                <div class="dropdown-menu" id="homeTurmaFilter" role="listbox" style="min-width:220px"></div>
               </div>
+              <div style="width:1px;height:18px;background:var(--outline);flex-shrink:0"></div>
+              <div class="filter-pills" id="homeFilterPills" role="group" aria-label="Filtrar por situação"></div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
-              <span style="font-size:12px;color:var(--text-500);flex-shrink:0">Turma:</span>
-              <div id="homeTurmaFilter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-            </div>
-            <div id="homeAttentionList" style="margin-top:8px"></div>
+            <div id="homeAttentionList"></div>
           </div>
-
           <!-- Atividades recentes (8º ano A como referência) -->
           <div class="section">
             <div class="section-label">Atividades recentes · 8º ano A</div>
@@ -2599,13 +2602,31 @@ function renderHomeFilterPills(f) {
 
 function renderHomeTurmaFilter(f) {
   homeAttentionTurmaFilter = f;
-  const el = document.getElementById('homeTurmaFilter');
-  if (!el) return;
-  const pills = [{ id:'all', label:'Todas' }, ...TURMAS.map(t => ({ id:t.id, label:t.nome }))];
-  el.innerHTML = pills.map(p => `
-    <button class="filter-pill ${f===p.id?'active':''}" style="font-size:11px;padding:3px 9px" onclick="renderHomeTurmaFilter('${p.id}');renderMultiAttention(homeAttentionSituacaoFilter,'${p.id}')">
-      ${p.label}
-    </button>`).join('');
+  const menu = document.getElementById('homeTurmaFilter');
+  if (!menu) return;
+  const opts = [
+    { id:'all', label:'Todas as turmas' },
+    ...TURMAS.map(t => ({ id:t.id, label:t.nome + ' \u2014 ' + t.disc }))
+  ];
+  menu.innerHTML = opts.map(o => `
+    <div class="dropdown-opt \" data-id="\" tabindex="0" role="option"
+         onclick="selectHomeTurma('\')">
+      \ <i class="pi pi-check opt-check"></i>
+    </div>`).join('');
+  const lbl = document.getElementById('homeTurmaLabel');
+  if (lbl) lbl.textContent = f === 'all' ? 'Todas as turmas' : (TURMAS.find(t=>t.id===f)?.nome || 'Todas as turmas');
+}
+
+function selectHomeTurma(id) {
+  homeAttentionTurmaFilter = id;
+  const lbl = document.getElementById('homeTurmaLabel');
+  if (lbl) lbl.textContent = id === 'all' ? 'Todas as turmas' : (TURMAS.find(t=>t.id===id)?.nome || 'Todas as turmas');
+  document.querySelectorAll('#homeTurmaFilter .dropdown-opt').forEach(o => {
+    o.classList.toggle('selected', o.dataset.id === id);
+  });
+  document.getElementById('homeTurmaFilter')?.classList.remove('open');
+  document.getElementById('homeTurmaBtn')?.classList.remove('open');
+  renderMultiAttention(homeAttentionSituacaoFilter, id);
 }
 
 function renderActivitiesInto(targetId) {
