@@ -588,324 +588,335 @@
     .page-header { margin-bottom: 16px; }
   }
 
-  /* ═══ ≤ 600px: Turmas list + tabelas → cards ═══ */
+  /* ── signal-text global (desktop = long, mobile = short) ── */
+  .signal-text--short { display: none; }
+
+  /* ══════════════════════════════════════════════════════════════
+     ≤ 600px — Cards em coluna, sem CTAs, clique no item inteiro
+  ══════════════════════════════════════════════════════════════ */
   @media (max-width: 600px) {
 
-    /* ─ Turmas list: linha → card vertical ─ */
+    /* ─ TURMAS LIST ─ */
     .tl-head { display: none !important; }
+    .turmas-list { overflow: visible; }
     .tl-row {
-      flex-wrap: wrap;
-      align-items: flex-start;
-      padding: 13px 14px;
-      gap: 0;
-      position: relative;
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      padding: 10px 14px 9px; position: static !important;
+      border-bottom: 1px solid var(--outline-2); cursor: pointer;
+      transition: background .1s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
     }
-    .tl-c-nome  { width: calc(100% - 62px); margin-bottom: 2px; }
-    .tl-c-disc  { width: 100%; display: flex !important; font-size: 11px; margin-bottom: 8px; }
-    .tl-c-est   { display: none !important; }
-    .tl-c-desemp{ width: 62%; display: flex !important; margin-bottom: 6px; }
-    .tl-c-tend  { width: 38%; display: flex !important; justify-content: flex-end;
-                  margin-bottom: 6px; align-items: flex-start; padding-top: 2px; }
-    .tl-c-alert { width: 100%; margin-bottom: 4px; }
-    .tl-c-cont  { width: 100%; display: block !important; font-size: 11px; color: var(--text-500); }
-    .tl-c-act   { position: absolute; top: 13px; right: 14px; width: auto; text-align: right; }
-    .tl-c-act .btn-sm { height: 30px; padding: 0 8px; font-size: 12px; }
+    .tl-row:last-child { border-bottom: none; }
+    .tl-row:active { background: var(--brand-5); }
+    /* L1: nome full width */
+    .tl-c-nome { width: 100% !important; flex: none !important; order: 1; margin-bottom: 2px; }
+    .tl-c-nome .turma-nome {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: block; max-width: 100%; font-size: 13px; font-weight: 700;
+    }
+    /* Tend: oculto */
+    .tl-c-tend { display: none !important; }
+    /* L2: disciplina */
+    .tl-c-disc {
+      width: 100%; order: 3; display: block !important;
+      font-size: 11px; color: var(--text-500); margin-bottom: 5px;
+    }
+    .tl-c-disc .turma-disc {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+    }
+    /* nAlunos: oculto */
+    .tl-c-est { display: none !important; }
+    /* L3: barra de desempenho sem % text */
+    .tl-c-desemp {
+      width: 100% !important; order: 4; display: flex !important;
+      align-items: center; margin-bottom: 5px;
+    }
+    .tl-c-desemp > div { width: 100% !important; gap: 0 !important; }
+    .tl-c-desemp > div > span { display: none !important; }
+    /* L4: alertas + dificuldade na mesma linha */
+    .tl-c-alert { flex-shrink: 0; order: 5; margin-right: 8px; margin-bottom: 0; }
+    .tl-c-cont  {
+      flex: 1; min-width: 0; order: 6; display: block !important;
+      font-size: 11px; color: var(--text-500);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; align-self: center;
+    }
+    /* Ver: oculto */
+    .tl-c-act { display: none !important; }
 
-    /* ─ Attention table: row → card ─ */
+    /* ─ ATTENTION TABLE ─ */
     .att-thead { display: none !important; }
     .attention-table { overflow: visible !important; }
     .attention-row {
-      flex-wrap: wrap;
-      align-items: flex-start;
-      padding: 12px 14px;
-      gap: 0;
-      min-width: unset !important;
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      padding: 9px 14px; gap: 0; min-width: unset !important;
+      -webkit-tap-highlight-color: transparent; user-select: none;
     }
-    .c-avatar { flex-shrink: 0; width: 36px; margin-right: 10px; align-self: flex-start; }
-    .c-info   { width: calc(100% - 46px); flex-shrink: 0; margin-bottom: 8px; }
+    .attention-row:active { background: var(--brand-5); }
+    .c-avatar { width: 36px; flex-shrink: 0; margin-right: 10px; align-self: flex-start; }
+    .c-info   { width: calc(100% - 46px); flex-shrink: 0; margin-bottom: 4px; }
     .c-info .student-name { font-size: 13px; }
-    .c-badge  { width: calc(100% - 46px); margin-left: 46px; margin-bottom: 6px; }
-    .c-spark  { margin-left: 46px; }
-    .c-score  { flex: 1; display: flex; justify-content: flex-end; }
-    .c-reason { width: 100%; margin-top: 6px; }
+    .c-info .student-sub  { font-size: 11px; }
+    .c-badge  { width: calc(100% - 46px); margin-left: 46px; margin-bottom: 3px; }
+    .c-spark  { display: none !important; }
+    .c-score  { display: none !important; }
+    .c-reason { width: 100%; margin-top: 4px; }
     .reason-text { white-space: normal; display: block; font-size: 12px; line-height: 1.4; }
-    .c-action { width: 100%; text-align: right; margin-top: 8px; }
+    .c-action { display: none !important; }
     .c-turma  { display: none; }
 
-    /* ─ Student table: row → card ─ */
+    /* ─ STUDENT TABLE ─ */
     .st-table { overflow: visible !important; }
     .st-thead { display: none !important; }
     .st-row {
-      flex-wrap: wrap;
-      padding: 12px 14px;
-      gap: 0;
-      align-items: flex-start;
-      min-width: unset !important;
+      display: flex; flex-wrap: wrap; padding: 9px 14px; gap: 0;
+      align-items: flex-start; min-width: unset !important;
+      -webkit-tap-highlight-color: transparent; user-select: none;
     }
+    .st-row:active { background: var(--brand-5); }
     .c-st-av   { width: 36px; flex-shrink: 0; margin-right: 10px; }
-    .c-st-nome { width: calc(100% - 46px); flex-shrink: 0; margin-bottom: 8px; }
-    .c-st-desemp { width: calc(100% - 46px); margin-left: 46px; margin-bottom: 6px; display: flex !important; }
+    .c-st-nome { width: calc(100% - 46px); flex-shrink: 0; margin-bottom: 4px; }
+    .c-st-desemp {
+      width: calc(100% - 46px); margin-left: 46px; margin-bottom: 4px; display: flex !important;
+    }
+    .c-st-desemp > div { width: 100% !important; gap: 0 !important; }
+    .c-st-desemp > div > span { display: none !important; }
     .c-st-spark  { display: none !important; }
-    .c-st-estado { width: 100%; margin-bottom: 4px; }
-    .c-st-ultimo { width: auto; text-align: left; margin-left: auto; }
-    .c-st-dific  { width: 100%; margin-top: 4px; }
-    .c-st-act    { margin-left: auto; }
-
-    /* ─ Students toolbar ─ */
+    .c-st-estado { width: 100%; margin-bottom: 3px; }
+    .c-st-ultimo { display: none !important; }
+    .c-st-dific  { width: 100%; margin-top: 3px; }
+    .c-st-act    { display: none !important; }
     .students-toolbar { flex-wrap: wrap; gap: 8px; }
     .students-toolbar .search-wrap { max-width: 100%; width: 100%; }
-    #stFilterPills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;
-      -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    #stFilterPills {
+      flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
     #stFilterPills::-webkit-scrollbar { display: none; }
+    .st-footer { font-size: 11px; padding: 8px 14px; }
+
+    /* ─ SIGNAL BANNER ─ */
+    .signal-banner {
+      flex-direction: column; gap: 10px; padding: 12px 14px 10px;
+    }
+    .signal-banner .signal-icon-box { width: 32px; height: 32px; font-size: 15px; }
+    .signal-title { font-size: 13px; margin-bottom: 3px; }
+    .signal-text--full  { display: none; }
+    .signal-text--short { display: block; font-size: 12px; line-height: 1.45; }
+    .signal-actions {
+      flex-direction: row; flex-wrap: wrap; gap: 8px;
+      width: 100%; flex-shrink: 0; padding: 0;
+    }
+    .signal-actions .btn { flex: 1; min-width: 0; justify-content: center; height: 36px; font-size: 12px; }
+
+    /* ─ ATIVIDADES ─ */
+    .activity-row { flex-wrap: wrap; align-items: flex-start; padding: 11px 14px; gap: 0; }
+    .activity-icon-box { flex-shrink: 0; align-self: flex-start; }
+    .activity-row > div:nth-child(2) { flex: 1; min-width: 0; }
+    .activity-name { font-size: 13px; white-space: normal; }
+    .activity-stats {
+      width: 100%; padding-left: 44px; margin-left: 0 !important;
+      gap: 10px; flex-wrap: wrap; margin-top: 4px; font-size: 12px;
+    }
+    .activity-row > div:last-child {
+      width: 100%; padding-left: 44px; margin-left: 0 !important; margin-top: 4px;
+    }
+
+    /* ─ SKILLS / CONTEÚDOS ─ */
+    .skill-row { padding: 7px 2px !important; }
+    .skill-count { display: none !important; }
+    .skill-bar-wrap { width: 72px !important; }
+    .skill-card {
+      padding: 11px 14px !important; margin-bottom: 6px !important; gap: 12px !important;
+    }
+    .skill-card-icon { width: 32px !important; height: 32px !important; font-size: 14px !important; }
+    .skill-card:active { box-shadow: 0 0 0 2px var(--brand-5) !important; }
+    .skill-card { -webkit-tap-highlight-color: transparent; user-select: none; }
+
+    /* ─ GERAL ─ */
+    .card { padding: 14px; }
+    .card-header { margin-bottom: 12px; gap: 8px; }
+    .card-title { font-size: 13px; }
+    .card-header .card-subtitle { display: none; }
+    .score-chip { font-size: 11px !important; padding: 2px 6px !important; min-width: 34px !important; }
+    .badge { font-size: 11px; }
+    .section-header { flex-wrap: wrap; gap: 8px; align-items: center; }
+    .btn-ghost.btn-sm { font-size: 12px; height: 32px; padding: 0 10px; }
+    .attention-table, .activities-list, .turmas-list { overflow: visible; }
   }
 
-  /* ═══ ≤ 480px ═══ */
+  /* ══════════════════════════════════════════════════════════════
+     ≤ 480px
+  ══════════════════════════════════════════════════════════════ */
   @media (max-width: 480px) {
-    /* KPI: manter 2 colunas (sobrescreve regra anterior de 1 coluna) */
     .kpi-grid { grid-template-columns: repeat(2,1fr) !important; gap: 8px; }
     .kpi-card { padding: 12px 12px 10px; }
     .kpi-value { font-size: 26px !important; }
     .kpi-icon { width: 28px; height: 28px; font-size: 13px; margin-bottom: 2px; }
-
-    /* Header compacto */
-    .topbar { padding: 0 10px; gap: 4px; }
+    .topbar { padding: 0 10px; gap: 0; }
     .escola-ctx { padding: 5px 8px 5px 10px; gap: 5px; }
-    .escola-ctx-value { max-width: 100px; font-size: 11px; }
+    .escola-ctx-value { font-size: 12px; }
     #periodoBtn { display: none !important; }
     .notif-btn, .topbar-avatar { width: 36px; height: 36px; }
-
-    /* Content */
     .content { padding: 0 10px 24px; }
     .page-title { font-size: 19px; }
     .sort-btn { font-size: 12px; height: 34px; padding: 0 10px; }
-
-    /* Profile */
     .modal-header { padding: 18px 16px 0; }
     .modal-body   { padding: 16px 16px 20px; }
     .situacao-row { flex-wrap: wrap; gap: 4px; }
-    .profile-av-lg { width: 52px; height: 52px; font-size: 18px; }
-
-    /* Atividades */
-    .activity-stats { gap: 10px; font-size: 11px; flex-wrap: wrap; }
-    .activity-row { flex-wrap: wrap; gap: 8px; }
+    .activity-stats { gap: 8px; font-size: 11px; }
   }
 
-  /* ═══ ≤ 375px: iPhone SE / menores ═══ */
+  /* ══════════════════════════════════════════════════════════════
+     ≤ 375px
+  ══════════════════════════════════════════════════════════════ */
   @media (max-width: 375px) {
-    .kpi-value  { font-size: 22px !important; }
-    .kpi-label  { font-size: 9px; }
-    .kpi-card   { padding: 10px 10px 8px; }
-    .escola-ctx-value { max-width: 72px; font-size: 11px; }
-    .content    { padding: 0 8px 20px; }
-    .page-title { font-size: 17px; }
-    .tl-c-desemp { width: 58%; }
-    .tl-c-tend   { width: 42%; }
-    .section     { margin-bottom: 14px; }
-    .badge { font-size: 11px; padding: 2px 7px; }
-  }
-
-    /* ═══════════════════════════════════════════════════
-       MOBILE BOTTOM BAR — navegação principal mobile
-    ═══════════════════════════════════════════════════ */
-    .mobile-bottom-bar {
-      display: none; /* invisible on desktop */
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
-      background: var(--surface);
-      border-top: 1px solid var(--outline);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -2px 16px rgba(0,0,0,.07);
-    }
-    .mbb-item {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 3px; padding: 8px 4px 9px;
-      border: none; background: transparent; cursor: pointer;
-      color: var(--text-300); font-family: var(--font);
-      transition: color .15s, background .12s;
-      min-height: 56px; border-radius: 0;
-      -webkit-tap-highlight-color: transparent; position: relative;
-    }
-    .mbb-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; z-index: 1; }
-    .mbb-item.active { color: var(--brand); }
-    .mbb-item.active::before {
-      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
-      height: 2px; background: var(--brand); border-radius: 0 0 2px 2px;
-    }
-    .mbb-icon { font-size: 20px; line-height: 1; }
-    .mbb-label { font-size: 10px; font-weight: 600; letter-spacing: .03em; line-height: 1; }
-
-    @media (max-width: 768px) {
-      /* ─ Mostrar bottom bar ─ */
-      .mobile-bottom-bar { display: flex; }
-
-      /* ─ Esconder sidebar e hamburger completamente ─ */
-      .sidebar, .sidebar-overlay { display: none !important; }
-      #sidebarToggle { display: none !important; }
-
-      /* ─ Padding no conteúdo para não ficar atrás da bottom bar ─ */
-      .main { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important; }
-    }
-
-  /* ═══════════════════════════════════════════════════════════════
-     MOBILE REFINEMENTS v2 — header, turmas, atenção, atividades
-  ═══════════════════════════════════════════════════════════════ */
-
-  /* ── 1. HEADER: escola select com espaço adequado ── */
-  @media (max-width: 768px) {
-    .topbar { padding: 0 12px; gap: 0; justify-content: flex-end; }
-    .topbar-right { flex: 1; min-width: 0; margin-left: 0; gap: 8px; justify-content: flex-end; }
-    /* dropdown-wrap da escola cresce */
-    .topbar-right > .dropdown-wrap:first-child { flex: 1; min-width: 0; overflow: hidden; }
-    .escola-ctx { width: 100%; min-width: 0; flex-shrink: 1 !important; box-sizing: border-box; }
-    .escola-ctx .ctx-icon { flex-shrink: 0; }
-    .escola-ctx-value { flex: 1; min-width: 0; max-width: none !important;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
-    .notif-btn, .topbar-avatar { flex-shrink: 0; }
-  }
-
-  @media (max-width: 480px) {
-    .topbar { padding: 0 10px; gap: 0; }
-    .topbar-right { gap: 6px; }
-    .escola-ctx { padding: 5px 8px; gap: 5px; }
-    .escola-ctx-value { font-size: 12px; }
-    /* esconde ícone em telas muito pequenas para ganhar mais espaço */
-  }
-
-  @media (max-width: 375px) {
-    .topbar { padding: 0 8px; }
-    .topbar-right { gap: 5px; }
+    .kpi-value { font-size: 22px !important; }
+    .kpi-label { font-size: 9px; }
+    .kpi-card  { padding: 10px 10px 8px; }
     .escola-ctx .ctx-icon { display: none; }
     .escola-ctx { padding: 5px 7px; gap: 4px; }
     .escola-ctx-value { font-size: 12px; }
     .escola-ctx-chevron { font-size: 9px; }
+    .content { padding: 0 8px 20px; }
+    .page-title { font-size: 17px; }
+    .tl-c-nome .turma-nome { font-size: 12px; }
+    .tl-c-disc .turma-disc { font-size: 10px; }
+    .student-name { font-size: 12px; }
+    .section { margin-bottom: 14px; }
+    .badge { padding: 2px 6px; }
   }
 
-  /* ── 2. TURMAS LIST: hierarquia clara e card compacto ── */
-  @media (max-width: 600px) {
-    .tl-head { display: none !important; }
-    .tl-row {
-      display: flex; flex-wrap: wrap; align-items: flex-start;
-      padding: 13px 14px 11px; position: static !important;
-      border-bottom: 1px solid var(--outline-2); cursor: pointer;
-      transition: background .1s;
+
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE BOTTOM BAR — hidden on desktop, shown on mobile
+  ═══════════════════════════════════════════════════════════ */
+  .mobile-bottom-bar {
+    display: none;                              /* hidden desktop */
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+    background: var(--surface);
+    border-top: 1px solid var(--outline);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 16px rgba(0,0,0,.06);
+  }
+  .mbb-item {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; padding: 8px 4px 10px;
+    border: none; background: transparent; cursor: pointer;
+    color: var(--text-300); font-family: var(--font);
+    transition: color .15s, background .12s;
+    min-height: 56px; border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+  }
+  .mbb-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; z-index: 1; }
+  .mbb-item.active { color: var(--brand); }
+  .mbb-item.active::before {
+    content: ''; position: absolute; top: 0; left: 22%; right: 22%;
+    height: 2px; background: var(--brand); border-radius: 0 0 2px 2px;
+  }
+  .mbb-icon  { font-size: 21px; line-height: 1; }
+  .mbb-label { font-size: 10px; font-weight: 600; letter-spacing: .04em; line-height: 1; }
+
+  /* ═══════════════════════════════════════════════════════════
+     ≤ 768px — bottom bar on, sidebar off, header compacto
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* ─ Bottom bar: ativa ─ */
+    .mobile-bottom-bar { display: flex; }
+
+    /* ─ Sidebar + hamburger: ocultos — nav via bottom bar ─ */
+    .sidebar          { display: none !important; }
+    .sidebar-overlay  { display: none !important; }
+    #sidebarToggle    { display: none !important; }
+
+    /* ─ Main: padding-bottom para não ficar atrás da barra ─ */
+    .main { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important; }
+
+    /* ─ Header: logo oculto, escola cresce ─ */
+    .topbar-logo { display: none; }
+    .topbar { padding: 0 12px; gap: 0; justify-content: flex-end; }
+    .topbar-right { flex: 1; min-width: 0; margin-left: 0; gap: 8px; justify-content: flex-end; }
+    .topbar-right > .dropdown-wrap:first-child { flex: 1; min-width: 0; overflow: hidden; }
+    .escola-ctx { width: 100%; min-width: 0; flex-shrink: 1 !important; box-sizing: border-box; }
+    .escola-ctx .ctx-icon { flex-shrink: 0; }
+    .escola-ctx-value {
+      flex: 1; min-width: 0; max-width: none !important;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px;
     }
-    .tl-row:hover { background: var(--bg); }
-    .tl-row:last-child { border-bottom: none; }
+    .notif-btn, .topbar-avatar { flex-shrink: 0; }
 
-    /* L1: nome (flex-1) + tendência (shrink) */
-    .tl-c-nome  { flex: 1; min-width: 0; order: 1; margin-bottom: 1px; }
-    .tl-c-nome .turma-nome { font-size: 14px; font-weight: 700; }
-    .tl-c-tend  { flex-shrink: 0; order: 2; margin-bottom: 1px;
-                  display: flex !important; align-items: flex-start;
-                  width: auto !important; padding-top: 1px; }
+    /* ─ Touch targets ─ */
+    .filter-pill { min-height: 40px; padding: 6px 13px; font-size: 12px; }
+    .btn { min-height: 44px; }
+    .btn-sm { min-height: 36px; }
 
-    /* L2: disciplina + separador */
-    .tl-c-disc  { width: 100%; order: 3; display: flex !important;
-                  font-size: 12px; margin-bottom: 8px; color: var(--text-500); }
-    .tl-c-est   { display: none !important; }
+    /* ─ Content ─ */
+    .content { padding: 0 14px 32px; }
+    .section { margin-bottom: 20px; }
+    .page-title { font-size: 22px; }
 
-    /* L3: desempenho (barra + %) full width */
-    .tl-c-desemp{ width: 100%; order: 4; display: flex !important;
-                  align-items: center; margin-bottom: 7px; }
-    .tl-c-desemp > div { flex: 1; } /* pbar */
+    /* ─ KPI: 2 colunas ─ */
+    .kpi-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .kpi-card { padding: 14px 14px 12px; }
+    .kpi-icon { width: 32px; height: 32px; font-size: 14px; }
+    .kpi-value { font-size: 28px; }
+    .kpi-sub, .kpi-trend { font-size: 11px; }
+    .kpi-label { font-size: 10px; }
 
-    /* L4: alertas + dificuldade na mesma linha */
-    .tl-c-alert { flex-shrink: 0; order: 5; margin-right: 8px; }
-    .tl-c-cont  { flex: 1; min-width: 0; order: 6; display: block !important;
-                  font-size: 11px; color: var(--text-500);
-                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-                  align-self: center; }
+    /* ─ Section headers ─ */
+    .section-header { flex-wrap: wrap; gap: 8px; }
 
-    /* L5: CTA full width, alinhado à direita */
-    .tl-c-act   { width: 100%; order: 7; margin-top: 10px;
-                  position: static !important; text-align: right; }
-    .tl-c-act .btn-sm { height: 32px; font-size: 12px; padding: 0 12px; }
+    /* ─ Filtros de atenção ─ */
+    #homeAttentionSection > div:nth-child(2) { flex-wrap: wrap; gap: 8px; }
+    #homeFilterPills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    #homeFilterPills::-webkit-scrollbar { display: none; }
+
+    /* ─ Dropdowns: não sair da tela ─ */
+    .dropdown-menu { max-width: calc(100vw - 20px); box-sizing: border-box; }
+    #escolaMenu  { right: auto; left: 0; }
+    #periodoMenu { right: 0; left: auto; }
+
+    /* ─ Modal → bottom sheet ─ */
+    .modal-panel {
+      width: 100vw; max-width: 100vw;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      position: fixed; bottom: 0; left: 0; max-height: 88vh;
+    }
+    .modal-overlay.open { align-items: flex-end; }
+
+    /* ─ Grids: empilhar ─ */
+    .grid-5-4, .grid-2 { grid-template-columns: 1fr !important; }
+
+    /* ─ Profile ─ */
+    .profile-banner { padding: 20px 16px; gap: 12px; }
+
+    /* ─ Breadcrumb ─ */
+    .breadcrumb { padding: 12px 0 4px; flex-wrap: wrap; }
+    .page-header { margin-bottom: 16px; }
   }
 
-  /* ── 3. ATTENTION CARDS: coesão visual ── */
-  @media (max-width: 600px) {
-    .att-thead { display: none !important; }
-    .attention-table { overflow: visible !important; }
-    .attention-row {
-      display: flex; flex-wrap: wrap; align-items: flex-start;
-      padding: 12px 14px; gap: 0;
-      min-width: unset !important;
-      position: relative;
-    }
-
-    /* Top: avatar + nome+sub */
-    .c-avatar { width: 36px; flex-shrink: 0; margin-right: 10px; align-self: flex-start; }
-    .c-info   { flex: 1; min-width: 0; margin-bottom: 6px; }
-    .c-info .student-name { font-size: 13px; }
-    .c-info .student-sub  { font-size: 11px; }
-
-    /* Badge: largura restante, indentado */
-    .c-badge  { width: calc(100% - 46px); margin-left: 46px; margin-bottom: 6px; }
-
-    /* Sparkline + score: mesma linha, indentado */
-    .c-spark { margin-left: 46px; flex-shrink: 0; display: flex; align-items: center; }
-    .c-score { flex-shrink: 0; padding-left: 8px; display: flex; align-items: center; gap: 4px; justify-content: flex-start; }
-    .c-score .score-chip { font-size: 12px; }
-
-    /* Razão: fundo sutil, full width */
-    .c-reason { width: 100%; margin-top: 8px; }
-    .reason-text {
-      white-space: normal; display: block;
-      font-size: 12px; line-height: 1.45; max-width: 100%;
-    }
-
-    /* CTA: direita, separado visualmente */
-    .c-action {
-      width: 100%; text-align: right; margin-top: 8px;
-      padding-top: 8px; border-top: 1px solid var(--outline-2);
-    }
-    .c-turma { display: none; }
+  /* ═══════════════════════════════════════════════════════════
+     ≤ 480px refinamentos
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 480px) {
+    .escola-ctx { padding: 5px 8px 5px 10px; gap: 5px; }
+    .escola-ctx-value { font-size: 12px; }
+    #periodoBtn { display: none !important; }
+    .topbar { padding: 0 10px; }
   }
 
-  /* ── 4. ATIVIDADES RECENTES: sem sobreposição ── */
-  @media (max-width: 600px) {
-    .activity-row {
-      flex-wrap: wrap;
-      align-items: flex-start;
-      padding: 12px 14px;
-      gap: 0;
-    }
-    .activity-icon-box { flex-shrink: 0; align-self: flex-start; }
-    /* Nome + data: ao lado do ícone */
-    .activity-row > div:nth-child(2) { flex: 1; min-width: 0; }
-    .activity-name { font-size: 13px; white-space: normal; }
-    /* Stats: segunda linha, indentada */
-    .activity-stats {
-      width: 100%;
-      padding-left: 44px;
-      margin-left: 0 !important;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-      font-size: 12px;
-    }
-    /* Badge: terceira linha, indentada */
-    .activity-row > div:last-child {
-      width: 100%;
-      padding-left: 44px;
-      margin-left: 0 !important;
-      margin-top: 4px;
-    }
-  }
-
-  /* ── 5. GERAL: min-width:0, sem overflow, padding consistente ── */
-  @media (max-width: 600px) {
-    .card { padding: 14px; }
-    .card-header { margin-bottom: 12px; gap: 8px; }
-    .card-title { font-size: 13px; }
-    .card-subtitle { font-size: 11px; }
-    .score-chip { font-size: 11px; padding: 2px 7px; min-width: 38px; }
-    .badge { font-size: 11px; }
-    .section-header { flex-wrap: wrap; gap: 8px; align-items: center; }
-    .btn-ghost.btn-sm { font-size: 12px; height: 32px; padding: 0 10px; }
-    /* evitar qualquer overflow horizontal */
-    .attention-table, .activities-list, .turmas-list { overflow: visible; }
-    .st-footer { font-size: 11px; padding: 8px 14px; }
+  /* ═══════════════════════════════════════════════════════════
+     ≤ 375px
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 375px) {
+    .escola-ctx .ctx-icon { display: none; }
+    .escola-ctx { padding: 5px 7px; gap: 4px; }
+    .escola-ctx-value { font-size: 12px; }
+    .topbar { padding: 0 8px; }
   }
 
   </style>
@@ -1428,20 +1439,29 @@ function renderKPIs() {
 
 /* ─── RENDER: Signal ─── */
 function renderSignal() {
-  const s = DATA.sinalPedagogico;
-  const ok = s.recomendacao === 'avancar';
-  document.getElementById('signalSection').innerHTML = `
-    <div class="signal-banner ${ok ? 'ok' : 'warning'}">
-      <div class="signal-icon-box"><i class="pi ${ok ? 'pi-check-circle' : 'pi-exclamation-circle'}"></i></div>
-      <div class="flex-1">
-        <div class="signal-title">${ok ? 'Turma pronta para avançar' : 'Atenção antes de avançar'}</div>
-        <div class="signal-text">${s.mensagem}</div>
-      </div>
-      <div class="signal-actions">
-        <button class="btn btn-sm btn-outline" onclick="setView('conteudos',document.getElementById('nav-cont-link'))">Ver conteúdos</button>
-        <button class="btn btn-sm btn-outline" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">Ver estudantes</button>
-      </div>
-    </div>`;
+  var s = DATA.sinalPedagogico;
+  var ok = s.recomendacao === 'avancar';
+  var critica = DATA.habilidades.slice().sort(function(a,b){return a.dominio-b.dominio;})[0];
+  var nomeHab = critica ? critica.nome : 'este conteúdo';
+  var shortMsg = ok
+    ? 'A turma está pronta para avançar para o próximo conteúdo.'
+    : 'Dificuldade identificada em ' + nomeHab + '. Considere retomar antes de avançar.';
+  var title   = ok ? 'Turma pronta para avançar' : 'Atenção antes de avançar';
+  var iconCls = ok ? 'pi-check-circle' : 'pi-exclamation-circle';
+  var bannerCls = ok ? 'ok' : 'warning';
+  document.getElementById('signalSection').innerHTML =
+    '<div class="signal-banner ' + bannerCls + '">' +
+      '<div class="signal-icon-box"><i class="pi ' + iconCls + '"></i></div>' +
+      '<div class="flex-1">' +
+        '<div class="signal-title">' + title + '</div>' +
+        '<div class="signal-text signal-text--full">' + s.mensagem + '</div>' +
+        '<div class="signal-text signal-text--short">' + shortMsg + '</div>' +
+      '</div>' +
+      '<div class="signal-actions">' +
+        '<button class="btn btn-sm btn-outline" onclick="setView(\'conteudos\',document.getElementById(\'nav-cont-link\'))">Ver conteúdos</button>' +
+        '<button class="btn btn-sm btn-outline" onclick="studentsFilter=\'atencao\';setView(\'estudantes\',document.getElementById(\'nav-est-link\'))">Ver estudantes</button>' +
+      '</div>' +
+    '</div>';
 }
 
 /* ─── RENDER: Skills ─── */
