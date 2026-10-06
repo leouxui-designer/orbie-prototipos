@@ -486,15 +486,25 @@
     @media(max-width:480px){ .escola-ctx-value{ max-width:120px; } }
 
     /* ─── TURMA CARDS ─── */
-    .turmas-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-    @media(max-width:1100px){ .turmas-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:600px) { .turmas-grid { grid-template-columns:1fr; } }
-    .turma-card { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); padding:20px; cursor:pointer; transition:border-color .15s,box-shadow .15s; display:flex; flex-direction:column; gap:12px; }
-    .turma-card:hover { border-color:var(--brand); box-shadow:var(--shadow-sm); }
-    .turma-card.queda   { border-left:3px solid var(--warning); }
-    .turma-card.critico { border-left:3px solid var(--error);   }
-    .turma-card.bom     { border-left:3px solid var(--success);  }
-    .turma-nome { font-size:16px; font-weight:700; color:var(--text-900); }
+    /* ─── TURMAS LIST ─── */
+    .turmas-list { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); overflow:hidden; }
+    .tl-head { display:flex; align-items:center; gap:12px; padding:9px 16px; border-bottom:1px solid var(--outline); background:var(--bg); }
+    .tl-head span { font-size:11px; font-weight:700; color:var(--text-300); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+    .tl-row { display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--outline-2); cursor:pointer; transition:background .1s; }
+    .tl-row:last-child { border-bottom:none; }
+    .tl-row:hover { background:var(--bg); }
+    .tl-c-nome  { width:130px; flex-shrink:0; }
+    .tl-c-disc  { width:148px; flex-shrink:0; }
+    .tl-c-est   { width:64px;  flex-shrink:0; text-align:center; }
+    .tl-c-desemp{ width:150px; flex-shrink:0; }
+    .tl-c-tend  { width:120px; flex-shrink:0; }
+    .tl-c-alert { width:82px;  flex-shrink:0; text-align:center; }
+    .tl-c-cont  { flex:1; min-width:0; }
+    .tl-c-act   { width:56px;  flex-shrink:0; text-align:right; }
+    @media(max-width:1100px){ .tl-c-cont{ display:none; } }
+    @media(max-width:768px){  .tl-c-disc,.tl-c-est{ display:none; } .tl-c-desemp{ width:120px; } }
+    /* ─── TURMA CARD (mantido para compatibilidade) ─── */
+    .turma-nome { font-size:13px; font-weight:600; color:var(--text-900); }
     .turma-disc { font-size:12px; color:var(--text-300); }
     .turma-row  { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .turma-desemp-label { font-size:11px; color:var(--text-300); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
@@ -577,9 +587,8 @@
     <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegação do painel">
       <!-- Início = Painel de Docentes (ativo, expandido) -->
       <div>
-        <button class="nav-item active expanded" onclick="toggleAcc(this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-home nav-icon"></i><span class="nav-label">Início</span><i class="pi pi-chevron-down nav-chevron" style="transform:rotate(180deg)"></i></div></button>
+        <button class="nav-item active expanded" id="nav-home-link" onclick="toggleAcc(this);setView('visao-geral',this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-home nav-icon"></i><span class="nav-label">Início</span><i class="pi pi-chevron-down nav-chevron" style="transform:rotate(180deg)"></i></div></button>
         <div class="nav-sub open">
-          <a class="nav-sub-item active" href="#" id="nav-home-link" onclick="setView('visao-geral',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Visão Geral</span></div></a>
           <a class="nav-sub-item" id="nav-est-link" href="#" onclick="setView('estudantes',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Estudantes</span></div></a>
           <a class="nav-sub-item" href="#" onclick="setView('atividades',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Atividades</span></div></a>
           <a class="nav-sub-item" id="nav-cont-link" href="#" onclick="setView('conteudos',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Conteúdos</span></div></a>
@@ -620,7 +629,7 @@
             <span class="breadcrumb-sep"><i class="pi pi-chevron-right" style="font-size:9px"></i></span>
           </span>
 
-          <span class="breadcrumb-current" id="breadcrumb-current">Visão Geral</span>
+          <span class="breadcrumb-current" id="breadcrumb-current">Início</span>
           <button class="fav-btn" aria-label="Favoritar"><i class="pi pi-star"></i></button>
         </nav>
 
@@ -1248,7 +1257,7 @@ function setView(id, el) {
   if (target) target.style.display='block';
   document.querySelectorAll('.nav-sub-item').forEach(i=>i.classList.remove('active'));
   if (el) el.classList.add('active');
-  const labels = { 'visao-geral':'Visão Geral', estudantes:'Estudantes', atividades:'Atividades', perfil:'Perfil', conteudos:'Conteúdos e Habilidades', 'turma-detalhe':'Turma' };
+  const labels = { 'visao-geral':'Início', estudantes:'Estudantes', atividades:'Atividades', perfil:'Perfil', conteudos:'Conteúdos e Habilidades', 'turma-detalhe':'Turma' };
   if (id !== 'perfil' && id !== 'turma-detalhe') {
     const bp = document.getElementById('breadcrumb-parent');
     if (bp) bp.style.display = 'none';
@@ -2421,36 +2430,62 @@ function renderHomeKPIs() {
 function renderTurmaCards() {
   const el = document.getElementById('turmasGrid');
   if (!el) return;
-  el.innerHTML = TURMAS.map(t => {
-    const tendBadge = { melhorando:'badge-success', estavel:'badge-neutral', queda:'badge-warning' };
-    const tendText  = { melhorando:'↗ Melhorando', estavel:'→ Estável', queda:'↘ Queda' };
-    const borderCls = t.tendencia==='queda'?'queda':t.desempenhoMedio<65?'critico':t.desempenhoMedio>=70?'bom':'';
-    const pCls = t.desempenhoMedio>=70?'good':t.desempenhoMedio>=55?'medium':'low';
-    const dColor = t.desempenhoMedio>=70?'var(--success)':t.desempenhoMedio>=55?'var(--warning)':'var(--error)';
-    return `
-      <div class="turma-card ${borderCls}" onclick="openTurmaDetalhe('${t.id}')">
-        <div class="turma-row">
-          <div>
-            <div class="turma-nome">${t.nome}</div>
-            <div class="turma-disc">${t.disc} · ${t.estudantes} estudantes</div>
-          </div>
-          <span class="badge ${tendBadge[t.tendencia]}" style="font-size:11px;flex-shrink:0">${tendText[t.tendencia]}</span>
+  const tendBadge = { melhorando:'badge-success', estavel:'badge-neutral', queda:'badge-warning' };
+  const tendIcon  = { melhorando:'pi-trending-up', estavel:'pi-minus-circle', queda:'pi-trending-down' };
+  const tendText  = { melhorando:'Melhorando', estavel:'Estável', queda:'Queda' };
+  const pCls  = v => v >= 70 ? 'good' : v >= 55 ? 'medium' : 'low';
+  const dColor = v => v >= 70 ? 'var(--success)' : v >= 55 ? 'var(--warning)' : 'var(--error)';
+
+  const thead = `
+    <div class="tl-head">
+      <div class="tl-c-nome"><span>Turma</span></div>
+      <div class="tl-c-disc"><span>Disciplina</span></div>
+      <div class="tl-c-est"><span>Alunos</span></div>
+      <div class="tl-c-desemp"><span>Desempenho médio</span></div>
+      <div class="tl-c-tend"><span>Tendência</span></div>
+      <div class="tl-c-alert"><span>Atenção</span></div>
+      <div class="tl-c-cont"><span>Principal dificuldade</span></div>
+      <div class="tl-c-act"></div>
+    </div>`;
+
+  const rows = TURMAS.map(t => `
+    <div class="tl-row" onclick="openTurmaDetalhe('${t.id}')">
+      <div class="tl-c-nome">
+        <span class="turma-nome">${t.nome}</span>
+      </div>
+      <div class="tl-c-disc">
+        <span class="turma-disc">${t.disc}</span>
+      </div>
+      <div class="tl-c-est">
+        <span style="font-size:13px;font-weight:600;color:var(--text-700)">${t.estudantes}</span>
+      </div>
+      <div class="tl-c-desemp">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1"><div class="pbar-wrap"><div class="pbar-fill ${pCls(t.desempenhoMedio)}" style="width:${t.desempenhoMedio}%"></div></div></div>
+          <span style="font-size:12px;font-weight:700;color:${dColor(t.desempenhoMedio)};width:30px;text-align:right">${t.desempenhoMedio}%</span>
         </div>
-        <div>
-          <div class="turma-desemp-label">Desempenho médio</div>
-          <div class="turma-row" style="margin-bottom:5px">
-            <span style="font-size:24px;font-weight:700;color:${dColor}">${t.desempenhoMedio}%</span>
-            ${t.alertas>0
-              ? `<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-circle" style="font-size:10px"></i> ${t.alertas} em atenção</span>`
-              : `<span class="badge badge-success" style="font-size:11px"><i class="pi pi-check-circle" style="font-size:10px"></i> Sem alertas</span>`}
-          </div>
-          <div class="pbar-wrap"><div class="pbar-fill ${pCls}" style="width:${t.desempenhoMedio}%"></div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-500)">
-          <i class="pi pi-exclamation-circle" style="font-size:11px;color:var(--warning)"></i>${t.habilidadeCritica}
-        </div>
-      </div>`;
-  }).join('');
+      </div>
+      <div class="tl-c-tend">
+        <span class="badge ${tendBadge[t.tendencia]}" style="font-size:11px">
+          <i class="pi ${tendIcon[t.tendencia]}" style="font-size:10px"></i> ${tendText[t.tendencia]}
+        </span>
+      </div>
+      <div class="tl-c-alert">
+        ${t.alertas > 0
+          ? `<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-circle" style="font-size:10px"></i> ${t.alertas}</span>`
+          : `<span style="font-size:12px;color:var(--text-300)">—</span>`}
+      </div>
+      <div class="tl-c-cont">
+        <span style="font-size:11px;color:var(--text-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${t.habilidadeCritica}</span>
+      </div>
+      <div class="tl-c-act">
+        <button class="btn btn-sm btn-ghost" style="padding:0 8px" onclick="event.stopPropagation();openTurmaDetalhe('${t.id}')" title="Ver detalhes de ${t.nome}">
+          Ver <i class="pi pi-arrow-right" style="font-size:10px"></i>
+        </button>
+      </div>
+    </div>`).join('');
+
+  el.innerHTML = `<div class="turmas-list">${thead}${rows}</div>`;
 }
 
 function openTurmaDetalhe(turmaId) {
