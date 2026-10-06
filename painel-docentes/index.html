@@ -703,6 +703,211 @@
     .section     { margin-bottom: 14px; }
     .badge { font-size: 11px; padding: 2px 7px; }
   }
+
+    /* ═══════════════════════════════════════════════════
+       MOBILE BOTTOM BAR — navegação principal mobile
+    ═══════════════════════════════════════════════════ */
+    .mobile-bottom-bar {
+      display: none; /* invisible on desktop */
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      background: var(--surface);
+      border-top: 1px solid var(--outline);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-shadow: 0 -2px 16px rgba(0,0,0,.07);
+    }
+    .mbb-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; padding: 8px 4px 9px;
+      border: none; background: transparent; cursor: pointer;
+      color: var(--text-300); font-family: var(--font);
+      transition: color .15s, background .12s;
+      min-height: 56px; border-radius: 0;
+      -webkit-tap-highlight-color: transparent; position: relative;
+    }
+    .mbb-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; z-index: 1; }
+    .mbb-item.active { color: var(--brand); }
+    .mbb-item.active::before {
+      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
+      height: 2px; background: var(--brand); border-radius: 0 0 2px 2px;
+    }
+    .mbb-icon { font-size: 20px; line-height: 1; }
+    .mbb-label { font-size: 10px; font-weight: 600; letter-spacing: .03em; line-height: 1; }
+
+    @media (max-width: 768px) {
+      /* ─ Mostrar bottom bar ─ */
+      .mobile-bottom-bar { display: flex; }
+
+      /* ─ Esconder sidebar e hamburger completamente ─ */
+      .sidebar, .sidebar-overlay { display: none !important; }
+      #sidebarToggle { display: none !important; }
+
+      /* ─ Padding no conteúdo para não ficar atrás da bottom bar ─ */
+      .main { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important; }
+    }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOBILE REFINEMENTS v2 — header, turmas, atenção, atividades
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* ── 1. HEADER: escola select com espaço adequado ── */
+  @media (max-width: 768px) {
+    .topbar { padding: 0 12px; gap: 0; justify-content: flex-end; }
+    .topbar-right { flex: 1; min-width: 0; margin-left: 0; gap: 8px; justify-content: flex-end; }
+    /* dropdown-wrap da escola cresce */
+    .topbar-right > .dropdown-wrap:first-child { flex: 1; min-width: 0; overflow: hidden; }
+    .escola-ctx { width: 100%; min-width: 0; flex-shrink: 1 !important; box-sizing: border-box; }
+    .escola-ctx .ctx-icon { flex-shrink: 0; }
+    .escola-ctx-value { flex: 1; min-width: 0; max-width: none !important;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .notif-btn, .topbar-avatar { flex-shrink: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .topbar { padding: 0 10px; gap: 0; }
+    .topbar-right { gap: 6px; }
+    .escola-ctx { padding: 5px 8px; gap: 5px; }
+    .escola-ctx-value { font-size: 12px; }
+    /* esconde ícone em telas muito pequenas para ganhar mais espaço */
+  }
+
+  @media (max-width: 375px) {
+    .topbar { padding: 0 8px; }
+    .topbar-right { gap: 5px; }
+    .escola-ctx .ctx-icon { display: none; }
+    .escola-ctx { padding: 5px 7px; gap: 4px; }
+    .escola-ctx-value { font-size: 12px; }
+    .escola-ctx-chevron { font-size: 9px; }
+  }
+
+  /* ── 2. TURMAS LIST: hierarquia clara e card compacto ── */
+  @media (max-width: 600px) {
+    .tl-head { display: none !important; }
+    .tl-row {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      padding: 13px 14px 11px; position: static !important;
+      border-bottom: 1px solid var(--outline-2); cursor: pointer;
+      transition: background .1s;
+    }
+    .tl-row:hover { background: var(--bg); }
+    .tl-row:last-child { border-bottom: none; }
+
+    /* L1: nome (flex-1) + tendência (shrink) */
+    .tl-c-nome  { flex: 1; min-width: 0; order: 1; margin-bottom: 1px; }
+    .tl-c-nome .turma-nome { font-size: 14px; font-weight: 700; }
+    .tl-c-tend  { flex-shrink: 0; order: 2; margin-bottom: 1px;
+                  display: flex !important; align-items: flex-start;
+                  width: auto !important; padding-top: 1px; }
+
+    /* L2: disciplina + separador */
+    .tl-c-disc  { width: 100%; order: 3; display: flex !important;
+                  font-size: 12px; margin-bottom: 8px; color: var(--text-500); }
+    .tl-c-est   { display: none !important; }
+
+    /* L3: desempenho (barra + %) full width */
+    .tl-c-desemp{ width: 100%; order: 4; display: flex !important;
+                  align-items: center; margin-bottom: 7px; }
+    .tl-c-desemp > div { flex: 1; } /* pbar */
+
+    /* L4: alertas + dificuldade na mesma linha */
+    .tl-c-alert { flex-shrink: 0; order: 5; margin-right: 8px; }
+    .tl-c-cont  { flex: 1; min-width: 0; order: 6; display: block !important;
+                  font-size: 11px; color: var(--text-500);
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+                  align-self: center; }
+
+    /* L5: CTA full width, alinhado à direita */
+    .tl-c-act   { width: 100%; order: 7; margin-top: 10px;
+                  position: static !important; text-align: right; }
+    .tl-c-act .btn-sm { height: 32px; font-size: 12px; padding: 0 12px; }
+  }
+
+  /* ── 3. ATTENTION CARDS: coesão visual ── */
+  @media (max-width: 600px) {
+    .att-thead { display: none !important; }
+    .attention-table { overflow: visible !important; }
+    .attention-row {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      padding: 12px 14px; gap: 0;
+      min-width: unset !important;
+      position: relative;
+    }
+
+    /* Top: avatar + nome+sub */
+    .c-avatar { width: 36px; flex-shrink: 0; margin-right: 10px; align-self: flex-start; }
+    .c-info   { flex: 1; min-width: 0; margin-bottom: 6px; }
+    .c-info .student-name { font-size: 13px; }
+    .c-info .student-sub  { font-size: 11px; }
+
+    /* Badge: largura restante, indentado */
+    .c-badge  { width: calc(100% - 46px); margin-left: 46px; margin-bottom: 6px; }
+
+    /* Sparkline + score: mesma linha, indentado */
+    .c-spark { margin-left: 46px; flex-shrink: 0; display: flex; align-items: center; }
+    .c-score { flex-shrink: 0; padding-left: 8px; display: flex; align-items: center; gap: 4px; justify-content: flex-start; }
+    .c-score .score-chip { font-size: 12px; }
+
+    /* Razão: fundo sutil, full width */
+    .c-reason { width: 100%; margin-top: 8px; }
+    .reason-text {
+      white-space: normal; display: block;
+      font-size: 12px; line-height: 1.45; max-width: 100%;
+    }
+
+    /* CTA: direita, separado visualmente */
+    .c-action {
+      width: 100%; text-align: right; margin-top: 8px;
+      padding-top: 8px; border-top: 1px solid var(--outline-2);
+    }
+    .c-turma { display: none; }
+  }
+
+  /* ── 4. ATIVIDADES RECENTES: sem sobreposição ── */
+  @media (max-width: 600px) {
+    .activity-row {
+      flex-wrap: wrap;
+      align-items: flex-start;
+      padding: 12px 14px;
+      gap: 0;
+    }
+    .activity-icon-box { flex-shrink: 0; align-self: flex-start; }
+    /* Nome + data: ao lado do ícone */
+    .activity-row > div:nth-child(2) { flex: 1; min-width: 0; }
+    .activity-name { font-size: 13px; white-space: normal; }
+    /* Stats: segunda linha, indentada */
+    .activity-stats {
+      width: 100%;
+      padding-left: 44px;
+      margin-left: 0 !important;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+    /* Badge: terceira linha, indentada */
+    .activity-row > div:last-child {
+      width: 100%;
+      padding-left: 44px;
+      margin-left: 0 !important;
+      margin-top: 4px;
+    }
+  }
+
+  /* ── 5. GERAL: min-width:0, sem overflow, padding consistente ── */
+  @media (max-width: 600px) {
+    .card { padding: 14px; }
+    .card-header { margin-bottom: 12px; gap: 8px; }
+    .card-title { font-size: 13px; }
+    .card-subtitle { font-size: 11px; }
+    .score-chip { font-size: 11px; padding: 2px 7px; min-width: 38px; }
+    .badge { font-size: 11px; }
+    .section-header { flex-wrap: wrap; gap: 8px; align-items: center; }
+    .btn-ghost.btn-sm { font-size: 12px; height: 32px; padding: 0 10px; }
+    /* evitar qualquer overflow horizontal */
+    .attention-table, .activities-list, .turmas-list { overflow: visible; }
+    .st-footer { font-size: 11px; padding: 8px 14px; }
+  }
+
   </style>
 </head>
 <body>
@@ -998,6 +1203,26 @@
     </main>
 
   </div><!-- /body-wrap -->
+
+  <!-- ════ MOBILE BOTTOM BAR ════ -->
+  <nav class="mobile-bottom-bar" id="mobileBottomBar" role="navigation" aria-label="Navegação principal mobile">
+    <button class="mbb-item active" id="mbb-inicio" onclick="setView('visao-geral',null)" aria-label="Início">
+      <i class="pi pi-home mbb-icon"></i>
+      <span class="mbb-label">Início</span>
+    </button>
+    <button class="mbb-item" id="mbb-estudantes" onclick="setView('estudantes',null)" aria-label="Estudantes">
+      <i class="pi pi-users mbb-icon"></i>
+      <span class="mbb-label">Estudantes</span>
+    </button>
+    <button class="mbb-item" id="mbb-atividades" onclick="setView('atividades',null)" aria-label="Atividades">
+      <i class="pi pi-file-edit mbb-icon"></i>
+      <span class="mbb-label">Atividades</span>
+    </button>
+    <button class="mbb-item" id="mbb-conteudos" onclick="setView('conteudos',null)" aria-label="Conteúdos">
+      <i class="pi pi-book mbb-icon"></i>
+      <span class="mbb-label">Conteúdos</span>
+    </button>
+  </nav>
 </div><!-- /app -->
 
 <!-- ════ PROFILE MODAL ════ -->
@@ -1443,6 +1668,7 @@ function toggleAcc(btn) {
 /* ─── VIEW SWITCHING ─── */
 function setView(id, el) {
   if (window.innerWidth <= 768) closeMobileSidebar();
+  updateMBB(id);
   document.querySelectorAll('[id^="view-"]').forEach(v=>v.style.display='none');
   const target = document.getElementById('view-'+id);
   if (target) target.style.display='block';
@@ -1461,6 +1687,7 @@ function setView(id, el) {
   if (id === 'perfil')         renderProfile();
   if (id === 'conteudos')      renderConteudos();
   if (id === 'turma-detalhe')  renderTurmaDetalhe();
+  if (!_routerUpdating) Router.push(id);
 }
 
 /* ─── SCROLL HELPER ─── */
@@ -2156,6 +2383,7 @@ function goToSkill(ativIdx) {
    CONTEÚDOS / HABILIDADES
 ═══════════════════════════════════════════════ */
 let conteudoIdx = null;
+let _routerUpdating  = false; // prevents recursive URL updates
 
 function computeSkillData(ativIdx) {
   const ativ = DATA.atividades[ativIdx];
@@ -2547,6 +2775,16 @@ function closeMobileSidebar() {
   document.body.style.overflow = '';
 }
 
+function updateMBB(viewId) {
+  const map = { 'visao-geral':'mbb-inicio', 'estudantes':'mbb-estudantes', 'atividades':'mbb-atividades', 'conteudos':'mbb-conteudos' };
+  document.querySelectorAll('.mbb-item').forEach(b => b.classList.remove('active'));
+  const target = map[viewId];
+  if (target) {
+    const el = document.getElementById(target);
+    if (el) el.classList.add('active');
+  }
+}
+
 /* ─── aria-expanded nos dropdowns ─── */
 function updateDropdownAria(btnId, isOpen) {
   const btn = document.getElementById(btnId);
@@ -2848,11 +3086,118 @@ function initHome() {
   try { renderActivitiesInto('homeActivitiesList'); } catch(e) {}
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   ROUTER — hash-based navigation (GitHub Pages compatible)
+   URLs: #/inicio  #/turmas/:id  #/estudantes/:id  #/conteudos/:idx
+═══════════════════════════════════════════════════════════════ */
+const Router = {
+
+  parse(hash) {
+    const raw = (hash || '').replace(/^#\/?/, '');
+    const [pathPart, qsPart] = raw.split('?');
+    const segs = pathPart ? pathPart.split('/').filter(Boolean) : [];
+    const qs = {};
+    if (qsPart) qsPart.split('&').forEach(kv => {
+      const [k, v] = kv.split('=');
+      if (k) qs[decodeURIComponent(k)] = decodeURIComponent(v || '');
+    });
+    const [s0, s1] = segs;
+    if (!s0 || s0 === 'inicio')          return { view:'visao-geral', qs };
+    if (s0 === 'turmas' && s1)           return { view:'turma-detalhe', turmaId: s1, qs };
+    if (s0 === 'turmas')                 return { view:'visao-geral', qs };
+    if (s0 === 'estudantes' && s1)       return { view:'perfil', studentId: s1, qs };
+    if (s0 === 'estudantes')             return { view:'estudantes', qs };
+    if (s0 === 'atividades')             return { view:'atividades', qs };
+    if (s0 === 'conteudos' && s1 != null)return { view:'conteudos', conteudoIdx: parseInt(s1) || 0, qs };
+    if (s0 === 'conteudos')              return { view:'conteudos', qs };
+    return { view:'visao-geral', qs };
+  },
+
+  buildHash(viewId) {
+    const e = currentEscolaId && currentEscolaId !== 'orbie-centro'
+      ? '?escola=' + encodeURIComponent(currentEscolaId) : '';
+    switch(viewId) {
+      case 'visao-geral':    return '#/inicio' + e;
+      case 'estudantes':     return '#/estudantes' + e;
+      case 'atividades':     return '#/atividades' + e;
+      case 'conteudos':      return conteudoIdx != null ? '#/conteudos/' + conteudoIdx + e : '#/conteudos' + e;
+      case 'turma-detalhe':  return currentTurmaId ? '#/turmas/' + currentTurmaId + e : '#/inicio' + e;
+      case 'perfil':         return currentProfileId ? '#/estudantes/' + currentProfileId + e : '#/estudantes' + e;
+      default:               return '#/inicio' + e;
+    }
+  },
+
+  push(viewId) {
+    const newHash = Router.buildHash(viewId);
+    const cur     = '#' + window.location.hash.replace(/^#/, '');
+    if (cur === newHash) return; // no change, skip
+    _routerUpdating = true;
+    window.location.hash = newHash.slice(1); // remove leading #
+    // release flag after hashchange fires
+    setTimeout(() => { _routerUpdating = false; }, 32);
+  },
+
+  _restore(route) {
+    _routerUpdating = true;
+
+    // Restore escola context from URL
+    if (route.qs && route.qs.escola && route.qs.escola !== currentEscolaId) {
+      switchEscola(route.qs.escola); // calls setView internally
+      setTimeout(() => { _routerUpdating = false; }, 32);
+      return;
+    }
+
+    switch(route.view) {
+      case 'turma-detalhe':
+        if (route.turmaId) {
+          const t = TURMAS.find(tt => tt.id === route.turmaId);
+          if (t) currentTurmaId = route.turmaId;
+        }
+        setView(currentTurmaId ? 'turma-detalhe' : 'visao-geral', null);
+        break;
+      case 'perfil':
+        const sid = parseInt(route.studentId);
+        if (DATA.estudantes.find(e => e.id === sid)) {
+          currentProfileId = sid;
+          setView('perfil', null);
+        } else {
+          setView('estudantes', null);
+        }
+        break;
+      case 'conteudos':
+        if (route.conteudoIdx != null) conteudoIdx = route.conteudoIdx;
+        setView('conteudos', null);
+        break;
+      default:
+        setView(route.view || 'visao-geral', null);
+    }
+
+    setTimeout(() => { _routerUpdating = false; }, 32);
+  },
+
+  init() {
+    window.addEventListener('hashchange', () => {
+      if (_routerUpdating) return;
+      Router._restore(Router.parse(window.location.hash));
+    });
+    Router._restore(Router.parse(window.location.hash));
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
     buildEscolasData();
-    showSkeletonsForView('visao-geral');
-    setTimeout(() => { try { ALL_ALERTAS = buildAllAlertas(); initHome(); } catch(err) { document.getElementById('escolaHeader').innerHTML = '<div style="color:red;font-size:14px;padding:12px">ERRO JS: ' + err.message + '</div>'; } }, 900);
+    const initRoute = Router.parse(window.location.hash);
+    showSkeletonsForView(initRoute.view || 'visao-geral');
+    setTimeout(() => {
+      try {
+        ALL_ALERTAS = buildAllAlertas();
+        Router.init();
+      } catch(err) {
+        const eh = document.getElementById('escolaHeader');
+        if (eh) eh.innerHTML = '<div style="color:red;font-size:14px;padding:12px">ERRO JS: ' + err.message + '</div>';
+      }
+    }, 900);
   } catch(initErr) {
     document.title = 'ERRO: ' + initErr.message;
   }
