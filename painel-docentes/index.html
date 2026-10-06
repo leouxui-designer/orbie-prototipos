@@ -1,0 +1,2660 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Docente — Orbie</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ─── TOKENS ─── */
+    :root {
+      --brand:        #2177FF;
+      --brand-dark:   #0059E7;
+      --brand-5:      rgba(33,119,255,.05);
+      --brand-bg:     #EEF4FF;
+      --text-900:     #1D2939;
+      --text-700:     #344054;
+      --text-500:     #525E76;
+      --text-300:     #8A95B2;
+      --surface:      #FFFFFF;
+      --bg:           #F8F9FC;
+      --outline:      #DDE4EB;
+      --outline-2:    #EDF0F5;
+      --overlay:      rgba(0,0,0,.03);
+      --overlay-h:    rgba(0,0,0,.05);
+      --success:      #12B76A; --success-bg: #ECFDF3;
+      --warning:      #F79009; --warning-bg: #FFFAEB;
+      --error:        #F04438; --error-bg:   #FEF3F2;
+      --info:         #2E90FA; --info-bg:    #EFF8FF;
+      --critical:     #F04438;
+      --moderate:     #F79009;
+      --r-xs: 6px; --r-sm: 8px; --r-md: 10px; --r-lg: 12px; --r-xl: 16px; --r-full: 999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.14);
+      --topbar-h: 64px;
+      --sidebar-w: 235px;
+      --font: 'Outfit', sans-serif;
+    }
+
+    html, body { height: 100%; font-family: var(--font); font-size: 14px; color: var(--text-700); background: var(--bg); -webkit-font-smoothing: antialiased; }
+
+    /* ─── APP SHELL ─── */
+    .app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    /* ─── TOPBAR ─── */
+    .topbar { height: var(--topbar-h); background: var(--surface); border-bottom: 1px solid var(--outline); display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; z-index: 200; position: relative; }
+    .topbar-logo { display: flex; align-items: center; width: 167px; flex-shrink: 0; }
+    .topbar-logo svg { height: 28px; width: auto; }
+    .topbar-menu-btn { width: 36px; height: 36px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; color: var(--text-500); font-size: 18px; transition: background .12s; flex-shrink: 0; }
+    .topbar-menu-btn:hover { background: var(--overlay-h); }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .ctx-pill { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--outline); border-radius: var(--r-lg); padding: 7px 10px 7px 13px; background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text-700); cursor: pointer; transition: border-color .15s, box-shadow .15s; white-space: nowrap; user-select: none; }
+    .ctx-pill:hover, .ctx-pill.open { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-5); }
+    .ctx-pill .pill-icon { font-size: 13px; color: var(--text-300); flex-shrink: 0; }
+    .ctx-pill .pill-chevron { font-size: 10px; color: var(--text-300); transition: transform .18s; }
+    .ctx-pill.open .pill-chevron { transform: rotate(180deg); }
+
+    .notif-btn { width: 36px; height: 36px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; color: var(--text-500); font-size: 18px; transition: background .12s; position: relative; }
+    .notif-btn:hover { background: var(--overlay-h); }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; background: var(--error); border-radius: var(--r-full); border: 2px solid var(--surface); }
+
+    .topbar-avatar { width: 36px; height: 36px; border-radius: var(--r-full); background: var(--brand-bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--brand); cursor: pointer; flex-shrink: 0; transition: box-shadow .15s; }
+    .topbar-avatar:hover { box-shadow: 0 0 0 3px var(--brand-5); }
+
+    /* ─── DROPDOWN ─── */
+    .dropdown-wrap { position: relative; }
+    .dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 210px; background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); z-index: 400; padding: 6px; animation: dropIn .12s ease; }
+    .dropdown-menu.open { display: block; }
+    @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .dropdown-section-label { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px 4px; }
+    .dropdown-opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-xs); cursor: pointer; font-size: 13px; color: var(--text-700); transition: background .1s, color .1s; }
+    .dropdown-opt:hover { background: var(--brand-bg); color: var(--brand); }
+    .dropdown-opt.selected { color: var(--brand); font-weight: 600; }
+    .dropdown-opt .opt-check { margin-left: auto; font-size: 12px; color: var(--brand); opacity: 0; }
+    .dropdown-opt.selected .opt-check { opacity: 1; }
+    .dropdown-divider { height: 1px; background: var(--outline-2); margin: 4px 0; }
+
+    /* ─── BODY ─── */
+    .body-wrap { display: flex; flex: 1; overflow: hidden; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--outline); display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; padding: 16px 12px; gap: 2px; transition: width .2s ease; scrollbar-width: thin; scrollbar-color: var(--outline) transparent; }
+    .sidebar.collapsed { width: 0; padding: 0; overflow: hidden; }
+    .nav-item { display: flex; align-items: center; border-radius: var(--r-xs); font-size: 14px; font-weight: 500; color: var(--text-500); cursor: pointer; width: 100%; transition: background .1s, color .1s; overflow: hidden; }
+    .nav-item:hover { background: var(--overlay-h); color: var(--text-700); }
+    .nav-item.active { background: var(--brand-bg); color: var(--brand); }
+    .nav-item-inner { display: flex; align-items: center; gap: 8px; padding: 9px 8px; width: 100%; }
+    .nav-bar { width: 4px; height: 18px; border-radius: var(--r-full); flex-shrink: 0; background: transparent; }
+    .nav-item.active > .nav-item-inner .nav-bar { background: var(--brand); }
+    .nav-item i.nav-icon { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-label { flex: 1; text-align: left; white-space: nowrap; }
+    .nav-chevron { font-size: 10px; color: var(--text-300); transition: transform .18s; flex-shrink: 0; }
+    .nav-item.expanded .nav-chevron { transform: rotate(180deg); }
+    .nav-sub { display: flex; flex-direction: column; gap: 1px; max-height: 0; overflow: hidden; transition: max-height .22s ease; }
+    .nav-sub.open { max-height: 400px; }
+    .nav-sub-item { display: flex; align-items: center; border-radius: var(--r-xs); font-size: 13px; font-weight: 400; color: var(--text-500); cursor: pointer; transition: background .1s, color .1s; text-decoration: none; }
+    .nav-sub-item:hover { background: var(--overlay-h); color: var(--text-700); }
+    .nav-sub-item.active { color: var(--brand); font-weight: 600; background: var(--brand-bg); }
+    .nav-sub-inner { display: flex; align-items: center; gap: 8px; padding: 7px 8px 7px 32px; width: 100%; }
+    .nav-sub-item.active .nav-sub-inner { padding-left: 8px; }
+    .nav-sub-item .nav-bar { opacity: 0; }
+    .nav-sub-item.active .nav-bar { opacity: 1; background: var(--brand); height: 16px; }
+    .nav-divider { height: 1px; background: var(--outline-2); margin: 6px 0; flex-shrink: 0; }
+
+    /* ─── MAIN ─── */
+    .main { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; min-width: 0; background: var(--bg); scrollbar-width: thin; scrollbar-color: var(--outline) transparent; }
+    .content { padding: 0 36px 56px; width: 100%; max-width: 1210px; }
+
+    /* ─── BREADCRUMB ─── */
+    .breadcrumb { display: flex; align-items: center; gap: 4px; padding: 20px 0 6px; }
+    .breadcrumb-link { font-size: 12px; color: var(--text-500); display: flex; align-items: center; gap: 4px; }
+    .breadcrumb-link:hover { color: var(--brand); }
+    .breadcrumb-sep { font-size: 9px; color: var(--text-300); }
+    .breadcrumb-current { font-size: 12px; color: var(--text-300); }
+    .fav-btn { width: 24px; height: 24px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; color: var(--text-300); font-size: 12px; transition: background .12s, color .12s; }
+    .fav-btn:hover { background: var(--overlay-h); color: var(--warning); }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 28px; }
+    .page-title { font-size: 28px; font-weight: 700; color: var(--text-900); line-height: 1.15; }
+    .page-meta { font-size: 12px; color: var(--text-300); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+    .page-meta-dot { width: 3px; height: 3px; background: var(--text-300); border-radius: var(--r-full); }
+
+    /* ─── SECTION ─── */
+    .section { margin-bottom: 28px; }
+    .section-label { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+    /* ─── CARD ─── */
+    .card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); padding: 20px; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--text-900); }
+    .card-subtitle { font-size: 12px; color: var(--text-300); margin-top: 2px; }
+
+    /* ─── KPI CARDS ─── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .kpi-card.urgent { border-color: rgba(240,68,56,.3); background: linear-gradient(145deg,#fff,#fff8f7); }
+    .kpi-icon { width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; margin-bottom: 4px; }
+    .kpi-icon-brand   { background: var(--brand-bg);   color: var(--brand);   }
+    .kpi-icon-warning { background: var(--warning-bg); color: var(--warning); }
+    .kpi-icon-error   { background: var(--error-bg);   color: var(--error);   }
+    .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .07em; }
+    .kpi-value { font-size: 38px; font-weight: 700; color: var(--text-900); line-height: 1; }
+    .kpi-value.medium { color: var(--warning); }
+    .kpi-value.low    { color: var(--error); }
+    .kpi-trend { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; }
+    .kpi-trend.down { color: var(--error); }
+    .kpi-trend.up   { color: var(--success); }
+    .kpi-trend.flat { color: var(--text-300); }
+    .kpi-sub { font-size: 12px; color: var(--text-300); }
+
+    /* ─── SIGNAL BANNER ─── */
+    .signal-banner { display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; border-radius: var(--r-lg); border: 1px solid; }
+    .signal-banner.warning { background: var(--warning-bg); border-color: rgba(247,144,9,.25); }
+    .signal-banner.ok      { background: var(--success-bg); border-color: rgba(18,183,106,.25); }
+    .signal-icon-box { width: 40px; height: 40px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+    .signal-banner.warning .signal-icon-box { background: rgba(247,144,9,.15); color: var(--warning); }
+    .signal-banner.ok      .signal-icon-box { background: rgba(18,183,106,.15); color: var(--success); }
+    .signal-title { font-size: 14px; font-weight: 700; color: var(--text-900); margin-bottom: 4px; }
+    .signal-text  { font-size: 13px; color: var(--text-500); line-height: 1.5; }
+    .signal-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+
+    /* ─── GRIDS ─── */
+    .grid-5-4 { display: grid; grid-template-columns: 5fr 4fr; gap: 16px; align-items: start; }
+    .grid-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ─── SKILLS LIST ─── */
+    .skill-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+    .skill-row + .skill-row { border-top: 1px solid var(--outline-2); }
+    .skill-name { font-size: 13px; color: var(--text-700); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .skill-bar-wrap { width: 90px; flex-shrink: 0; }
+    .skill-pct { font-size: 13px; font-weight: 700; width: 34px; text-align: right; flex-shrink: 0; }
+    .skill-count { font-size: 11px; color: var(--text-300); width: 68px; flex-shrink: 0; text-align: right; }
+
+    /* ─── PROGRESS BAR ─── */
+    .pbar-wrap { background: #EFF2F7; border-radius: var(--r-full); height: 6px; overflow: hidden; }
+    .pbar-fill { height: 100%; border-radius: var(--r-full); transition: width .5s cubic-bezier(.4,0,.2,1); }
+    .pbar-fill.good   { background: var(--success); }
+    .pbar-fill.medium { background: var(--moderate); }
+    .pbar-fill.low    { background: var(--critical); }
+
+    /* ─── FILTER PILLS ─── */
+    .filter-pills { display: flex; align-items: center; gap: 6px; }
+    .filter-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: var(--r-full); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--outline); color: var(--text-500); background: transparent; transition: all .12s; }
+    .filter-pill:hover { background: var(--overlay-h); color: var(--text-700); }
+    .filter-pill.active { background: var(--brand-bg); color: var(--brand); border-color: transparent; }
+
+    /* ─── ATTENTION TABLE ─── */
+    .attention-table { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); overflow: hidden; }
+    .att-thead { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--outline); }
+    .att-thead span { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .06em; }
+    .attention-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--outline-2); cursor: pointer; transition: background .1s; }
+    .attention-row:last-child { border-bottom: none; }
+    .attention-row:hover { background: var(--bg); }
+    .c-avatar  { width: 36px;  flex-shrink: 0; }
+    .c-info    { width: 160px; flex-shrink: 0; }
+    .c-badge   { width: 160px; flex-shrink: 0; }
+    .c-spark   { width: 72px;  flex-shrink: 0; }
+    .c-score   { width: 52px;  flex-shrink: 0; text-align: center; }
+    .c-reason  { flex: 1;      min-width: 0; }
+    .c-action  { width: 100px; flex-shrink: 0; text-align: right; }
+    .student-avatar { width: 36px; height: 36px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+    .student-name   { font-size: 13px; font-weight: 600; color: var(--text-900); }
+    .student-sub    { font-size: 11px; color: var(--text-300); margin-top: 1px; }
+    .reason-text    { font-size: 12px; color: var(--text-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    /* ─── SCORE CHIP ─── */
+    .score-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 3px 8px; border-radius: var(--r-full); font-size: 12px; font-weight: 700; }
+    .score-chip.good    { background: var(--success-bg); color: var(--success); }
+    .score-chip.medium  { background: var(--warning-bg); color: var(--warning); }
+    .score-chip.low     { background: var(--error-bg);   color: var(--error);   }
+    .score-chip.neutral { background: var(--bg);          color: var(--text-300); }
+
+    /* ─── BADGE / PILL ─── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--r-full); font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); }
+    .badge-error   { background: var(--error-bg);   color: var(--error);   }
+    .badge-info    { background: var(--info-bg);     color: var(--info);    }
+    .badge-neutral { background: var(--bg);           color: var(--text-500); border: 1px solid var(--outline); }
+    .badge-brand   { background: var(--brand-bg);    color: var(--brand);   }
+
+    /* ─── BUTTONS ─── */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; height: 40px; border-radius: var(--r-lg); font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-outline { background: transparent; border: 1px solid var(--outline); color: var(--text-700); }
+    .btn-outline:hover { background: var(--overlay-h); }
+    .btn-ghost { background: transparent; color: var(--brand); }
+    .btn-ghost:hover { background: var(--brand-5); }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: var(--r-sm); }
+
+    /* ─── ACTIVITIES ─── */
+    .activities-list { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); overflow: hidden; }
+    .activity-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--outline-2); transition: background .1s; }
+    .activity-row:last-child { border-bottom: none; }
+    .activity-row:hover { background: var(--bg); cursor: pointer; }
+    .activity-icon-box { width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--brand-bg); color: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .activity-icon-box.alert-icon { background: var(--error-bg); color: var(--error); }
+    .activity-name { font-size: 13px; font-weight: 600; color: var(--text-900); }
+    .activity-date { font-size: 11px; color: var(--text-300); margin-top: 1px; }
+    .activity-stats { display: flex; align-items: center; gap: 20px; font-size: 12px; color: var(--text-500); margin-left: auto; }
+    .activity-stats strong { color: var(--text-700); font-weight: 600; }
+    .act-footer { display: flex; align-items: center; justify-content: flex-end; padding: 10px 16px; border-top: 1px solid var(--outline-2); }
+
+    /* ─── PROFILE MODAL ─── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 500; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; animation: fadeIn .15s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .modal-panel { background: var(--surface); border-radius: var(--r-xl); width: 580px; max-height: 82vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: slideUp .18s ease; scrollbar-width: thin; }
+    @keyframes slideUp { from { opacity:0; transform:scale(.96) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .modal-header { display: flex; align-items: flex-start; gap: 16px; padding: 24px 24px 0; }
+    .modal-avatar { width: 52px; height: 52px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .modal-title { font-size: 20px; font-weight: 700; color: var(--text-900); }
+    .modal-sub   { font-size: 13px; color: var(--text-300); margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+    .modal-close { margin-left: auto; width: 36px; height: 36px; border-radius: var(--r-full); display: flex; align-items: center; justify-content: center; color: var(--text-300); font-size: 16px; transition: background .12s, color .12s; flex-shrink: 0; }
+    .modal-close:hover { background: var(--overlay-h); color: var(--text-700); }
+    .modal-body  { padding: 20px 24px 24px; }
+    .modal-divider { height: 1px; background: var(--outline-2); margin: 16px 0; }
+    .modal-score-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--outline-2); }
+    .modal-score-row:last-child { border-bottom: none; }
+
+    /* ─── UTILITY ─── */
+    .flex  { display: flex; }
+    .flex-1 { flex: 1; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .mt-2  { margin-top: 8px; }
+    .mt-4  { margin-top: 16px; }
+    .mb-3  { margin-bottom: 12px; }
+    .text-xs  { font-size: 12px; }
+    .text-sm  { font-size: 13px; }
+    .fw-600 { font-weight: 600; }
+    .fw-700 { font-weight: 700; }
+    .c-300  { color: var(--text-300); }
+    .c-500  { color: var(--text-500); }
+    .c-900  { color: var(--text-900); }
+    .c-brand { color: var(--brand); }
+    .w-full { width: 100%; }
+
+    /* ─── STUDENTS TABLE ─── */
+    .st-table { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); overflow: hidden; }
+    .st-thead { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 20px; border-bottom: 1px solid var(--outline); background: var(--bg); }
+    .st-thead > div { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+    .st-thead .sortable { cursor: pointer; user-select: none; transition: color .12s; display: flex; align-items: center; gap: 4px; }
+    .st-thead .sortable:hover { color: var(--brand); }
+    .st-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--outline-2); cursor: pointer; transition: background .1s; border-left: 3px solid transparent; }
+    .st-row:last-child { border-bottom: none; }
+    .st-row:hover { background: var(--bg); }
+    .st-row[data-estado="atencao"] { border-left-color: var(--error); }
+    .st-row[data-estado="queda"]   { border-left-color: var(--warning); }
+    .st-footer { padding: 10px 16px; border-top: 1px solid var(--outline-2); text-align: right; font-size: 12px; color: var(--text-300); background: var(--surface); }
+    .c-st-av     { width: 36px;  flex-shrink: 0; }
+    .c-st-nome   { width: 172px; flex-shrink: 0; }
+    .c-st-desemp { width: 160px; flex-shrink: 0; }
+    .c-st-spark  { width: 88px;  flex-shrink: 0; }
+    .c-st-estado { width: 152px; flex-shrink: 0; }
+    .c-st-ultimo { width: 72px;  flex-shrink: 0; text-align: center; }
+    .c-st-dific  { flex: 1; min-width: 0; }
+    .c-st-act    { width: 36px;  flex-shrink: 0; }
+    .estado-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: var(--r-full); font-size: 12px; font-weight: 600; }
+    .estado-bom       { background: var(--success-bg);  color: var(--success); }
+    .estado-evoluindo { background: var(--info-bg);     color: var(--info);    }
+    .estado-estavel   { background: var(--bg);           color: var(--text-500); border: 1px solid var(--outline); }
+    .estado-atencao   { background: var(--error-bg);    color: var(--error);   }
+    .estado-queda     { background: var(--warning-bg);  color: var(--warning); }
+    .dif-tag { background: var(--bg); border: 1px solid var(--outline); border-radius: var(--r-full); padding: 2px 8px; font-size: 11px; color: var(--text-500); white-space: nowrap; }
+    .students-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .students-toolbar .search-wrap { flex: 1; max-width: 380px; }
+    .sort-btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; height: 36px; border-radius: var(--r-sm); border: 1px solid var(--outline); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text-700); cursor: pointer; white-space: nowrap; transition: border-color .15s; }
+    .sort-btn:hover { border-color: var(--brand); }
+    .sort-btn.open  { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-5); }
+    .empty-state { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--r-lg); padding: 56px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-300); }
+    .empty-state i { font-size: 28px; opacity: .4; }
+
+    /* ─── CLICKABLE KPIs ─── */
+    .kpi-card-clickable { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+    .kpi-card-clickable:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
+    .kpi-card-clickable.urgent:hover { border-color: var(--error); }
+
+
+    /* ─── SKELETON / LOADING ─── */
+    .skeleton { background:linear-gradient(90deg,var(--outline-2) 25%,var(--surface) 50%,var(--outline-2) 75%); background-size:200% 100%; animation:shimmer 1.6s infinite; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .sk-block { border-radius:var(--r-lg); }
+    .sk-line  { border-radius:var(--r-xs); }
+
+    /* ─── EMPTY STATE CARD ─── */
+    .empty-state-card { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-xl); padding:52px 32px; display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; }
+    .es-icon  { width:56px; height:56px; border-radius:var(--r-lg); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:4px; }
+    .es-title { font-size:16px; font-weight:700; color:var(--text-900); }
+    .es-text  { font-size:13px; color:var(--text-500); max-width:400px; line-height:1.65; }
+    /* ─── CONTEÚDOS VIEW ─── */
+    .skill-card { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); padding:18px 20px; cursor:pointer; transition:border-color .15s,box-shadow .15s; display:flex; align-items:center; gap:16px; margin-bottom:12px; }
+    .skill-card:hover { box-shadow:var(--shadow-sm); }
+    .skill-card.critico:hover { border-color:var(--error); }
+    .skill-card.atencao:hover  { border-color:var(--warning); }
+    .skill-card.adequado:hover { border-color:var(--success); }
+    .skill-card-icon { width:40px; height:40px; border-radius:var(--r-sm); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .sk-ic-critico  { background:var(--error-bg);   color:var(--error);   }
+    .sk-ic-atencao  { background:var(--warning-bg); color:var(--warning); }
+    .sk-ic-adequado { background:var(--success-bg); color:var(--success); }
+    .distrib-bar { display:flex; height:6px; border-radius:var(--r-full); overflow:hidden; }
+    .distrib-seg { height:100%; }
+    .detail-header { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-xl); padding:24px 28px; }
+    .dist-row { display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--outline-2); }
+    .dist-row:last-child { border-bottom:none; }
+    .dist-label { font-size:12px; color:var(--text-500); width:180px; flex-shrink:0; display:flex; align-items:center; gap:6px; }
+    .dist-bar-col { flex:1; display:flex; flex-wrap:wrap; gap:3px; }
+    .dist-count { font-size:12px; font-weight:600; color:var(--text-700); width:90px; flex-shrink:0; text-align:right; }
+    .student-dot { display:inline-flex; width:28px; height:28px; border-radius:50%; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; cursor:pointer; transition:transform .12s; }
+    .student-dot:hover { transform:scale(1.15); }
+    .ev-note { padding:10px 0; border-bottom:1px solid var(--outline-2); font-size:13px; color:var(--text-700); display:flex; align-items:flex-start; gap:10px; line-height:1.5; }
+    .ev-note:last-child { border-bottom:none; }
+    .context-note { background:var(--info-bg); border:1px solid rgba(46,144,250,.2); border-radius:var(--r-lg); padding:14px 18px; margin-bottom:20px; display:flex; align-items:flex-start; gap:12px; font-size:13px; color:var(--text-700); line-height:1.6; }
+    /* ─── PROFILE PAGE ─── */
+    .profile-banner { border-radius: var(--r-xl); padding: 28px 32px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; min-height: 110px; }
+    .profile-av-lg  { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; border: 3px solid rgba(255,255,255,.25); flex-shrink: 0; }
+    .situacao-row   { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--outline-2); }
+    .situacao-row:last-child { border-bottom: none; }
+    .situacao-label { font-size: 11px; color: var(--text-300); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .situacao-value { font-size: 14px; font-weight: 700; color: var(--text-900); display: flex; align-items: center; gap: 6px; }
+    .hist-row    { display: grid; grid-template-columns: 28px 1fr auto auto auto 16px; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--outline-2); cursor: pointer; transition: background .1s; }
+    .hist-row:last-child { border-bottom: none; }
+    .hist-row:hover { background: var(--bg); }
+    .hist-detail { display: none; background: var(--bg); border-bottom: 1px solid var(--outline-2); padding: 14px 16px 14px 56px; }
+    .hist-detail.open { display: block; }
+    .ev-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--outline-2); }
+    .ev-item:last-child { border-bottom: none; }
+    .ev-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .skill-compare { display: flex; flex-direction: column; gap: 4px; }
+    .skill-compare-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-300); }
+    .skill-compare-lbl { width: 40px; flex-shrink: 0; }
+
+    /* ─── FOCUS VISIBLE ─── */
+    :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    .btn:focus-visible, .filter-pill:focus-visible, .ctx-pill:focus-visible,
+    .icon-btn:focus-visible, .nav-item:focus-visible, .nav-sub-item:focus-visible,
+    .sort-btn:focus-visible, .skill-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+    input:focus-visible, button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+
+    /* ─── SKIP LINK ─── */
+    .skip-link {
+      position: absolute; top: -56px; left: 16px; z-index: 9999;
+      background: var(--brand); color: #fff;
+      padding: 10px 18px; border-radius: 0 0 var(--r-sm) var(--r-sm);
+      font-size: 13px; font-weight: 600; text-decoration: none;
+      transition: top .15s; white-space: nowrap;
+    }
+    .skip-link:focus { top: 0; outline: none; box-shadow: var(--shadow-md); }
+
+    /* ─── TOUCH TARGETS ─── */
+    .nav-item-inner { min-height: 44px; }
+    .nav-sub-inner  { min-height: 40px; }
+    .icon-btn       { min-width: 36px; min-height: 36px; }
+    .filter-pill    { min-height: 36px; }
+
+    /* ─── MOBILE SIDEBAR OVERLAY ─── */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 90; }
+    .sidebar-overlay.active { display: block; }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE BREAKPOINTS
+    ───────────────────────────────────────── */
+
+    /* Tablets wide — 1100px */
+    @media (max-width: 1100px) {
+      .kpi-grid { grid-template-columns: repeat(2,1fr); }
+      .grid-5-4, .grid-2 { grid-template-columns: 1fr; }
+      .c-st-dific { display: none; }
+      .attention-table, .st-table { overflow-x: auto; }
+      .attention-row  { min-width: 680px; }
+      .st-row, .st-thead { min-width: 700px; }
+    }
+
+    /* Tablets — 900px */
+    @media (max-width: 900px) {
+      .content { padding: 0 20px 40px; }
+      .profile-banner { flex-wrap: wrap; gap: 14px; }
+      .c-reason, .att-thead { display: none; }
+      .c-badge  { width: 120px; }
+      .filter-pills, .students-toolbar { flex-wrap: wrap; }
+      .students-toolbar .search-wrap { max-width: 100%; }
+      .skill-row { flex-wrap: wrap; gap: 6px; }
+      .skill-count { text-align: left; }
+      .distrib-bar, .profile-banner .topbar-right { flex-wrap: wrap; }
+    }
+
+    /* Mobile — 768px */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed; top: var(--topbar-h); left: 0; bottom: 0;
+        z-index: 95; transform: translateX(-100%);
+        transition: transform .25s ease; box-shadow: none;
+      }
+      .sidebar.mobile-open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+      /* escolaBtn é o seletor principal — não ocultar no mobile */
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .content { padding: 0 14px 32px; }
+      .page-title { font-size: 22px; }
+      .kpi-value { font-size: 30px; }
+      .topbar { padding: 0 12px; gap: 8px; }
+      .topbar-logo { width: auto; }
+      .hist-row { grid-template-columns: 28px 1fr auto auto; }
+      .hist-row > :nth-child(5), .hist-row > :nth-child(6) { display: none; }
+      .ctx-pill { padding: 6px 8px 6px 10px; font-size: 12px; }
+    }
+
+    /* Mobile pequeno — 480px */
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .topbar-logo svg { height: 22px; }
+      #periodoBtn { display: none; }
+      .content { padding: 0 10px 24px; }
+      .page-title { font-size: 20px; }
+      .modal-panel { width: 95vw; }
+      .empty-state-card { padding: 36px 16px; }
+      .profile-banner { padding: 18px 16px; }
+    }
+
+    /* ─── ESCOLA CONTEXT SELECTOR ─── */
+    .escola-ctx { display:inline-flex; align-items:center; gap:10px; border:1px solid var(--outline); border-radius:var(--r-lg); padding:7px 12px 7px 13px; background:var(--surface); cursor:pointer; transition:border-color .15s,box-shadow .15s; user-select:none; white-space:nowrap; flex-shrink:0; }
+    .escola-ctx:hover, .escola-ctx.open { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-5); }
+    .escola-ctx .ctx-icon { font-size:16px; color:var(--brand); flex-shrink:0; }
+    .escola-ctx-info { display:flex; flex-direction:column; gap:1px; }
+    .escola-ctx-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-300); line-height:1; }
+    .escola-ctx-value { font-size:13px; font-weight:600; color:var(--text-900); line-height:1.3; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .escola-ctx-chevron { font-size:10px; color:var(--text-300); transition:transform .18s; flex-shrink:0; }
+    .escola-ctx.open .escola-ctx-chevron { transform:rotate(180deg); }
+    @media(max-width:768px){ .escola-ctx-value{ max-width:120px;font-size:12px; } .escola-ctx{ padding:6px 8px 6px 10px;gap:7px; } }
+    @media(max-width:480px){ .escola-ctx-label{ display:none; } }
+
+    /* ─── TURMA CARDS ─── */
+    .turmas-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    @media(max-width:1100px){ .turmas-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px) { .turmas-grid { grid-template-columns:1fr; } }
+    .turma-card { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); padding:20px; cursor:pointer; transition:border-color .15s,box-shadow .15s; display:flex; flex-direction:column; gap:12px; }
+    .turma-card:hover { border-color:var(--brand); box-shadow:var(--shadow-sm); }
+    .turma-card.queda   { border-left:3px solid var(--warning); }
+    .turma-card.critico { border-left:3px solid var(--error);   }
+    .turma-card.bom     { border-left:3px solid var(--success);  }
+    .turma-nome { font-size:16px; font-weight:700; color:var(--text-900); }
+    .turma-disc { font-size:12px; color:var(--text-300); }
+    .turma-row  { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .turma-desemp-label { font-size:11px; color:var(--text-300); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+    /* Escola header */
+    .escola-header { display:flex; align-items:center; gap:10px; padding-bottom:16px; border-bottom:1px solid var(--outline-2); margin-bottom:20px; }
+    .escola-header i { font-size:18px; color:var(--brand); }
+    .escola-header-nome { font-size:15px; font-weight:700; color:var(--text-900); }
+    .escola-header-sub  { font-size:12px; color:var(--text-300); margin-top:2px; }
+    /* Turma tag na lista de atenção */
+    .turma-tag { display:inline-flex; align-items:center; padding:1px 7px; border-radius:var(--r-full); background:var(--brand-bg); color:var(--brand); font-size:10px; font-weight:700; white-space:nowrap; }
+    /* Coluna turma na tabela multi-turma */
+    .c-turma { width:88px; flex-shrink:0; }
+    /* Turma detail: back button bar */
+    .turma-back-bar { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+    .turma-back-btn { background:transparent; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:var(--brand); padding:0; }
+  </style>
+</head>
+<body>
+<a href="#main" class="skip-link">Pular para o conteúdo principal</a>
+<div class="app">
+
+  <!-- ════ TOPBAR ════ -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <svg width="112" height="33" viewBox="0 0 191 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0)">
+          <path d="M41.763 56C56.5366 56 67.7509 45.0144 67.7509 30.4669C67.7509 15.9194 56.5392 4.9364 41.763 4.9364C26.9868 4.9364 15.7776 15.922 15.7776 30.4669C15.7776 45.0119 26.9157 56 41.7655 56M41.7655 52.1357C29.4156 52.1357 20.0967 42.893 20.0967 30.4669C20.0967 18.0408 29.4156 8.79812 41.7655 8.79812C54.1154 8.79812 63.4344 18.0408 63.4344 30.4669C63.4344 42.893 54.1154 52.1357 41.7655 52.1357Z" fill="#1064AD"/>
+          <path d="M92.769 16.8315C91.481 16.453 90.4952 16.3005 88.981 16.3005C84.1335 16.3005 80.4954 19.0291 78.4502 23.4219V18.5718C78.4502 17.5861 77.9192 16.9814 76.936 16.9814H76.0264C75.1169 16.9814 74.5122 17.5886 74.5122 18.5718V53.4238C74.5122 54.4096 75.1194 55.0905 76.0264 55.0905H77.1621C78.0716 55.0905 78.6763 54.4096 78.6763 53.4238V33.1956C78.6763 25.5433 82.8429 20.0124 88.6024 20.0124C89.512 20.0124 90.3453 20.1648 91.4047 20.4671C92.3143 20.7695 93.1476 20.6932 93.5261 19.5576L93.6786 18.9504C94.1334 17.6623 93.5261 17.0551 92.769 16.829" fill="#1064AD"/>
+          <path d="M116.487 16.3006C110.046 16.3006 104.82 19.1028 101.408 23.5743V2.58637C101.408 1.45072 100.954 0.767295 99.6655 1.14584L98.7559 1.37196C97.694 1.67429 97.3154 2.20528 97.3154 3.0386V53.4213C97.3154 54.4071 97.8464 55.088 98.8296 55.088H99.8916C100.877 55.088 101.406 54.4071 101.406 53.4213V48.4976C104.663 53.0428 109.891 55.9975 116.484 55.9975C127.699 55.9975 135.577 47.2095 135.577 36.1478C135.577 25.086 127.699 16.298 116.484 16.298M116.106 52.2095C107.696 52.2095 101.18 46.3 101.027 36.1478C100.875 25.9955 107.77 20.0861 116.106 20.0861C125.272 20.0861 131.334 27.2836 131.334 36.1478C131.334 45.0119 125.272 52.2095 116.106 52.2095Z" fill="#1064AD"/>
+          <path d="M143.848 55.0905H144.984C145.969 55.0905 146.498 54.4096 146.498 53.4239V18.5719C146.498 17.5861 145.967 16.9814 144.984 16.9814H143.848C142.939 16.9814 142.334 17.5887 142.334 18.5719V53.4239C142.334 54.4096 142.941 55.0905 143.848 55.0905Z" fill="#1064AD"/>
+          <path d="M157.566 37.4384H188.478C189.766 37.4384 190.523 36.605 190.523 35.3932C190.523 30.6194 188.856 25.998 185.749 22.5123C182.642 18.6481 177.944 16.3005 172.111 16.3005C161.125 16.3005 153.244 24.8624 153.244 36.2265C153.244 48.6526 162.64 56 172.944 56C178.097 56 184.385 53.9548 188.704 49.4071C189.235 48.7999 189.613 47.8929 188.78 47.0596L188.325 46.6811C187.644 46.0002 186.811 45.8478 185.825 46.6811C181.961 50.5453 177.037 52.212 172.794 52.212C164.99 52.212 158.097 46.7573 157.566 37.4384ZM172.113 20.0886C176.963 20.0886 180.752 22.0575 183.099 25.3934C184.842 27.591 185.901 30.3933 186.28 33.6529H157.566C158.399 25.5458 164.083 20.0911 172.113 20.0911" fill="#1064AD"/>
+          <path d="M140.645 6.44547C141.212 8.48558 143.361 9.68982 145.442 9.13343C147.522 8.57704 148.749 6.47088 148.183 4.43077C147.616 2.39067 145.467 1.18642 143.386 1.74535C141.305 2.30175 140.078 4.40791 140.645 6.44801" fill="#29B84C"/>
+          <path d="M79.9758 3.57717C79.8513 2.26876 78.863 1.32111 78.1465 0.846021C77.547 0.447146 76.203 0 74.6812 0C70.8017 0 64.3155 1.94102 56.6276 5.38608C56.3913 5.49279 54.1327 6.6259 52.9081 7.24072C53.777 7.62689 54.618 8.05626 55.4259 8.52881L57.842 7.26359C65.5299 3.81091 71.6883 1.96897 75.4306 1.96897C76.1776 1.96897 76.9652 2.07059 77.3056 2.2027C77.6486 2.33482 78.0297 2.51266 78.0449 3.22911C78.0881 5.35559 75.4306 9.25542 70.634 14.0292C64.3688 20.2639 55.0677 27.4004 44.4428 34.1203C25.3603 46.1907 10.6528 51.5946 4.54515 51.5946C1.02132 51.5946 2.0274 49.4605 1.96643 49.9457C2.27384 47.489 5.47247 42.6466 13.9911 35.2179L15.9474 33.4979C15.8458 32.5655 15.7873 31.6178 15.7797 30.6498L12.6497 33.3937C4.4486 40.4921 0 46.2644 0 49.6815C0 50.1261 0.193086 52.2856 2.77942 53.2002C3.46031 53.4416 4.30125 53.5636 5.29717 53.5636C12.9266 53.5636 28.8232 46.6277 45.797 35.8911C56.3837 29.1966 65.6849 22.088 71.9881 15.8813C75.9616 11.9662 80.2883 6.88758 79.9758 3.57971" fill="#F79850"/>
+        </g>
+        <defs><clipPath id="clip0"><rect width="190.523" height="56" fill="white"/></clipPath></defs>
+      </svg>
+    </div>
+    <button class="topbar-menu-btn" id="sidebarToggle" aria-label="Abrir/fechar menu"><i class="pi pi-bars"></i></button>
+    <div class="topbar-right">
+      <!-- Escola (contexto global) -->
+      <div class="dropdown-wrap">
+        <button class="escola-ctx" id="escolaBtn" aria-haspopup="listbox" aria-expanded="false" onclick="openDd('escolaMenu','escolaBtn')">
+          <i class="pi pi-building ctx-icon"></i>
+          <div class="escola-ctx-info">
+            <span class="escola-ctx-label">Escola</span>
+            <span class="escola-ctx-value" id="escolaLabel">Colégio Orbie Centro</span>
+          </div>
+          <i class="pi pi-chevron-down escola-ctx-chevron"></i>
+        </button>
+        <div class="dropdown-menu" id="escolaMenu" role="listbox" style="min-width:240px">
+          <div class="dropdown-section-label">Selecionar escola</div>
+          <div class="dropdown-opt selected" tabindex="0" role="option" onclick="switchEscolaOpt('orbie-centro','Colégio Orbie Centro',this)">
+            <i class="pi pi-building" style="font-size:13px;color:var(--brand)"></i> Colégio Orbie Centro <i class="pi pi-check opt-check"></i>
+          </div>
+          <div class="dropdown-opt" tabindex="0" role="option" onclick="switchEscolaOpt('horizonte','Escola Municipal Horizonte',this)">
+            <i class="pi pi-building" style="font-size:13px;color:var(--text-300)"></i> Escola Municipal Horizonte <i class="pi pi-check opt-check"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Período -->
+      <div class="dropdown-wrap">
+        <button class="ctx-pill" id="periodoBtn" aria-haspopup="listbox" aria-expanded="false" onclick="openDd('periodoMenu','periodoBtn')">
+          <i class="pi pi-calendar pill-icon"></i><span id="periodoLabel">3º Trimestre</span><i class="pi pi-chevron-down pill-chevron"></i>
+        </button>
+        <div class="dropdown-menu" id="periodoMenu" role="listbox">
+          <div class="dropdown-section-label">Período</div>
+          <div class="dropdown-opt selected" tabindex="0" role="option" onclick="pickOpt('periodoMenu','periodoBtn','periodoLabel','3º Trimestre',this)">3º Trimestre <span class="badge badge-brand" style="padding:0 5px;font-size:10px;margin-left:4px">atual</span><i class="pi pi-check opt-check"></i></div>
+          <div class="dropdown-opt" tabindex="0" role="option" onclick="pickOpt('periodoMenu','periodoBtn','periodoLabel','2º Trimestre',this)">2º Trimestre <i class="pi pi-check opt-check"></i></div>
+          <div class="dropdown-opt" tabindex="0" role="option" onclick="pickOpt('periodoMenu','periodoBtn','periodoLabel','1º Trimestre',this)">1º Trimestre <i class="pi pi-check opt-check"></i></div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section-label">Recortes</div>
+          <div class="dropdown-opt" tabindex="0" role="option" onclick="pickOpt('periodoMenu','periodoBtn','periodoLabel','Últimas 4 semanas',this)">Últimas 4 semanas <i class="pi pi-check opt-check"></i></div>
+          <div class="dropdown-opt" tabindex="0" role="option" onclick="pickOpt('periodoMenu','periodoBtn','periodoLabel','Últimas 2 semanas',this)">Últimas 2 semanas <i class="pi pi-check opt-check"></i></div>
+        </div>
+      </div>
+      <button class="notif-btn" aria-label="Notificações"><i class="pi pi-bell"></i><span class="notif-dot"></span></button>
+      <div class="topbar-avatar" title="Amanda Ferreira">A</div>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
+
+  <!-- ════ BODY ════ -->
+  <div class="body-wrap">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegação do painel">
+      <!-- Início = Painel de Docentes (ativo, expandido) -->
+      <div>
+        <button class="nav-item active expanded" onclick="toggleAcc(this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-home nav-icon"></i><span class="nav-label">Início</span><i class="pi pi-chevron-down nav-chevron" style="transform:rotate(180deg)"></i></div></button>
+        <div class="nav-sub open">
+          <a class="nav-sub-item active" href="#" id="nav-home-link" onclick="setView('visao-geral',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Visão Geral</span></div></a>
+          <a class="nav-sub-item" id="nav-est-link" href="#" onclick="setView('estudantes',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Estudantes</span></div></a>
+          <a class="nav-sub-item" href="#" onclick="setView('atividades',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Atividades</span></div></a>
+          <a class="nav-sub-item" id="nav-cont-link" href="#" onclick="setView('conteudos',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Conteúdos</span></div></a>
+        </div>
+      </div>
+      <div class="nav-divider"></div>
+      <a class="nav-item" href="#"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-users nav-icon"></i><span class="nav-label">Turmas</span></div></a>
+      <div>
+        <button class="nav-item" onclick="toggleAcc(this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-copy nav-icon"></i><span class="nav-label">Biblioteca</span><i class="pi pi-chevron-down nav-chevron"></i></div></button>
+        <div class="nav-sub">
+          <a class="nav-sub-item" href="#"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Banco de Questões</span></div></a>
+          <a class="nav-sub-item" href="#"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Curadoria</span></div></a>
+        </div>
+      </div>
+      <a class="nav-item" href="#"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-pen-to-square nav-icon"></i><span class="nav-label">Correção de Respostas</span></div></a>
+      <div>
+        <button class="nav-item" onclick="toggleAcc(this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-chart-line nav-icon"></i><span class="nav-label">Relatórios</span><i class="pi pi-chevron-down nav-chevron"></i></div></button>
+        <div class="nav-sub">
+          <a class="nav-sub-item" href="#"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Acompanhamento</span></div></a>
+          <a class="nav-sub-item" href="#"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Trilhas Adaptativas</span></div></a>
+          <a class="nav-sub-item" href="#"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Downloads</span></div></a>
+        </div>
+      </div>
+      <div class="nav-divider"></div>
+      <a class="nav-item" href="#"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-question-circle nav-icon"></i><span class="nav-label">Central de Ajuda</span></div></a>
+      <a class="nav-item" href="#"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-star nav-icon"></i><span class="nav-label">Favoritos</span></div></a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" id="main">
+      <div class="content">
+
+        <nav class="breadcrumb">
+          <a class="breadcrumb-link" href="#" onclick="setView('visao-geral',null);return false">Início</a>
+          <span class="breadcrumb-sep"><i class="pi pi-chevron-right" style="font-size:9px"></i></span>
+          <span id="breadcrumb-parent" style="display:none;align-items:center;gap:4px">
+            <a class="breadcrumb-link" id="breadcrumb-parent-label" href="#" onclick="goBack();return false" style="cursor:pointer;color:var(--text-500)"></a>
+            <span class="breadcrumb-sep"><i class="pi pi-chevron-right" style="font-size:9px"></i></span>
+          </span>
+
+          <span class="breadcrumb-current" id="breadcrumb-current">Visão Geral</span>
+          <button class="fav-btn" aria-label="Favoritar"><i class="pi pi-star"></i></button>
+        </nav>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="page-title">Início</h1>
+            <div class="page-meta">
+              <span>Atualizado em 05/10/2026</span>
+              <span class="page-meta-dot"></span>
+              <span id="meta-escola">Colégio Orbie Centro</span>
+              <span class="page-meta-dot"></span>
+              <span id="meta-periodo">3º Trimestre</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ VIEW: VISÃO GERAL (HOME multi-turma) ══ -->
+        <div id="view-visao-geral">
+
+          <!-- Escola header -->
+          <div class="escola-header" id="escolaHeader"></div>
+
+          <!-- KPIs consolidados (todas as turmas) -->
+          <div class="section">
+            <div class="kpi-grid" id="homeKpiGrid"></div>
+          </div>
+
+          <!-- Minhas Turmas -->
+          <div class="section">
+            <div class="section-header" style="margin-bottom:14px">
+              <div class="section-label" style="margin:0">Minhas turmas</div>
+              <span style="font-size:12px;color:var(--text-300)">Clique em uma turma para ver os detalhes</span>
+            </div>
+            <div class="turmas-grid" id="turmasGrid"></div>
+          </div>
+
+          <!-- Estudantes que precisam de atenção (todas as turmas) -->
+          <div class="section" id="homeAttentionSection">
+            <div class="section-header">
+              <div class="section-label" style="margin:0">Estudantes que precisam de atenção</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="filter-pills" id="homeFilterPills" role="group" aria-label="Filtrar por situação"></div>
+                <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
+                  Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
+                </button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
+              <span style="font-size:12px;color:var(--text-500);flex-shrink:0">Turma:</span>
+              <div id="homeTurmaFilter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+            </div>
+            <div id="homeAttentionList" style="margin-top:8px"></div>
+          </div>
+
+          <!-- Atividades recentes (8º ano A como referência) -->
+          <div class="section">
+            <div class="section-label">Atividades recentes · 8º ano A</div>
+            <div id="homeActivitiesList"></div>
+          </div>
+
+        </div><!-- /view-visao-geral -->
+
+        <!-- ══ VIEW: TURMA DETALHE (visão de uma turma específica) ══ -->
+        <div id="view-turma-detalhe" style="display:none">
+
+          <!-- Back button + contexto da turma (renderizado via JS) -->
+          <div id="turmaDetalheHeader"></div>
+
+          <!-- KPIs (por turma) -->
+          <div class="section">
+            <div class="kpi-grid" id="kpiGrid"></div>
+          </div>
+
+          <!-- Sinal Pedagógico -->
+          <div class="section" id="signalSection"></div>
+
+          <!-- Evolução + Habilidades -->
+          <div class="section" id="skillsSection">
+            <div class="grid-5-4">
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Evolução da Turma</div>
+                    <div class="card-subtitle">Desempenho médio por atividade — 3º Trimestre</div>
+                  </div>
+                  <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                  </div>
+                </div>
+                <div style="position:relative;height:210px" role="img" aria-label="Gráfico de evolução da turma"><canvas id="chartEvolucao"></canvas></div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
+              </div>
+              <div class="card">
+                <div class="card-header"><div>
+                  <div class="card-title">Conteúdos e Habilidades</div>
+                  <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
+                </div></div>
+                <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Crítico &lt;50%</span>
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50–65%</span>
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado ≥65%</span>
+                </div>
+                <div id="skillsList"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estudantes em atenção (por turma) -->
+          <div class="section" id="attentionSection">
+            <div class="section-header">
+              <div class="section-label" style="margin:0">Estudantes que precisam de atenção</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="filter-pills" id="filterPills" role="group" aria-label="Filtrar estudantes em atenção"></div>
+                <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
+                  Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
+                </button>
+              </div>
+            </div>
+            <div id="attentionList" style="margin-top:12px"></div>
+          </div>
+
+          <!-- Atividades recentes -->
+          <div class="section">
+            <div class="section-label" id="turmaActivLabel">Atividades recentes</div>
+            <div id="activitiesList"></div>
+          </div>
+
+        </div><!-- /view-turma-detalhe -->
+
+
+        <!-- ══ VIEW: ESTUDANTES ══ -->
+        <div id="view-estudantes" style="display:none">
+
+          <!-- Toolbar: search + sort -->
+          <div class="students-toolbar">
+            <div class="search-wrap">
+              <i class="pi pi-search"></i>
+              <input type="text" id="studentSearch" placeholder="Buscar por nome..." oninput="filterStudents()">
+            </div>
+            <div class="dropdown-wrap" style="margin-left:auto">
+              <button class="sort-btn" id="sortBtn" onclick="openDd('sortMenu','sortBtn')">
+                <i class="pi pi-sort-alt" style="font-size:12px"></i>
+                Ordenar: <span id="sortLabel" class="sort-label">Situação</span>
+                <i class="pi pi-chevron-down" style="font-size:10px;color:var(--text-300)"></i>
+              </button>
+              <div class="dropdown-menu" id="sortMenu" role="listbox">
+                <div class="dropdown-opt selected" tabindex="0" role="option" onclick="setSortBy('estado','Situação',this)">Situação (urgentes primeiro) <i class="pi pi-check opt-check"></i></div>
+                <div class="dropdown-opt" tabindex="0" role="option" onclick="setSortBy('nome-asc','Nome A→Z',this)">Nome A → Z <i class="pi pi-check opt-check"></i></div>
+                <div class="dropdown-opt" tabindex="0" role="option" onclick="setSortBy('nome-desc','Nome Z→A',this)">Nome Z → A <i class="pi pi-check opt-check"></i></div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-opt" tabindex="0" role="option" onclick="setSortBy('desemp-desc','Desempenho ↓',this)">Desempenho (maior → menor) <i class="pi pi-check opt-check"></i></div>
+                <div class="dropdown-opt" tabindex="0" role="option" onclick="setSortBy('desemp-asc','Desempenho ↑',this)">Desempenho (menor → maior) <i class="pi pi-check opt-check"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter pills -->
+          <div id="stFilterPills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"></div>
+
+          <!-- Table -->
+          <div id="studentTable"></div>
+
+        </div>
+
+
+        <!-- ══ VIEW: CONTEÚDOS ══ -->
+        <div id="view-conteudos" style="display:none">
+          <div id="conteudosContent"></div>
+        </div>
+        <!-- ══ VIEW: PERFIL ══ -->
+        <div id="view-perfil" style="display:none">
+          <div id="profileContent"></div>
+        </div>
+        <!-- ══ VIEW: ATIVIDADES ══ -->
+        <div id="view-atividades" style="display:none">
+          <div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--r-lg);padding:48px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-300)">
+            <i class="pi pi-file" style="font-size:28px;opacity:.4"></i>
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Atividades</span>
+            <span style="font-size:13px">próxima iteração</span>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </main>
+
+  </div><!-- /body-wrap -->
+</div><!-- /app -->
+
+<!-- ════ PROFILE MODAL ════ -->
+<div class="modal-overlay" id="profileModal" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-panel" id="modalContent"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   DATA MODEL
+═══════════════════════════════════════════════════════ */
+const DATA = {
+  kpis: { desempenhoMedio:63, desempenhoAnterior:67, estudantesAtencao:9, totalEstudantes:20, taxaConclusao:90 },
+
+  evolucao: [
+    { label:'05/ago', atividade:'Diagnóstico Inicial',               media:64 },
+    { label:'19/ago', atividade:'Sistemas do Corpo Humano',          media:64 },
+    { label:'02/set', atividade:'Quiz: Digestão e Circulação',       media:64 },
+    { label:'16/set', atividade:'Genética Básica',                   media:53 },
+    { label:'23/set', atividade:'Interpretação de Texto Científico', media:63 },
+    { label:'30/set', atividade:'Equilíbrio Ecológico',              media:63 },
+  ],
+
+  habilidades: [
+    { nome:'Hereditariedade e genética',        dominio:38, afetados:8 },
+    { nome:'Fisiologia dos sistemas',           dominio:51, afetados:6 },
+    { nome:'Equilíbrio ecológico',              dominio:55, afetados:5 },
+    { nome:'Sistema digestório e circulatório', dominio:62, afetados:4 },
+    { nome:'Leitura de texto científico',       dominio:68, afetados:3 },
+  ],
+
+  sinalPedagogico: {
+    recomendacao: 'retomar',
+    mensagem: '8 estudantes (40% da turma) tiveram dificuldade com Hereditariedade e genética. Considere retomar esse conteúdo antes de avançar para Reações Químicas em 14/10.',
+    proximo: 'Reações Químicas',
+    data: '14/10/2026',
+  },
+
+  atividades: [
+    { id:'A1', nome:'Diagnóstico Inicial',               data:'05/08/2026', entregues:20, total:20, media:64, status:'ok'      },
+    { id:'A2', nome:'Sistemas do Corpo Humano',          data:'19/08/2026', entregues:20, total:20, media:64, status:'ok'      },
+    { id:'A3', nome:'Quiz: Digestão e Circulação',       data:'02/09/2026', entregues:20, total:20, media:64, status:'ok'      },
+    { id:'A4', nome:'Genética Básica',                   data:'16/09/2026', entregues:19, total:20, media:53, status:'alert'   },
+    { id:'A5', nome:'Interpretação de Texto Científico', data:'23/09/2026', entregues:18, total:20, media:63, status:'ok'      },
+    { id:'A6', nome:'Equilíbrio Ecológico',              data:'30/09/2026', entregues:18, total:20, media:63, status:'ok'      },
+    { id:'A7', nome:'Reações Químicas',                  data:'14/10/2026', entregues:null,total:20,media:null, status:'planned'},
+  ],
+
+  estudantes: [
+    { id:1,  nome:'Ana Lima',         init:'AL', perfil:'estavel-alto',           scores:[88,85,90,87,91,89], media:88, tend:'estavel',    alerta:null               },
+    { id:2,  nome:'Bruno Souza',      init:'BS', perfil:'estavel-alto',           scores:[82,79,84,81,86,83], media:83, tend:'estavel',    alerta:null               },
+    { id:3,  nome:'Carla Mendes',     init:'CM', perfil:'estavel-alto',           scores:[91,88,93,90,95,92], media:92, tend:'estavel',    alerta:null               },
+    { id:4,  nome:'Diego Alves',      init:'DA', perfil:'evolucao',               scores:[48,52,58,63,71,78], media:62, tend:'melhorando', alerta:null               },
+    { id:5,  nome:'Elena Costa',      init:'EC', perfil:'evolucao',               scores:[42,55,60,58,67,74], media:59, tend:'melhorando', alerta:null               },
+    { id:6,  nome:'Felipe Rocha',     init:'FR', perfil:'evolucao',               scores:[51,47,55,62,70,76], media:60, tend:'melhorando', alerta:null               },
+    { id:7,  nome:'Gabriela Nunes',   init:'GN', perfil:'queda',                  scores:[75,78,72,65,52,44], media:64, tend:'queda',      alerta:'queda'            },
+    { id:8,  nome:'Henrique Lima',    init:'HL', perfil:'queda',                  scores:[80,76,70,68,55,47], media:66, tend:'queda',      alerta:'queda'            },
+    { id:9,  nome:'Isabela Santos',   init:'IS', perfil:'queda',                  scores:[70,72,68,60,51,43], media:61, tend:'queda',      alerta:'queda'            },
+    { id:10, nome:'João Pedro Melo',  init:'JP', perfil:'dificuldade-recorrente', scores:[38,42,35,31,40,38], media:37, tend:'baixo',      alerta:'baixo-persistente'},
+    { id:11, nome:'Karen Oliveira',   init:'KO', perfil:'dificuldade-recorrente', scores:[45,40,43,35,41,39], media:41, tend:'baixo',      alerta:'baixo-persistente'},
+    { id:12, nome:'Lucas Ferreira',   init:'LF', perfil:'dificuldade-recorrente', scores:[40,38,44,29,38,42], media:39, tend:'baixo',      alerta:'baixo-persistente'},
+    { id:13, nome:'Marina Carvalho',  init:'MC', perfil:'resultado-ruim-isolado', scores:[72,75,70,32,68,71], media:65, tend:'recuperou',  alerta:null               },
+    { id:14, nome:'Nathan Barbosa',   init:'NB', perfil:'resultado-ruim-isolado', scores:[68,71,73,28,65,69], media:62, tend:'recuperou',  alerta:null               },
+    { id:15, nome:'Olivia Castro',    init:'OC', perfil:'dificuldade-genetica',   scores:[55,60,58,33,62,67], media:56, tend:'melhorando', alerta:null               },
+    { id:16, nome:'Paulo Ramos',      init:'PR', perfil:'dificuldade-genetica',   scores:[62,65,63,35,60,64], media:58, tend:'estavel',    alerta:null               },
+    { id:17, nome:'Rafaela Teixeira', init:'RT', perfil:'queda-genetica',         scores:[70,67,65,31,56,48], media:56, tend:'queda',      alerta:'queda'            },
+    { id:18, nome:'Samuel Viana',     init:'SV', perfil:'inativo',                scores:[65,60,58,null,null,null], media:61, tend:'inativo', alerta:'inativo'      },
+    { id:19, nome:'Tâmara Gomes',     init:'TG', perfil:'inativo',                scores:[72,68,70,65,null,null],   media:69, tend:'inativo', alerta:'inativo'      },
+    { id:20, nome:'Uriel Pinto',      init:'UP', perfil:'medio-estavel',          scores:[60,62,58,61,63,65], media:62, tend:'estavel',    alerta:null               },
+  ],
+
+  alertas: [
+    { eid:10, tipo:'baixo-persistente', score:38,   atv:'A6', data:'30/09', dific:'Desempenho abaixo de 50% em todas as atividades do trimestre'      },
+    { eid:11, tipo:'baixo-persistente', score:39,   atv:'A6', data:'30/09', dific:'Dificuldade constante, inclusive em Hereditariedade e genética'      },
+    { eid:12, tipo:'baixo-persistente', score:42,   atv:'A6', data:'30/09', dific:'Pior resultado em Genética Básica (29%) — lacuna anterior provável'  },
+    { eid:7,  tipo:'queda',             score:44,   atv:'A6', data:'30/09', dific:'Queda acentuada nas últimas 4 atividades — era uma das melhores'      },
+    { eid:9,  tipo:'queda',             score:43,   atv:'A6', data:'30/09', dific:'Declínio constante desde a Genética Básica'                           },
+    { eid:8,  tipo:'queda',             score:47,   atv:'A6', data:'30/09', dific:'Queda de 80% no início para 47% na última atividade'                  },
+    { eid:18, tipo:'inativo',           score:null, atv:'A3', data:'02/09', dific:'Sem entregas nas últimas 3 atividades'                                },
+    { eid:19, tipo:'inativo',           score:null, atv:'A4', data:'16/09', dific:'Sem entregas nas últimas 2 atividades'                                },
+    { eid:17, tipo:'queda',             score:48,   atv:'A6', data:'30/09', dific:'Queda moderada e dificuldade grave em Genética Básica (31%)'           },
+  ],
+};
+
+
+/* ─── TURMAS DA ESCOLA ─── */
+const TURMAS = [
+  { id:'8a',  nome:'8º ano A',  disc:'Ciências da Natureza', estudantes:20, desempenhoMedio:63, desempenhoAnterior:67, tendencia:'queda',     alertas:9,  taxaConclusao:90, habilidadeCritica:'Hereditariedade e genética',   hasFullData:true  },
+  { id:'8b',  nome:'8º ano B',  disc:'Ciências da Natureza', estudantes:28, desempenhoMedio:71, desempenhoAnterior:68, tendencia:'melhorando', alertas:3,  taxaConclusao:95, habilidadeCritica:'Equilíbrio ecológico',           hasFullData:false },
+  { id:'9a',  nome:'9º ano A',  disc:'Ciências da Natureza', estudantes:25, desempenhoMedio:58, desempenhoAnterior:55, tendencia:'melhorando', alertas:6,  taxaConclusao:88, habilidadeCritica:'Sistema nervoso e hormonal',     hasFullData:false },
+  { id:'9b',  nome:'9º ano B',  disc:'Ciências da Natureza', estudantes:27, desempenhoMedio:67, desempenhoAnterior:67, tendencia:'estavel',   alertas:4,  taxaConclusao:92, habilidadeCritica:'Genética e herança biológica',   hasFullData:false },
+  { id:'1ema',nome:'1º EM A',   disc:'Biologia',             estudantes:32, desempenhoMedio:74, desempenhoAnterior:70, tendencia:'melhorando', alertas:2,  taxaConclusao:97, habilidadeCritica:'Química orgânica básica',        hasFullData:false },
+  { id:'1emb',nome:'1º EM B',   disc:'Biologia',             estudantes:30, desempenhoMedio:55, desempenhoAnterior:62, tendencia:'queda',     alertas:11, taxaConclusao:82, habilidadeCritica:'Biologia celular',               hasFullData:false },
+];
+
+/* ─── ALERTAS EXTRA (outras turmas) ─── */
+const ALERTAS_EXTRA = [
+  { _id:101, nome:'Carlos Melo',     init:'CM', tipo:'queda',             score:52,   atv:'A5', data:'20/09', dific:'Queda nas últimas 3 atividades',                         turmaId:'8b',   turmaNome:'8º ano B',  tend:'queda'  },
+  { _id:102, nome:'Fernanda Lima',   init:'FL', tipo:'baixo-persistente', score:41,   atv:'A4', data:'15/09', dific:'Desempenho abaixo de 50% em todas as atividades',         turmaId:'8b',   turmaNome:'8º ano B',  tend:'baixo'  },
+  { _id:103, nome:'Rafael Souza',    init:'RS', tipo:'inativo',           score:null, atv:'A4', data:'15/09', dific:'Sem entregas nas últimas 2 atividades',                   turmaId:'8b',   turmaNome:'8º ano B',  tend:'inativo'},
+  { _id:104, nome:'Amanda Costa',    init:'AC', tipo:'queda',             score:47,   atv:'A5', data:'22/09', dific:'Queda em Biologia — Sistema nervoso',                     turmaId:'9a',   turmaNome:'9º ano A',  tend:'queda'  },
+  { _id:105, nome:'Pedro Alves',     init:'PA', tipo:'baixo-persistente', score:44,   atv:'A5', data:'22/09', dific:'Dificuldade persistente em todas as habilidades',          turmaId:'9a',   turmaNome:'9º ano A',  tend:'baixo'  },
+  { _id:106, nome:'Vitória Martins', init:'VM', tipo:'queda',             score:51,   atv:'A5', data:'22/09', dific:'Queda após bom início de trimestre',                      turmaId:'9a',   turmaNome:'9º ano A',  tend:'queda'  },
+  { _id:107, nome:'Lucas Pereira',   init:'LP', tipo:'baixo-persistente', score:43,   atv:'A5', data:'24/09', dific:'Desempenho abaixo da média em Genética e herança',        turmaId:'9b',   turmaNome:'9º ano B',  tend:'baixo'  },
+  { _id:108, nome:'Mariana Silva',   init:'MS', tipo:'inativo',           score:null, atv:'A4', data:'16/09', dific:'Sem entregas nas últimas 2 atividades',                   turmaId:'9b',   turmaNome:'9º ano B',  tend:'inativo'},
+  { _id:109, nome:'Thiago Rocha',    init:'TR', tipo:'queda',             score:48,   atv:'A5', data:'21/09', dific:'Queda em Biologia celular',                               turmaId:'1emb', turmaNome:'1º EM B',   tend:'queda'  },
+  { _id:110, nome:'Camila Santos',   init:'CS', tipo:'baixo-persistente', score:39,   atv:'A5', data:'21/09', dific:'Dificuldade recorrente em todas as habilidades',           turmaId:'1emb', turmaNome:'1º EM B',   tend:'baixo'  },
+  { _id:111, nome:'Gabriel Dias',    init:'GD', tipo:'queda',             score:51,   atv:'A5', data:'21/09', dific:'Queda acentuada nas últimas 3 atividades',                 turmaId:'1emb', turmaNome:'1º EM B',   tend:'queda'  },
+];
+
+/* ─── ALL_ALERTAS: 8A + extras com turmaNome ─── */
+function buildAllAlertas() {
+  return [
+    ...DATA.alertas.map(al => ({ ...al, turmaId: (TURMAS.find(t=>t.hasFullData)||TURMAS[0]).id, turmaNome: (TURMAS.find(t=>t.hasFullData)||TURMAS[0]).nome })),
+    ...ALERTAS_EXTRA,
+  ];
+}
+let ALL_ALERTAS = [];
+let currentEscolaId = 'orbie-centro';
+let ESCOLAS_DATA    = {};
+/* ─── HELPERS ─── */
+const AVATAR_COLORS = ['#2177FF','#12B76A','#F79009','#8B5CF6','#EC4899','#06B6D4','#F59E0B','#10B981','#EF4444','#6366F1','#0EA5E9','#14B8A6','#F97316','#A855F7','#22D3EE','#84CC16','#E11D48','#7C3AED','#0891B2','#CA8A04'];
+const avColor = id => AVATAR_COLORS[(id-1) % AVATAR_COLORS.length];
+const getE    = id => DATA.estudantes.find(e => e.id === id);
+
+function scoreCls(v) {
+  if (v === null || v === undefined) return 'neutral';
+  return v >= 70 ? 'good' : v >= 50 ? 'medium' : 'low';
+}
+function domCls(v) { return v >= 65 ? 'good' : v >= 50 ? 'medium' : 'low'; }
+function domColor(v) { return v >= 65 ? 'var(--success)' : v >= 50 ? 'var(--moderate)' : 'var(--critical)'; }
+
+function alertBadge(tipo) {
+  if (tipo === 'queda')             return `<span class="badge badge-warning" style="font-size:11px">↘ Queda</span>`;
+  if (tipo === 'baixo-persistente') return `<span class="badge badge-error"   style="font-size:11px"><i class="pi pi-exclamation-circle" style="font-size:10px"></i> Baixo persistente</span>`;
+  if (tipo === 'inativo')           return `<span class="badge badge-neutral" style="font-size:11px">⚫ Inativo</span>`;
+  return '';
+}
+
+function tendLabel(t) {
+  return { estavel:'Desempenho estável', melhorando:'Em evolução ↗', queda:'Queda recente ↘', baixo:'Desempenho abaixo', inativo:'Sem participação', recuperou:'Recuperou após queda' }[t] || t;
+}
+
+function buildSparkline(scores) {
+  const valid = scores.filter(s => s !== null);
+  if (valid.length < 2) return `<span style="font-size:11px;color:var(--text-300)">sem dados</span>`;
+  const last4 = valid.slice(-4);
+  const W = 64, H = 24;
+  const minV = Math.min(...last4), maxV = Math.max(...last4);
+  const range = maxV - minV || 10;
+  const xStep = W / (last4.length - 1);
+  const pts = last4.map((v,i) => {
+    const x = (i * xStep).toFixed(1);
+    const y = (H - ((v - minV) / range) * (H - 6) - 3).toFixed(1);
+    return `${x},${y}`;
+  });
+  const lastVal = last4[last4.length-1];
+  const lineColor = lastVal >= 70 ? '#12B76A' : lastVal >= 50 ? '#F79009' : '#F04438';
+  const dots = last4.map((v,i) => {
+    const x = (i * xStep).toFixed(1);
+    const y = (H - ((v - minV) / range) * (H - 6) - 3).toFixed(1);
+    const c = v >= 70 ? '#12B76A' : v >= 50 ? '#F79009' : '#F04438';
+    return `<circle cx="${x}" cy="${y}" r="2.5" fill="${c}" stroke="white" stroke-width="1.5"/>`;
+  }).join('');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block"><polyline points="${pts.join(' ')}" fill="none" stroke="${lineColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>${dots}</svg>`;
+}
+
+/* ─── RENDER: KPIs ─── */
+function renderKPIs() {
+  const k = DATA.kpis;
+  const diff = k.desempenhoMedio - k.desempenhoAnterior;
+  const tDir = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
+  const tIcon = diff > 0 ? 'pi-trending-up' : 'pi-trending-down';
+  const tText = (diff > 0 ? '+' : '') + diff + 'pp vs. 2º trimestre';
+  const hAdequate = DATA.habilidades.filter(h => h.dominio >= 60).length;
+  const hTotal = DATA.habilidades.length;
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon-brand"><i class="pi pi-users"></i></div>
+      <div class="kpi-label">Estudantes acompanhados</div>
+      <div class="kpi-value">${k.totalEstudantes}</div>
+      <div class="kpi-sub">${k.taxaConclusao}% de conclusão nas atividades recentes</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon-warning"><i class="pi pi-chart-bar"></i></div>
+      <div class="kpi-label">Desempenho médio</div>
+      <div class="kpi-value medium">${k.desempenhoMedio}%</div>
+      <div class="kpi-trend ${tDir}"><i class="pi ${tIcon}" style="font-size:11px"></i>${tText}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon-error"><i class="pi pi-check-square"></i></div>
+      <div class="kpi-label">Habilidades c/ domínio ≥ 60%</div>
+      <div class="kpi-value low">${hAdequate} de ${hTotal}</div>
+      <div class="kpi-sub">${Math.round(hAdequate/hTotal*100)}% das habilidades avaliadas</div>
+    </div>
+    <div class="kpi-card urgent kpi-card-clickable" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
+      <div class="kpi-icon kpi-icon-error"><i class="pi pi-exclamation-circle"></i></div>
+      <div class="kpi-label">Precisam de atenção</div>
+      <div class="kpi-value low">${k.estudantesAtencao}</div>
+      <div class="kpi-sub">${Math.round(k.estudantesAtencao/k.totalEstudantes*100)}% da turma · queda, baixo desempenho ou inativos</div>
+    </div>`;
+}
+
+/* ─── RENDER: Signal ─── */
+function renderSignal() {
+  const s = DATA.sinalPedagogico;
+  const ok = s.recomendacao === 'avancar';
+  document.getElementById('signalSection').innerHTML = `
+    <div class="signal-banner ${ok ? 'ok' : 'warning'}">
+      <div class="signal-icon-box"><i class="pi ${ok ? 'pi-check-circle' : 'pi-exclamation-circle'}"></i></div>
+      <div class="flex-1">
+        <div class="signal-title">${ok ? 'Turma pronta para avançar' : 'Atenção antes de avançar'}</div>
+        <div class="signal-text">${s.mensagem}</div>
+      </div>
+      <div class="signal-actions">
+        <button class="btn btn-sm btn-outline" onclick="setView('conteudos',document.getElementById('nav-cont-link'))">Ver conteúdos</button>
+        <button class="btn btn-sm btn-outline" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">Ver estudantes</button>
+      </div>
+    </div>`;
+}
+
+/* ─── RENDER: Skills ─── */
+function renderSkills() {
+  document.getElementById('skillsList').innerHTML = DATA.habilidades.map(h => {
+    const ativIdx = SKILLS_LABEL.indexOf(h.nome);
+    return `<div class="skill-row" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
+         onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''"
+         onclick="goToSkill(${ativIdx})" title="Ver detalhes de ${h.nome}">
+      <span class="skill-name">${h.nome}</span>
+      <div class="skill-bar-wrap"><div class="pbar-wrap"><div class="pbar-fill ${domCls(h.dominio)}" style="width:${h.dominio}%"></div></div></div>
+      <span class="skill-pct" style="color:${domColor(h.dominio)}">${h.dominio}%</span>
+      <span class="skill-count">${h.afetados} estudantes</span>
+      <i class="pi pi-chevron-right" style="font-size:10px;color:var(--text-300);flex-shrink:0"></i>
+    </div>`;
+  }).join('');
+}
+
+/* ─── RENDER: Attention list ─── */
+let activeFilter = 'all';
+function renderFilterPills(f) {
+  activeFilter = f;
+  const counts = { all: DATA.alertas.length, queda: DATA.alertas.filter(a=>a.tipo==='queda').length, 'baixo-persistente': DATA.alertas.filter(a=>a.tipo==='baixo-persistente').length, inativo: DATA.alertas.filter(a=>a.tipo==='inativo').length };
+  const pills = [{ id:'all',label:'Todos'},{ id:'queda',label:'Queda'},{ id:'baixo-persistente',label:'Baixo desempenho'},{ id:'inativo',label:'Inativos'}];
+  document.getElementById('filterPills').innerHTML = pills.map(p => `
+    <button class="filter-pill ${f===p.id?'active':''}" onclick="renderFilterPills('${p.id}');renderAttention('${p.id}')">
+      ${p.label} <span class="badge ${f===p.id?'badge-brand':'badge-neutral'}" style="padding:0 6px;font-size:10px;min-width:20px;justify-content:center">${counts[p.id]}</span>
+    </button>`).join('');
+}
+
+function renderAttention(f) {
+  const filtered = f==='all' ? DATA.alertas : DATA.alertas.filter(a=>a.tipo===f);
+  if (!filtered.length) {
+    document.getElementById('attentionList').innerHTML = renderEmptyState(
+      f === 'all' ? 'sem-atencao' : 'filtro-vazio'
+    );
+    return;
+  }
+  const rows = filtered.map(al => {
+    const e = getE(al.eid);
+    return `
+    <div class="attention-row" onclick="openProfile(${e.id})">
+      <div class="c-avatar"><div class="student-avatar" style="background:${avColor(e.id)}">${e.init}</div></div>
+      <div class="c-info"><div class="student-name">${e.nome}</div><div class="student-sub">${tendLabel(e.tend)}</div></div>
+      <div class="c-badge">${alertBadge(al.tipo)}</div>
+      <div class="c-spark">${buildSparkline(e.scores)}</div>
+      <div class="c-score">${al.score!==null ? `<span class="score-chip ${scoreCls(al.score)}">${al.score}%</span>` : `<span class="score-chip neutral">—</span>`}</div>
+      <div class="c-reason"><span class="reason-text">${al.dific}</span></div>
+      <div class="c-action"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProfile(${e.id})">Ver perfil <i class="pi pi-arrow-right" style="font-size:10px"></i></button></div>
+    </div>`;
+  }).join('');
+  document.getElementById('attentionList').innerHTML = `
+    <div class="attention-table">
+      <div class="att-thead">
+        <div style="width:36px;flex-shrink:0"></div>
+        <div class="c-info"><span>Estudante</span></div>
+        <div class="c-badge"><span>Situação</span></div>
+        <div class="c-spark"><span>Evolução</span></div>
+        <div class="c-score"><span>Último</span></div>
+        <div class="c-reason"><span>Principal dificuldade</span></div>
+        <div class="c-action"></div>
+      </div>
+      ${rows || '<div style="padding:32px;text-align:center;color:var(--text-300);font-size:13px">Nenhum estudante com este alerta</div>'}
+    </div>`;
+}
+
+/* ─── RENDER: Activities ─── */
+function renderActivities() {
+  const recent = DATA.atividades.filter(a=>a.status!=='planned').slice(-4).reverse();
+  const next = DATA.atividades.find(a=>a.status==='planned');
+  document.getElementById('activitiesList').innerHTML = `
+    <div class="activities-list">
+      ${recent.map(a => `
+        <div class="activity-row">
+          <div class="activity-icon-box ${a.status==='alert'?'alert-icon':''}"><i class="pi pi-file-edit"></i></div>
+          <div style="flex:1;min-width:0">
+            <div class="activity-name">${a.nome}</div>
+            <div class="activity-date">${a.data}</div>
+          </div>
+          <div class="activity-stats">
+            <span><strong>${a.entregues}/${a.total}</strong> entregues</span>
+            <span style="display:flex;align-items:center;gap:6px">Média <span class="score-chip ${scoreCls(a.media)}">${a.media}%</span></span>
+          </div>
+          <div style="flex-shrink:0;margin-left:8px">
+            ${a.status==='alert' ? `<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-triangle" style="font-size:10px"></i> Resultado baixo</span>` : `<span class="badge badge-neutral" style="font-size:11px">Normal</span>`}
+          </div>
+        </div>`).join('')}
+      ${next ? `<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Próxima: <strong style="color:var(--text-700)">${next.nome}</strong> · ${next.data}</span></div>` : ''}
+    </div>`;
+}
+
+/* ─── CHART ─── */
+let evolChart;
+function initChart() {
+  if (evolChart) evolChart.destroy();
+  const ctx = document.getElementById('chartEvolucao').getContext('2d');
+  evolChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: DATA.evolucao.map(d => d.label),
+      datasets: [
+        {
+          label: 'Desempenho',
+          data: DATA.evolucao.map(d => d.media),
+          borderColor: '#2177FF',
+          backgroundColor: 'rgba(33,119,255,.07)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: DATA.evolucao.map((_,i) => i===3 ? 7 : 5),
+          pointBackgroundColor: DATA.evolucao.map((_,i) => i===3 ? '#F04438' : '#2177FF'),
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 8,
+        },
+        {
+          label: 'Meta',
+          data: Array(DATA.evolucao.length).fill(70),
+          borderColor: '#DDE4EB',
+          borderDash: [4,4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          backgroundColor: '#1D2939',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,.75)',
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            title: items => DATA.evolucao[items[0].dataIndex].atividade,
+            label: item => item.datasetIndex===1 ? null : ` ${item.raw}% de desempenho médio`,
+          }
+        }
+      },
+      scales: {
+        y: { min:0, max:100, ticks:{ callback:v=>v+'%', font:{size:11,family:"'Outfit',sans-serif"}, color:'#8A95B2', stepSize:20 }, grid:{ color:'#EFF2F7' }, border:{ display:false } },
+        x: { ticks:{ font:{size:11,family:"'Outfit',sans-serif"}, color:'#8A95B2' }, grid:{ display:false }, border:{ display:false } }
+      }
+    }
+  });
+}
+
+/* ─── PROFILE — state ─── */
+let currentProfileId  = null;
+let profilePreviousView = 'visao-geral';
+let profileChartInst  = null;
+
+function openProfile(id) {
+  currentProfileId = id;
+  const vis = [...document.querySelectorAll('[id^="view-"]')].find(v => v.style.display !== 'none');
+  profilePreviousView = vis ? vis.id.replace('view-','') : 'visao-geral';
+  if (profilePreviousView === 'perfil') profilePreviousView = 'visao-geral';
+  setView('perfil', null);
+}
+
+function closeProfile() { goBack(); }
+
+function goBack() {
+  document.getElementById('breadcrumb-parent').style.display = 'none';
+  const targetEl = profilePreviousView === 'estudantes' ? document.getElementById('nav-est-link') : null;
+  setView(profilePreviousView, targetEl);
+}
+
+/* ─── DROPDOWN ─── */
+function openDd(menuId, btnId) {
+  const menu = document.getElementById(menuId), btn = document.getElementById(btnId);
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.dropdown-menu.open').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.ctx-pill.open, .escola-ctx.open').forEach(b=>b.classList.remove('open'));
+  if (!isOpen) { menu.classList.add('open'); btn.classList.add('open'); }
+}
+function pickOpt(menuId, btnId, labelId, value, el) {
+  document.getElementById(labelId).textContent = value;
+  el.closest('.dropdown-menu').querySelectorAll('.dropdown-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(menuId).classList.remove('open');
+  document.getElementById(btnId).classList.remove('open');
+
+  if (labelId==='periodoLabel') document.getElementById('meta-periodo').textContent = value;
+  if (labelId === 'periodoLabel') reloadCurrentViewState();
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown-wrap')) {
+    document.querySelectorAll('.dropdown-menu.open').forEach(m=>m.classList.remove('open'));
+    document.querySelectorAll('.ctx-pill.open, .escola-ctx.open').forEach(b=>b.classList.remove('open'));
+  }
+});
+
+/* ─── SIDEBAR ─── */
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebarOverlay');
+  var mobile = window.innerWidth <= 768;
+  if (mobile) {
+    var opened = sb.classList.toggle('mobile-open');
+    if (ov) ov.classList.toggle('active', opened);
+    document.body.style.overflow = opened ? 'hidden' : '';
+    this.setAttribute('aria-expanded', opened.toString());
+  } else {
+    sb.classList.toggle('collapsed');
+    this.setAttribute('aria-expanded', (!sb.classList.contains('collapsed')).toString());
+  }
+});
+
+/* ─── NAV ACCORDION ─── */
+function toggleAcc(btn) {
+  const sub = btn.nextElementSibling;
+  if (!sub?.classList.contains('nav-sub')) return;
+  const open = sub.classList.toggle('open');
+  btn.classList.toggle('expanded', open);
+  const ch = btn.querySelector('.nav-chevron');
+  if (ch) ch.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+/* ─── VIEW SWITCHING ─── */
+function setView(id, el) {
+  document.querySelectorAll('[id^="view-"]').forEach(v=>v.style.display='none');
+  const target = document.getElementById('view-'+id);
+  if (target) target.style.display='block';
+  document.querySelectorAll('.nav-sub-item').forEach(i=>i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const labels = { 'visao-geral':'Visão Geral', estudantes:'Estudantes', atividades:'Atividades', perfil:'Perfil', conteudos:'Conteúdos e Habilidades', 'turma-detalhe':'Turma' };
+  if (id !== 'perfil' && id !== 'turma-detalhe') {
+    const bp = document.getElementById('breadcrumb-parent');
+    if (bp) bp.style.display = 'none';
+    document.getElementById('breadcrumb-current').textContent = labels[id] || id;
+    document.getElementById('page-title').textContent = id==='visao-geral' ? 'Início' : labels[id] || id;
+  }
+  if (id !== 'conteudos') conteudoIdx = null;
+  if (id === 'visao-geral')    initHome();
+  if (id === 'estudantes')     renderEstudantes();
+  if (id === 'perfil')         renderProfile();
+  if (id === 'conteudos')      renderConteudos();
+  if (id === 'turma-detalhe')  renderTurmaDetalhe();
+}
+
+/* ─── SCROLL HELPER ─── */
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ─── INIT ─── */
+function init() {
+  renderKPIs();
+  renderSignal();
+  renderSkills();
+  renderFilterPills('all');
+  renderAttention('all');
+  renderActivities();
+  initChart();
+}
+
+/* ─── DIFICULDADES por estudante ─── */
+const DIFICULDADES = {
+  1:[], 2:[], 3:[],
+  4: ['Conhecimentos prévios'],
+  5: ['Conhecimentos prévios'],
+  6: ['Conhecimentos prévios'],
+  7: ['Equilíbrio ecológico','Texto científico'],
+  8: ['Equilíbrio ecológico','Texto científico'],
+  9: ['Equilíbrio ecológico','Texto científico'],
+  10:['Hereditariedade','Fisiologia dos sistemas'],
+  11:['Hereditariedade','Fisiologia dos sistemas'],
+  12:['Hereditariedade','Fisiologia dos sistemas'],
+  13:['Hereditariedade (resultado pontual)'],
+  14:['Hereditariedade (resultado pontual)'],
+  15:['Hereditariedade'],
+  16:['Hereditariedade'],
+  17:['Hereditariedade','Equilíbrio ecológico'],
+  18:['3 atividades não entregues'],
+  19:['2 atividades não entregues'],
+  20:[],
+};
+
+/* ─── Estado do estudante (icon + texto = acessível) ─── */
+function getEstado(e) {
+  const al = DATA.alertas.find(a => a.eid === e.id);
+  if (al) {
+    if (al.tipo === 'inativo')           return { id:'atencao',  label:'Inativo',        icon:'pi-ban',                sub:'Sem participação recente' };
+    if (al.tipo === 'baixo-persistente') return { id:'atencao',  label:'Atenção',         icon:'pi-exclamation-triangle', sub:'Baixo desempenho persistente' };
+    if (al.tipo === 'queda')             return { id:'queda',    label:'Queda',           icon:'pi-trending-down',      sub:'Queda de desempenho' };
+  }
+  if (e.tend === 'melhorando') return { id:'evoluindo', label:'Evoluindo',       icon:'pi-trending-up',   sub:'Em melhora contínua' };
+  if (e.tend === 'recuperou')  return { id:'evoluindo', label:'Recuperou',       icon:'pi-trending-up',   sub:'Recuperou após queda' };
+  if (e.media >= 75)           return { id:'bom',       label:'Bom desempenho',  icon:'pi-check-circle',  sub:'Desempenho consistente' };
+  return                                { id:'estavel',  label:'Estável',         icon:'pi-minus-circle',  sub:'Desempenho regular' };
+}
+
+/* ─── Último resultado válido ─── */
+function getUltimo(e) {
+  for (let i = e.scores.length - 1; i >= 0; i--) {
+    if (e.scores[i] !== null) return { score: e.scores[i], data: DATA.atividades[i]?.data || '' };
+  }
+  return null;
+}
+
+/* ─── Sparkline full (todos os scores) ─── */
+function buildSparklineFull(scores) {
+  const valid = scores.filter(s => s !== null);
+  if (valid.length < 2) return '<span style="font-size:11px;color:var(--text-300)">—</span>';
+  const W = 80, H = 28;
+  const minV = Math.min(...valid), maxV = Math.max(...valid);
+  const range = maxV - minV || 10;
+  const xStep = W / (valid.length - 1);
+  const pts = valid.map((v,i) => `${(i*xStep).toFixed(1)},${(H-((v-minV)/range)*(H-6)-3).toFixed(1)}`);
+  const last = valid[valid.length-1];
+  const lc = last>=70?'#12B76A':last>=50?'#F79009':'#F04438';
+  const dots = valid.map((v,i) => {
+    const x=(i*xStep).toFixed(1), y=(H-((v-minV)/range)*(H-6)-3).toFixed(1);
+    const dc=v>=70?'#12B76A':v>=50?'#F79009':'#F04438';
+    return `<circle cx="${x}" cy="${y}" r="2.5" fill="${dc}" stroke="white" stroke-width="1.5"/>`;
+  }).join('');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block"><polyline points="${pts.join(' ')}" fill="none" stroke="${lc}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>${dots}</svg>`;
+}
+
+/* ─── Estudantes: estado ─── */
+let studentsFilter = 'all';
+let studentsSort   = 'estado';
+
+function renderEstudantes() {
+  renderStFilterPills();
+  filterStudents();
+}
+
+function renderStFilterPills() {
+  const counts = { all:0, bom:0, evoluindo:0, estavel:0, atencao:0, queda:0 };
+  DATA.estudantes.forEach(e => { counts.all++; counts[getEstado(e).id]++; });
+  const pills = [
+    { id:'all',      label:'Todos',          icon:'' },
+    { id:'atencao',  label:'Atenção',         icon:'pi-exclamation-triangle' },
+    { id:'queda',    label:'Queda',           icon:'pi-trending-down' },
+    { id:'estavel',  label:'Estável',         icon:'pi-minus-circle' },
+    { id:'evoluindo',label:'Evoluindo',       icon:'pi-trending-up' },
+    { id:'bom',      label:'Bom desempenho',  icon:'pi-check-circle' },
+  ];
+  document.getElementById('stFilterPills').innerHTML = pills.map(p => `
+    <button class="filter-pill ${studentsFilter===p.id?'active':''}" onclick="setStudentFilter('${p.id}')">
+      ${p.icon?`<i class="pi ${p.icon}" style="font-size:10px"></i>`:''}${p.label}
+      <span class="badge ${studentsFilter===p.id?'badge-brand':'badge-neutral'}"
+            style="padding:0 5px;font-size:10px;min-width:20px;justify-content:center">${counts[p.id]}</span>
+    </button>`).join('');
+}
+
+function filterStudents() {
+  const q = (document.getElementById('studentSearch')?.value||'').toLowerCase();
+  let arr = DATA.estudantes.filter(e => {
+    const m = e.nome.toLowerCase().includes(q);
+    const f = studentsFilter==='all' || getEstado(e).id===studentsFilter;
+    return m && f;
+  });
+  arr = sortStudentsArr(arr);
+  renderStudentRows(arr);
+}
+
+function sortStudentsArr(arr) {
+  const PRIO = { atencao:0, queda:1, estavel:2, evoluindo:3, bom:4 };
+  return [...arr].sort((a,b) => {
+    switch(studentsSort) {
+      case 'nome-asc':   return a.nome.localeCompare(b.nome,'pt-BR');
+      case 'nome-desc':  return b.nome.localeCompare(a.nome,'pt-BR');
+      case 'desemp-desc':return b.media - a.media;
+      case 'desemp-asc': return a.media - b.media;
+      default:           return (PRIO[getEstado(a).id]-PRIO[getEstado(b).id]) || a.nome.localeCompare(b.nome,'pt-BR');
+    }
+  });
+}
+
+function setStudentFilter(f) {
+  studentsFilter = f;
+  renderStFilterPills();
+  filterStudents();
+}
+
+function setSortBy(key, label, el) {
+  studentsSort = key;
+  document.getElementById('sortLabel').textContent = label;
+  if (el) {
+    el.closest('.dropdown-menu').querySelectorAll('.dropdown-opt').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('sortMenu').classList.remove('open');
+    document.getElementById('sortBtn').classList.remove('open');
+  }
+  filterStudents();
+}
+
+function renderStudentRows(arr) {
+  const el = document.getElementById('studentTable');
+  if (!arr.length) {
+    const q = (document.getElementById('studentSearch')?.value || '').trim();
+    el.innerHTML = renderEmptyState(
+      studentsFilter !== 'all' ? 'filtro-vazio' : (q ? 'busca-vazia' : 'sem-dados-periodo'),
+      { query: q }
+    );
+    return;
+  }
+  const thead = `
+    <div class="st-thead">
+      <div class="c-st-av"></div>
+      <div class="c-st-nome sortable" onclick="setSortBy('nome-asc','Nome A→Z',null)">Nome <i class="pi pi-sort-alt" style="font-size:10px;opacity:.5"></i></div>
+      <div class="c-st-desemp sortable" onclick="setSortBy('desemp-desc','Desempenho ↓',null)">Desempenho <i class="pi pi-sort-alt" style="font-size:10px;opacity:.5"></i></div>
+      <div class="c-st-spark">Evolução</div>
+      <div class="c-st-estado">Situação</div>
+      <div class="c-st-ultimo">Último</div>
+      <div class="c-st-dific">Dificuldades identificadas</div>
+      <div class="c-st-act"></div>
+    </div>`;
+  const rows = arr.map(e => {
+    const est = getEstado(e);
+    const ult = getUltimo(e);
+    const difs = DIFICULDADES[e.id] || [];
+    const difTags = difs.length
+      ? difs.slice(0,2).map(d=>`<span class="dif-tag">${d}</span>`).join('')
+        + (difs.length>2 ? `<span style="font-size:11px;color:var(--text-300);margin-left:2px">+${difs.length-2}</span>` : '')
+      : '<span style="font-size:11px;color:var(--text-300)">Nenhuma identificada</span>';
+    return `
+      <div class="st-row" data-estado="${est.id}" onclick="openProfile(${e.id})">
+        <div class="c-st-av"><div class="student-avatar" style="background:${avColor(e.id)}">${e.init}</div></div>
+        <div class="c-st-nome">
+          <div class="student-name">${e.nome}</div>
+          <div class="student-sub">${est.sub}</div>
+        </div>
+        <div class="c-st-desemp">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1"><div class="pbar-wrap"><div class="pbar-fill ${scoreCls(e.media)}" style="width:${e.media}%"></div></div></div>
+            <span style="font-size:12px;font-weight:700;width:32px;text-align:right;color:${e.media>=70?'var(--success)':e.media>=50?'var(--warning)':'var(--error)'}">${e.media}%</span>
+          </div>
+        </div>
+        <div class="c-st-spark">${buildSparklineFull(e.scores)}</div>
+        <div class="c-st-estado"><span class="estado-badge estado-${est.id}"><i class="pi ${est.icon}" style="font-size:11px"></i>${est.label}</span></div>
+        <div class="c-st-ultimo">
+          ${ult
+            ? `<span class="score-chip ${scoreCls(ult.score)}">${ult.score}%</span><div style="font-size:10px;color:var(--text-300);margin-top:3px;white-space:nowrap">${ult.data}</div>`
+            : `<span class="score-chip neutral">—</span>`}
+        </div>
+        <div class="c-st-dific"><div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${difTags}</div></div>
+        <div class="c-st-act">
+          <button class="icon-btn icon-btn-neutral" title="Ver perfil" onclick="event.stopPropagation();openProfile(${e.id})">
+            <i class="pi pi-arrow-right"></i>
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+  el.innerHTML = `<div class="st-table">${thead}${rows}</div><div class="st-footer">${arr.length} de ${DATA.estudantes.length} estudantes</div>`;
+}
+
+/* ─── SKILLS label map ─── */
+const SKILLS_LABEL = [
+  'Conhecimentos prévios',
+  'Fisiologia dos sistemas',
+  'Sistema digestório e circulatório',
+  'Hereditariedade e genética',
+  'Leitura de texto científico',
+  'Equilíbrio ecológico',
+];
+
+/* ─── ESCOLA: Escola Municipal Horizonte ─── */
+const TURMAS_HORIZONTE = [
+  { id:'6a',  nome:'6º ano A', disc:'Língua Portuguesa', estudantes:20, desempenhoMedio:72, desempenhoAnterior:68, tendencia:'melhorando', alertas:2,  taxaConclusao:96, habilidadeCritica:'Produção textual',        hasFullData:false },
+  { id:'6b',  nome:'6º ano B', disc:'Língua Portuguesa', estudantes:22, desempenhoMedio:58, desempenhoAnterior:64, tendencia:'queda',      alertas:8,  taxaConclusao:84, habilidadeCritica:'Interpretação de texto', hasFullData:false },
+  { id:'7a',  nome:'7º ano A', disc:'Matemática',        estudantes:22, desempenhoMedio:61, desempenhoAnterior:65, tendencia:'queda',      alertas:9,  taxaConclusao:87, habilidadeCritica:'Equações e inequações',  hasFullData:true  },
+  { id:'8ah', nome:'8º ano A', disc:'Matemática',        estudantes:19, desempenhoMedio:55, desempenhoAnterior:53, tendencia:'melhorando', alertas:5,  taxaConclusao:89, habilidadeCritica:'Geometria espacial',     hasFullData:false },
+];
+
+const DATA_HORIZONTE = {
+  kpis: { desempenhoMedio:61, desempenhoAnterior:65, estudantesAtencao:9, totalEstudantes:22, taxaConclusao:87 },
+  evolucao: [
+    { label:'08/ago', atividade:'Diagnóstico de Nivelamento',  media:67 },
+    { label:'22/ago', atividade:'Frações e Decimais',          media:63 },
+    { label:'05/set', atividade:'Equações do 1º Grau',         media:58 },
+    { label:'19/set', atividade:'Geometria Plana',             media:55 },
+    { label:'26/set', atividade:'Probabilidade e Estatística', media:61 },
+    { label:'03/out', atividade:'Revisão Integrada',           media:64 },
+  ],
+  habilidades: [
+    { nome:'Equações e inequações',      dominio:42, afetados:9 },
+    { nome:'Geometria plana',            dominio:55, afetados:7 },
+    { nome:'Frações e números decimais', dominio:60, afetados:5 },
+    { nome:'Probabilidade básica',       dominio:63, afetados:4 },
+    { nome:'Resolução de problemas',     dominio:70, afetados:2 },
+  ],
+  sinalPedagogico: {
+    recomendacao: 'retomar',
+    mensagem: '9 estudantes (41% da turma) tiveram dificuldade com Equações e inequações. Considere retomar antes de avançar para Sistemas de Equações em 17/10.',
+    proximo: 'Sistemas de Equações',
+    data: '17/10/2026',
+  },
+  atividades: [
+    { id:'H1', nome:'Diagnóstico de Nivelamento',  data:'08/08/2026', entregues:22, total:22,   media:67,   status:'ok'      },
+    { id:'H2', nome:'Frações e Decimais',           data:'22/08/2026', entregues:22, total:22,   media:63,   status:'ok'      },
+    { id:'H3', nome:'Equações do 1º Grau',          data:'05/09/2026', entregues:21, total:22,   media:58,   status:'alert'   },
+    { id:'H4', nome:'Geometria Plana',              data:'19/09/2026', entregues:20, total:22,   media:55,   status:'alert'   },
+    { id:'H5', nome:'Probabilidade e Estatística',  data:'26/09/2026', entregues:19, total:22,   media:61,   status:'ok'      },
+    { id:'H6', nome:'Revisão Integrada',            data:'03/10/2026', entregues:19, total:22,   media:64,   status:'ok'      },
+    { id:'H7', nome:'Sistemas de Equações',         data:'17/10/2026', entregues:null,total:22,  media:null, status:'planned' },
+  ],
+  estudantes: [
+    { id:1,  nome:'Alice Borges',       init:'AB', perfil:'estavel-alto',           scores:[85,82,84,88,86,90],       media:86, tend:'estavel',    alerta:null                },
+    { id:2,  nome:'Bruno Castilho',     init:'BC', perfil:'estavel-alto',           scores:[79,78,80,82,81,84],       media:81, tend:'estavel',    alerta:null                },
+    { id:3,  nome:'Clara Dias',         init:'CD', perfil:'estavel-alto',           scores:[88,90,87,92,89,93],       media:90, tend:'estavel',    alerta:null                },
+    { id:4,  nome:'Danilo Esteves',     init:'DE', perfil:'evolucao',               scores:[50,55,58,62,68,73],       media:61, tend:'melhorando', alerta:null                },
+    { id:5,  nome:'Eduarda Figueiredo', init:'EF', perfil:'evolucao',               scores:[45,50,54,58,65,70],       media:57, tend:'melhorando', alerta:null                },
+    { id:6,  nome:'Fábio Gomes',        init:'FG', perfil:'queda',                  scores:[80,76,70,65,55,48],       media:66, tend:'queda',      alerta:'queda'             },
+    { id:7,  nome:'Giovana Henriques',  init:'GH', perfil:'queda',                  scores:[75,72,68,62,52,45],       media:62, tend:'queda',      alerta:'queda'             },
+    { id:8,  nome:'Henrique Ivo',       init:'HI', perfil:'dificuldade-recorrente', scores:[40,38,35,32,40,37],       media:37, tend:'baixo',      alerta:'baixo-persistente' },
+    { id:9,  nome:'Isabela Jardim',     init:'IJ', perfil:'dificuldade-recorrente', scores:[42,44,38,36,43,41],       media:41, tend:'baixo',      alerta:'baixo-persistente' },
+    { id:10, nome:'João Kaneko',        init:'JK', perfil:'dificuldade-recorrente', scores:[45,42,40,38,44,42],       media:42, tend:'baixo',      alerta:'baixo-persistente' },
+    { id:11, nome:'Karla Lima',         init:'KL', perfil:'resultado-ruim-isolado', scores:[70,72,68,35,71,74],       media:65, tend:'recuperou',  alerta:null                },
+    { id:12, nome:'Leonardo Maia',      init:'LM', perfil:'inativo',                scores:[65,62,60,null,null,null], media:62, tend:'inativo',    alerta:'inativo'           },
+    { id:13, nome:'Mariana Nobre',      init:'MN', perfil:'inativo',                scores:[70,68,65,60,null,null],   media:66, tend:'inativo',    alerta:'inativo'           },
+    { id:14, nome:'Nathan Oliveira',    init:'NO', perfil:'medio-estavel',          scores:[60,62,58,61,63,65],       media:62, tend:'estavel',    alerta:null                },
+    { id:15, nome:'Olívia Prado',       init:'OP', perfil:'evolucao',               scores:[48,52,56,60,67,72],       media:59, tend:'melhorando', alerta:null                },
+    { id:16, nome:'Paulo Queiroz',      init:'PQ', perfil:'estavel-alto',           scores:[83,80,85,86,88,87],       media:85, tend:'estavel',    alerta:null                },
+    { id:17, nome:'Renata Silva',       init:'RS', perfil:'queda',                  scores:[72,68,63,55,50,44],       media:59, tend:'queda',      alerta:'queda'             },
+    { id:18, nome:'Samuel Torres',      init:'ST', perfil:'medio-estavel',          scores:[62,64,60,63,65,67],       media:64, tend:'estavel',    alerta:null                },
+    { id:19, nome:'Talita Urquiza',     init:'TU', perfil:'estavel-alto',           scores:[90,88,92,91,94,96],       media:92, tend:'estavel',    alerta:null                },
+    { id:20, nome:'Ulisses Vargas',     init:'UV', perfil:'dificuldade-recorrente', scores:[43,40,38,35,42,39],       media:40, tend:'baixo',      alerta:'baixo-persistente' },
+    { id:21, nome:'Vera Wattson',       init:'VW', perfil:'evolucao',               scores:[52,55,60,65,70,75],       media:63, tend:'melhorando', alerta:null                },
+    { id:22, nome:'Xavier Yamamoto',    init:'XY', perfil:'medio-estavel',          scores:[65,67,63,66,68,70],       media:67, tend:'estavel',    alerta:null                },
+  ],
+  alertas: [
+    { eid:6,  tipo:'queda',             score:48,   atv:'H6', data:'03/10', dific:'Queda acentuada nas últimas 4 atividades'          },
+    { eid:7,  tipo:'queda',             score:45,   atv:'H6', data:'03/10', dific:'Declínio constante desde Frações e Decimais'        },
+    { eid:8,  tipo:'baixo-persistente', score:37,   atv:'H6', data:'03/10', dific:'Desempenho abaixo de 50% em todas as atividades'    },
+    { eid:9,  tipo:'baixo-persistente', score:41,   atv:'H6', data:'03/10', dific:'Dificuldade constante em Equações e Geometria'     },
+    { eid:10, tipo:'baixo-persistente', score:42,   atv:'H6', data:'03/10', dific:'Abaixo de 50% em Equações do 1º Grau e Geometria'  },
+    { eid:12, tipo:'inativo',           score:null, atv:'H3', data:'05/09', dific:'Sem entregas nas últimas 3 atividades'              },
+    { eid:13, tipo:'inativo',           score:null, atv:'H5', data:'26/09', dific:'Sem entregas nas últimas 2 atividades'              },
+    { eid:17, tipo:'queda',             score:44,   atv:'H6', data:'03/10', dific:'Queda moderada — era uma das melhores da turma'     },
+    { eid:20, tipo:'baixo-persistente', score:39,   atv:'H6', data:'03/10', dific:'Dificuldade recorrente em todas as habilidades'     },
+  ],
+};
+
+const ALERTAS_EXTRA_HORIZONTE = [
+  { _id:201, nome:'Beatriz Campos',  init:'BC', tipo:'queda',             score:54,   atv:'P5', data:'25/09', dific:'Queda em Produção Textual e Interpretação',       turmaId:'6b',  turmaNome:'6º ano B', tend:'queda'   },
+  { _id:202, nome:'Felipe Duarte',   init:'FD', tipo:'baixo-persistente', score:43,   atv:'P4', data:'18/09', dific:'Dificuldade persistente em Interpretação de Texto', turmaId:'6b',  turmaNome:'6º ano B', tend:'baixo'   },
+  { _id:203, nome:'Gisele Evaristo', init:'GE', tipo:'inativo',           score:null, atv:'P3', data:'10/09', dific:'Sem entregas nas últimas 3 atividades',             turmaId:'6b',  turmaNome:'6º ano B', tend:'inativo' },
+  { _id:204, nome:'Isadora Fontes',  init:'IF', tipo:'queda',             score:51,   atv:'P5', data:'25/09', dific:'Queda nas últimas 3 atividades de LP',              turmaId:'6b',  turmaNome:'6º ano B', tend:'queda'   },
+  { _id:205, nome:'Júlio Gandra',    init:'JG', tipo:'baixo-persistente', score:47,   atv:'P5', data:'25/09', dific:'Dificuldade recorrente em Produção Textual',         turmaId:'6b',  turmaNome:'6º ano B', tend:'baixo'   },
+  { _id:206, nome:'Marcos Henrique', init:'MH', tipo:'queda',             score:50,   atv:'M4', data:'22/09', dific:'Queda em Geometria Espacial',                       turmaId:'8ah', turmaNome:'8º ano A', tend:'queda'   },
+  { _id:207, nome:'Nina Guerra',     init:'NG', tipo:'baixo-persistente', score:44,   atv:'M4', data:'22/09', dific:'Dificuldade persistente em Matemática',              turmaId:'8ah', turmaNome:'8º ano A', tend:'baixo'   },
+  { _id:208, nome:'Otávio Henrique', init:'OH', tipo:'inativo',           score:null, atv:'M3', data:'08/09', dific:'Sem entregas nas últimas 3 atividades',              turmaId:'8ah', turmaNome:'8º ano A', tend:'inativo' },
+  { _id:209, nome:'Paula Inocente',  init:'PI', tipo:'baixo-persistente', score:42,   atv:'M4', data:'22/09', dific:'Dificuldade persistente em todas as habilidades',    turmaId:'8ah', turmaNome:'8º ano A', tend:'baixo'   },
+  { _id:210, nome:'Quênia Jardim',   init:'QJ', tipo:'queda',             score:48,   atv:'M4', data:'22/09', dific:'Queda moderada após início promissor',                turmaId:'8ah', turmaNome:'8º ano A', tend:'queda'   },
+];
+
+const DIFICULDADES_HORIZONTE = {
+  1:[], 2:[], 3:[],
+  4:  ['Frações', 'Conhecimentos prévios'],
+  5:  ['Conhecimentos prévios'],
+  6:  ['Equações e inequações', 'Geometria plana'],
+  7:  ['Equações e inequações'],
+  8:  ['Equações', 'Frações e decimais'],
+  9:  ['Equações', 'Geometria plana'],
+  10: ['Equações', 'Geometria plana'],
+  11: ['Equações (resultado pontual)'],
+  12: ['3 atividades não entregues'],
+  13: ['2 atividades não entregues'],
+  14: [], 15: ['Conhecimentos prévios'], 16: [], 18: [], 19: [], 22: [],
+  17: ['Equações e inequações', 'Geometria plana'],
+  20: ['Equações', 'Frações', 'Geometria'],
+  21: ['Conhecimentos prévios'],
+};
+
+const SKILLS_LABEL_HORIZONTE = [
+  'Diagnóstico de Nivelamento',
+  'Frações e números decimais',
+  'Equações e inequações',
+  'Geometria plana',
+  'Probabilidade básica',
+  'Revisão integrada',
+];
+
+/* ─── ESCOLAS DATA & SWITCH ─── */
+function buildEscolasData() {
+  ESCOLAS_DATA = {
+    'orbie-centro': {
+      nomeEscola:    'Colégio Orbie Centro',
+      kpis:          { ...DATA.kpis },
+      evolucao:      DATA.evolucao.map(x=>({...x})),
+      habilidades:   DATA.habilidades.map(x=>({...x})),
+      sinalPedagogico: { ...DATA.sinalPedagogico },
+      atividades:    DATA.atividades.map(x=>({...x})),
+      estudantes:    DATA.estudantes.map(x=>({...x, scores:[...x.scores]})),
+      alertas:       DATA.alertas.map(x=>({...x})),
+      turmas:        TURMAS.map(x=>({...x})),
+      alertasExtra:  ALERTAS_EXTRA.map(x=>({...x})),
+      dificuldades:  { ...DIFICULDADES },
+      skillsLabel:   [...SKILLS_LABEL],
+    },
+    'horizonte': {
+      nomeEscola:    'Escola Municipal Horizonte',
+      kpis:          { ...DATA_HORIZONTE.kpis },
+      evolucao:      DATA_HORIZONTE.evolucao.map(x=>({...x})),
+      habilidades:   DATA_HORIZONTE.habilidades.map(x=>({...x})),
+      sinalPedagogico: { ...DATA_HORIZONTE.sinalPedagogico },
+      atividades:    DATA_HORIZONTE.atividades.map(x=>({...x})),
+      estudantes:    DATA_HORIZONTE.estudantes.map(x=>({...x, scores:[...x.scores]})),
+      alertas:       DATA_HORIZONTE.alertas.map(x=>({...x})),
+      turmas:        TURMAS_HORIZONTE.map(x=>({...x})),
+      alertasExtra:  ALERTAS_EXTRA_HORIZONTE.map(x=>({...x})),
+      dificuldades:  { ...DIFICULDADES_HORIZONTE },
+      skillsLabel:   [...SKILLS_LABEL_HORIZONTE],
+    },
+  };
+}
+
+function _replArr(target, src) { target.length = 0; src.forEach(x => target.push(x)); }
+
+function switchEscola(id) {
+  if (id === currentEscolaId) return;
+  currentEscolaId = id;
+  const ed = ESCOLAS_DATA[id];
+  if (!ed) return;
+  // Atualiza DATA
+  DATA.kpis            = { ...ed.kpis };
+  _replArr(DATA.evolucao,    ed.evolucao);
+  _replArr(DATA.habilidades, ed.habilidades);
+  DATA.sinalPedagogico = { ...ed.sinalPedagogico };
+  _replArr(DATA.atividades,  ed.atividades);
+  _replArr(DATA.estudantes,  ed.estudantes);
+  _replArr(DATA.alertas,     ed.alertas);
+  // Atualiza TURMAS
+  _replArr(TURMAS, ed.turmas);
+  // Atualiza ALERTAS_EXTRA
+  _replArr(ALERTAS_EXTRA, ed.alertasExtra);
+  // Atualiza DIFICULDADES
+  Object.keys(DIFICULDADES).forEach(k => delete DIFICULDADES[k]);
+  Object.assign(DIFICULDADES, ed.dificuldades);
+  // Atualiza SKILLS_LABEL
+  _replArr(SKILLS_LABEL, ed.skillsLabel);
+  // Reconstrói ALL_ALERTAS
+  ALL_ALERTAS = buildAllAlertas();
+  // Atualiza labels
+  const lbl = document.getElementById('escolaLabel');
+  if (lbl) lbl.textContent = ed.nomeEscola;
+  const me = document.getElementById('meta-escola');
+  if (me) me.textContent = ed.nomeEscola;
+  // Reseta turma e navega para o dashboard
+  currentTurmaId = null;
+  setView('visao-geral', document.getElementById('nav-home-link'));
+}
+
+function switchEscolaOpt(id, label, el) {
+  el.closest('.dropdown-menu').querySelectorAll('.dropdown-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('escolaMenu').classList.remove('open');
+  document.getElementById('escolaBtn').classList.remove('open');
+  switchEscola(id);
+}
+
+/* ─── renderProfile ─── */
+function renderProfile() {
+  if (!currentProfileId) return;
+  const e = getE(currentProfileId);
+  if (!e) return;
+  const al = DATA.alertas.find(a => a.eid === e.id);
+  const est = getEstado(e);
+  const difs = DIFICULDADES[e.id] || [];
+  const ult = getUltimo(e);
+  const validScores = e.scores.filter(s => s !== null);
+  const completedCount = validScores.length;
+  const f3 = validScores.slice(0, Math.min(3, validScores.length));
+  const l3 = validScores.slice(-Math.min(3, validScores.length));
+  const avgF3 = f3.reduce((a,b)=>a+b,0) / (f3.length || 1);
+  const avgL3 = l3.reduce((a,b)=>a+b,0) / (l3.length || 1);
+  const trendPp = Math.round(avgL3 - avgF3);
+  const vsClass = e.media - DATA.kpis.desempenhoMedio;
+  const prevLabel = profilePreviousView === 'estudantes' ? 'Estudantes' : 'Visão Geral';
+  const bp = document.getElementById('breadcrumb-parent');
+  if (bp) { bp.style.display = 'inline-flex'; }
+  const bpl = document.getElementById('breadcrumb-parent-label');
+  if (bpl) bpl.textContent = prevLabel;
+  document.getElementById('breadcrumb-current').textContent = e.nome;
+  document.getElementById('page-title').textContent = e.nome;
+
+  /* ── Banner ── */
+  const col = avColor(e.id);
+  const bannerHtml = `
+    <div class="profile-banner section" style="background:linear-gradient(135deg,${col} 0%,${col}bb 100%)">
+      <button onclick="goBack()" style="background:rgba(255,255,255,.18);color:white;border:1px solid rgba(255,255,255,.3);border-radius:var(--r-sm);padding:0 14px;height:34px;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
+        <i class="pi pi-arrow-left" style="font-size:11px"></i>${prevLabel}
+      </button>
+      <div class="profile-av-lg">${e.init}</div>
+      <div style="flex:1">
+        <div style="font-size:22px;font-weight:700;color:white;line-height:1.2">${e.nome}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:4px">${(function(){const t=TURMAS.find(x=>x.id===currentTurmaId);const en=(document.getElementById('escolaLabel')||{textContent:''}).textContent.trim();return t?t.nome+' · '+t.disc+' · '+en:en;})()}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge" style="background:rgba(255,255,255,.18);color:white;border:1px solid rgba(255,255,255,.3);font-size:11px">
+            <i class="pi ${est.icon}" style="font-size:10px"></i>${est.label}
+          </span>
+          ${al ? `<span class="badge" style="background:rgba(255,255,255,.18);color:white;border:1px solid rgba(255,255,255,.3);font-size:11px">${al.dific.substring(0,48)}${al.dific.length>48?'…':''}</span>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:44px;font-weight:700;color:white;line-height:1">${ult ? ult.score+'%' : '—'}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">última atividade</div>
+        <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.85);margin-top:4px">${e.media}% média</div>
+      </div>
+    </div>`;
+
+  /* ── Situação Atual ── */
+  const trendColor = trendPp > 0 ? 'var(--success)' : trendPp < -5 ? 'var(--error)' : 'var(--text-500)';
+  const vsColor    = vsClass  > 0 ? 'var(--success)' : vsClass  < -5 ? 'var(--error)' : 'var(--text-500)';
+  const situacaoHtml = `
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Situação Atual</div><div class="card-subtitle">3º Trimestre · 8º ano A</div></div></div>
+      <div class="situacao-row"><span class="situacao-label">Último resultado</span><span class="situacao-value">${ult ? `<span class="score-chip ${scoreCls(ult.score)}">${ult.score}%</span><span style="font-size:11px;color:var(--text-300)">${ult.data}</span>` : '—'}</span></div>
+      <div class="situacao-row"><span class="situacao-label">Média do trimestre</span><span class="situacao-value"><span class="score-chip ${scoreCls(e.media)}">${e.media}%</span></span></div>
+      <div class="situacao-row"><span class="situacao-label">vs. Média da turma</span><span class="situacao-value" style="color:${vsColor}">${vsClass>0?'+':''}${vsClass}pp</span></div>
+      <div class="situacao-row"><span class="situacao-label">Variação recente</span><span class="situacao-value" style="color:${trendColor}">${trendPp>0?'↗ +':'↘ '}${trendPp}pp<span style="font-size:11px;color:var(--text-300);font-weight:400;margin-left:4px">início vs. final</span></span></div>
+      <div class="situacao-row"><span class="situacao-label">Atividades concluídas</span><span class="situacao-value" style="color:${completedCount<4?'var(--error)':'var(--text-900)'}">${completedCount} de 6</span></div>
+    </div>`;
+
+  /* ── Histórico de atividades ── */
+  const histRows = DATA.atividades.map((a, i) => {
+    const score  = e.scores[i] ?? null;
+    const ca     = DATA.evolucao[i]?.media;
+    const diff   = score !== null && ca ? score - ca : null;
+    const statusBadge = a.status==='planned'
+      ? `<span class="badge badge-brand"  style="font-size:11px">Planejada</span>`
+      : score !== null
+        ? `<span class="badge badge-success" style="font-size:11px">Entregue</span>`
+        : `<span class="badge badge-error"   style="font-size:11px">Não entregue</span>`;
+    const scoreEl = score !== null
+      ? `<span class="score-chip ${scoreCls(score)}">${score}%</span>`
+      : `<span class="score-chip neutral">—</span>`;
+    const detailHtml = score !== null && ca ? `
+      <div style="display:flex;align-items:center;gap:20px;font-size:12px;color:var(--text-500);margin-bottom:10px">
+        <span>Média da turma: <strong style="color:var(--text-700)">${ca}%</strong></span>
+        <span>Seu resultado: <strong style="color:${score>=70?'var(--success)':score>=50?'var(--warning)':'var(--error)'}">${score}%</strong></span>
+        <span style="font-weight:600;color:${diff>=0?'var(--success)':'var(--error)'}">${diff>=0?'↑ +':'↓ '}${diff}pp</span>
+      </div>
+      <div class="skill-compare">
+        <div class="skill-compare-row"><span class="skill-compare-lbl">Turma</span><div style="flex:1;max-width:200px"><div class="pbar-wrap" style="height:5px"><div class="pbar-fill medium" style="width:${ca}%"></div></div></div><span>${ca}%</span></div>
+        <div class="skill-compare-row"><span class="skill-compare-lbl">Você</span><div style="flex:1;max-width:200px"><div class="pbar-wrap" style="height:5px"><div class="pbar-fill ${scoreCls(score)}" style="width:${score}%"></div></div></div><span>${score}%</span></div>
+      </div>` : `<span style="font-size:12px;color:var(--text-300)">${score===null && a.status!=='planned' ? 'Atividade não entregue neste período.' : 'Atividade ainda não realizada.'}</span>`;
+    return `
+      <div class="hist-row" id="hist-row-${a.id}" onclick="toggleHistDetail('${a.id}')">
+        <div style="width:28px;height:28px;border-radius:var(--r-sm);background:var(--brand-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--brand);flex-shrink:0">${a.id}</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--text-900)">${a.nome}</div><div style="font-size:11px;color:var(--text-300)">${a.data} · ${SKILLS_LABEL[i]||''}</div></div>
+        ${scoreEl}${statusBadge}
+        <i class="pi pi-chevron-down" id="hist-chev-${a.id}" style="font-size:11px;color:var(--text-300);transition:transform .18s;justify-self:end"></i>
+      </div>
+      <div class="hist-detail" id="hist-detail-${a.id}">${detailHtml}</div>`;
+  }).join('');
+
+  /* ── Habilidades (SKILLS_LABEL indexadas corretamente) ── */
+  const skillsHtml = SKILLS_LABEL.map((skName, i) => {
+    const ativ = DATA.atividades[i];
+    if (!ativ || ativ.status === 'planned') return '';
+    const studentScore = e.scores[i];
+    const classAvg = DATA.evolucao[i]?.media || 0;
+    if (studentScore === null) return `
+      <div style="padding:8px 0;border-bottom:1px solid var(--outline-2);display:flex;align-items:center;gap:8px">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text-700);font-weight:500">${skName}</div>
+          <div style="font-size:10px;color:var(--text-300)">${ativ.id} · ${ativ.data}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-300)">Não entregue</span>
+      </div>`;
+    const cls = domCls(studentScore);
+    const diff = studentScore - classAvg;
+    return `
+      <div style="padding:9px 0;border-bottom:1px solid var(--outline-2);cursor:pointer"
+           onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''"
+           onclick="goToSkill(${i})" title="Ver ${skName} no painel de conteúdos">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div>
+            <div style="font-size:12px;color:var(--text-700);font-weight:500">${skName}</div>
+            <div style="font-size:10px;color:var(--text-300)">${ativ.id} · ${ativ.data}</div>
+          </div>
+          <div style="display:flex;gap:8px;font-size:11px;align-items:center">
+            <span style="color:${domColor(studentScore)};font-weight:700">${studentScore}%</span>
+            <span style="color:var(--text-300)">${classAvg}% turma</span>
+            <span style="color:${diff>=0?'var(--success)':'var(--error)'};font-weight:600">${diff>=0?'+':''}${diff}pp</span>
+            <i class="pi pi-chevron-right" style="font-size:10px;color:var(--text-300)"></i>
+          </div>
+        </div>
+        <div style="position:relative">
+          <div class="pbar-wrap" style="height:5px"><div style="width:${classAvg}%;height:100%;background:var(--outline);border-radius:999px"></div></div>
+          <div style="position:absolute;top:0;left:0;right:0">
+            <div class="pbar-wrap" style="height:5px;background:transparent"><div class="pbar-fill ${cls}" style="width:${studentScore}%"></div></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  /* ── Evidências ── */
+  const evItems = generateEvidencias(e);
+  const evHtml = evItems.map(ev => `
+    <div class="ev-item">
+      <div class="ev-dot" style="background:${ev.type==='positive'?'var(--success)':ev.type==='negative'?'var(--error)':'var(--text-300)'}"></div>
+      <div><i class="pi ${ev.icon}" style="font-size:12px;color:${ev.type==='positive'?'var(--success)':ev.type==='negative'?'var(--error)':'var(--text-300)'};margin-right:6px"></i>
+        <span style="font-size:13px;color:var(--text-700)">${ev.text}</span>
+      </div>
+    </div>`).join('');
+
+  /* ── Montar página ── */
+  document.getElementById('profileContent').innerHTML = `
+    ${bannerHtml}
+    <div class="grid-5-4 section">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Evolução ao longo do tempo</div><div class="card-subtitle">Comparação com a média da turma · 3º Trimestre</div></div>
+          <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:2px;background:${col};border-radius:2px;display:inline-block"></span>${e.nome.split(' ')[0]}</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:2px;background:var(--outline);display:inline-block"></span>Turma</span>
+          </div>
+        </div>
+        <div style="position:relative;height:200px"><canvas id="profileChartCanvas"></canvas></div>
+      </div>
+      ${situacaoHtml}
+    </div>
+    <div class="grid-5-4 section">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Histórico de Atividades</div><div class="card-subtitle">Clique em uma atividade para ver detalhes</div></div></div>
+        ${histRows}
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Habilidades</div><div class="card-subtitle">Clique em uma habilidade para ver o detalhamento no painel de conteúdos</div></div></div>
+        ${skillsHtml}
+      </div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Evidências</div><div class="card-subtitle">Dados que sustentam a leitura apresentada pelo painel</div></div></div>
+        ${evHtml}
+      </div>
+    </div>`;
+
+  /* ── Chart ── */
+  if (profileChartInst) profileChartInst.destroy();
+  const ctx = document.getElementById('profileChartCanvas').getContext('2d');
+  profileChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: DATA.atividades.filter(a=>a.status!=='planned').map(a=>a.id),
+      datasets: [
+        { label: e.nome.split(' ')[0],
+          data: e.scores.filter((_,i)=>DATA.atividades[i].status!=='planned'),
+          borderColor: col, backgroundColor: col+'18', fill: true, tension: 0.35, spanGaps: false,
+          pointRadius: e.scores.map((s,i)=>DATA.atividades[i].status==='planned'?0:s===null?0:5),
+          pointBackgroundColor: e.scores.map(s=>s===null?'transparent':s<50?'#F04438':s<70?'#F79009':'#12B76A'),
+          pointBorderColor: '#fff', pointBorderWidth: 2, pointHoverRadius: 8 },
+        { label: 'Turma',
+          data: DATA.evolucao.map(d=>d.media),
+          borderColor: '#DDE4EB', borderDash:[4,4], borderWidth:2, pointRadius:0, fill:false }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins: {
+        legend:{display:false},
+        tooltip:{ backgroundColor:'#1D2939', padding:12, cornerRadius:8,
+          callbacks:{
+            title: items => DATA.atividades[items[0].dataIndex]?.nome || '',
+            label: item => item.datasetIndex===0
+              ? ` ${item.raw!==null?item.raw+'%':'Não entregue'} (${e.nome.split(' ')[0]})`
+              : ` ${item.raw}% (média da turma)` }}
+      },
+      scales:{
+        y:{ min:0, max:100, ticks:{callback:v=>v+'%',font:{size:11,family:"'Outfit',sans-serif"},color:'#8A95B2',stepSize:25},grid:{color:'#EFF2F7'},border:{display:false}},
+        x:{ ticks:{font:{size:11,family:"'Outfit',sans-serif"},color:'#8A95B2'},grid:{display:false},border:{display:false}}
+      }
+    }
+  });
+}
+
+/* ─── toggle activity row ─── */
+function toggleHistDetail(id) {
+  const d = document.getElementById('hist-detail-'+id);
+  const ch = document.getElementById('hist-chev-'+id);
+  if (!d) return;
+  const open = d.classList.toggle('open');
+  if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+/* ─── generateEvidencias ─── */
+function generateEvidencias(e) {
+  const valid = e.scores.filter(s => s !== null);
+  if (!valid.length) return [];
+  const f3 = valid.slice(0, Math.min(3,valid.length));
+  const l3 = valid.slice(-Math.min(3,valid.length));
+  const trendPp = Math.round((l3.reduce((a,b)=>a+b,0)/l3.length) - (f3.reduce((a,b)=>a+b,0)/f3.length));
+  const minS = Math.min(...valid), maxS = Math.max(...valid);
+  const minIdx = e.scores.indexOf(minS), maxIdx = e.scores.indexOf(maxS);
+  const vsClass = e.media - DATA.kpis.desempenhoMedio;
+  const items = [];
+  if (e.tend==='queda')
+    items.push({ type:'negative', icon:'pi-trending-down', text:`Queda de ${Math.abs(trendPp)}pp comparando início ao fim do trimestre — declínio consistente nas últimas atividades.` });
+  else if (e.tend==='melhorando')
+    items.push({ type:'positive', icon:'pi-trending-up', text:`Evolução de +${trendPp}pp ao longo do trimestre — melhora contínua a partir das primeiras atividades.` });
+  else if (e.tend==='baixo')
+    items.push({ type:'negative', icon:'pi-exclamation-triangle', text:`Desempenho abaixo de 50% em ${valid.filter(s=>s<50).length} das ${valid.length} atividades — dificuldade persistente sem sinais de melhora.` });
+  else if (e.tend==='inativo')
+    items.push({ type:'negative', icon:'pi-ban', text:`Entregou apenas ${valid.length} de 6 atividades. Ausência nas atividades mais recentes compromete o acompanhamento.` });
+  else if (e.tend==='recuperou')
+    items.push({ type:'positive', icon:'pi-trending-up', text:`Recuperou desempenho após resultado atípico — última atividade acima do patamar anterior ao dip.` });
+  else
+    items.push({ type:'neutral', icon:'pi-minus', text:`Desempenho estável ao longo do trimestre, sem variações significativas entre atividades.` });
+  items.push({ type:maxS>=70?'positive':'neutral', icon:'pi-star',
+    text:`Melhor resultado: ${maxS}% em "${DATA.atividades[maxIdx]?.nome}" (${DATA.atividades[maxIdx]?.data}).` });
+  items.push({ type:minS<50?'negative':'neutral', icon:'pi-arrow-down',
+    text:`Pior resultado: ${minS}% em "${DATA.atividades[minIdx]?.nome}" (${DATA.atividades[minIdx]?.data}).` });
+  if (Math.abs(vsClass) > 2)
+    items.push({ type:vsClass>0?'positive':'negative', icon:vsClass>0?'pi-arrow-up':'pi-arrow-down',
+      text:`Média pessoal (${e.media}%) ${vsClass>0?'+':''}${vsClass}pp em relação à média da turma (${DATA.kpis.desempenhoMedio}%).` });
+  else
+    items.push({ type:'neutral', icon:'pi-equals',
+      text:`Média pessoal (${e.media}%) alinhada com a média da turma (${DATA.kpis.desempenhoMedio}%).` });
+  if (e.scores[3] !== null && e.scores[3] < 45)
+    items.push({ type:'negative', icon:'pi-exclamation-circle',
+      text:`Resultado muito baixo em Genética Básica (${e.scores[3]}%) — possível lacuna anterior que pode estar afetando outros conteúdos.` });
+  if (valid.length < 6)
+    items.push({ type:'negative', icon:'pi-times-circle',
+      text:`Apenas ${valid.length} de 6 atividades entregues — dados incompletos limitam a precisão da análise.` });
+  return items;
+}
+
+/* ─── goToSkill — navega para detalhe de habilidade ─── */
+function goToSkill(ativIdx) {
+  conteudoIdx = ativIdx;
+  setView('conteudos', document.getElementById('nav-cont-link'));
+}
+
+/* ═══════════════════════════════════════════════
+   CONTEÚDOS / HABILIDADES
+═══════════════════════════════════════════════ */
+let conteudoIdx = null;
+
+function computeSkillData(ativIdx) {
+  const ativ = DATA.atividades[ativIdx];
+  if (!ativ || ativ.status === 'planned') return null;
+  const items = DATA.estudantes
+    .map(e => ({ id:e.id, nome:e.nome, init:e.init, score:e.scores[ativIdx], tend:e.tend }))
+    .filter(s => s.score !== null)
+    .sort((a,b) => a.score - b.score);
+  const total = items.length;
+  if (!total) return null;
+  const avg = Math.round(items.reduce((a,b)=>a+b.score,0)/total);
+  const high   = items.filter(s=>s.score>=70);
+  const medium = items.filter(s=>s.score>=50&&s.score<70);
+  const low    = items.filter(s=>s.score<50);
+  const diffVsClass = avg - DATA.kpis.desempenhoMedio;
+  const nivel = avg>=65?'adequado':avg>=50?'atencao':'critico';
+  return { items, total, avg, high, medium, low, diffVsClass, nivel };
+}
+
+function renderConteudos() {
+  if (conteudoIdx !== null) renderSkillDetail(conteudoIdx);
+  else renderSkillList();
+}
+
+function openSkillDetail(idx) {
+  conteudoIdx = idx;
+  renderConteudos();
+  document.getElementById('main').scrollTo(0,0);
+}
+
+function closeSkillDetail() {
+  conteudoIdx = null;
+  renderConteudos();
+}
+
+function renderSkillList() {
+  const sortedIdx = [0,1,2,3,4,5]
+    .filter(i => DATA.atividades[i].status !== 'planned')
+    .sort((a,b) => (computeSkillData(a)?.avg||99) - (computeSkillData(b)?.avg||99));
+
+  if (!sortedIdx.length) {
+    document.getElementById('conteudosContent').innerHTML = renderEmptyState('sem-atividades');
+    return;
+  }
+
+  const cards = sortedIdx.map(idx => {
+    const ativ = DATA.atividades[idx];
+    const d    = computeSkillData(idx);
+    if (!d) return '';
+    const sk   = SKILLS_LABEL[idx];
+    const nivelMap = { critico:['Crítico','badge-error','pi-exclamation-triangle','sk-ic-critico'],
+                       atencao: ['Atenção', 'badge-warning','pi-exclamation-circle','sk-ic-atencao'],
+                       adequado:['Adequado','badge-success','pi-check-circle','sk-ic-adequado'] };
+    const [nivelLabel,nivelBadge,icon,icCls] = nivelMap[d.nivel];
+    const lPct = Math.round(d.low.length/d.total*100);
+    const mPct = Math.round(d.medium.length/d.total*100);
+    const hPct = Math.round(d.high.length/d.total*100);
+    const diffText = d.diffVsClass===0?'Igual à média':(d.diffVsClass>0?'+':'')+d.diffVsClass+'pp vs. média';
+    return `<div class="skill-card ${d.nivel}" onclick="openSkillDetail(${idx})">
+      <div class="skill-card-icon ${icCls}"><i class="pi ${icon}"></i></div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px;font-weight:700;color:var(--text-900)">${sk}</span>
+          <span class="badge ${nivelBadge}" style="font-size:11px">${nivelLabel}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-300);margin-bottom:10px">${ativ.nome} · ${ativ.data} · ${d.total} respostas</div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="min-width:180px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-300);margin-bottom:4px">
+              <span>Domínio médio</span>
+              <span style="font-weight:700;color:${domColor(d.avg)}">${d.avg}%  <span style="font-weight:400;color:var(--text-300)">${diffText}</span></span>
+            </div>
+            <div class="pbar-wrap"><div class="pbar-fill ${domCls(d.avg)}" style="width:${d.avg}%"></div></div>
+          </div>
+          <div>
+            <div class="distrib-bar" style="width:120px;gap:2px;margin-bottom:4px">
+              <div class="distrib-seg" style="background:var(--error);width:${lPct}%;min-width:${d.low.length?4:0}px"></div>
+              <div class="distrib-seg" style="background:var(--moderate);width:${mPct}%;min-width:${d.medium.length?4:0}px"></div>
+              <div class="distrib-seg" style="background:var(--success);width:${hPct}%;min-width:${d.high.length?4:0}px"></div>
+            </div>
+            <div style="display:flex;gap:8px;font-size:10px">
+              <span style="color:var(--error)">${d.low.length} &lt;50%</span>
+              <span style="color:var(--moderate)">${d.medium.length} 50-69%</span>
+              <span style="color:var(--success)">${d.high.length} ≥70%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span style="font-size:12px;color:${d.low.length>d.total*0.3?'var(--error)':'var(--text-300)'}">${d.low.length} com dificuldade</span>
+        <i class="pi pi-chevron-right" style="color:var(--text-300);font-size:14px;margin-top:2px"></i>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('conteudosContent').innerHTML = `
+    <div class="context-note">
+      <i class="pi pi-info-circle" style="color:var(--info);font-size:16px;flex-shrink:0;margin-top:1px"></i>
+      <div><strong>Como usar esta tela:</strong> Os dados abaixo mostram como a turma se saiu em cada habilidade avaliada.
+      Use essas evidências para embasar sua decisão sobre avançar ou retomar algum conteúdo.
+      O painel apresenta observações — a decisão pedagógica é sua.</div>
+    </div>
+    ${cards}`;
+}
+
+function renderSkillDetail(idx) {
+  const ativ = DATA.atividades[idx];
+  const sk   = SKILLS_LABEL[idx];
+  const d    = computeSkillData(idx);
+  if (!d || d.total < 3) {
+    document.getElementById('conteudosContent').innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <button onclick="closeSkillDetail()" style="background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--brand);padding:0">
+          <i class="pi pi-arrow-left" style="font-size:11px"></i> Conteúdos
+        </button>
+      </div>
+      ${renderEmptyState('sem-dados-conteudo')}`;
+    return;
+  }
+
+  /* ── KPIs ── */
+  const kpis = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:0">
+    <div class="kpi-card" style="padding:16px 18px">
+      <div class="kpi-label">Domínio médio</div>
+      <div class="kpi-value ${domCls(d.avg)}" style="font-size:32px">${d.avg}%</div>
+      <div class="kpi-sub">${d.diffVsClass>0?'+':''}${d.diffVsClass}pp em relação à média geral (${DATA.kpis.desempenhoMedio}%)</div>
+    </div>
+    <div class="kpi-card ${d.low.length>d.total/3?'urgent':''}" style="padding:16px 18px">
+      <div class="kpi-label">Abaixo de 50%</div>
+      <div class="kpi-value ${d.low.length>d.total*0.3?'low':''}" style="font-size:32px">${d.low.length}</div>
+      <div class="kpi-sub">${Math.round(d.low.length/d.total*100)}% dos estudantes que entregaram</div>
+    </div>
+    <div class="kpi-card" style="padding:16px 18px">
+      <div class="kpi-label">Entregaram</div>
+      <div class="kpi-value" style="font-size:32px">${d.total}</div>
+      <div class="kpi-sub">de ${DATA.estudantes.length} estudantes da turma</div>
+    </div>
+  </div>`;
+
+  /* ── Distribuição (dots clicáveis) ── */
+  const mkGroup = (arr, label, color) => {
+    if (!arr.length) return '';
+    const dots = arr.map(s=>`<div class="student-dot" style="background:${avColor(s.id)}" title="${s.nome}: ${s.score}%" onclick="openProfile(${s.id})">${s.init}</div>`).join('');
+    return `<div class="dist-row">
+      <div class="dist-label"><span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>${label}</div>
+      <div class="dist-bar-col">${dots}</div>
+      <div class="dist-count">${arr.length} estudante${arr.length!==1?'s':''}</div>
+    </div>`;
+  };
+
+  /* ── Contexto do trimestre ── */
+  const ativRows = DATA.atividades.filter(a=>a.status!=='planned').map((a,i)=>{
+    const ca = DATA.evolucao[i]?.media;
+    const isThis = i===idx;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:${isThis?'var(--brand-bg)':'transparent'};border-radius:${isThis?'var(--r-sm)':'0'};border-bottom:1px solid var(--outline-2)">
+      <span style="font-size:11px;font-weight:700;width:28px;color:${isThis?'var(--brand)':'var(--text-300)'}">${a.id}</span>
+      <span style="flex:1;font-size:12px;color:${isThis?'var(--brand)':'var(--text-700)'};font-weight:${isThis?700:400}">${a.nome}${isThis?' <span style="font-size:10px;color:var(--brand);font-weight:400">← este conteúdo</span>':''}</span>
+      <span style="font-size:11px;color:var(--text-300)">${a.data}</span>
+      <span class="score-chip ${scoreCls(ca)}" style="font-size:11px">${ca}%</span>
+    </div>`;
+  }).join('');
+
+  /* ── Estudantes com maior dificuldade ── */
+  const diffStudents = d.low.concat(d.medium).slice(0,6).map(s=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--outline-2);cursor:pointer" onclick="openProfile(${s.id})">
+      <div class="student-avatar" style="background:${avColor(s.id)};width:32px;height:32px;font-size:11px;flex-shrink:0">${s.init}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text-900)">${s.nome}</div>
+        <div style="font-size:11px;color:var(--text-300)">${getEstado(DATA.estudantes.find(e=>e.id===s.id)).label}</div>
+      </div>
+      <span class="score-chip ${scoreCls(s.score)}">${s.score}%</span>
+      <i class="pi pi-arrow-right" style="font-size:11px;color:var(--text-300)"></i>
+    </div>`).join('');
+
+  /* ── Evidências (observações factuais, sem prescrições) ── */
+  const evNotes = [];
+  evNotes.push(`${d.low.length} de ${d.total} estudantes obtiveram resultado abaixo de 50% nesta atividade.`);
+  if (d.avg < DATA.kpis.desempenhoMedio)
+    evNotes.push(`O resultado médio aqui (${d.avg}%) ficou ${DATA.kpis.desempenhoMedio-d.avg}pp abaixo da média geral da turma (${DATA.kpis.desempenhoMedio}%).`);
+  if (d.high.length > 0)
+    evNotes.push(`${d.high.length} estudante${d.high.length!==1?'s':''} (${Math.round(d.high.length/d.total*100)}%) atingiu resultado adequado (≥70%).`);
+  const alsoAlert = d.low.filter(s=>DATA.alertas.some(al=>al.eid===s.id)).length;
+  if (alsoAlert>0)
+    evNotes.push(`${alsoAlert} dos estudantes com dificuldade aqui também têm alertas ativos na turma (queda, baixo desempenho ou inatividade).`);
+  if (d.medium.length>0)
+    evNotes.push(`${d.medium.length} estudante${d.medium.length!==1?'s':''} ficaram na faixa parcial (50-69%) — domínio em desenvolvimento.`);
+
+  const evHtml = evNotes.map(t=>`<div class="ev-note"><i class="pi pi-circle-fill" style="font-size:6px;color:var(--brand);flex-shrink:0;margin-top:5px"></i><span>${t}</span></div>`).join('');
+
+  const nivelBadge = d.nivel==='critico'?'badge-error':d.nivel==='atencao'?'badge-warning':'badge-success';
+  const nivelLabel = d.nivel==='critico'?'Crítico':d.nivel==='atencao'?'Atenção':'Adequado';
+
+  document.getElementById('conteudosContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="closeSkillDetail()" style="background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--brand);padding:0">
+        <i class="pi pi-arrow-left" style="font-size:11px"></i> Conteúdos
+      </button>
+      <span style="color:var(--outline)">|</span>
+      <span style="font-size:13px;color:var(--text-500)">${sk}</span>
+    </div>
+
+    <div class="detail-header section">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+        <div>
+          <div style="font-size:22px;font-weight:700;color:var(--text-900);margin-bottom:4px">${sk}</div>
+          <div style="font-size:13px;color:var(--text-300)">Avaliado em: ${ativ.nome} · ${ativ.data}</div>
+        </div>
+        <span class="badge ${nivelBadge}" style="font-size:12px;flex-shrink:0">${nivelLabel}</span>
+      </div>
+    </div>
+
+    <div class="section">${kpis}</div>
+
+    <div class="grid-5-4 section" style="align-items:start">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Distribuição dos estudantes</div><div class="card-subtitle">Clique em um estudante para ver seu perfil completo</div></div></div>
+        ${mkGroup(d.low,    'Abaixo de 50% — maior dificuldade', 'var(--error)')}
+        ${mkGroup(d.medium, 'Entre 50% e 69% — parcial', 'var(--moderate)')}
+        ${mkGroup(d.high,   'Acima de 70% — adequado', 'var(--success)')}
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Contexto do trimestre</div><div class="card-subtitle">Média da turma em cada atividade</div></div></div>
+        ${ativRows}
+      </div>
+    </div>
+
+    <div class="grid-2 section" style="align-items:start">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Estudantes com maior dificuldade</div><div class="card-subtitle">Ordenados do menor para o maior resultado · clique para ver perfil</div></div></div>
+        ${diffStudents || '<div style="padding:16px 0;font-size:13px;color:var(--text-300)">Nenhum estudante com dificuldade nesta atividade.</div>'}
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Observações sobre este conteúdo</div><div class="card-subtitle">Dados objetivos para apoiar sua análise</div></div></div>
+        ${evHtml}
+      </div>
+    </div>`;
+}
+
+/* ════════════════════════════════════════
+   ESTADOS DO PROTÓTIPO
+════════════════════════════════════════ */
+
+/* ─── Skeleton ─── */
+function renderSkeleton(type) {
+  const skLine = (w='60%') => `<div class="skeleton sk-line" style="height:12px;width:${w};margin-bottom:7px"></div>`;
+  const skKPI  = () => `<div class="kpi-card" style="opacity:.7">
+    ${skLine('55%')}<div class="skeleton sk-block" style="height:38px;width:45%;margin-bottom:8px"></div>${skLine('75%')}
+  </div>`;
+  const skRow  = () => `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--outline-2)">
+    <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0"></div>
+    <div style="flex:1">${skLine('45%')}${skLine('30%')}</div>
+    <div class="skeleton sk-block" style="width:52px;height:26px"></div>
+  </div>`;
+  const skListRow = () => `<div style="padding:14px 16px;border-bottom:1px solid var(--outline-2)">${skLine('55%')}${skLine('35%')}</div>`;
+  const skTable = () => `<div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--r-lg);overflow:hidden">${Array(5).fill(0).map(skRow).join('')}</div>`;
+  const skList  = () => `<div style="background:var(--surface);border:1px solid var(--outline);border-radius:var(--r-lg);overflow:hidden">${Array(5).fill(0).map(skListRow).join('')}</div>`;
+
+  switch(type) {
+    case 'kpi':    return `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">${Array(4).fill(0).map(skKPI).join('')}</div>`;
+    case 'banner': return `<div class="skeleton sk-block" style="height:72px"></div>`;
+    case 'table':  return skTable();
+    case 'list':   return skList();
+    default:       return `<div class="skeleton sk-block" style="height:80px"></div>`;
+  }
+}
+
+/* ─── Empty States ─── */
+function renderEmptyState(type, ctx) {
+  ctx = ctx || {};
+  const S = {
+    'sem-atencao': {
+      icon:'pi-check-circle', ic:'var(--success)', ibg:'var(--success-bg)',
+      title:'Nenhum estudante em atenção',
+      text:'Ótima notícia — nenhum estudante apresenta queda de desempenho, baixo resultado persistente ou inatividade neste período. Continue acompanhando para identificar mudanças.'
+    },
+    'sem-atividades': {
+      icon:'pi-calendar-plus', ic:'var(--brand)', ibg:'var(--brand-bg)',
+      title:'Turma ainda sem atividades',
+      text:'Os dados do painel são gerados a partir das atividades realizadas. Quando a primeira atividade for registrada, as informações aparecem aqui automaticamente.'
+    },
+    'busca-vazia': {
+      icon:'pi-search', ic:'var(--text-300)', ibg:'var(--bg)',
+      title: ctx.query ? `Nenhum resultado para "${ctx.query}"` : 'Nenhum estudante encontrado',
+      text: 'Verifique a grafia ou tente um nome diferente.',
+      btn: { label:'Limpar busca', fn:'clearStudentSearch()' }
+    },
+    'filtro-vazio': {
+      icon:'pi-filter', ic:'var(--text-300)', ibg:'var(--bg)',
+      title:'Nenhum estudante neste estado',
+      text:'Nenhum estudante corresponde ao filtro selecionado neste período.',
+      btn: { label:'Ver todos os estudantes', fn:"setStudentFilter('all')" }
+    },
+    'sem-dados-periodo': {
+      icon:'pi-calendar', ic:'var(--text-300)', ibg:'var(--bg)',
+      title:'Sem dados para este período',
+      text:'Não há atividades registradas para esta turma no período selecionado. Selecione outro período ou turma para ver os dados disponíveis.'
+    },
+    'sem-dados-conteudo': {
+      icon:'pi-chart-bar', ic:'var(--text-300)', ibg:'var(--bg)',
+      title:'Dados insuficientes para análise',
+      text:'Poucos estudantes entregaram esta atividade. Com mais respostas será possível analisar o desempenho da turma neste conteúdo com mais precisão.'
+    },
+    'erro': {
+      icon:'pi-exclamation-triangle', ic:'var(--error)', ibg:'var(--error-bg)',
+      title:'Não foi possível carregar',
+      text:'Algo não saiu como esperado. Tente recarregar a página ou entre em contato com o suporte.',
+      btn: { label:'Recarregar página', fn:'location.reload()' }
+    }
+  };
+  const s = S[type] || S['sem-dados-periodo'];
+  return `<div class="empty-state-card">
+    <div class="es-icon" style="background:${s.ibg}"><i class="pi ${s.icon}" style="color:${s.ic};font-size:22px"></i></div>
+    <div class="es-title">${s.title}</div>
+    <div class="es-text">${s.text}</div>
+    ${s.btn ? `<button class="btn btn-outline btn-sm" onclick="${s.btn.fn}" style="margin-top:4px">${s.btn.label}</button>` : ''}
+  </div>`;
+}
+
+/* ─── Context helpers ─── */
+function currentContextHasData() {
+  return true; // Todas as escolas têm dados completos
+}
+
+
+
+function clearStudentSearch() {
+  const el = document.getElementById('studentSearch');
+  if (el) { el.value = ''; filterStudents(); }
+}
+
+/* ─── Skeleton helpers por view ─── */
+function showSkeletonsForView(viewId) {
+  if (viewId === 'visao-geral') {
+    const homeIds = { homeKpiGrid:'kpi', homeAttentionList:'table', homeActivitiesList:'list' };
+    Object.entries(homeIds).forEach(([id,t])=>{ const el=document.getElementById(id); if(el) el.innerHTML=renderSkeleton(t); });
+    const tg = document.getElementById('turmasGrid'); if(tg) tg.innerHTML='';
+    const eh = document.getElementById('escolaHeader'); if(eh) eh.innerHTML='';
+  } else if (viewId === 'turma-detalhe') {
+    const ids = { kpiGrid:'kpi', signalSection:'banner', skillsList:'list', attentionList:'table', activitiesList:'list' };
+    Object.entries(ids).forEach(([id,t])=>{ const el=document.getElementById(id); if(el) el.innerHTML=renderSkeleton(t); });
+  } else if (viewId === 'estudantes') {
+    const el = document.getElementById('studentTable'); if(el) el.innerHTML=renderSkeleton('table');
+  } else if (viewId === 'conteudos') {
+    const el = document.getElementById('conteudosContent'); if(el) el.innerHTML=renderSkeleton('list');
+  }
+}
+
+/* ─── Reload view with context check ─── */
+function reloadCurrentViewState() {
+  const vis = [...document.querySelectorAll('[id^="view-"]')].find(v => v.style.display !== 'none');
+  const viewId = vis ? vis.id.replace('view-','') : 'visao-geral';
+  if (viewId === 'perfil') return;
+  showSkeletonsForView(viewId);
+  setTimeout(() => {
+    if      (viewId === 'visao-geral')   initHome();
+    else if (viewId === 'estudantes')    renderEstudantes();
+    else if (viewId === 'conteudos')     renderConteudos();
+    else if (viewId === 'turma-detalhe') renderTurmaDetalhe();
+  }, 400);
+}
+/* ═══════════════════════════════════════════════
+   ACESSIBILIDADE & RESPONSIVIDADE
+═══════════════════════════════════════════════ */
+
+/* ─── Escape fecha modais e dropdowns ─── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  // Fechar dropdowns
+  document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.ctx-pill.open, .escola-ctx.open').forEach(b => {
+    b.classList.remove('open');
+    b.setAttribute('aria-expanded','false');
+  });
+  // Fechar modal de perfil
+  const modal = document.getElementById('profileModal');
+  if (modal?.classList.contains('open')) closeProfile();
+  // Fechar sidebar mobile
+  closeMobileSidebar();
+});
+
+/* ─── Mobile sidebar ─── */
+function closeMobileSidebar() {
+  const sidebar  = document.getElementById('sidebar');
+  const overlay  = document.getElementById('sidebarOverlay');
+  if (sidebar)  sidebar.classList.remove('mobile-open');
+  if (overlay)  overlay.classList.remove('active');
+  const btn = document.getElementById('sidebarToggle');
+  if (btn) btn.setAttribute('aria-expanded','false');
+  document.body.style.overflow = '';
+}
+
+/* ─── aria-expanded nos dropdowns ─── */
+function updateDropdownAria(btnId, isOpen) {
+  const btn = document.getElementById(btnId);
+  if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+/* ═══════════════════════════════════════════════════
+   MULTI-TURMA: funções do dashboard inicial
+═══════════════════════════════════════════════════ */
+let currentTurmaId              = null;
+let homeAttentionSituacaoFilter = 'all';
+let homeAttentionTurmaFilter    = 'all';
+
+function getAggregatedKPIs() {
+  const totalEst    = TURMAS.reduce((s,t) => s + t.estudantes, 0);
+  const totalAlerts = TURMAS.reduce((s,t) => s + t.alertas, 0);
+  const avgDesemp   = Math.round(TURMAS.reduce((s,t) => s + t.desempenhoMedio*t.estudantes, 0) / totalEst);
+  const turmasProblema = TURMAS.filter(t => t.desempenhoMedio < 65 || t.tendencia === 'queda').length;
+  return { totalEst, totalAlerts, avgDesemp, turmasProblema };
+}
+
+function renderEscolaHeader() {
+  const nome = (document.getElementById('escolaLabel')?.textContent || 'Escola').trim();
+  const per  = (document.getElementById('periodoLabel')?.textContent || '').trim();
+  const k    = getAggregatedKPIs();
+  const el   = document.getElementById('escolaHeader');
+  if (!el) return;
+  el.innerHTML = `
+    <i class="pi pi-building"></i>
+    <div>
+      <div class="escola-header-nome">${nome}</div>
+      <div class="escola-header-sub">${TURMAS.length} turmas · ${k.totalEst} estudantes · ${per}</div>
+    </div>`;
+  const me = document.getElementById('meta-escola');
+  if (me) me.textContent = nome;
+}
+
+function renderHomeKPIs() {
+  const el = document.getElementById('homeKpiGrid');
+  if (!el) return;
+  const k = getAggregatedKPIs();
+  const avgAnterior = Math.round(TURMAS.reduce((s,t) => s + t.desempenhoAnterior*t.estudantes, 0) / k.totalEst);
+  const diff = k.avgDesemp - avgAnterior;
+  const tDir = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
+  el.innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon-brand"><i class="pi pi-users"></i></div>
+      <div class="kpi-label">Estudantes acompanhados</div>
+      <div class="kpi-value">${k.totalEst}</div>
+      <div class="kpi-sub">${TURMAS.length} turmas na escola selecionada</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon-warning"><i class="pi pi-chart-bar"></i></div>
+      <div class="kpi-label">Desempenho médio geral</div>
+      <div class="kpi-value ${k.avgDesemp>=70?'':'medium'}">${k.avgDesemp}%</div>
+      <div class="kpi-trend ${tDir}"><i class="pi pi-trending-${diff>=0?'up':'down'}" style="font-size:11px"></i>${(diff>0?'+':'')+diff}pp vs. período anterior</div>
+    </div>
+    <div class="kpi-card ${k.turmasProblema>2?'urgent':''}">
+      <div class="kpi-icon kpi-icon-${k.turmasProblema>2?'error':'warning'}"><i class="pi pi-exclamation-circle"></i></div>
+      <div class="kpi-label">Turmas com atenção</div>
+      <div class="kpi-value ${k.turmasProblema>2?'low':''}">${k.turmasProblema}</div>
+      <div class="kpi-sub">${Math.round(k.turmasProblema/TURMAS.length*100)}% das turmas · queda ou abaixo de 65%</div>
+    </div>
+    <div class="kpi-card urgent kpi-card-clickable" onclick="document.getElementById('homeAttentionSection').scrollIntoView({behavior:'smooth'})">
+      <div class="kpi-icon kpi-icon-error"><i class="pi pi-exclamation-circle"></i></div>
+      <div class="kpi-label">Estudantes em atenção</div>
+      <div class="kpi-value low">${k.totalAlerts}</div>
+      <div class="kpi-sub">${Math.round(k.totalAlerts/k.totalEst*100)}% do total · todas as turmas</div>
+    </div>`;
+}
+
+function renderTurmaCards() {
+  const el = document.getElementById('turmasGrid');
+  if (!el) return;
+  el.innerHTML = TURMAS.map(t => {
+    const tendBadge = { melhorando:'badge-success', estavel:'badge-neutral', queda:'badge-warning' };
+    const tendText  = { melhorando:'↗ Melhorando', estavel:'→ Estável', queda:'↘ Queda' };
+    const borderCls = t.tendencia==='queda'?'queda':t.desempenhoMedio<65?'critico':t.desempenhoMedio>=70?'bom':'';
+    const pCls = t.desempenhoMedio>=70?'good':t.desempenhoMedio>=55?'medium':'low';
+    const dColor = t.desempenhoMedio>=70?'var(--success)':t.desempenhoMedio>=55?'var(--warning)':'var(--error)';
+    return `
+      <div class="turma-card ${borderCls}" onclick="openTurmaDetalhe('${t.id}')">
+        <div class="turma-row">
+          <div>
+            <div class="turma-nome">${t.nome}</div>
+            <div class="turma-disc">${t.disc} · ${t.estudantes} estudantes</div>
+          </div>
+          <span class="badge ${tendBadge[t.tendencia]}" style="font-size:11px;flex-shrink:0">${tendText[t.tendencia]}</span>
+        </div>
+        <div>
+          <div class="turma-desemp-label">Desempenho médio</div>
+          <div class="turma-row" style="margin-bottom:5px">
+            <span style="font-size:24px;font-weight:700;color:${dColor}">${t.desempenhoMedio}%</span>
+            ${t.alertas>0
+              ? `<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-circle" style="font-size:10px"></i> ${t.alertas} em atenção</span>`
+              : `<span class="badge badge-success" style="font-size:11px"><i class="pi pi-check-circle" style="font-size:10px"></i> Sem alertas</span>`}
+          </div>
+          <div class="pbar-wrap"><div class="pbar-fill ${pCls}" style="width:${t.desempenhoMedio}%"></div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-500)">
+          <i class="pi pi-exclamation-circle" style="font-size:11px;color:var(--warning)"></i>${t.habilidadeCritica}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openTurmaDetalhe(turmaId) {
+  currentTurmaId = turmaId;
+  setView('turma-detalhe', null);
+}
+
+function renderTurmaDetalhe() {
+  const turma = TURMAS.find(t => t.id === currentTurmaId) || TURMAS[0];
+  // Breadcrumb
+  const bp = document.getElementById('breadcrumb-parent');
+  if (bp) bp.style.display = 'inline-flex';
+  const bpl = document.getElementById('breadcrumb-parent-label');
+  if (bpl) bpl.textContent = 'Início';
+  document.getElementById('breadcrumb-current').textContent = turma.nome;
+  document.getElementById('page-title').textContent = turma.nome;
+  // Back bar
+  const hdr = document.getElementById('turmaDetalheHeader');
+  if (hdr) hdr.innerHTML = `
+    <div class="turma-back-bar">
+      <button class="turma-back-btn" onclick="setView('visao-geral',document.getElementById('nav-home-link'))">
+        <i class="pi pi-arrow-left" style="font-size:11px"></i> Início
+      </button>
+      <span style="color:var(--outline)">|</span>
+      <span style="font-size:13px;color:var(--text-500)">${turma.disc}</span>
+      ${!turma.hasFullData ? `<span class="badge badge-info" style="font-size:11px;margin-left:auto"><i class="pi pi-info-circle" style="font-size:10px"></i> Dados de referência: 8º ano A</span>` : ''}
+    </div>`;
+  // Atividades label
+  const al = document.getElementById('turmaActivLabel');
+  if (al) al.textContent = 'Atividades recentes · ' + turma.nome;
+  // Override DATA.kpis temporariamente para turmas sem dados completos
+  const origKpis = DATA.kpis;
+  if (!turma.hasFullData) {
+    DATA.kpis = { desempenhoMedio:turma.desempenhoMedio, desempenhoAnterior:turma.desempenhoAnterior,
+                  estudantesAtencao:turma.alertas, totalEstudantes:turma.estudantes, taxaConclusao:turma.taxaConclusao };
+  }
+  renderKPIs(); renderSignal(); renderSkills();
+  renderFilterPills('all'); renderAttention('all'); renderActivities(); initChart();
+  if (!turma.hasFullData) DATA.kpis = origKpis;
+}
+
+function renderHomeKPIsSkeletons() {
+  const el = document.getElementById('homeKpiGrid');
+  if (el) el.innerHTML = renderSkeleton('kpi');
+}
+
+/* ── renderMultiAttention (home: todas as turmas) ── */
+function renderMultiAttention(situacaoFilter, turmaFilter) {
+  homeAttentionSituacaoFilter = situacaoFilter || 'all';
+  homeAttentionTurmaFilter    = turmaFilter    || 'all';
+  if (!ALL_ALERTAS.length) ALL_ALERTAS = buildAllAlertas();
+  let filtered = ALL_ALERTAS;
+  if (homeAttentionSituacaoFilter !== 'all') filtered = filtered.filter(al => al.tipo === homeAttentionSituacaoFilter);
+  if (homeAttentionTurmaFilter    !== 'all') filtered = filtered.filter(al => al.turmaId === homeAttentionTurmaFilter);
+  const el = document.getElementById('homeAttentionList');
+  if (!el) return;
+  if (!filtered.length) { el.innerHTML = renderEmptyState(homeAttentionSituacaoFilter!=='all'||homeAttentionTurmaFilter!=='all'?'filtro-vazio':'sem-atencao'); return; }
+  const thead = `<div class="att-thead">
+    <div style="width:36px;flex-shrink:0"></div>
+    <div class="c-info"><span>Estudante</span></div>
+    <div class="c-turma"><span>Turma</span></div>
+    <div class="c-badge"><span>Situação</span></div>
+    <div class="c-spark"><span>Evolução</span></div>
+    <div class="c-score"><span>Último</span></div>
+    <div class="c-reason"><span>Principal dificuldade</span></div>
+    <div class="c-action"></div>
+  </div>`;
+  const rows = filtered.map(al => {
+    const eData = al.eid ? getE(al.eid) : null;
+    const nome  = eData ? eData.nome : al.nome;
+    const init  = eData ? eData.init : al.init;
+    const tend  = eData ? eData.tend : (al.tend||'queda');
+    const scores = eData ? eData.scores : null;
+    const colorIdx = eData ? eData.id : ((al._id||100) % 20 + 1);
+    const scoreEl  = (al.score!==null&&al.score!==undefined) ? `<span class="score-chip ${scoreCls(al.score)}">${al.score}%</span>` : `<span class="score-chip neutral">—</span>`;
+    const actionEl = eData
+      ? `<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProfile(${eData.id})">Ver <i class="pi pi-arrow-right" style="font-size:10px"></i></button>`
+      : `<button class="btn btn-sm btn-outline" style="font-size:11px" onclick="openTurmaDetalhe('${al.turmaId}')">Ver turma</button>`;
+    return `<div class="attention-row" ${eData?`onclick="openProfile(${eData.id})"`:''}>
+      <div class="c-avatar"><div class="student-avatar" style="background:${avColor(colorIdx)}">${init}</div></div>
+      <div class="c-info"><div class="student-name">${nome}</div><div class="student-sub">${tendLabel(tend)}</div></div>
+      <div class="c-turma"><span class="turma-tag">${al.turmaNome}</span></div>
+      <div class="c-badge">${alertBadge(al.tipo)}</div>
+      <div class="c-spark">${scores?buildSparkline(scores):'<span style="font-size:11px;color:var(--text-300)">—</span>'}</div>
+      <div class="c-score">${scoreEl}</div>
+      <div class="c-reason"><span class="reason-text">${al.dific}</span></div>
+      <div class="c-action">${actionEl}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `<div class="attention-table">${thead}${rows}</div>`;
+}
+
+function renderHomeFilterPills(f) {
+  homeAttentionSituacaoFilter = f;
+  if (!ALL_ALERTAS.length) ALL_ALERTAS = buildAllAlertas();
+  const counts = { all:ALL_ALERTAS.length, queda:0, 'baixo-persistente':0, inativo:0 };
+  ALL_ALERTAS.forEach(al => { if(counts[al.tipo]!==undefined) counts[al.tipo]++; });
+  const pills = [
+    { id:'all', label:'Todos' },
+    { id:'queda', label:'Queda' },
+    { id:'baixo-persistente', label:'Baixo desempenho' },
+    { id:'inativo', label:'Inativos' },
+  ];
+  const el = document.getElementById('homeFilterPills');
+  if (!el) return;
+  el.innerHTML = pills.map(p => `
+    <button class="filter-pill ${f===p.id?'active':''}" onclick="renderHomeFilterPills('${p.id}');renderMultiAttention('${p.id}',homeAttentionTurmaFilter)">
+      ${p.label}<span class="badge ${f===p.id?'badge-brand':'badge-neutral'}" style="padding:0 5px;font-size:10px;min-width:20px;justify-content:center">${counts[p.id]||0}</span>
+    </button>`).join('');
+}
+
+function renderHomeTurmaFilter(f) {
+  homeAttentionTurmaFilter = f;
+  const el = document.getElementById('homeTurmaFilter');
+  if (!el) return;
+  const pills = [{ id:'all', label:'Todas' }, ...TURMAS.map(t => ({ id:t.id, label:t.nome }))];
+  el.innerHTML = pills.map(p => `
+    <button class="filter-pill ${f===p.id?'active':''}" style="font-size:11px;padding:3px 9px" onclick="renderHomeTurmaFilter('${p.id}');renderMultiAttention(homeAttentionSituacaoFilter,'${p.id}')">
+      ${p.label}
+    </button>`).join('');
+}
+
+function renderActivitiesInto(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) { renderActivities(); return; }
+  const recent = DATA.atividades.filter(a=>a.status!=='planned').slice(-4).reverse();
+  const next   = DATA.atividades.find(a=>a.status==='planned');
+  el.innerHTML = `<div class="activities-list">
+    ${recent.map(a => `
+      <div class="activity-row">
+        <div class="activity-icon-box ${a.status==='alert'?'alert-icon':''}"><i class="pi pi-file-edit"></i></div>
+        <div style="flex:1;min-width:0"><div class="activity-name">${a.nome}</div><div class="activity-date">${a.data}</div></div>
+        <div class="activity-stats">
+          <span><strong>${a.entregues}/${a.total}</strong> entregues</span>
+          <span style="display:flex;align-items:center;gap:6px">Média <span class="score-chip ${scoreCls(a.media)}">${a.media}%</span></span>
+        </div>
+        <div style="flex-shrink:0;margin-left:8px">
+          ${a.status==='alert'?`<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-triangle" style="font-size:10px"></i> Resultado baixo</span>`:`<span class="badge badge-neutral" style="font-size:11px">Normal</span>`}
+        </div>
+      </div>`).join('')}
+    ${next?`<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Próxima: <strong style="color:var(--text-700)">${next.nome}</strong> · ${next.data}</span></div>`:''}
+  </div>`;
+}
+
+function initHome() {
+  renderEscolaHeader();
+  renderHomeKPIs();
+  renderTurmaCards();
+  try { renderHomeFilterPills('all'); }     catch(e) {}
+  try { renderHomeTurmaFilter('all'); }     catch(e) {}
+  try { renderMultiAttention('all','all'); } catch(e) {}
+  try { renderActivitiesInto('homeActivitiesList'); } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    buildEscolasData();
+    showSkeletonsForView('visao-geral');
+    setTimeout(() => { try { ALL_ALERTAS = buildAllAlertas(); initHome(); } catch(err) { document.getElementById('escolaHeader').innerHTML = '<div style="color:red;font-size:14px;padding:12px">ERRO JS: ' + err.message + '</div>'; } }, 900);
+  } catch(initErr) {
+    document.title = 'ERRO: ' + initErr.message;
+  }
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
