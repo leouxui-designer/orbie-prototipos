@@ -133,6 +133,22 @@
     .page-meta { font-size: 12px; color: var(--text-300); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
     .page-meta-dot { width: 3px; height: 3px; background: var(--text-300); border-radius: var(--r-full); }
 
+    /* ─── HOME DASHBOARD GRID ─── */
+    .home-main-row { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; margin-bottom: 28px; }
+    .home-main-row > div { min-width: 0; }
+    .home-main-row .section { margin-bottom: 0; }
+    .home-analytics-row { display: grid; grid-template-columns: 5fr 4fr; gap: 16px; align-items: start; }
+    .home-analytics-row > div { min-width: 0; }
+    .home-analytics-row .card { height: 100%; }
+
+    /* ─── COMPACT ATTENTION (sidebar) ─── */
+    .compact-att-list { display: flex; flex-direction: column; gap: 0; }
+    .compact-att-row { display: flex; align-items: center; gap: 10px; padding: 10px 4px; border-radius: var(--r-xs); cursor: pointer; transition: background .1s; border-bottom: 1px solid var(--outline-2); }
+    .compact-att-row:last-child { border-bottom: none; }
+    .compact-att-row:hover { background: var(--bg); }
+    .compact-att-info { flex: 1; min-width: 0; }
+    .compact-att-name { font-size: 13px; font-weight: 600; color: var(--text-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .compact-att-meta { font-size: 11px; color: var(--text-300); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
     /* ─── SECTION ─── */
     .section { margin-bottom: 28px; }
     .section-label { font-size: 11px; font-weight: 700; color: var(--text-300); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
@@ -423,6 +439,8 @@
     @media (max-width: 1100px) {
       .kpi-grid { grid-template-columns: repeat(2,1fr); }
       .grid-5-4, .grid-2 { grid-template-columns: 1fr; }
+      .home-main-row { grid-template-columns: 1fr; }
+      .home-analytics-row { grid-template-columns: 1fr; }
       .c-st-dific { display: none; }
       .attention-table, .st-table { overflow-x: auto; }
       .attention-row  { min-width: 680px; }
@@ -440,6 +458,8 @@
       .skill-row { flex-wrap: wrap; gap: 6px; }
       .skill-count { text-align: left; }
       .distrib-bar, .profile-banner .topbar-right { flex-wrap: wrap; }
+      .home-main-row { grid-template-columns: 1fr; }
+      .home-analytics-row { grid-template-columns: 1fr; }
     }
 
     /* Mobile — 768px */
@@ -460,6 +480,10 @@
       .hist-row { grid-template-columns: 28px 1fr auto auto; }
       .hist-row > :nth-child(5), .hist-row > :nth-child(6) { display: none; }
       .ctx-pill { padding: 6px 8px 6px 10px; font-size: 12px; }
+      .home-main-row { grid-template-columns: 1fr; }
+      .home-main-row > div:first-child { order: 2; }
+      .home-main-row > div:last-child  { order: 1; }
+      .home-analytics-row { grid-template-columns: 1fr; }
     }
 
     /* Mobile pequeno — 480px */
@@ -919,6 +943,163 @@
     .topbar { padding: 0 8px; }
   }
 
+
+  /* ─── CHART SCROLL WRAPPER ─── */
+  .chart-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* negative margin + padding trick to allow natural card padding */
+    margin: 0 0 10px;
+  }
+  /* prevent chart from being squished to zero */
+  .chart-scroll-wrap > div { min-width: 320px; }
+
+  /* ─── EVOLUÇÃO + HABILIDADES: fixes mobile ─── */
+  @media (max-width: 600px) {
+    /* card-header legend wraps em vez de overflow */
+    .card-header { flex-wrap: wrap !important; }
+    
+    /* skill-name trunca em vez de overflow */
+    .skill-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    /* garantir que skillsSection não gera overflow horizontal */
+    #skillsSection        { overflow-x: hidden; }
+    #skillsSection .card  { overflow-x: hidden; }
+    
+    /* garantir que attentionSection não gera overflow */
+    #attentionSection     { overflow-x: hidden; }
+    
+    /* skill-row não vaza lateralmente */
+    .skill-row { overflow-x: hidden; min-width: 0; }
+
+    /* chart scroll wrapper no mobile */
+    .chart-scroll-wrap { margin: 0 0 8px; }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE DENSITY — filtros, estudantes, turmas mais compactos
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* 1. Section-header "Estudantes" — título + Ver todos na mesma linha */
+    #homeAttentionSection .section-header {
+      flex-wrap: nowrap !important;
+      align-items: center;
+    }
+    #homeAttentionSection .section-header .section-label {
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #homeAttentionSection .section-header .btn {
+      flex-shrink: 0;
+    }
+
+    /* 2. Filtros: dropdown em cima, chips abaixo em linha única */
+    #homeAttentionSection > div:nth-child(2) {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 6px !important;
+    }
+    /* Esconder divisor vertical quando empilhado */
+    #homeAttentionSection > div:nth-child(2) > div:nth-child(2) {
+      display: none !important;
+    }
+    /* Turma dropdown: largura total */
+    #homeAttentionSection > div:nth-child(2) > .dropdown-wrap {
+      width: 100%;
+    }
+    #homeAttentionSection > div:nth-child(2) > .dropdown-wrap .sort-btn {
+      width: 100%;
+    }
+    /* Pills: linha única com scroll horizontal */
+    #homeFilterPills {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      padding-bottom: 2px;
+      width: 100%;
+      gap: 6px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #homeFilterPills::-webkit-scrollbar { display: none; }
+    /* Garantir que cada pill não encolhe */
+    #homeFilterPills .filter-pill { flex-shrink: 0; }
+  }
+
+  @media (max-width: 600px) {
+
+    /* 3. Turma cards: ocultar principal dificuldade (mais compacto) */
+    .tl-c-cont  { display: none !important; }
+    /* Alert fica sozinho na linha — ajustar */
+    .tl-c-alert { width: 100%; margin-right: 0; }
+    /* Padding ainda mais apertado */
+    .tl-row { padding: 9px 14px 8px !important; }
+
+    /* 4. Attention cards: sem margem extra em c-badge */
+    .c-badge  { margin-bottom: 2px !important; }
+    .c-info   { margin-bottom: 3px !important; }
+    .attention-row { padding: 8px 14px !important; }
+
+    /* 5. c-reason: garantir oculto (já está via 900px mas reforça) */
+    .c-reason { display: none !important; }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOBILE FIX — student-sub, header selects, turma filter
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* ── 1. student-sub: ocultar no mobile ── */
+  @media (max-width: 600px) {
+    .c-info .student-sub { display: none !important; }
+    /* student table: também oculta o sub abaixo do nome */
+    .c-st-nome .student-sub { display: none !important; }
+    /* Compensar: info precisa de menos margem sem sub-text */
+    .c-info   { margin-bottom: 2px !important; }
+    .c-st-nome { margin-bottom: 2px !important; }
+  }
+
+  /* ── 2. Header selects: período reativado, layout proporcional ── */
+  @media (max-width: 768px) {
+    /* Re-ativar período (anula display:none dos 3 blocos anteriores) */
+    #periodoBtn { display: inline-flex !important; flex-shrink: 0; }
+
+    /* Período: mostrar apenas ícone (compacto e reconhecível) */
+    #periodoLabel     { display: none !important; }
+    #periodoBtn .pill-icon { font-size: 14px; }
+    #periodoBtn .pill-chevron { font-size: 9px; }
+    #periodoBtn { padding: 7px 8px; gap: 4px; }
+
+    /* Distribuição: escola flex (cresce), período fixo (ícone) */
+    .topbar-right > .dropdown-wrap:first-child { flex: 1; min-width: 0; }
+    .topbar-right > .dropdown-wrap:nth-child(2) { flex: none; }
+  }
+
+  /* ── 3. Select de turma (filtro na seção de atenção): full width ── */
+  @media (max-width: 768px) {
+    /* Container cresce para full width */
+    #homeAttentionSection > div:nth-child(2) > .dropdown-wrap {
+      display: block;
+      width: 100%;
+    }
+    /* Botão do select ocupa a largura do container */
+    #homeTurmaBtn {
+      display: flex !important;  /* inline-flex → flex (bloco) */
+      width: 100%;
+      justify-content: space-between;
+    }
+    /* Dropdown do turma: largura do container, não sair da tela */
+    #homeTurmaFilter {
+      width: 100%;
+      max-width: calc(100vw - 28px);
+      min-width: 0 !important;
+      left: 0;
+      right: auto;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -1045,46 +1226,71 @@
         <!-- ══ VIEW: VISÃO GERAL (HOME multi-turma) ══ -->
         <div id="view-visao-geral">
 
-
           <!-- KPIs consolidados (todas as turmas) -->
           <div class="section">
             <div class="kpi-grid" id="homeKpiGrid"></div>
           </div>
 
-          <!-- Minhas Turmas -->
-          <div class="section">
-            <div class="section-header" style="margin-bottom:14px">
-              <div class="section-label" style="margin:0">Minhas turmas</div>
-              <span style="font-size:12px;color:var(--text-300)">Clique em uma turma para ver os detalhes</span>
+          <!-- Dashboard row 1: Minhas turmas + Atenção -->
+          <div class="home-main-row">
+            <!-- col esquerda: Minhas Turmas -->
+            <div>
+              <div class="section">
+                <div class="section-header" style="margin-bottom:14px">
+                  <div class="section-label" style="margin:0">Minhas turmas</div>
+                  <span style="font-size:12px;color:var(--text-300)">Clique em uma turma para ver os detalhes</span>
+                </div>
+                <div class="turmas-grid" id="turmasGrid"></div>
+              </div>
             </div>
-            <div class="turmas-grid" id="turmasGrid"></div>
+            <!-- col direita: Atenção compacto -->
+            <div>
+              <div class="section" id="homeAttentionSection">
+                <div class="section-header" style="margin-bottom:12px">
+                  <div class="section-label" style="margin:0">Precisam de atenção</div>
+                  <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
+                    Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
+                  </button>
+                </div>
+                <div id="homeAttentionList"></div>
+              </div>
+            </div>
           </div>
 
-          <!-- Estudantes que precisam de atenção (todas as turmas) -->
-          <div class="section" id="homeAttentionSection">
-            <div class="section-header" style="margin-bottom:12px">
-              <div class="section-label" style="margin:0">Estudantes que precisam de atenção</div>
-              <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
-                Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
-              </button>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-              <div class="dropdown-wrap">
-                <button class="sort-btn" id="homeTurmaBtn" onclick="openDd('homeTurmaFilter','homeTurmaBtn')">
-                  <span id="homeTurmaLabel">Todas as turmas</span>
-                  <i class="pi pi-chevron-down" style="font-size:10px;color:var(--text-300)"></i>
-                </button>
-                <div class="dropdown-menu" id="homeTurmaFilter" role="listbox" style="min-width:220px"></div>
-              </div>
-              <div style="width:1px;height:18px;background:var(--outline);flex-shrink:0"></div>
-              <div class="filter-pills" id="homeFilterPills" role="group" aria-label="Filtrar por situação"></div>
-            </div>
-            <div id="homeAttentionList"></div>
-          </div>
-          <!-- Atividades recentes (8º ano A como referência) -->
+          <!-- Dashboard row 2: Atividades recentes -->
           <div class="section">
-            <div class="section-label">Atividades recentes · 8º ano A</div>
+            <div class="section-label">Atividades recentes &middot; 8&ordm; ano A</div>
             <div id="homeActivitiesList"></div>
+          </div>
+
+          <!-- Dashboard row 3: Analítica - Evolução + Habilidades -->
+          <div class="home-analytics-row">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Evolução da Turma</div>
+                  <div class="card-subtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre &middot; 8&ordm; ano A</div>
+                </div>
+                <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
+                  <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
+                  <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                </div>
+              </div>
+              <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div>
+                <div class="card-title">Conteúdos e Habilidades</div>
+                <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
+              </div></div>
+              <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Cr&iacute;tico &lt;50%</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50&ndash;65%</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado &ge;65%</span>
+              </div>
+              <div id="homeSkillsList"></div>
+            </div>
           </div>
 
         </div><!-- /view-visao-geral -->
@@ -1117,7 +1323,7 @@
                     <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
                   </div>
                 </div>
-                <div style="position:relative;height:210px" role="img" aria-label="Gráfico de evolução da turma"><canvas id="chartEvolucao"></canvas></div>
+                <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Gráfico de evolução da turma"><canvas id="chartEvolucao"></canvas></div></div>
                 <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
               </div>
               <div class="card">
@@ -2851,25 +3057,21 @@ function renderHomeKPIs() {
   const tDir = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
   el.innerHTML = `
     <div class="kpi-card">
-      <div class="kpi-icon kpi-icon-brand"><i class="pi pi-users"></i></div>
       <div class="kpi-label">Estudantes acompanhados</div>
       <div class="kpi-value">${k.totalEst}</div>
       <div class="kpi-sub">${TURMAS.length} turmas na escola selecionada</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-icon kpi-icon-warning"><i class="pi pi-chart-bar"></i></div>
       <div class="kpi-label">Desempenho médio geral</div>
       <div class="kpi-value ${k.avgDesemp>=70?'':'medium'}">${k.avgDesemp}%</div>
       <div class="kpi-trend ${tDir}"><i class="pi pi-trending-${diff>=0?'up':'down'}" style="font-size:11px"></i>${(diff>0?'+':'')+diff}pp vs. período anterior</div>
     </div>
-    <div class="kpi-card ${k.turmasProblema>2?'urgent':''}">
-      <div class="kpi-icon kpi-icon-${k.turmasProblema>2?'error':'warning'}"><i class="pi pi-exclamation-circle"></i></div>
+    <div class="kpi-card">
       <div class="kpi-label">Turmas com atenção</div>
       <div class="kpi-value ${k.turmasProblema>2?'low':''}">${k.turmasProblema}</div>
       <div class="kpi-sub">${Math.round(k.turmasProblema/TURMAS.length*100)}% das turmas · queda ou abaixo de 65%</div>
     </div>
-    <div class="kpi-card urgent kpi-card-clickable" onclick="document.getElementById('homeAttentionSection').scrollIntoView({behavior:'smooth'})">
-      <div class="kpi-icon kpi-icon-error"><i class="pi pi-exclamation-circle"></i></div>
+    <div class="kpi-card kpi-card-clickable" onclick="document.getElementById('homeAttentionSection').scrollIntoView({behavior:'smooth'})">
       <div class="kpi-label">Estudantes em atenção</div>
       <div class="kpi-value low">${k.totalAlerts}</div>
       <div class="kpi-sub">${Math.round(k.totalAlerts/k.totalEst*100)}% do total · todas as turmas</div>
@@ -3097,13 +3299,90 @@ function renderActivitiesInto(targetId) {
   </div>`;
 }
 
+/* ─── HOME: Atenção compacta (sidebar) ─── */
+function renderHomeAttentionCompact() {
+  if (!ALL_ALERTAS.length) ALL_ALERTAS = buildAllAlertas();
+  const prioritized = ALL_ALERTAS
+    .slice().sort((a,b) => {
+      const order = { 'baixo-persistente':0, 'queda':1, 'inativo':2 };
+      return (order[a.tipo]??3) - (order[b.tipo]??3);
+    }).slice(0, 6);
+  const el = document.getElementById('homeAttentionList');
+  if (!el) return;
+  if (!prioritized.length) { el.innerHTML = renderEmptyState('sem-atencao'); return; }
+  el.innerHTML = `<div class="compact-att-list">${prioritized.map(al => {
+    const eData = al.eid ? getE(al.eid) : null;
+    const nome  = eData ? eData.nome : al.nome;
+    const init  = eData ? eData.init : al.init;
+    const colorIdx = eData ? eData.id : ((al._id||100) % 20 + 1);
+    const clickFn  = eData ? `onclick="openProfile(${eData.id})"` : `onclick="openTurmaDetalhe('${al.turmaId}')"`;
+    return `<div class="compact-att-row" ${clickFn}>
+      <div class="student-avatar" style="background:${avColor(colorIdx)};width:32px;height:32px;font-size:11px;font-weight:700;flex-shrink:0;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff">${init}</div>
+      <div class="compact-att-info">
+        <div class="compact-att-name">${nome}</div>
+        <div class="compact-att-meta">${al.turmaNome || ''} &middot; ${al.dific}</div>
+      </div>
+      <div>${alertBadge(al.tipo)}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ─── HOME: Skills / Evolução (analytics) ─── */
+let homeEvolucaoChart = null;
+function renderHomeSkills() {
+  // Skills list
+  const sl = document.getElementById('homeSkillsList');
+  if (sl) {
+    sl.innerHTML = DATA.habilidades.map(h => {
+      const ativIdx = SKILLS_LABEL.indexOf(h.nome);
+      return `<div class="skill-row" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
+           onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='''"
+           onclick="goToSkill(${ativIdx})" title="Ver detalhes de ${h.nome}">
+        <span class="skill-name">${h.nome}</span>
+        <div class="skill-bar-wrap"><div class="pbar-wrap"><div class="pbar-fill ${domCls(h.dominio)}" style="width:${h.dominio}%"></div></div></div>
+        <span class="skill-pct" style="color:${domColor(h.dominio)}">${h.dominio}%</span>
+        <span class="skill-count">${h.afetados} estudantes</span>
+        <i class="pi pi-chevron-right" style="font-size:10px;color:var(--text-300);flex-shrink:0"></i>
+      </div>`;
+    }).join('');
+  }
+  // Chart
+  const canvas = document.getElementById('homeChartEvolucao');
+  if (!canvas) return;
+  if (homeEvolucaoChart) { homeEvolucaoChart.destroy(); homeEvolucaoChart = null; }
+  const labels = DATA.evolucao.map(p => p.label);
+  const scores = DATA.evolucao.map(p => p.score);
+  const ptColors = scores.map(s => s < 70 ? '#F04438' : '#2177FF');
+  homeEvolucaoChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: scores, borderColor: '#2177FF', backgroundColor: 'rgba(33,119,255,.08)',
+        pointBackgroundColor: ptColors, pointBorderColor: ptColors,
+        pointRadius: 5, pointHoverRadius: 7, tension: 0.35, fill: true, borderWidth: 2
+      },{
+        data: labels.map(()=>70), borderColor: '#DDE4EB', borderDash: [5,4],
+        pointRadius: 0, borderWidth: 1.5, fill: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y + '%' } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#8A95B2' } },
+        y: { min: 0, max: 100, grid: { color: '#EDF0F5' }, ticks: { font: { size: 11 }, color: '#8A95B2', callback: v => v + '%' } }
+      }
+    }
+  });
+}
+
 function initHome() {
   renderHomeKPIs();
   renderTurmaCards();
-  try { renderHomeFilterPills('all'); }     catch(e) {}
-  try { renderHomeTurmaFilter('all'); }     catch(e) {}
-  try { renderMultiAttention('all','all'); } catch(e) {}
+  try { renderHomeAttentionCompact(); }         catch(e) {}
   try { renderActivitiesInto('homeActivitiesList'); } catch(e) {}
+  try { renderHomeSkills(); }                   catch(e) {}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3225,6 +3504,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
