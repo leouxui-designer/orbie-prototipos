@@ -140,6 +140,15 @@
     .home-analytics-row { display: grid; grid-template-columns: 5fr 4fr; gap: 16px; align-items: start; }
     .home-analytics-row > div { min-width: 0; }
     .home-analytics-row .card { height: 100%; }
+    /* ─── HOME TWO-COLUMN LAYOUT ─── */
+    .home-two-col { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; }
+    .home-left-col, .home-right-col { min-width:0; display:flex; flex-direction:column; gap:20px; }
+    .home-left-col > *, .home-right-col > * { margin-bottom:0 !important; }
+    /* Attention panel: same visual border as turmas-list */
+    .home-attention-panel { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); padding:16px 16px 12px; }
+    .home-attention-panel .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-300); }
+    @media (max-width:1100px) { .home-two-col { grid-template-columns:1fr; } }
+    @media (max-width:768px)  { .home-two-col { grid-template-columns:1fr; } }
 
     /* ─── COMPACT ATTENTION (sidebar) ─── */
     .compact-att-list { display: flex; flex-direction: column; gap: 0; }
@@ -1100,6 +1109,37 @@
     }
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════
+     DASHBOARD DESKTOP — column widths, overflow, density
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* Narrower right column = more space for left */
+  .home-two-col { grid-template-columns: 1fr 292px !important; }
+
+  /* Turmas list: tighter columns, scroll safety */
+  .turmas-list { overflow-x: auto !important; overflow-y: visible !important; }
+  .tl-row  { gap: 10px !important; min-width: 580px; }
+  .tl-head { gap: 10px !important; min-width: 580px; }
+  .tl-c-nome  { width: 110px !important; flex-shrink: 0 !important; }
+  .tl-c-disc  { width: 120px !important; flex-shrink: 0 !important; }
+  .tl-c-est   { width:  46px !important; flex-shrink: 0 !important; text-align: center !important; }
+  .tl-c-desemp{ width: 136px !important; flex-shrink: 0 !important; }
+  .tl-c-tend  { width:  96px !important; flex-shrink: 0 !important; }
+  .tl-c-alert { width:  64px !important; flex-shrink: 0 !important; text-align: center !important; }
+  .tl-c-cont  { display: none !important; }   /* hide dificuldade col desktop too */
+  .tl-c-act   { display: none !important; }   /* card is clickable — no Ver button needed */
+
+  /* Skills list: hide count (noisy in narrow card) */
+  .skill-count { display: none; }
+  .skill-row { padding: 8px 2px; }
+
+  /* Activities: compact row that fits in narrow right column */
+  .activity-row { gap: 10px !important; padding: 10px 14px !important; align-items: flex-start; }
+  .activity-icon-box { width: 30px !important; height: 30px !important; font-size: 14px !important; flex-shrink: 0; margin-top: 1px; }
+  .activity-stats { gap: 8px !important; flex-wrap: wrap; font-size: 11px !important; }
+  .act-row-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
   </style>
 </head>
 <body>
@@ -1231,21 +1271,57 @@
             <div class="kpi-grid" id="homeKpiGrid"></div>
           </div>
 
-          <!-- Dashboard row 1: Minhas turmas + Atenção -->
-          <div class="home-main-row">
-            <!-- col esquerda: Minhas Turmas -->
-            <div>
+          <!-- Dashboard: two-column layout -->
+          <div class="home-two-col">
+
+            <!-- LEFT: Minhas turmas → Conteúdos e Habilidades → Evolução da Turma -->
+            <div class="home-left-col">
+
+              <!-- 1. Minhas turmas -->
               <div class="section">
                 <div class="section-header" style="margin-bottom:14px">
                   <div class="section-label" style="margin:0">Minhas turmas</div>
-                  <span style="font-size:12px;color:var(--text-300)">Clique em uma turma para ver os detalhes</span>
                 </div>
                 <div class="turmas-grid" id="turmasGrid"></div>
               </div>
-            </div>
-            <!-- col direita: Atenção compacto -->
-            <div>
-              <div class="section" id="homeAttentionSection">
+
+              <!-- 2. Conteúdos e Habilidades -->
+              <div class="card">
+                <div class="card-header"><div>
+                  <div class="card-title">Conteúdos e Habilidades</div>
+                  <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
+                </div></div>
+                <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Cr&iacute;tico &lt;50%</span>
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50&ndash;65%</span>
+                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado &ge;65%</span>
+                </div>
+                <div id="homeSkillsList"></div>
+              </div>
+
+              <!-- 3. Evolução da Turma -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Evolução da Turma</div>
+                    <div class="card-subtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre &middot; 8&ordm; ano A</div>
+                  </div>
+                  <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                  </div>
+                </div>
+                <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
+              </div>
+
+            </div><!-- /home-left-col -->
+
+            <!-- RIGHT: Precisam de atenção → Atividades recentes -->
+            <div class="home-right-col">
+
+              <!-- 1. Precisam de atenção -->
+              <div class="home-attention-panel" id="homeAttentionSection">
                 <div class="section-header" style="margin-bottom:12px">
                   <div class="section-label" style="margin:0">Precisam de atenção</div>
                   <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
@@ -1254,45 +1330,16 @@
                 </div>
                 <div id="homeAttentionList"></div>
               </div>
-            </div>
-          </div>
 
-          <!-- Dashboard row 2: Atividades recentes -->
-          <div class="section">
-            <div class="section-label">Atividades recentes &middot; 8&ordm; ano A</div>
-            <div id="homeActivitiesList"></div>
-          </div>
-
-          <!-- Dashboard row 3: Analítica - Evolução + Habilidades -->
-          <div class="home-analytics-row">
-            <div class="card">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Evolução da Turma</div>
-                  <div class="card-subtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre &middot; 8&ordm; ano A</div>
-                </div>
-                <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
-                  <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
-                  <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
-                </div>
+              <!-- 2. Atividades recentes -->
+              <div class="section">
+                <div class="section-label">Atividades recentes &middot; 8&ordm; ano A</div>
+                <div id="homeActivitiesList"></div>
               </div>
-              <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
-              <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
-            </div>
-            <div class="card">
-              <div class="card-header"><div>
-                <div class="card-title">Conteúdos e Habilidades</div>
-                <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
-              </div></div>
-              <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Cr&iacute;tico &lt;50%</span>
-                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50&ndash;65%</span>
-                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado &ge;65%</span>
-              </div>
-              <div id="homeSkillsList"></div>
-            </div>
-          </div>
 
+            </div><!-- /home-right-col -->
+
+          </div><!-- /home-two-col -->
         </div><!-- /view-visao-geral -->
 
         <!-- ══ VIEW: TURMA DETALHE (visão de uma turma específica) ══ -->
@@ -1758,6 +1805,7 @@ function renderActivities() {
       ${next ? `<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Próxima: <strong style="color:var(--text-700)">${next.nome}</strong> · ${next.data}</span></div>` : ''}
     </div>`;
 }
+
 
 /* ─── CHART ─── */
 let evolChart;
@@ -3277,26 +3325,29 @@ function selectHomeTurma(id) {
   renderMultiAttention(homeAttentionSituacaoFilter, id);
 }
 
+
+
 function renderActivitiesInto(targetId) {
   const el = document.getElementById(targetId);
   if (!el) { renderActivities(); return; }
   const recent = DATA.atividades.filter(a=>a.status!=='planned').slice(-4).reverse();
   const next   = DATA.atividades.find(a=>a.status==='planned');
-  el.innerHTML = `<div class="activities-list">
-    ${recent.map(a => `
-      <div class="activity-row">
-        <div class="activity-icon-box ${a.status==='alert'?'alert-icon':''}"><i class="pi pi-file-edit"></i></div>
-        <div style="flex:1;min-width:0"><div class="activity-name">${a.nome}</div><div class="activity-date">${a.data}</div></div>
-        <div class="activity-stats">
-          <span><strong>${a.entregues}/${a.total}</strong> entregues</span>
-          <span style="display:flex;align-items:center;gap:6px">Média <span class="score-chip ${scoreCls(a.media)}">${a.media}%</span></span>
-        </div>
-        <div style="flex-shrink:0;margin-left:8px">
-          ${a.status==='alert'?`<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-triangle" style="font-size:10px"></i> Resultado baixo</span>`:`<span class="badge badge-neutral" style="font-size:11px">Normal</span>`}
-        </div>
-      </div>`).join('')}
-    ${next?`<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Próxima: <strong style="color:var(--text-700)">${next.nome}</strong> · ${next.data}</span></div>`:''}
-  </div>`;
+  el.innerHTML = '<div class="activities-list">' +
+    recent.map(a =>
+      '<div class="activity-row">' +
+        '<div class="activity-icon-box ' + (a.status==='alert'?'alert-icon':'') + '"><i class="pi pi-file-edit"></i></div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="activity-name">' + a.nome + '</div>' +
+          '<div class="activity-date" style="margin-top:2px">' + a.data + ' &middot; <strong>' + a.entregues + '/' + a.total + '</strong> entregues</div>' +
+        '</div>' +
+        '<div class="act-row-right">' +
+          '<span class="score-chip ' + scoreCls(a.media) + '">' + a.media + '%</span>' +
+          (a.status==='alert' ? '<span class="badge badge-error" style="font-size:10px;padding:2px 6px"><i class="pi pi-exclamation-triangle" style="font-size:9px"></i></span>' : '') +
+        '</div>' +
+      '</div>'
+    ).join('') +
+    (next ? '<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Pr&oacute;xima: <strong style="color:var(--text-700)">' + next.nome + '</strong> &middot; ' + next.data + '</span></div>' : '') +
+    '</div>';
 }
 
 /* ─── HOME: Atenção compacta (sidebar) ─── */
