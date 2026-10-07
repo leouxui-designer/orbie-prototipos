@@ -521,7 +521,7 @@
     /* ─── TURMA CARDS ─── */
     /* ─── TURMAS LIST ─── */
     .turmas-list { background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); overflow:hidden; }
-    .tl-head { display:flex; align-items:center; gap:12px; padding:9px 16px; border-bottom:1px solid var(--outline); background:var(--bg); }
+    .tl-head { display:flex; align-items:center; gap:12px; padding:9px 16px; border-bottom:1px solid var(--outline); background:var(--surface); }
     .tl-head span { font-size:11px; font-weight:700; color:var(--text-300); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
     .tl-row { display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--outline-2); cursor:pointer; transition:background .1s; }
     .tl-row:last-child { border-bottom:none; }
@@ -1140,6 +1140,14 @@
   .activity-stats { gap: 8px !important; flex-wrap: wrap; font-size: 11px !important; }
   .act-row-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
+
+  /* ─── Dashboard: equal-height section headers ─── */
+  .home-left-col .section-header,
+  .home-right-col .section-header { min-height: 32px; }
+
+  /* Estável: simple gray pill, no icon, no border */
+  .badge-estavel { background: var(--bg); color: var(--text-500); }
+  .skill-row:hover { background: var(--bg); }
   </style>
 </head>
 <body>
@@ -1212,7 +1220,7 @@
       <!-- Início = Painel de Docentes (ativo, expandido) -->
       <div>
         <button class="nav-item active expanded" id="nav-home-link" onclick="toggleAcc(this);setView('visao-geral',this)"><div class="nav-item-inner"><div class="nav-bar"></div><i class="pi pi-home nav-icon"></i><span class="nav-label">Início</span><i class="pi pi-chevron-down nav-chevron" style="transform:rotate(180deg)"></i></div></button>
-        <div class="nav-sub open">
+        <div class="nav-sub">
           <a class="nav-sub-item" id="nav-est-link" href="#" onclick="setView('estudantes',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Estudantes</span></div></a>
           <a class="nav-sub-item" href="#" onclick="setView('atividades',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Atividades</span></div></a>
           <a class="nav-sub-item" id="nav-cont-link" href="#" onclick="setView('conteudos',this);return false"><div class="nav-sub-inner"><div class="nav-bar"></div><span>Conteúdos</span></div></a>
@@ -1321,14 +1329,16 @@
             <div class="home-right-col">
 
               <!-- 1. Precisam de atenção -->
-              <div class="home-attention-panel" id="homeAttentionSection">
-                <div class="section-header" style="margin-bottom:12px">
+              <div id="homeAttentionSection">
+                <div class="section-header" style="margin-bottom:14px">
                   <div class="section-label" style="margin:0">Precisam de atenção</div>
                   <button class="btn btn-sm btn-ghost" onclick="studentsFilter='atencao';setView('estudantes',document.getElementById('nav-est-link'))">
                     Ver todos <i class="pi pi-arrow-right" style="font-size:10px"></i>
                   </button>
                 </div>
-                <div id="homeAttentionList"></div>
+                <div class="home-attention-panel">
+                  <div id="homeAttentionList"></div>
+                </div>
               </div>
 
               <!-- 2. Atividades recentes -->
@@ -1722,7 +1732,7 @@ function renderSkills() {
   document.getElementById('skillsList').innerHTML = DATA.habilidades.map(h => {
     const ativIdx = SKILLS_LABEL.indexOf(h.nome);
     return `<div class="skill-row" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
-         onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''"
+
          onclick="goToSkill(${ativIdx})" title="Ver detalhes de ${h.nome}">
       <span class="skill-name">${h.nome}</span>
       <div class="skill-bar-wrap"><div class="pbar-wrap"><div class="pbar-fill ${domCls(h.dominio)}" style="width:${h.dominio}%"></div></div></div>
@@ -1759,7 +1769,6 @@ function renderAttention(f) {
     <div class="attention-row" onclick="openProfile(${e.id})">
       <div class="c-avatar"><div class="student-avatar" style="background:${avColor(e.id)}">${e.init}</div></div>
       <div class="c-info"><div class="student-name">${e.nome}</div><div class="student-sub">${tendLabel(e.tend)}</div></div>
-      <div class="c-badge">${alertBadge(al.tipo)}</div>
       <div class="c-spark">${buildSparkline(e.scores)}</div>
       <div class="c-score">${al.score!==null ? `<span class="score-chip ${scoreCls(al.score)}">${al.score}%</span>` : `<span class="score-chip neutral">—</span>`}</div>
       <div class="c-reason"><span class="reason-text">${al.dific}</span></div>
@@ -3129,8 +3138,8 @@ function renderHomeKPIs() {
 function renderTurmaCards() {
   const el = document.getElementById('turmasGrid');
   if (!el) return;
-  const tendBadge = { melhorando:'badge-success', estavel:'badge-neutral', queda:'badge-warning' };
-  const tendIcon  = { melhorando:'pi-trending-up', estavel:'pi-minus-circle', queda:'pi-trending-down' };
+  const tendBadge = { melhorando:'badge-success', estavel:'badge-estavel', queda:'badge-warning' };
+  const tendIcon  = { melhorando:'pi-trending-up', estavel:'', queda:'pi-trending-down' };
   const tendText  = { melhorando:'Melhorando', estavel:'Estável', queda:'Queda' };
   const pCls  = v => v >= 70 ? 'good' : v >= 55 ? 'medium' : 'low';
   const dColor = v => v >= 70 ? 'var(--success)' : v >= 55 ? 'var(--warning)' : 'var(--error)';
@@ -3142,7 +3151,6 @@ function renderTurmaCards() {
       <div class="tl-c-est"><span>Alunos</span></div>
       <div class="tl-c-desemp"><span>Desempenho médio</span></div>
       <div class="tl-c-tend"><span>Tendência</span></div>
-      <div class="tl-c-alert"><span>Atenção</span></div>
       <div class="tl-c-cont"><span>Principal dificuldade</span></div>
       <div class="tl-c-act"></div>
     </div>`;
@@ -3166,13 +3174,8 @@ function renderTurmaCards() {
       </div>
       <div class="tl-c-tend">
         <span class="badge ${tendBadge[t.tendencia]}" style="font-size:11px">
-          <i class="pi ${tendIcon[t.tendencia]}" style="font-size:10px"></i> ${tendText[t.tendencia]}
+          ${tendIcon[t.tendencia] ? `<i class="pi ${tendIcon[t.tendencia]}" style="font-size:10px"></i> ` : ''}${tendText[t.tendencia]}
         </span>
-      </div>
-      <div class="tl-c-alert">
-        ${t.alertas > 0
-          ? `<span class="badge badge-error" style="font-size:11px"><i class="pi pi-exclamation-circle" style="font-size:10px"></i> ${t.alertas}</span>`
-          : `<span style="font-size:12px;color:var(--text-300)">—</span>`}
       </div>
       <div class="tl-c-cont">
         <span style="font-size:11px;color:var(--text-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${t.habilidadeCritica}</span>
@@ -3341,12 +3344,10 @@ function renderActivitiesInto(targetId) {
           '<div class="activity-date" style="margin-top:2px">' + a.data + ' &middot; <strong>' + a.entregues + '/' + a.total + '</strong> entregues</div>' +
         '</div>' +
         '<div class="act-row-right">' +
-          '<span class="score-chip ' + scoreCls(a.media) + '">' + a.media + '%</span>' +
           (a.status==='alert' ? '<span class="badge badge-error" style="font-size:10px;padding:2px 6px"><i class="pi pi-exclamation-triangle" style="font-size:9px"></i></span>' : '') +
         '</div>' +
       '</div>'
     ).join('') +
-    (next ? '<div class="act-footer"><span style="font-size:12px;color:var(--text-300)"><i class="pi pi-calendar" style="font-size:11px;margin-right:4px"></i>Pr&oacute;xima: <strong style="color:var(--text-700)">' + next.nome + '</strong> &middot; ' + next.data + '</span></div>' : '') +
     '</div>';
 }
 
@@ -3371,9 +3372,9 @@ function renderHomeAttentionCompact() {
       <div class="student-avatar" style="background:${avColor(colorIdx)};width:32px;height:32px;font-size:11px;font-weight:700;flex-shrink:0;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff">${init}</div>
       <div class="compact-att-info">
         <div class="compact-att-name">${nome}</div>
-        <div class="compact-att-meta">${al.turmaNome || ''} &middot; ${al.dific}</div>
+        <div class="compact-att-meta">${al.turmaNome || ''}</div>
       </div>
-      <div>${alertBadge(al.tipo)}</div>
+      
     </div>`;
   }).join('')}</div>`;
 }
@@ -3387,7 +3388,6 @@ function renderHomeSkills() {
     sl.innerHTML = DATA.habilidades.map(h => {
       const ativIdx = SKILLS_LABEL.indexOf(h.nome);
       return `<div class="skill-row" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
-           onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='''"
            onclick="goToSkill(${ativIdx})" title="Ver detalhes de ${h.nome}">
         <span class="skill-name">${h.nome}</span>
         <div class="skill-bar-wrap"><div class="pbar-wrap"><div class="pbar-fill ${domCls(h.dominio)}" style="width:${h.dominio}%"></div></div></div>
