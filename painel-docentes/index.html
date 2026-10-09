@@ -1119,13 +1119,13 @@
 
   /* Turmas list: tighter columns, scroll safety */
   .turmas-list { overflow-x: auto !important; overflow-y: visible !important; }
-  .tl-row  { gap: 10px !important; min-width: 580px; }
+  .tl-row  { gap: 10px !important; min-width: 500px; }
   .tl-head { gap: 10px !important; min-width: 580px; }
-  .tl-c-nome  { width: 110px !important; flex-shrink: 0 !important; }
-  .tl-c-disc  { width: 120px !important; flex-shrink: 0 !important; }
+  .tl-c-nome  { width: 105px !important; flex-shrink: 0 !important; }
+  .tl-c-disc  { flex: 1 !important; min-width: 96px !important; }
   .tl-c-est   { width:  46px !important; flex-shrink: 0 !important; text-align: center !important; }
-  .tl-c-desemp{ width: 136px !important; flex-shrink: 0 !important; }
-  .tl-c-tend  { width:  96px !important; flex-shrink: 0 !important; }
+  .tl-c-desemp{ width: 152px !important; flex-shrink: 0 !important; }
+  .tl-c-tend  { width: 110px !important; flex-shrink: 0 !important; }
   .tl-c-alert { width:  64px !important; flex-shrink: 0 !important; text-align: center !important; }
   .tl-c-cont  { display: none !important; }   /* hide dificuldade col desktop too */
   .tl-c-act   { display: none !important; }   /* card is clickable — no Ver button needed */
@@ -1148,6 +1148,92 @@
   /* Estável: simple gray pill, no icon, no border */
   .badge-estavel { background: var(--bg); color: var(--text-500); }
   .skill-row:hover { background: var(--bg); }
+
+  /* ══════════════════════════════════════════════════════════════════
+     VISUAL HIERARCHY REFINEMENTS
+     neutral by default → color for meaning → strong only for priority
+  ══════════════════════════════════════════════════════════════════ */
+
+  /* ─── Extra tokens: softer semantic surfaces ─── */
+  :root {
+    --success-soft: #F0FDF6;  --success-ink: #0A7A42;
+    --warning-soft: #FFFBF0;  --warning-ink: #A05C00;
+    --error-soft:   #FFF2F1;  --error-ink:   #C53030;
+    --info-soft:    #EFF8FF;  --info-ink:    #1A6BB5;
+  }
+
+  /* ─── Student avatar: remove hardcoded white text ─── */
+  .student-avatar { color: inherit; }
+
+  /* ─── KPI cards: no icon boxes — icons were removed; keep values neutral ─── */
+  .kpi-icon-brand   { background: var(--bg); color: var(--text-300); }
+  .kpi-icon-warning { background: var(--bg); color: var(--text-300); }
+  .kpi-icon-error   { background: var(--error-soft); color: var(--error-ink); }
+  /* Only "Turmas/estudantes em atenção" keeps the error treatment */
+  .kpi-value.medium { color: var(--text-700); }
+  /* .kpi-value.low stays var(--error) — it IS critical */
+
+  /* ─── Score chips: more subtle ─── */
+  .score-chip.good   { background: var(--success-soft); color: var(--success-ink); }
+  .score-chip.medium { background: var(--warning-soft); color: var(--warning-ink); }
+  .score-chip.low    { background: var(--error-soft);   color: var(--error-ink);   }
+
+  /* ─── Semantic badges: reduce saturation ─── */
+  .badge-success { background: var(--success-soft); color: var(--success-ink); }
+  .badge-warning { background: var(--warning-soft); color: var(--warning-ink); }
+  .badge-error   { background: var(--error-soft);   color: var(--error-ink);   }
+  .badge-info    { background: var(--info-soft);    color: var(--info-ink);    }
+
+  /* ─── badge-estavel: already has no border — keep neutral ─── */
+  .badge-estavel { background: var(--bg); color: var(--text-500); }
+
+  /* ─── Student estado badges: reduce saturation ─── */
+  .estado-bom       { background: var(--success-soft); color: var(--success-ink); }
+  .estado-evoluindo { background: var(--info-soft);    color: var(--info-ink);    }
+  .estado-atencao   { background: var(--error-soft);   color: var(--error-ink);   }
+  .estado-queda     { background: var(--warning-soft); color: var(--warning-ink); }
+
+  /* ─── Signal banner: less saturated background ─── */
+  .signal-banner.warning {
+    background: #FFFDF8;
+    border-color: rgba(247,144,9,.18);
+  }
+  .signal-banner.ok {
+    background: #FAFFFC;
+    border-color: rgba(18,183,106,.18);
+  }
+  .signal-banner.warning .signal-icon-box { background: rgba(247,144,9,.10); }
+  .signal-banner.ok      .signal-icon-box { background: rgba(18,183,106,.10); }
+
+  /* ─── Progress bars: slightly softer saturation ─── */
+  .pbar-fill.good   { background: #22C55E; }
+  .pbar-fill.medium { background: #F59E0B; }
+  .pbar-fill.low    { background: #EF4444; }
+
+  /* ─── Turma tendência badges ─── */
+  .badge-success { background: var(--success-soft); color: var(--success-ink); }
+
+  /* ─── KPI urgent border: very subtle ─── */
+  .kpi-card.urgent { border-color: var(--outline); }
+
+  /* ─── Turma list: dColor function produces inline styles — override via CSS context ─── */
+
+  /* ─── Attention table: lighter hover ─── */
+  .attention-row:hover { background: var(--bg); }
+
+  /* ─── Section labels: slightly more weight ─── */
+  .section-label { color: var(--text-500); font-weight: 700; }
+
+  /* ─── Card header titles ─── */
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text-900); }
+
+  /* ─── Breadcrumb-current: de-emphasize ─── */
+  .breadcrumb-current { color: var(--text-300); font-weight: 400; }
+
+  /* ─── Trend indicators in student table: subtle ─── */
+  .kpi-trend.up   { color: var(--success-ink); }
+  .kpi-trend.down { color: var(--error-ink);   }
+
   </style>
 </head>
 <body>
@@ -1309,14 +1395,24 @@
 
               <!-- 3. Evolução da Turma -->
               <div class="card">
-                <div class="card-header">
-                  <div>
+                <div class="card-header" style="flex-wrap:wrap;gap:10px;align-items:flex-start">
+                  <div style="flex:1;min-width:0">
                     <div class="card-title">Evolução da Turma</div>
-                    <div class="card-subtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre &middot; 8&ordm; ano A</div>
+                    <div class="card-subtitle" id="homeEvolSubtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre</div>
                   </div>
-                  <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300);flex-shrink:0">
-                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
-                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0">
+                    <select id="homeEvolTurmaSelect" class="sort-btn" style="height:32px;padding:0 10px;font-size:12px;cursor:pointer;font-family:var(--font)" onchange="renderHomeEvolChart()">
+                      <option value="8a">8&ordm; ano A</option>
+                      <option value="8b">8&ordm; ano B</option>
+                      <option value="9a">9&ordm; ano A</option>
+                      <option value="9b">9&ordm; ano B</option>
+                      <option value="1ema">1&ordm; EM A</option>
+                      <option value="1emb">1&ordm; EM B</option>
+                    </select>
+                    <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300)">
+                      <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
+                      <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                    </div>
                   </div>
                 </div>
                 <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
@@ -1620,6 +1716,12 @@ let ESCOLAS_DATA    = {};
 /* ─── HELPERS ─── */
 const AVATAR_COLORS = ['#2177FF','#12B76A','#F79009','#8B5CF6','#EC4899','#06B6D4','#F59E0B','#10B981','#EF4444','#6366F1','#0EA5E9','#14B8A6','#F97316','#A855F7','#22D3EE','#84CC16','#E11D48','#7C3AED','#0891B2','#CA8A04'];
 const avColor = id => AVATAR_COLORS[(id-1) % AVATAR_COLORS.length];
+
+/* ─── Avatar: light bg + dark text system ─── */
+const AVATAR_BG   = ['#EEF4FF','#EDFDF5','#FFF8EE','#F2EFFF','#FEF1F8','#ECFEFF','#FFF8EE','#EDFDF5','#FFF0F0','#F0EFFF','#EFF8FF','#EFFDF9','#FFF4ED','#F9F0FF','#ECFEFF','#F5FDE7','#FFF0F2','#F3F0FF','#ECFEFF','#FEFCE8'];
+const AVATAR_INK  = ['#1558BB','#0A7A42','#A05C00','#5A21B2','#9D174D','#0E7490','#92400E','#065F46','#B91C1C','#3730A3','#0369A1','#0F766E','#C2410C','#7E22CE','#0E7490','#3F6212','#9F1239','#4C1D95','#155E75','#713F12'];
+const avBgColor   = id => AVATAR_BG[(id-1)  % AVATAR_BG.length];
+const avInkColor  = id => AVATAR_INK[(id-1) % AVATAR_INK.length];
 const getE    = id => DATA.estudantes.find(e => e.id === id);
 
 function scoreCls(v) {
@@ -1767,7 +1869,7 @@ function renderAttention(f) {
     const e = getE(al.eid);
     return `
     <div class="attention-row" onclick="openProfile(${e.id})">
-      <div class="c-avatar"><div class="student-avatar" style="background:${avColor(e.id)}">${e.init}</div></div>
+      <div class="c-avatar"><div class="student-avatar" style="background:${avBgColor(e.id)};color:${avInkColor(e.id)}">${e.init}</div></div>
       <div class="c-info"><div class="student-name">${e.nome}</div><div class="student-sub">${tendLabel(e.tend)}</div></div>
       <div class="c-spark">${buildSparkline(e.scores)}</div>
       <div class="c-score">${al.score!==null ? `<span class="score-chip ${scoreCls(al.score)}">${al.score}%</span>` : `<span class="score-chip neutral">—</span>`}</div>
@@ -2153,7 +2255,7 @@ function renderStudentRows(arr) {
       : '<span style="font-size:11px;color:var(--text-300)">Nenhuma identificada</span>';
     return `
       <div class="st-row" data-estado="${est.id}" onclick="openProfile(${e.id})">
-        <div class="c-st-av"><div class="student-avatar" style="background:${avColor(e.id)}">${e.init}</div></div>
+        <div class="c-st-av"><div class="student-avatar" style="background:${avBgColor(e.id)};color:${avInkColor(e.id)}">${e.init}</div></div>
         <div class="c-st-nome">
           <div class="student-name">${e.nome}</div>
           <div class="student-sub">${est.sub}</div>
@@ -2809,7 +2911,7 @@ function renderSkillDetail(idx) {
   /* ── Distribuição (dots clicáveis) ── */
   const mkGroup = (arr, label, color) => {
     if (!arr.length) return '';
-    const dots = arr.map(s=>`<div class="student-dot" style="background:${avColor(s.id)}" title="${s.nome}: ${s.score}%" onclick="openProfile(${s.id})">${s.init}</div>`).join('');
+    const dots = arr.map(s=>`<div class="student-dot" style="background:${avBgColor(s.id)};color:${avInkColor(s.id)}" title="${s.nome}: ${s.score}%" onclick="openProfile(${s.id})">${s.init}</div>`).join('');
     return `<div class="dist-row">
       <div class="dist-label"><span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>${label}</div>
       <div class="dist-bar-col">${dots}</div>
@@ -2832,7 +2934,7 @@ function renderSkillDetail(idx) {
   /* ── Estudantes com maior dificuldade ── */
   const diffStudents = d.low.concat(d.medium).slice(0,6).map(s=>`
     <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--outline-2);cursor:pointer" onclick="openProfile(${s.id})">
-      <div class="student-avatar" style="background:${avColor(s.id)};width:32px;height:32px;font-size:11px;flex-shrink:0">${s.init}</div>
+      <div class="student-avatar" style="background:${avBgColor(s.id)};color:${avInkColor(s.id)};width:32px;height:32px;font-size:11px;flex-shrink:0">${s.init}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:600;color:var(--text-900)">${s.nome}</div>
         <div style="font-size:11px;color:var(--text-300)">${getEstado(DATA.estudantes.find(e=>e.id===s.id)).label}</div>
@@ -3267,7 +3369,7 @@ function renderMultiAttention(situacaoFilter, turmaFilter) {
       ? `<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openProfile(${eData.id})">Ver <i class="pi pi-arrow-right" style="font-size:10px"></i></button>`
       : `<button class="btn btn-sm btn-outline" style="font-size:11px" onclick="openTurmaDetalhe('${al.turmaId}')">Ver turma</button>`;
     return `<div class="attention-row" ${eData?`onclick="openProfile(${eData.id})"`:''}>
-      <div class="c-avatar"><div class="student-avatar" style="background:${avColor(colorIdx)}">${init}</div></div>
+      <div class="c-avatar"><div class="student-avatar" style="background:${avBgColor(colorIdx)};color:${avInkColor(colorIdx)}">${init}</div></div>
       <div class="c-info"><div class="student-name">${nome}</div><div class="student-sub">${tendLabel(tend)}</div></div>
       <div class="c-turma"><span class="turma-tag">${al.turmaNome}</span></div>
       <div class="c-badge">${alertBadge(al.tipo)}</div>
@@ -3369,7 +3471,7 @@ function renderHomeAttentionCompact() {
     const colorIdx = eData ? eData.id : ((al._id||100) % 20 + 1);
     const clickFn  = eData ? `onclick="openProfile(${eData.id})"` : `onclick="openTurmaDetalhe('${al.turmaId}')"`;
     return `<div class="compact-att-row" ${clickFn}>
-      <div class="student-avatar" style="background:${avColor(colorIdx)};width:32px;height:32px;font-size:11px;font-weight:700;flex-shrink:0;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff">${init}</div>
+      <div class="student-avatar" style="background:${avBgColor(colorIdx)};color:${avInkColor(colorIdx)};width:32px;height:32px;font-size:11px;font-weight:700;flex-shrink:0;border-radius:999px;display:flex;align-items:center;justify-content:center">${init}</div>
       <div class="compact-att-info">
         <div class="compact-att-name">${nome}</div>
         <div class="compact-att-meta">${al.turmaNome || ''}</div>
@@ -3397,13 +3499,36 @@ function renderHomeSkills() {
       </div>`;
     }).join('');
   }
-  // Chart
+  // Chart — delegate to renderHomeEvolChart so the turma select works
+  renderHomeEvolChart();
+}
+
+
+/* ─── HOME: Evolução por turma — dados mock ─── */
+const HOME_EVOL_DATA = {
+  '8a':   { labels:['05/ago','19/ago','02/set','16/set','23/set','30/set'], scores:[64,64,64,53,63,63] },
+  '8b':   { labels:['05/ago','19/ago','02/set','16/set','23/set','30/set'], scores:[68,70,72,65,71,73] },
+  '9a':   { labels:['08/ago','22/ago','05/set','19/set','26/set','03/out'], scores:[55,58,60,57,62,64] },
+  '9b':   { labels:['08/ago','22/ago','05/set','19/set','26/set','03/out'], scores:[67,68,65,70,72,69] },
+  '1ema': { labels:['10/ago','24/ago','07/set','21/set','28/set','05/out'], scores:[74,76,78,75,80,82] },
+  '1emb': { labels:['10/ago','24/ago','07/set','21/set','28/set','05/out'], scores:[55,52,50,54,58,56] },
+};
+const HOME_EVOL_NAMES = {
+  '8a':'8º ano A','8b':'8º ano B','9a':'9º ano A','9b':'9º ano B','1ema':'1º EM A','1emb':'1º EM B'
+};
+
+function renderHomeEvolChart() {
   const canvas = document.getElementById('homeChartEvolucao');
   if (!canvas) return;
-  if (homeEvolucaoChart) { homeEvolucaoChart.destroy(); homeEvolucaoChart = null; }
-  const labels = DATA.evolucao.map(p => p.label);
-  const scores = DATA.evolucao.map(p => p.score);
+  const sel    = document.getElementById('homeEvolTurmaSelect');
+  const key    = (sel && sel.value) ? sel.value : '8a';
+  const d      = HOME_EVOL_DATA[key] || HOME_EVOL_DATA['8a'];
+  const sub    = document.getElementById('homeEvolSubtitle');
+  if (sub) sub.textContent = 'Desempenho médio por atividade — 3º Trimestre · ' + (HOME_EVOL_NAMES[key] || '');
+  const labels   = d.labels;
+  const scores   = d.scores;
   const ptColors = scores.map(s => s < 70 ? '#F04438' : '#2177FF');
+  if (homeEvolucaoChart) { homeEvolucaoChart.destroy(); homeEvolucaoChart = null; }
   homeEvolucaoChart = new Chart(canvas, {
     type: 'line',
     data: {
@@ -3419,10 +3544,10 @@ function renderHomeSkills() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y + '%' } } },
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => ctx.parsed.y + '%' } } },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#8A95B2' } },
-        y: { min: 0, max: 100, grid: { color: '#EDF0F5' }, ticks: { font: { size: 11 }, color: '#8A95B2', callback: v => v + '%' } }
+        x: { grid:{display:false}, ticks:{ font:{size:11}, color:'#8A95B2' } },
+        y: { min:0, max:100, grid:{color:'#EDF0F5'}, ticks:{ font:{size:11}, color:'#8A95B2', callback: v => v+'%' } }
       }
     }
   });
