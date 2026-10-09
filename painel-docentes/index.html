@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -1234,6 +1234,51 @@
   .kpi-trend.up   { color: var(--success-ink); }
   .kpi-trend.down { color: var(--error-ink);   }
 
+  /* ─── KPI BAND (home compact strip) ─── */
+  .kpi-band { display:flex; background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); overflow:hidden; margin-bottom:0; }
+  .kpi-stat { flex:1; padding:12px 16px; border-right:1px solid var(--outline-2); display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .kpi-stat:last-child { border-right:none; }
+  .kpi-stat-value { font-size:22px; font-weight:700; color:var(--text-900); line-height:1.1; }
+  .kpi-stat-value.alert { color:var(--error-ink,#C53030); }
+  .kpi-stat-label { font-size:11px; font-weight:600; color:var(--text-500); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi-stat-trend { font-size:11px; color:var(--text-300); }
+
+  /* ─── ATT-ITEM (richer home attention panel items) ─── */
+  .att-item { display:flex; align-items:flex-start; gap:10px; padding:10px 4px; border-bottom:1px solid var(--outline-2); cursor:pointer; transition:background .1s; border-radius:var(--r-xs); }
+  .att-item:last-child { border-bottom:none; }
+  .att-item:hover { background:var(--bg); }
+  .att-item-avatar { flex-shrink:0; width:32px; height:32px; border-radius:var(--r-full); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+  .att-item-body { flex:1; min-width:0; }
+  .att-item-header { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:2px; }
+  .att-item-name { font-size:13px; font-weight:600; color:var(--text-900); white-space:nowrap; }
+  .att-item-reason { font-size:12px; color:var(--text-500); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ─── TURMA SUMMARY (diagnostic natural-language card) ─── */
+  .turma-summary { background:var(--bg); border:1px solid var(--outline); border-left:3px solid var(--outline); border-radius:var(--r-lg); padding:14px 18px; margin-bottom:20px; }
+  .turma-summary.critical { border-left-color:var(--error-ink,#C53030); }
+  .turma-summary-text { font-size:13px; color:var(--text-700); line-height:1.65; margin:0; }
+
+  /* ─── ANALYTICS TOGGLE (home collapsible section) ─── */
+  .analytics-toggle-btn { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--surface); border:1px solid var(--outline); border-radius:var(--r-lg); font-size:13px; font-weight:500; color:var(--text-500); cursor:pointer; width:100%; transition:background .12s,color .12s; margin-top:20px; margin-bottom:0; }
+  .analytics-toggle-btn:hover { background:var(--bg); color:var(--text-700); }
+  .analytics-toggle-btn .toggle-chevron { margin-left:auto; font-size:11px; transition:transform .18s; }
+  .analytics-toggle-btn.open .toggle-chevron { transform:rotate(180deg); }
+  .analytics-section { display:none; }
+  .analytics-section.open { display:block; padding-top:20px; }
+
+  /* ─── SKILL ROW OK (adequate skills, muted) ─── */
+  .skill-row-ok .skill-name { color:var(--text-300); }
+  .skill-row-ok .skill-pct  { color:var(--text-300) !important; }
+
+  /* ─── RESPONSIVE: kpi-band on narrow screens ─── */
+  @media (max-width:600px) {
+    .kpi-band { flex-wrap:wrap; }
+    .kpi-stat { flex:0 0 50%; border-bottom:1px solid var(--outline-2); }
+    .kpi-stat:nth-child(odd)  { border-right:1px solid var(--outline-2); }
+    .kpi-stat:nth-child(3), .kpi-stat:nth-child(4) { border-bottom:none; }
+    .att-item-reason { white-space:normal; }
+  }
+
   </style>
 </head>
 <body>
@@ -1358,73 +1403,27 @@
         </div>
 
         <!-- ══ VIEW: VISÃO GERAL (HOME multi-turma) ══ -->
+        <!-- ══ VIEW: VISÃO GERAL (HOME multi-turma) ══ -->
         <div id="view-visao-geral">
 
-          <!-- KPIs consolidados (todas as turmas) -->
+          <!-- 1. KPI compact band -->
           <div class="section">
-            <div class="kpi-grid" id="homeKpiGrid"></div>
+            <div id="homeKpiGrid"></div>
           </div>
 
-          <!-- Dashboard: two-column layout -->
+          <!-- 2. Two-column: LEFT = Minhas turmas | RIGHT = Precisam de atenção -->
           <div class="home-two-col">
 
-            <!-- LEFT: Minhas turmas → Conteúdos e Habilidades → Evolução da Turma -->
             <div class="home-left-col">
-
-              <!-- 1. Minhas turmas -->
               <div class="section">
                 <div class="section-header" style="margin-bottom:14px">
                   <div class="section-label" style="margin:0">Minhas turmas</div>
                 </div>
                 <div class="turmas-grid" id="turmasGrid"></div>
               </div>
+            </div>
 
-              <!-- 2. Conteúdos e Habilidades -->
-              <div class="card">
-                <div class="card-header"><div>
-                  <div class="card-title">Conteúdos e Habilidades</div>
-                  <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
-                </div></div>
-                <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Cr&iacute;tico &lt;50%</span>
-                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50&ndash;65%</span>
-                  <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado &ge;65%</span>
-                </div>
-                <div id="homeSkillsList"></div>
-              </div>
-
-              <!-- 3. Evolução da Turma -->
-              <div class="card">
-                <div class="card-header" style="flex-wrap:wrap;gap:10px;align-items:flex-start">
-                  <div style="flex:1;min-width:0">
-                    <div class="card-title">Evolução da Turma</div>
-                    <div class="card-subtitle" id="homeEvolSubtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre</div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0">
-                    <select id="homeEvolTurmaSelect" class="sort-btn" style="height:32px;padding:0 10px;font-size:12px;cursor:pointer;font-family:var(--font)" onchange="renderHomeEvolChart()">
-                      <option value="8a">8&ordm; ano A</option>
-                      <option value="8b">8&ordm; ano B</option>
-                      <option value="9a">9&ordm; ano A</option>
-                      <option value="9b">9&ordm; ano B</option>
-                      <option value="1ema">1&ordm; EM A</option>
-                      <option value="1emb">1&ordm; EM B</option>
-                    </select>
-                    <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300)">
-                      <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
-                      <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
-                <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
-              </div>
-
-            </div><!-- /home-left-col -->
-
-            <!-- RIGHT: Precisam de atenção → Atividades recentes -->
             <div class="home-right-col">
-
-              <!-- 1. Precisam de atenção -->
               <div id="homeAttentionSection">
                 <div class="section-header" style="margin-bottom:14px">
                   <div class="section-label" style="margin:0">Precisam de atenção</div>
@@ -1436,16 +1435,63 @@
                   <div id="homeAttentionList"></div>
                 </div>
               </div>
-
-              <!-- 2. Atividades recentes -->
-              <div class="section">
-                <div class="section-label">Atividades recentes &middot; 8&ordm; ano A</div>
-                <div id="homeActivitiesList"></div>
-              </div>
-
-            </div><!-- /home-right-col -->
+            </div>
 
           </div><!-- /home-two-col -->
+
+          <!-- 3. Analytics section: hidden by default, revealed by toggle -->
+          <button id="analyticsToggleBtn" class="analytics-toggle-btn" onclick="toggleHomeAnalytics()" aria-expanded="false" aria-controls="homeAnalyticsSection">
+            <i class="pi pi-chart-bar" style="font-size:13px"></i>
+            Análises e evolução
+            <i class="pi pi-chevron-down toggle-chevron"></i>
+          </button>
+          <div id="homeAnalyticsSection" class="analytics-section">
+
+            <div class="section">
+              <div class="section-label">Atividades recentes &middot; 8&ordm; ano A</div>
+              <div id="homeActivitiesList"></div>
+            </div>
+
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header"><div>
+                <div class="card-title">Conteúdos e Habilidades</div>
+                <div class="card-subtitle">Clique em uma habilidade para ver o detalhamento</div>
+              </div></div>
+              <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--error);border-radius:50%;display:inline-block"></span>Cr&iacute;tico &lt;50%</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--warning);border-radius:50%;display:inline-block"></span>Parcial 50&ndash;65%</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-300)"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block"></span>Adequado &ge;65%</span>
+              </div>
+              <div id="homeSkillsList"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header" style="flex-wrap:wrap;gap:10px;align-items:flex-start">
+                <div style="flex:1;min-width:0">
+                  <div class="card-title">Evolução da Turma</div>
+                  <div class="card-subtitle" id="homeEvolSubtitle">Desempenho médio por atividade &mdash; 3&ordm; Trimestre</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0">
+                  <select id="homeEvolTurmaSelect" class="sort-btn" style="height:32px;padding:0 10px;font-size:12px;cursor:pointer;font-family:var(--font)" onchange="renderHomeEvolChart()">
+                    <option value="8a">8&ordm; ano A</option>
+                    <option value="8b">8&ordm; ano B</option>
+                    <option value="9a">9&ordm; ano A</option>
+                    <option value="9b">9&ordm; ano B</option>
+                    <option value="1ema">1&ordm; EM A</option>
+                    <option value="1emb">1&ordm; EM B</option>
+                  </select>
+                  <div style="display:flex;gap:14px;font-size:11px;color:var(--text-300)">
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--brand);border-radius:2px;display:inline-block"></span>Desempenho</span>
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--outline);display:inline-block"></span>Meta 70%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-scroll-wrap"><div style="position:relative;height:210px;min-width:320px" role="img" aria-label="Grafico de evolucao da turma"><canvas id="homeChartEvolucao"></canvas></div></div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-300);text-align:center"><i class="pi pi-info-circle" style="font-size:10px;margin-right:3px"></i>Ponto vermelho indica atividade com resultado abaixo do esperado</div>
+            </div>
+
+          </div><!-- /homeAnalyticsSection -->
+
         </div><!-- /view-visao-geral -->
 
         <!-- ══ VIEW: TURMA DETALHE (visão de uma turma específica) ══ -->
@@ -1453,6 +1499,8 @@
 
           <!-- Back button + contexto da turma (renderizado via JS) -->
           <div id="turmaDetalheHeader"></div>
+          <!-- Diagnóstico natural-language (renderizado via JS) -->
+          <div id="turmaSummaryContainer"></div>
 
           <!-- KPIs (por turma) -->
           <div class="section">
@@ -1831,10 +1879,12 @@ function renderSignal() {
 
 /* ─── RENDER: Skills ─── */
 function renderSkills() {
-  document.getElementById('skillsList').innerHTML = DATA.habilidades.map(h => {
-    const ativIdx = SKILLS_LABEL.indexOf(h.nome);
-    return `<div class="skill-row" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
-
+  const sorted = DATA.habilidades.slice().sort((a, b) => a.dominio - b.dominio);
+  document.getElementById('skillsList').innerHTML = sorted.map(h => {
+    const isOk     = h.dominio >= 65;
+    const rowClass = isOk ? 'skill-row skill-row-ok' : 'skill-row';
+    const ativIdx  = SKILLS_LABEL.indexOf(h.nome);
+    return `<div class="${rowClass}" style="cursor:pointer;border-radius:var(--r-xs);padding:8px 4px;margin:-2px;transition:background .12s"
          onclick="goToSkill(${ativIdx})" title="Ver detalhes de ${h.nome}">
       <span class="skill-name">${h.nome}</span>
       <div class="skill-bar-wrap"><div class="pbar-wrap"><div class="pbar-fill ${domCls(h.dominio)}" style="width:${h.dominio}%"></div></div></div>
@@ -2489,6 +2539,29 @@ function switchEscolaOpt(id, label, el) {
   switchEscola(id);
 }
 
+function buildStudentDiagnostic(e, al, est, difs) {
+  const firstName = e.nome.split(' ')[0];
+  let text = '';
+  if (e.tend === 'queda')
+    text = firstName + ' apresenta queda de desempenho nas últimas atividades.';
+  else if (e.tend === 'baixo')
+    text = firstName + ' mantém desempenho abaixo da média de forma persistente.';
+  else if (e.tend === 'inativo')
+    text = firstName + ' não entregou as últimas atividades.';
+  else if (e.tend === 'melhorando')
+    text = firstName + ' está em evolução, com melhora contínua.';
+  else if (e.tend === 'recuperou')
+    text = firstName + ' recuperou o desempenho após um resultado atípico.';
+  else
+    text = firstName + ' mantém desempenho estável.';
+  const vsClassDiff = e.media - DATA.kpis.desempenhoMedio;
+  if (Math.abs(vsClassDiff) > 2)
+    text += ' Média pessoal de ' + e.media + '%, ' + (vsClassDiff > 0 ? 'acima' : 'abaixo') + ' da média da turma (' + DATA.kpis.desempenhoMedio + '%).';
+  if (difs && difs.length > 0)
+    text += ' Dificuldades identificadas: ' + difs.slice(0, 2).join(', ') + '.';
+  return text;
+}
+
 /* ─── renderProfile ─── */
 function renderProfile() {
   if (!currentProfileId) return;
@@ -2636,8 +2709,12 @@ function renderProfile() {
     </div>`).join('');
 
   /* ── Montar página ── */
+  // Build diagnostic summary
+  const diagTxt = buildStudentDiagnostic(e, al, est, difs);
+  const isCritical = est.id === 'atencao' || e.tend === 'baixo' || e.tend === 'inativo';
+  const diagnosticHtml = '<div class="turma-summary' + (isCritical ? ' critical' : '') + '"><p class="turma-summary-text">' + diagTxt + '</p></div>';
   document.getElementById('profileContent').innerHTML = `
-    ${bannerHtml}
+    ${diagnosticHtml}${bannerHtml}
     <div class="grid-5-4 section">
       <div class="card">
         <div class="card-header">
@@ -3211,30 +3288,33 @@ function renderHomeKPIs() {
   const el = document.getElementById('homeKpiGrid');
   if (!el) return;
   const k = getAggregatedKPIs();
-  const avgAnterior = Math.round(TURMAS.reduce((s,t) => s + t.desempenhoAnterior*t.estudantes, 0) / k.totalEst);
+  const avgAnterior = Math.round(
+    TURMAS.reduce((s,t) => s + t.desempenhoAnterior * t.estudantes, 0) / k.totalEst
+  );
   const diff = k.avgDesemp - avgAnterior;
-  const tDir = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
-  el.innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Estudantes acompanhados</div>
-      <div class="kpi-value">${k.totalEst}</div>
-      <div class="kpi-sub">${TURMAS.length} turmas na escola selecionada</div>
+  const trendTxt = (diff > 0 ? '↗ +' : diff < 0 ? '↘ ' : '→ ') + Math.abs(diff) + 'pp vs. período anterior';
+  el.innerHTML = `<div class="kpi-band">
+    <div class="kpi-stat">
+      <div class="kpi-stat-label">Desempenho médio</div>
+      <div class="kpi-stat-value">${k.avgDesemp}%</div>
+      <div class="kpi-stat-trend">${trendTxt}</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Desempenho médio geral</div>
-      <div class="kpi-value ${k.avgDesemp>=70?'':'medium'}">${k.avgDesemp}%</div>
-      <div class="kpi-trend ${tDir}"><i class="pi pi-trending-${diff>=0?'up':'down'}" style="font-size:11px"></i>${(diff>0?'+':'')+diff}pp vs. período anterior</div>
+    <div class="kpi-stat">
+      <div class="kpi-stat-label">Estudantes</div>
+      <div class="kpi-stat-value">${k.totalEst}</div>
+      <div class="kpi-stat-trend">${TURMAS.length} turmas</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Turmas com atenção</div>
-      <div class="kpi-value ${k.turmasProblema>2?'low':''}">${k.turmasProblema}</div>
-      <div class="kpi-sub">${Math.round(k.turmasProblema/TURMAS.length*100)}% das turmas · queda ou abaixo de 65%</div>
+    <div class="kpi-stat">
+      <div class="kpi-stat-label">Turmas em atenção</div>
+      <div class="kpi-stat-value">${k.turmasProblema}</div>
+      <div class="kpi-stat-trend">queda ou abaixo de 65%</div>
     </div>
-    <div class="kpi-card kpi-card-clickable" onclick="document.getElementById('homeAttentionSection').scrollIntoView({behavior:'smooth'})">
-      <div class="kpi-label">Estudantes em atenção</div>
-      <div class="kpi-value low">${k.totalAlerts}</div>
-      <div class="kpi-sub">${Math.round(k.totalAlerts/k.totalEst*100)}% do total · todas as turmas</div>
-    </div>`;
+    <div class="kpi-stat" style="cursor:pointer" onclick="document.getElementById('homeAttentionSection').scrollIntoView({behavior:'smooth'})">
+      <div class="kpi-stat-label">Estudantes em atenção</div>
+      <div class="kpi-stat-value ${k.totalAlerts > 0 ? 'alert' : ''}">${k.totalAlerts}</div>
+      <div class="kpi-stat-trend">${Math.round(k.totalAlerts / k.totalEst * 100)}% do total · todas as turmas</div>
+    </div>
+  </div>`;
 }
 
 function renderTurmaCards() {
@@ -3297,6 +3377,31 @@ function openTurmaDetalhe(turmaId) {
   setView('turma-detalhe', null);
 }
 
+function buildTurmaDiagnostic(turma) {
+  const perf  = turma.desempenhoMedio;
+  const prev  = turma.desempenhoAnterior;
+  const diff  = perf - prev;
+  const skill = turma.habilidadeCritica;
+
+  const state = perf >= 70 ? 'está bem'
+              : perf >= 55 ? 'está estável'
+              : 'está abaixo do esperado';
+
+  const trend = diff > 3  ? ', com tendência de melhora'
+              : diff < -3 ? ', com queda recente'
+              : '';
+
+  const alertText = turma.alertas > 0
+    ? ' ' + turma.alertas + ' de ' + turma.estudantes + ' estudante' + (turma.alertas !== 1 ? 's precisam' : ' precisa') + ' de atenção.'
+    : '';
+
+  const skillText = (skill && perf < 70)
+    ? ' A maior dificuldade está em ' + skill + '.'
+    : '';
+
+  return 'A turma ' + state + trend + '.' + alertText + skillText;
+}
+
 function renderTurmaDetalhe() {
   const turma = TURMAS.find(t => t.id === currentTurmaId) || TURMAS[0];
   // Breadcrumb
@@ -3317,6 +3422,13 @@ function renderTurmaDetalhe() {
       <span style="font-size:13px;color:var(--text-500)">${turma.disc}</span>
       ${!turma.hasFullData ? `<span class="badge badge-info" style="font-size:11px;margin-left:auto"><i class="pi pi-info-circle" style="font-size:10px"></i> Dados de referência: 8º ano A</span>` : ''}
     </div>`;
+  // Diagnostic summary
+  const summaryContainer = document.getElementById('turmaSummaryContainer');
+  if (summaryContainer) {
+    const diagTxt    = buildTurmaDiagnostic(turma);
+    const isCrit     = turma.desempenhoMedio < 55 || turma.alertas > turma.estudantes * 0.3;
+    summaryContainer.innerHTML = '<div class="turma-summary' + (isCrit ? ' critical' : '') + '"><p class="turma-summary-text" id="turmaSummaryText">' + diagTxt + '</p></div>';
+  }
   // Atividades label
   const al = document.getElementById('turmaActivLabel');
   if (al) al.textContent = 'Atividades recentes · ' + turma.nome;
@@ -3456,29 +3568,35 @@ function renderActivitiesInto(targetId) {
 /* ─── HOME: Atenção compacta (sidebar) ─── */
 function renderHomeAttentionCompact() {
   if (!ALL_ALERTAS.length) ALL_ALERTAS = buildAllAlertas();
+  const PRIO = { 'baixo-persistente': 0, 'queda': 1, 'inativo': 2 };
   const prioritized = ALL_ALERTAS
-    .slice().sort((a,b) => {
-      const order = { 'baixo-persistente':0, 'queda':1, 'inativo':2 };
-      return (order[a.tipo]??3) - (order[b.tipo]??3);
-    }).slice(0, 6);
+    .slice()
+    .sort((a, b) => (PRIO[a.tipo] ?? 3) - (PRIO[b.tipo] ?? 3))
+    .slice(0, 6);
   const el = document.getElementById('homeAttentionList');
   if (!el) return;
   if (!prioritized.length) { el.innerHTML = renderEmptyState('sem-atencao'); return; }
-  el.innerHTML = `<div class="compact-att-list">${prioritized.map(al => {
-    const eData = al.eid ? getE(al.eid) : null;
-    const nome  = eData ? eData.nome : al.nome;
-    const init  = eData ? eData.init : al.init;
-    const colorIdx = eData ? eData.id : ((al._id||100) % 20 + 1);
-    const clickFn  = eData ? `onclick="openProfile(${eData.id})"` : `onclick="openTurmaDetalhe('${al.turmaId}')"`;
-    return `<div class="compact-att-row" ${clickFn}>
-      <div class="student-avatar" style="background:${avBgColor(colorIdx)};color:${avInkColor(colorIdx)};width:32px;height:32px;font-size:11px;font-weight:700;flex-shrink:0;border-radius:999px;display:flex;align-items:center;justify-content:center">${init}</div>
-      <div class="compact-att-info">
-        <div class="compact-att-name">${nome}</div>
-        <div class="compact-att-meta">${al.turmaNome || ''}</div>
-      </div>
-      
-    </div>`;
-  }).join('')}</div>`;
+  el.innerHTML = prioritized.map(al => {
+    const eData    = al.eid ? getE(al.eid) : null;
+    const nome     = eData ? eData.nome : al.nome;
+    const init     = eData ? eData.init : al.init;
+    const colorIdx = eData ? eData.id : ((al._id || 100) % 20 + 1);
+    const clickFn  = eData
+      ? `onclick="openProfile(${eData.id})"`
+      : `onclick="openTurmaDetalhe('${al.turmaId}')"`;
+    const reason   = al.dific.length > 62 ? al.dific.substring(0, 59) + '…' : al.dific;
+    return `<div class="att-item" ${clickFn}>` +
+      `<div class="att-item-avatar" style="background:${avBgColor(colorIdx)};color:${avInkColor(colorIdx)}">${init}</div>` +
+      `<div class="att-item-body">` +
+        `<div class="att-item-header">` +
+          `<span class="att-item-name">${nome}</span>` +
+          `<span class="turma-tag">${al.turmaNome || ''}</span>` +
+          alertBadge(al.tipo) +
+        `</div>` +
+        `<div class="att-item-reason">${reason}</div>` +
+      `</div>` +
+      `</div>`;
+  }).join('');
 }
 
 /* ─── HOME: Skills / Evolução (analytics) ─── */
@@ -3551,6 +3669,24 @@ function renderHomeEvolChart() {
       }
     }
   });
+}
+
+function toggleHomeAnalytics() {
+  const btn = document.getElementById('analyticsToggleBtn');
+  const sec = document.getElementById('homeAnalyticsSection');
+  if (!btn || !sec) return;
+  const isOpen = sec.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  if (isOpen) {
+    setTimeout(() => {
+      if (homeEvolucaoChart) {
+        homeEvolucaoChart.resize();
+      } else {
+        renderHomeSkills();
+      }
+    }, 50);
+  }
 }
 
 function initHome() {
